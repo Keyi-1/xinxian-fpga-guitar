@@ -42,4 +42,9 @@
 `define SLIDE_TIME_MS        20
 `define RETRIGGER_DEAD_MS    25
 
+//正弦查找表配置
+`define SINE_LUT_ADDR_BITS  10
+`define SINE_LUT_SIZE       1024
+`define SINE_LUT_VALUE_BITS 16
+
 `endif
