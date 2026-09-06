@@ -7,6 +7,11 @@ gowin/.cache/
 *.log
 *.jou
 
+# Gowin generated directories at any nesting level
+**/impl/
+**/temp/
+**/.cache/
+
 # ModelSim generated files
 sim/modelsim/work/
 sim/modelsim/transcript
