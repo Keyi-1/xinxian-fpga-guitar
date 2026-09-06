@@ -1,5 +1,6 @@
+`include "../config/guitar_config.vh"
 module xinxian_top #(
-    parameter integer CLK_HZ   = 50000000,
+    parameter integer CLK_HZ   = `SYSTEM_CLK_HZ,
     parameter integer BLINK_HZ = 1
 ) (
     input  wire sys_clk_50m,
