@@ -1,0 +1,22 @@
+# Gowin generated files
+build/
+gowin/impl/
+gowin/temp/
+gowin/.cache/
+*.rpt
+*.log
+*.jou
+
+# ModelSim generated files
+sim/modelsim/work/
+sim/modelsim/transcript
+*.wlf
+*.vcd
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Local IDE and user settings
+.vscode/
+*.gprj.user
