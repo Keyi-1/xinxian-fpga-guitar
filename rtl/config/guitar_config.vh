@@ -1,5 +1,6 @@
 `ifndef XINXIAN_GUITAR_CONFIG_VH
 `define XINXIAN_GUITAR_CONFIG_VH
+`define AUDIO_SAMPLE_DIV 256
 
 //包括矩阵扫描、去抖、滑音和再触发参数，后续需要调参
 // Build modes
