@@ -48,4 +48,12 @@
 `define SINE_LUT_SIZE       1024
 `define SINE_LUT_VALUE_BITS 16
 
+//增加包络设置：MINIMAL阶段初始参数
+`define ENV_LEVEL_BITS       16
+`define ENV_FULL_SCALE       32767
+`define ENV_SUSTAIN_LEVEL    24576
+`define ENV_ATTACK_SAMPLES   4
+`define ENV_DECAY_SAMPLES    8
+`define ENV_RELEASE_SAMPLES  8
+
 `endif
