@@ -56,4 +56,8 @@
 `define ENV_DECAY_SAMPLES    8
 `define ENV_RELEASE_SAMPLES  8
 
+//PT8211 DAC配置
+`define PT8211_REF_DIV          4
+`define PT8211_BITS_PER_FRAME   32
+
 `endif
