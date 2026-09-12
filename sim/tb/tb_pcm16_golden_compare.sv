@@ -24,6 +24,7 @@ module tb_pcm16_golden_compare;
     integer sample_index;
     integer mismatch_count;
     integer wait_cycles;
+    integer export_file;
 
     voice_audio_core #(
         .SAMPLE_DIV(4)
@@ -96,6 +97,8 @@ module tb_pcm16_golden_compare;
                 end
             end
 
+            $fwrite(export_file, "%04h\n", pcm16);
+
             if (pcm16 !== golden_pcm16[index]) begin
                 $display(
                     "MISMATCH index=%0d rtl=%0d golden=%0d",
@@ -128,6 +131,16 @@ module tb_pcm16_golden_compare;
         sample_index   = 0;
         mismatch_count = 0;
 
+        export_file = $fopen(
+            "../vectors/rtl_voice_e4_pcm16.mem",
+            "w"
+        );
+
+        if (export_file == 0) begin
+            $display("FAIL: cannot open RTL PCM export file");
+            $finish;
+        end
+
         repeat (3) @(posedge clk_audio_ref);
         rst_n = 1'b1;
 
@@ -146,6 +159,8 @@ module tb_pcm16_golden_compare;
              sample_index = sample_index + 1) begin
             compare_next_sample(sample_index);
         end
+
+        $fclose(export_file);
 
         if (mismatch_count != 0) begin
             $display(
