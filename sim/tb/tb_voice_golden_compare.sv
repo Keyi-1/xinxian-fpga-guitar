@@ -61,36 +61,43 @@ module tb_voice_golden_compare;
     endtask
 
     task compare_next_sample;
-        input integer index;
-        begin
-            wait_cycles = 0;
+    input integer index;
+    begin
+        wait_cycles = 0;
 
-            while (sample_valid !== 1'b1) begin
-                @(posedge clk_audio_ref);
-                #1;
+        // 等待当前 sample_valid 脉冲结束
+        while (sample_valid === 1'b1) begin
+            @(posedge clk_audio_ref);
+            #1;
+        end
 
-                wait_cycles = wait_cycles + 1;
+        // 等待下一个新的 sample_valid 脉冲
+        while (sample_valid !== 1'b1) begin
+            @(posedge clk_audio_ref);
+            #1;
 
-                if (wait_cycles > 20) begin
-                    $display(
-                        "FAIL: timeout waiting sample index=%0d",
-                        index
-                    );
-                    $finish;
-                end
-            end
+            wait_cycles = wait_cycles + 1;
 
-            if (pcm_out !== golden_pcm24[index]) begin
+            if (wait_cycles > 20) begin
                 $display(
-                    "MISMATCH index=%0d rtl=%0d golden=%0d",
-                    index,
-                    pcm_out,
-                    golden_pcm24[index]
+                    "FAIL: timeout waiting sample index=%0d",
+                    index
                 );
-                mismatch_count = mismatch_count + 1;
+                $finish;
             end
         end
-    endtask
+
+        if (pcm_out !== golden_pcm24[index]) begin
+            $display(
+                "MISMATCH index=%0d rtl=%0d golden=%0d",
+                index,
+                pcm_out,
+                golden_pcm24[index]
+            );
+            mismatch_count = mismatch_count + 1;
+        end
+    end
+endtask
 
     initial begin
         $readmemh("../../sim/vectors/voice_e4_pcm24.mem", golden_pcm24);
