@@ -12,6 +12,9 @@ module tb_matrix_scanner;
     wire        frame_valid;
     wire [31:0] fret_mask;
     wire [15:0] fret_id;
+    wire        stable_valid;
+    wire [31:0] stable_fret_mask;
+    wire [15:0] stable_fret_id;
 
     // Diode-isolated matrix model: only the selected row contributes to
     // the column input. A pressed key pulls its column low.
@@ -32,7 +35,10 @@ module tb_matrix_scanner;
         .row_drive_n (row_drive_n),
         .frame_valid (frame_valid),
         .fret_mask   (fret_mask),
-        .fret_id     (fret_id)
+        .fret_id     (fret_id),
+        .stable_valid(stable_valid),
+        .stable_fret_mask(stable_fret_mask),
+        .stable_fret_id(stable_fret_id)
     );
 
     always #5 clk = ~clk;

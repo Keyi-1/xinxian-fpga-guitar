@@ -7,7 +7,8 @@
 
 module matrix_scanner #(
     parameter integer CLK_DIV        = 4,
-    parameter integer SETTLE_CYCLES  = 1
+    parameter integer SETTLE_CYCLES  = 1,
+    parameter integer DEBOUNCE_FRAMES = 2
 ) (
     input  wire        clk,
     input  wire        rst_n,
@@ -18,16 +19,33 @@ module matrix_scanner #(
 
     output reg         frame_valid,
     output reg [31:0]  fret_mask,
-    output reg [15:0]  fret_id
+    output reg [15:0]  fret_id,
+
+    output reg         stable_valid,
+    output reg [31:0]  stable_fret_mask,
+    output reg [15:0]  stable_fret_id
 );
 
     reg [31:0] work_mask;
     reg [1:0]  row_index;
     reg [31:0] div_count;
     reg [31:0] settle_count;
+    reg [31:0] candidate_mask;
+    reg [31:0] candidate_count;
 
     wire [7:0] col_pressed;
     assign col_pressed = ~col_in_n;
+
+    wire [31:0] frame_mask_next;
+    wire [15:0] frame_id_next;
+
+    assign frame_mask_next = {col_pressed, work_mask[23:0]};
+    assign frame_id_next = {
+        highest_fret(col_pressed),
+        highest_fret(work_mask[23:16]),
+        highest_fret(work_mask[15:8]),
+        highest_fret(work_mask[7:0])
+    };
 
     function [3:0] highest_fret;
         input [7:0] mask;
@@ -64,12 +82,18 @@ module matrix_scanner #(
             row_index   <= 2'd0;
             div_count   <= 32'd0;
             settle_count<= 32'd0;
+            candidate_mask <= 32'd0;
+            candidate_count <= 32'd0;
             frame_valid <= 1'b0;
             fret_mask   <= 32'd0;
             fret_id     <= 16'd0;
+            stable_valid <= 1'b0;
+            stable_fret_mask <= 32'd0;
+            stable_fret_id <= 16'd0;
         end
         else begin
             frame_valid <= 1'b0;
+            stable_valid <= 1'b0;
 
             if (div_count < CLK_DIV - 1) begin
                 div_count <= div_count + 1;
@@ -101,17 +125,35 @@ module matrix_scanner #(
 
                             // Commit the complete frame, including the
                             // row captured in this clock cycle.
-                            fret_mask[7:0]   <= work_mask[7:0];
-                            fret_mask[15:8]  <= work_mask[15:8];
-                            fret_mask[23:16] <= work_mask[23:16];
-                            fret_mask[31:24] <= col_pressed;
-
-                            fret_id[3:0]   <= highest_fret(work_mask[7:0]);
-                            fret_id[7:4]   <= highest_fret(work_mask[15:8]);
-                            fret_id[11:8]  <= highest_fret(work_mask[23:16]);
-                            fret_id[15:12] <= highest_fret(col_pressed);
+                            fret_mask <= frame_mask_next;
+                            fret_id   <= frame_id_next;
 
                             frame_valid <= 1'b1;
+
+                            // A state must appear in consecutive complete
+                            // frames before it becomes stable. Raw outputs
+                            // above remain available for diagnostics.
+                            if (candidate_mask == frame_mask_next) begin
+                                if (candidate_count < DEBOUNCE_FRAMES) begin
+                                    candidate_count <= candidate_count + 1;
+
+                                    if ((candidate_count + 1) >= DEBOUNCE_FRAMES) begin
+                                        stable_fret_mask <= frame_mask_next;
+                                        stable_fret_id   <= frame_id_next;
+                                        stable_valid     <= 1'b1;
+                                    end
+                                end
+                            end
+                            else begin
+                                candidate_mask  <= frame_mask_next;
+                                candidate_count <= 32'd1;
+
+                                if (DEBOUNCE_FRAMES <= 1) begin
+                                    stable_fret_mask <= frame_mask_next;
+                                    stable_fret_id   <= frame_id_next;
+                                    stable_valid     <= 1'b1;
+                                end
+                            end
                         end
 
                         default: begin
