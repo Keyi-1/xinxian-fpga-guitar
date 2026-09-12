@@ -68,7 +68,7 @@ module voice_audio_core #(
 
             if (nco_sample_valid) begin
                 // Q1.15 包络增益乘以 16-bit 正弦样本
-                pcm_out <= pcm_product >>> 15;
+                pcm_out <= pcm_product >>> 7;
             end
         end
     end

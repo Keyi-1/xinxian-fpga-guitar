@@ -11,7 +11,7 @@ from gen_voice_golden import (
 )
 
 
-VECTOR_LENGTH = 48000
+VECTOR_LENGTH = 48800
 NOTE_OFF_INDEX = 36000
 
 
@@ -66,7 +66,7 @@ def main() -> None:
             note_off=note_off,
         )
 
-        pcm24 = (nco_sample * env_level) >> 15
+        pcm24 = (nco_sample * env_level) >> 7
 
         if pcm24 < 0:
             magnitude = -pcm24

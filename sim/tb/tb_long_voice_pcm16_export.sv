@@ -138,7 +138,7 @@ module tb_long_voice_pcm16_export;
 
         // 输出 Release 阶段样本
         for (sample_index = 36000;
-             sample_index < 48000;
+             sample_index < 48800;
              sample_index = sample_index + 1) begin
             export_next_sample;
         end
@@ -146,7 +146,7 @@ module tb_long_voice_pcm16_export;
         $fclose(export_file);
 
         $display(
-            "PASS: exported long RTL PCM16 samples=48000"
+            "PASS: exported long RTL PCM16 samples=48800"
         );
         $finish;
     end
