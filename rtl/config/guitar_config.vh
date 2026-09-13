@@ -41,6 +41,7 @@
 `define MATRIX_SCAN_HZ       1000
 `define DEBOUNCE_SCANS       3
 `define SLIDE_TIME_MS        20
+`define SLIDE_SAMPLES        960
 `define RETRIGGER_DEAD_MS    25
 
 //正弦查找表配置
