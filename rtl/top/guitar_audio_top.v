@@ -10,7 +10,8 @@ module guitar_audio_top #(
     parameter integer PT8211_REF_DIV         = `PT8211_REF_DIV,
     parameter integer SLIDE_SAMPLES           = `SLIDE_SAMPLES,
     parameter integer ADC_SPI_CLK_DIV         = `ADC_SPI_CLK_DIV,
-    parameter integer ADC_DEAD_SAMPLES        = `RETRIGGER_DEAD_SAMPLES
+    parameter integer ADC_DEAD_SAMPLES        = `RETRIGGER_DEAD_SAMPLES,
+    parameter integer USE_HARMONIC            = 0
 ) (
     input  wire        sys_clk_50m,
     input  wire        audio_clk_12m288,
@@ -100,35 +101,39 @@ module guitar_audio_top #(
         .dst_velocity_level(velocity_level_audio)
     );
 
-    four_string_audio_chain #(
-        .SAMPLE_DIV   (SAMPLE_DIV),
-        .REF_DIV      (PT8211_REF_DIV),
-        .SLIDE_SAMPLES(SLIDE_SAMPLES)
-    ) u_four_string_audio_chain (
-        .clk_audio_ref       (audio_clk_12m288),
-        .rst_n               (rst_n),
-        .stable_valid        (stable_valid_audio),
-        .stable_fret_id      (stable_fret_id_audio),
-        .pluck_valid         (pluck_valid_audio),
-        .velocity_level      (velocity_level_audio),
-        .note_on             (),
-        .note_off            (),
-        .slide_valid         (),
-        .control_voice_active(),
-        .current_fret_id     (),
-        .target_phase_inc    (),
-        .phase_inc           (),
-        .slide_busy          (),
-        .sample_tick         (),
-        .pcm_mix_valid       (),
-        .pcm_mix             (),
-        .audio_voice_active  (audio_voice_active),
-        .voice_pcm           (),
-        .pcm16_valid         (),
-        .pcm16_out           (),
-        .dac_bclk            (dac_bclk),
-        .dac_lrck            (dac_lrck),
-        .dac_din             (dac_din)
-    );
+    generate
+        if (USE_HARMONIC == 0) begin : u_sine_audio_path
+            four_string_audio_chain #(
+                .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV),
+                .SLIDE_SAMPLES(SLIDE_SAMPLES)
+            ) u_four_string_audio_chain (
+                .clk_audio_ref(audio_clk_12m288), .rst_n(rst_n),
+                .stable_valid(stable_valid_audio), .stable_fret_id(stable_fret_id_audio),
+                .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level_audio),
+                .note_on(), .note_off(), .slide_valid(), .control_voice_active(),
+                .current_fret_id(), .target_phase_inc(), .phase_inc(), .slide_busy(),
+                .sample_tick(), .pcm_mix_valid(), .pcm_mix(),
+                .audio_voice_active(audio_voice_active), .voice_pcm(),
+                .pcm16_valid(), .pcm16_out(), .dac_bclk(dac_bclk),
+                .dac_lrck(dac_lrck), .dac_din(dac_din)
+            );
+        end
+        else begin : u_harmonic_audio_path
+            four_string_harmonic_audio_chain #(
+                .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV),
+                .SLIDE_SAMPLES(SLIDE_SAMPLES)
+            ) u_four_string_harmonic_audio_chain (
+                .clk_audio_ref(audio_clk_12m288), .rst_n(rst_n),
+                .stable_valid(stable_valid_audio), .stable_fret_id(stable_fret_id_audio),
+                .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level_audio),
+                .note_on(), .note_off(), .slide_valid(), .control_voice_active(),
+                .current_fret_id(), .target_phase_inc(), .phase_inc(), .slide_busy(),
+                .sample_tick(), .pcm_mix_valid(), .pcm_mix(),
+                .audio_voice_active(audio_voice_active), .voice_pcm(),
+                .pcm16_valid(), .pcm16_out(), .dac_bclk(dac_bclk),
+                .dac_lrck(dac_lrck), .dac_din(dac_din)
+            );
+        end
+    endgenerate
 
 endmodule
