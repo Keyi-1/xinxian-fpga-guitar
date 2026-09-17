@@ -9,6 +9,7 @@ module four_voice_audio_output #(
     input  wire          rst_n,
     input  wire [3:0]    note_on,
     input  wire [3:0]    note_off,
+    input  wire [7:0]    velocity_level,
     input  wire [127:0]  phase_inc,
 
     output wire          sample_tick,
@@ -31,6 +32,7 @@ module four_voice_audio_output #(
         .rst_n        (rst_n),
         .note_on      (note_on),
         .note_off     (note_off),
+        .velocity_level(velocity_level),
         .phase_inc    (phase_inc),
         .sample_tick  (sample_tick),
         .sample_valid (pcm_mix_valid),

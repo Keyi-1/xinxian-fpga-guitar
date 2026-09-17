@@ -7,6 +7,7 @@ module voice_audio_core #(
     input  wire                                  rst_n,
     input  wire                                  note_on,
     input  wire                                  note_off,
+    input  wire [1:0]                            velocity_level,
     input  wire [`PHASE_ACC_BITS-1:0]            phase_inc,
 
     output wire                                  sample_tick,
@@ -51,6 +52,7 @@ module voice_audio_core #(
         .sample_ce (sample_tick),
         .note_on   (note_on),
         .note_off  (note_off),
+        .velocity_level(velocity_level),
         .env_level (envelope_level),
         .active    (envelope_active)
     );

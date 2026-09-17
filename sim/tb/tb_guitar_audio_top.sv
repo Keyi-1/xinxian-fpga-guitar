@@ -234,6 +234,25 @@ module tb_guitar_audio_top;
             $display("FAIL: ADC velocity levels=%h", velocity_level);
             $finish;
         end
+        if ((dut.u_four_string_audio_chain.u_four_voice_audio_output
+                .u_four_voice_audio_core.u_voice0.u_voice_envelope.attack_target !== 16'd12288) ||
+            (dut.u_four_string_audio_chain.u_four_voice_audio_output
+                .u_four_voice_audio_core.u_voice1.u_voice_envelope.attack_target !== 16'd16384) ||
+            (dut.u_four_string_audio_chain.u_four_voice_audio_output
+                .u_four_voice_audio_core.u_voice2.u_voice_envelope.attack_target !== 16'd24576) ||
+            (dut.u_four_string_audio_chain.u_four_voice_audio_output
+                .u_four_voice_audio_core.u_voice3.u_voice_envelope.attack_target !== 16'd32767)) begin
+            $display("FAIL: ADC velocity attack targets %0d %0d %0d %0d",
+                     dut.u_four_string_audio_chain.u_four_voice_audio_output
+                         .u_four_voice_audio_core.u_voice0.u_voice_envelope.attack_target,
+                     dut.u_four_string_audio_chain.u_four_voice_audio_output
+                         .u_four_voice_audio_core.u_voice1.u_voice_envelope.attack_target,
+                     dut.u_four_string_audio_chain.u_four_voice_audio_output
+                         .u_four_voice_audio_core.u_voice2.u_voice_envelope.attack_target,
+                     dut.u_four_string_audio_chain.u_four_voice_audio_output
+                         .u_four_voice_audio_core.u_voice3.u_voice_envelope.attack_target);
+            $finish;
+        end
 
         // Releasing string 2 enters Release but preserves other voices.
         pressed = 32'h40000201;

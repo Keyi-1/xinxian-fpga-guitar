@@ -11,6 +11,7 @@ module four_string_audio_chain #(
     input  wire         stable_valid,
     input  wire [15:0]  stable_fret_id,
     input  wire [3:0]   pluck_valid,
+    input  wire [7:0]   velocity_level,
 
     output wire [3:0]   note_on,
     output wire [3:0]   note_off,
@@ -61,6 +62,7 @@ module four_string_audio_chain #(
         .rst_n        (rst_n),
         .note_on      (note_on),
         .note_off     (note_off),
+        .velocity_level(velocity_level),
         .phase_inc    (phase_inc),
         .sample_tick  (sample_tick),
         .pcm_mix_valid(pcm_mix_valid),

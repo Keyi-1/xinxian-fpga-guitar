@@ -31,6 +31,7 @@ module tb_long_voice_pcm16_export;
         .rst_n        (rst_n),
         .note_on      (note_on),
         .note_off     (note_off),
+        .velocity_level(2'd3),
         .phase_inc    (phase_inc),
         .sample_tick  (sample_tick),
         .sample_valid (pcm24_valid),

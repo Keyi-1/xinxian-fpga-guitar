@@ -37,6 +37,7 @@ module tb_four_string_audio_output_chain;
         .stable_valid        (stable_valid),
         .stable_fret_id      (stable_fret_id),
         .pluck_valid         (pluck_valid),
+        .velocity_level      (8'hFF),
         .note_on             (note_on),
         .note_off            (note_off),
         .slide_valid         (slide_valid),

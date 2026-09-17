@@ -28,6 +28,7 @@ module tb_voice_golden_compare;
         .rst_n        (rst_n),
         .note_on      (note_on),
         .note_off     (note_off),
+        .velocity_level(2'd3),
         .phase_inc    (phase_inc),
         .sample_tick  (sample_tick),
         .sample_valid (sample_valid),

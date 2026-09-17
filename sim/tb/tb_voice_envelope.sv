@@ -22,6 +22,7 @@ module tb_voice_envelope;
         .sample_ce (sample_ce),
         .note_on   (note_on),
         .note_off  (note_off),
+        .velocity_level(2'd3),
         .env_level (env_level),
         .active    (active)
     );

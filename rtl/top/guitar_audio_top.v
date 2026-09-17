@@ -41,6 +41,7 @@ module guitar_audio_top #(
     wire [15:0] stable_fret_id_audio;
     wire [3:0]  pluck_valid_sys;
     wire [3:0]  pluck_valid_audio;
+    wire [7:0]  velocity_level_audio;
 
     matrix_scanner #(
         .CLK_DIV        (MATRIX_CLK_DIV),
@@ -92,9 +93,11 @@ module guitar_audio_top #(
         .src_clk  (sys_clk_50m),
         .src_rst_n(rst_n),
         .src_event(pluck_valid_sys),
+        .src_velocity_level(velocity_level),
         .dst_clk  (audio_clk_12m288),
         .dst_rst_n(rst_n),
-        .dst_event(pluck_valid_audio)
+        .dst_event(pluck_valid_audio),
+        .dst_velocity_level(velocity_level_audio)
     );
 
     four_string_audio_chain #(
@@ -107,6 +110,7 @@ module guitar_audio_top #(
         .stable_valid        (stable_valid_audio),
         .stable_fret_id      (stable_fret_id_audio),
         .pluck_valid         (pluck_valid_audio),
+        .velocity_level      (velocity_level_audio),
         .note_on             (),
         .note_off            (),
         .slide_valid         (),

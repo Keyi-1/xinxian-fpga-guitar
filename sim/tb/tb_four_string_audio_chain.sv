@@ -54,6 +54,7 @@ module tb_four_string_audio_chain;
         .rst_n        (rst_n),
         .note_on      (note_on),
         .note_off     (note_off),
+        .velocity_level(8'hFF),
         .phase_inc    (phase_inc),
         .sample_tick  (sample_tick),
         .sample_valid (sample_valid),

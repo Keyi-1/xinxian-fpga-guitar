@@ -29,6 +29,7 @@ module tb_four_voice_audio_output;
         .rst_n        (rst_n),
         .note_on      (note_on),
         .note_off     (note_off),
+        .velocity_level(8'hFF),
         .phase_inc    (phase_inc),
         .sample_tick  (sample_tick),
         .pcm_mix_valid(pcm_mix_valid),
