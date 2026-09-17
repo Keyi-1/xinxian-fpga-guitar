@@ -8,13 +8,18 @@ module guitar_audio_top #(
     parameter integer MATRIX_DEBOUNCE_FRAMES = `DEBOUNCE_SCANS,
     parameter integer SAMPLE_DIV             = `AUDIO_SAMPLE_DIV,
     parameter integer PT8211_REF_DIV         = `PT8211_REF_DIV,
-    parameter integer SLIDE_SAMPLES           = `SLIDE_SAMPLES
+    parameter integer SLIDE_SAMPLES           = `SLIDE_SAMPLES,
+    parameter integer ADC_SPI_CLK_DIV         = `ADC_SPI_CLK_DIV,
+    parameter integer ADC_DEAD_SAMPLES        = `RETRIGGER_DEAD_SAMPLES
 ) (
     input  wire        sys_clk_50m,
     input  wire        audio_clk_12m288,
     input  wire        rst_n,
     input  wire [7:0]  fret_col_in_n,
-    input  wire [3:0]  pluck_valid_sys,
+    output wire        adc_cs_n,
+    output wire        adc_sclk,
+    output wire        adc_mosi,
+    input  wire        adc_miso,
 
     output wire [3:0]  fret_row_oe,
     output wire [3:0]  fret_row_drive_n,
@@ -24,12 +29,17 @@ module guitar_audio_top #(
 
     output wire [31:0] stable_fret_mask,
     output wire [15:0] stable_fret_id,
-    output wire [3:0]  audio_voice_active
+    output wire [3:0]  audio_voice_active,
+    output wire [7:0]  velocity_level,
+    output wire [47:0] raw_adc,
+    output wire [47:0] peak_adc,
+    output wire [31:0] event_timestamp
 );
 
     wire        stable_valid_sys;
     wire        stable_valid_audio;
     wire [15:0] stable_fret_id_audio;
+    wire [3:0]  pluck_valid_sys;
     wire [3:0]  pluck_valid_audio;
 
     matrix_scanner #(
@@ -59,6 +69,23 @@ module guitar_audio_top #(
         .dst_rst_n  (rst_n),
         .dst_valid  (stable_valid_audio),
         .dst_fret_id(stable_fret_id_audio)
+    );
+
+    mcp3208_pluck_frontend #(
+        .SPI_CLK_DIV (ADC_SPI_CLK_DIV),
+        .DEAD_SAMPLES(ADC_DEAD_SAMPLES)
+    ) u_mcp3208_pluck_frontend (
+        .clk            (sys_clk_50m),
+        .rst_n          (rst_n),
+        .adc_cs_n       (adc_cs_n),
+        .adc_sclk       (adc_sclk),
+        .adc_mosi       (adc_mosi),
+        .adc_miso       (adc_miso),
+        .pluck_valid    (pluck_valid_sys),
+        .velocity_level (velocity_level),
+        .raw_adc        (raw_adc),
+        .peak_adc       (peak_adc),
+        .event_timestamp(event_timestamp)
     );
 
     pluck_event_cdc u_pluck_event_cdc (

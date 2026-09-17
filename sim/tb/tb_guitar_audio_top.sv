@@ -6,17 +6,33 @@ module tb_guitar_audio_top;
     reg         audio_clk_12m288;
     reg         rst_n;
     reg [31:0]  pressed;
-    reg [3:0]   pluck_valid_sys;
 
     wire [7:0]  fret_col_in_n;
     wire [3:0]  fret_row_oe;
     wire [3:0]  fret_row_drive_n;
+    wire        adc_cs_n;
+    wire        adc_sclk;
+    wire        adc_mosi;
+    reg         adc_miso;
     wire        dac_bclk;
     wire        dac_lrck;
     wire        dac_din;
     wire [31:0] stable_fret_mask;
     wire [15:0] stable_fret_id;
     wire [3:0]  audio_voice_active;
+    wire [7:0]  velocity_level;
+    wire [47:0] raw_adc;
+    wire [47:0] peak_adc;
+    wire [31:0] event_timestamp;
+
+    reg [11:0] adc_value0;
+    reg [11:0] adc_value1;
+    reg [11:0] adc_value2;
+    reg [11:0] adc_value3;
+    reg [4:0]  adc_command;
+    reg [2:0]  adc_channel;
+    reg [11:0] adc_selected_data;
+    integer    adc_rising_count;
 
     // Diode-isolated active-low matrix model.
     assign fret_col_in_n = fret_row_oe[0] ? ~pressed[7:0]   :
@@ -31,13 +47,18 @@ module tb_guitar_audio_top;
         .MATRIX_DEBOUNCE_FRAMES(2),
         .SAMPLE_DIV            (64),
         .PT8211_REF_DIV        (1),
-        .SLIDE_SAMPLES         (4)
+        .SLIDE_SAMPLES         (4),
+        .ADC_SPI_CLK_DIV       (2),
+        .ADC_DEAD_SAMPLES      (2)
     ) dut (
         .sys_clk_50m      (sys_clk_50m),
         .audio_clk_12m288 (audio_clk_12m288),
         .rst_n            (rst_n),
         .fret_col_in_n    (fret_col_in_n),
-        .pluck_valid_sys  (pluck_valid_sys),
+        .adc_cs_n         (adc_cs_n),
+        .adc_sclk         (adc_sclk),
+        .adc_mosi         (adc_mosi),
+        .adc_miso         (adc_miso),
         .fret_row_oe      (fret_row_oe),
         .fret_row_drive_n (fret_row_drive_n),
         .dac_bclk         (dac_bclk),
@@ -45,22 +66,58 @@ module tb_guitar_audio_top;
         .dac_din          (dac_din),
         .stable_fret_mask (stable_fret_mask),
         .stable_fret_id   (stable_fret_id),
-        .audio_voice_active(audio_voice_active)
+        .audio_voice_active(audio_voice_active),
+        .velocity_level   (velocity_level),
+        .raw_adc          (raw_adc),
+        .peak_adc         (peak_adc),
+        .event_timestamp  (event_timestamp)
     );
 
     // Deliberately unrelated periods exercise both CDC paths.
     always #5 sys_clk_50m = ~sys_clk_50m;
     always #7 audio_clk_12m288 = ~audio_clk_12m288;
 
-    task pulse_pluck_sys;
-        input [3:0] value;
+    function [11:0] adc_value_for_channel;
+        input [2:0] channel;
         begin
-            @(negedge sys_clk_50m);
-            pluck_valid_sys = value;
-            @(negedge sys_clk_50m);
-            pluck_valid_sys = 4'd0;
+            case (channel)
+                3'd0: adc_value_for_channel = adc_value0;
+                3'd1: adc_value_for_channel = adc_value1;
+                3'd2: adc_value_for_channel = adc_value2;
+                default: adc_value_for_channel = adc_value3;
+            endcase
         end
-    endtask
+    endfunction
+
+    always @(negedge adc_cs_n) begin
+        adc_command       = 5'd0;
+        adc_channel       = 3'd0;
+        adc_selected_data = 12'd0;
+        adc_rising_count  = 0;
+        adc_miso          = 1'b0;
+    end
+
+    always @(posedge adc_sclk) begin
+        if (!adc_cs_n) begin
+            if (adc_rising_count < 5)
+                adc_command[4-adc_rising_count] = adc_mosi;
+            if (adc_rising_count == 4) begin
+                adc_channel = {adc_command[2:1], adc_mosi};
+                adc_selected_data = adc_value_for_channel(
+                    {adc_command[2:1], adc_mosi});
+            end
+            adc_rising_count = adc_rising_count + 1;
+        end
+    end
+
+    always @(negedge adc_sclk) begin
+        if (!adc_cs_n) begin
+            if ((adc_rising_count >= 6) && (adc_rising_count <= 17))
+                adc_miso = adc_selected_data[17-adc_rising_count];
+            else
+                adc_miso = 1'b0;
+        end
+    end
 
     task wait_stable_fret;
         input [15:0] expected_id;
@@ -144,7 +201,15 @@ module tb_guitar_audio_top;
         audio_clk_12m288  = 1'b0;
         rst_n             = 1'b0;
         pressed           = 32'd0;
-        pluck_valid_sys   = 4'd0;
+        adc_miso          = 1'b0;
+        adc_value0        = 12'd0;
+        adc_value1        = 12'd0;
+        adc_value2        = 12'd0;
+        adc_value3        = 12'd0;
+        adc_command       = 5'd0;
+        adc_channel       = 3'd0;
+        adc_selected_data = 12'd0;
+        adc_rising_count  = 0;
         bit_count         = 0;
         frame_count       = 0;
         error_count       = 0;
@@ -159,9 +224,16 @@ module tb_guitar_audio_top;
         pressed = 32'h40080201;
         wait_stable_fret(16'h7421);
 
-        // A one-system-clock pluck pulse must cross safely into audio clock.
-        pulse_pluck_sys(4'b1111);
+        // Four MCP3208 envelope levels map to velocity levels 0 through 3.
+        adc_value0 = 12'd1200;
+        adc_value1 = 12'd1700;
+        adc_value2 = 12'd2400;
+        adc_value3 = 12'd3300;
         wait_audio_active(4'b1111);
+        if (velocity_level !== 8'hE4) begin
+            $display("FAIL: ADC velocity levels=%h", velocity_level);
+            $finish;
+        end
 
         // Releasing string 2 enters Release but preserves other voices.
         pressed = 32'h40000201;
