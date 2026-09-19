@@ -23,6 +23,7 @@ module tb_voice_envelope;
         .note_on   (note_on),
         .note_off  (note_off),
         .velocity_level(2'd3),
+        .sustain_enable(1'b0),
         .env_level (env_level),
         .active    (active)
     );

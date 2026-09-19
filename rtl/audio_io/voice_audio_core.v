@@ -53,6 +53,7 @@ module voice_audio_core #(
         .note_on   (note_on),
         .note_off  (note_off),
         .velocity_level(velocity_level),
+        .sustain_enable(1'b0),
         .env_level (envelope_level),
         .active    (envelope_active)
     );

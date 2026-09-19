@@ -25,6 +25,7 @@ module tb_four_voice_harmonic_audio_core;
         .note_on(note_on), .note_off(note_off),
         .velocity_level(velocity_level), .phase_inc(phase_inc),
         .timbre_select(1'b0),
+        .sustain_enable(1'b0),
         .sample_tick(sample_tick), .sample_valid(sample_valid),
         .pcm_mix(pcm_mix), .voice_active(voice_active),
         .voice_pcm(voice_pcm), .voice_busy(voice_busy),

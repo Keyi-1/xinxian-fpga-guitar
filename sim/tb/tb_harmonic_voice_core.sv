@@ -28,6 +28,7 @@ module tb_harmonic_voice_core;
         .velocity_level(2'd3),
         .phase_inc     (32'h01C20D2F),
         .timbre_blend  (9'd0),
+        .sustain_enable(1'b0),
         .sample_valid  (sample_valid),
         .pcm_out       (pcm_out),
         .env_level     (env_level),

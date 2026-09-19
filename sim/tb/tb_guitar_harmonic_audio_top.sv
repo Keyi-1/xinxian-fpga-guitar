@@ -43,6 +43,7 @@ module tb_guitar_harmonic_audio_top;
         .rst_n(rst_n), .fret_col_in_n(fret_col_in_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk), .adc_mosi(adc_mosi),
         .adc_miso(adc_miso), .timbre_select(1'b0), .chorus_enable(1'b0),
+        .sustain_reverb_enable(1'b0),
         .fret_row_oe(fret_row_oe),
         .fret_row_drive_n(fret_row_drive_n), .dac_bclk(dac_bclk),
         .dac_lrck(dac_lrck), .dac_din(dac_din), .stable_fret_mask(),

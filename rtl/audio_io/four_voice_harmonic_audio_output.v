@@ -15,6 +15,7 @@ module four_voice_harmonic_audio_output #(
     input  wire [127:0]  phase_inc,
     input  wire          timbre_select,
     input  wire          chorus_enable,
+    input  wire          sustain_reverb_enable,
 
     output wire          sample_tick,
     output wire          pcm_mix_valid,
@@ -27,6 +28,8 @@ module four_voice_harmonic_audio_output #(
     output wire          timbre_busy,
     output wire [8:0]    chorus_blend,
     output wire          chorus_busy,
+    output wire [8:0]    reverb_blend,
+    output wire          reverb_busy,
     output wire          pcm16_valid,
     output wire signed [15:0] pcm16_out,
     output wire          dac_bclk,
@@ -38,6 +41,8 @@ module four_voice_harmonic_audio_output #(
     wire signed [23:0]   pcm_mix_raw;
     wire                 pcm_clip_valid;
     wire signed [23:0]   pcm_clip;
+    wire                 pcm_chorus_valid;
+    wire signed [23:0]   pcm_chorus;
     reg [1:0]            rock_drive_level;
 
     four_voice_harmonic_audio_core #(
@@ -48,6 +53,7 @@ module four_voice_harmonic_audio_output #(
         .note_on(note_on), .note_off(note_off),
         .velocity_level(velocity_level), .phase_inc(phase_inc),
         .timbre_select(timbre_select),
+        .sustain_enable(sustain_reverb_enable),
         .sample_tick(sample_tick), .sample_valid(pcm_mix_raw_valid),
         .pcm_mix(pcm_mix_raw), .voice_active(voice_active),
         .voice_pcm(voice_pcm), .voice_busy(voice_busy),
@@ -87,11 +93,23 @@ module four_voice_harmonic_audio_output #(
         .sample_valid_in(pcm_clip_valid),
         .pcm_in         (pcm_clip),
         .chorus_enable  (chorus_enable),
-        .sample_valid   (pcm_mix_valid),
-        .pcm_out        (pcm_mix),
+        .sample_valid   (pcm_chorus_valid),
+        .pcm_out        (pcm_chorus),
         .effect_blend   (chorus_blend),
         .effect_busy    (chorus_busy),
         .lfo_position   ()
+    );
+
+    pcm24_reverb u_pcm24_reverb (
+        .clk            (clk_audio_ref),
+        .rst_n          (rst_n),
+        .sample_valid_in(pcm_chorus_valid),
+        .pcm_in         (pcm_chorus),
+        .reverb_enable  (sustain_reverb_enable),
+        .sample_valid   (pcm_mix_valid),
+        .pcm_out        (pcm_mix),
+        .effect_blend   (reverb_blend),
+        .effect_busy    (reverb_busy)
     );
 
     pcm24_to_16 u_pcm24_to_16 (

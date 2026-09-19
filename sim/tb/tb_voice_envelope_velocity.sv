@@ -16,21 +16,25 @@ module tb_voice_envelope_velocity;
     voice_envelope u_env0 (
         .clk(clk), .rst_n(rst_n), .sample_ce(sample_ce),
         .note_on(note_on[0]), .note_off(note_off[0]), .velocity_level(2'd0),
+        .sustain_enable(1'b0),
         .env_level(env0), .active()
     );
     voice_envelope u_env1 (
         .clk(clk), .rst_n(rst_n), .sample_ce(sample_ce),
         .note_on(note_on[1]), .note_off(note_off[1]), .velocity_level(2'd1),
+        .sustain_enable(1'b0),
         .env_level(env1), .active()
     );
     voice_envelope u_env2 (
         .clk(clk), .rst_n(rst_n), .sample_ce(sample_ce),
         .note_on(note_on[2]), .note_off(note_off[2]), .velocity_level(2'd2),
+        .sustain_enable(1'b0),
         .env_level(env2), .active()
     );
     voice_envelope u_env3 (
         .clk(clk), .rst_n(rst_n), .sample_ce(sample_ce),
         .note_on(note_on[3]), .note_off(note_off[3]), .velocity_level(2'd3),
+        .sustain_enable(1'b0),
         .env_level(env3), .active()
     );
 

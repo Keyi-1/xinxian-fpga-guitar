@@ -13,6 +13,7 @@ module harmonic_voice_core #(
     input  wire [1:0]                   velocity_level,
     input  wire [`PHASE_ACC_BITS-1:0]   phase_inc,
     input  wire [8:0]                   timbre_blend,
+    input  wire                         sustain_enable,
 
     output reg                          sample_valid,
     output reg signed [23:0]            pcm_out,
@@ -67,6 +68,7 @@ module harmonic_voice_core #(
         .note_on       (note_on),
         .note_off      (note_off),
         .velocity_level(velocity_level),
+        .sustain_enable(sustain_enable),
         .env_level     (envelope_level),
         .active        (envelope_active)
     );

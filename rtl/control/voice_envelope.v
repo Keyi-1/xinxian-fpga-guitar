@@ -12,6 +12,7 @@ module voice_envelope #(
     input  wire                                  note_on,
     input  wire                                  note_off,
     input  wire [1:0]                            velocity_level,
+    input  wire                                  sustain_enable,
 
     output reg  [`ENV_LEVEL_BITS-1:0]            env_level,
     output reg                                   active
@@ -31,6 +32,7 @@ module voice_envelope #(
     reg [`ENV_LEVEL_BITS-1:0] attack_step;
     reg [`ENV_LEVEL_BITS-1:0] decay_step;
     reg [`ENV_LEVEL_BITS-1:0] release_step;
+    reg [`ENV_LEVEL_BITS-1:0] active_release_step;
 
     function [`ENV_LEVEL_BITS-1:0] velocity_attack_target;
         input [1:0] velocity;
@@ -106,6 +108,7 @@ module voice_envelope #(
             attack_step <= 0;
             decay_step <= 0;
             release_step <= 0;
+            active_release_step <= 0;
         end
         else if (sample_ce) begin
             if (note_on) begin
@@ -117,12 +120,21 @@ module voice_envelope #(
                 attack_step <= velocity_attack_step(velocity_level);
                 decay_step <= velocity_decay_step(velocity_level);
                 release_step <= velocity_release_step(velocity_level);
+                active_release_step <= velocity_release_step(velocity_level);
             end
             else if (note_off &&
                      state != STATE_IDLE &&
                      state != STATE_RELEASE) begin
                 state  <= STATE_RELEASE;
                 active <= 1'b1;
+                if (sustain_enable) begin
+                    if ((release_step >> 2) == 0)
+                        active_release_step <= 1;
+                    else
+                        active_release_step <= release_step >> 2;
+                end
+                else
+                    active_release_step <= release_step;
             end
             else begin
                 case (state)
@@ -162,13 +174,13 @@ module voice_envelope #(
                     end
 
                     STATE_RELEASE: begin
-                        if (env_level <= release_step) begin
+                        if (env_level <= active_release_step) begin
                             env_level <= 0;
                             active    <= 1'b0;
                             state     <= STATE_IDLE;
                         end
                         else begin
-                            env_level <= env_level - release_step;
+                            env_level <= env_level - active_release_step;
                             active    <= 1'b1;
                         end
                     end
