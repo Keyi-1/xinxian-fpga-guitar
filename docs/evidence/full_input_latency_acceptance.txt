@@ -1,0 +1,53 @@
+Xinxian FPGA Guitar - FULL input coverage and digital latency acceptance
+Date: 2026-09-19
+Simulator: ModelSim SE-64 10.6d
+
+1. 4x8 neck matrix exhaustive coverage
+
+Testbench: sim/tb/tb_matrix_scanner_exhaustive.sv
+
+Coverage:
+- every non-empty 8-bit fret mask (255 combinations) on each of four strings
+- all 32 individual fret positions are therefore exercised
+- highest-fret priority for every possible same-string key combination
+- simultaneous different masks on all four strings
+- one-hot row enable and active-low/high-impedance boundary intent
+
+Result:
+PASS: exhaustive 4x8 matrix positions/priority/isolation patterns=1022
+
+2. MCP3208 velocity coverage
+
+Testbench: sim/tb/tb_mcp3208_velocity_exhaustive.sv
+
+Coverage:
+- MCP3208 command and serial-data path
+- four strings x four velocity levels = 16 independent events
+- per-string hysteresis rearm and retrigger
+- one-hot event identity and monotonically increasing timestamp
+
+Result:
+PASS: MCP3208 all strings x all velocity levels events=16
+
+3. Internal real-clock latency repetition
+
+Testbench: sim/tb/tb_guitar_audio_latency.sv
+
+Coverage:
+- 50 MHz system clock and 12.288 MHz audio-reference clock
+- 48 kHz sample rate and real MCP3208 SPI divider
+- each of four strings measured eight times (32 total measurements)
+- trigger threshold crossing to first nonzero PCM16 queued for PT8211
+- sine and 32-harmonic paths checked in parallel
+- 128 consecutive PCM samples checked after every trigger
+- no harmonic scheduling deadline miss
+
+Result:
+PASS: real-clock four-string ADC-to-PT8211-queue latency measurements=32 sine_max_ns=357264 harmonic_max_ns=151698
+
+Maximum measured latency:
+- sine path: 0.357264 ms
+- 32-harmonic FULL path: 0.151698 ms
+- README internal limit: 5 ms
+
+All three simulations completed with 0 errors and 0 warnings.

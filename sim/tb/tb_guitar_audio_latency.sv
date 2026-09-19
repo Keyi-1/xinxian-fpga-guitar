@@ -7,6 +7,7 @@ module tb_guitar_audio_latency;
 
     localparam integer LATENCY_LIMIT_NS = 5000000;
     localparam integer STREAM_SAMPLES   = 128;
+    localparam integer REPEAT_ROUNDS    = 8;
 
     reg sys_clk_50m;
     reg audio_clk_12m288;
@@ -54,7 +55,9 @@ module tb_guitar_audio_latency;
         .velocity_level    (),
         .raw_adc           (),
         .peak_adc          (),
-        .event_timestamp   ()
+        .event_timestamp   (),
+        .final_pcm_valid   (),
+        .final_pcm         ()
     );
 
     guitar_audio_top #(
@@ -85,7 +88,9 @@ module tb_guitar_audio_latency;
         .velocity_level    (),
         .raw_adc           (),
         .peak_adc          (),
-        .event_timestamp   ()
+        .event_timestamp   (),
+        .final_pcm_valid   (),
+        .final_pcm         ()
     );
 
     always #10 sys_clk_50m = ~sys_clk_50m;
@@ -166,6 +171,7 @@ module tb_guitar_audio_latency;
     integer stream_interval_errors;
     time maximum_sine_latency;
     time maximum_harmonic_latency;
+    integer measurement_count;
 
     always @(posedge sys_clk_50m) begin
         #1;
@@ -334,6 +340,7 @@ module tb_guitar_audio_latency;
     endtask
 
     integer string_index;
+    integer round_index;
 
     initial begin
         sys_clk_50m = 1'b0;
@@ -356,14 +363,27 @@ module tb_guitar_audio_latency;
         stream_interval_errors = 0;
         maximum_sine_latency = 0;
         maximum_harmonic_latency = 0;
+        measurement_count = 0;
         clear_adc_values;
 
-        for (string_index = 0; string_index < 4;
-             string_index = string_index + 1)
-            measure_string(string_index);
+        for (round_index = 0; round_index < REPEAT_ROUNDS;
+             round_index = round_index + 1) begin
+            for (string_index = 0; string_index < 4;
+                 string_index = string_index + 1) begin
+                measure_string(string_index);
+                measurement_count = measurement_count + 1;
+            end
+        end
 
-        $display("PASS: real-clock four-string ADC-to-PT8211-queue latency and continuous PCM sine_max_ns=%0d harmonic_max_ns=%0d",
-                 maximum_sine_latency, maximum_harmonic_latency);
+        if (measurement_count < 30) begin
+            $display("FAIL: latency repetitions=%0d expected_at_least=30",
+                     measurement_count);
+            $fatal;
+        end
+
+        $display("PASS: real-clock four-string ADC-to-PT8211-queue latency measurements=%0d sine_max_ns=%0d harmonic_max_ns=%0d",
+                 measurement_count, maximum_sine_latency,
+                 maximum_harmonic_latency);
         $finish;
     end
 
