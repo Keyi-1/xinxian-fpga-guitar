@@ -1,0 +1,35 @@
+Xinxian FPGA Guitar - FULL real-time endurance acceptance
+Date: 2026-09-19
+Simulator: ModelSim SE-64 10.6d
+Testbench: sim/tb/tb_full_realtime_acceptance.sv
+
+Real-time parameters exercised:
+- Audio reference clock: 12.288 MHz
+- PCM sample rate: 48 kHz (divider 256)
+- PT8211 bit clock: 1.536 MHz (reference divider 4)
+- PT8211 frame rate: 48 kHz, 16-bit left + 16-bit right
+- FFT: 1024 points, 512-sample inter-frame gap
+- LCD timing: 800x480 using a 33.333 MHz pixel clock
+- Harmonic engine: four voices, 32 logical components per voice
+
+Acceptance checks:
+- 10,000 consecutive PT8211 frames, LRCK and every serial data bit checked
+- PCM-valid interval is exactly 256 audio-reference cycles
+- all four voices remain active throughout the endurance window
+- harmonic deadline_miss remains zero
+- classic/rock, chorus and sustain/reverb controls switch and settle to full blend
+- spectrum and display CDC continue updating without overrun
+- LCD renders non-black spectrum pixels
+- spectrum frame interval remains between 31 ms and 35 ms
+
+Result:
+PASS: FULL real-time 10000-frame endurance pcm=10003 spectrum=6 display=6 interval_ns=32916582..32916583
+
+Derived spectrum rate:
+- minimum: 30.3797 FPS (32.916583 ms)
+- maximum: 30.3797 FPS (32.916582 ms)
+
+ModelSim result:
+- Errors: 0
+- Warnings: 0
+- Simulated duration: 208.416255190 ms
