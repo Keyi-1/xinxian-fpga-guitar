@@ -37,7 +37,9 @@ module guitar_audio_top #(
     output wire [7:0]  velocity_level,
     output wire [47:0] raw_adc,
     output wire [47:0] peak_adc,
-    output wire [31:0] event_timestamp
+    output wire [31:0] event_timestamp,
+    output wire        final_pcm_valid,
+    output wire signed [23:0] final_pcm
 );
 
     wire        stable_valid_sys;
@@ -115,7 +117,8 @@ module guitar_audio_top #(
                 .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level_audio),
                 .note_on(), .note_off(), .slide_valid(), .control_voice_active(),
                 .current_fret_id(), .target_phase_inc(), .phase_inc(), .slide_busy(),
-                .sample_tick(), .pcm_mix_valid(), .pcm_mix(),
+                .sample_tick(), .pcm_mix_valid(final_pcm_valid),
+                .pcm_mix(final_pcm),
                 .audio_voice_active(audio_voice_active), .voice_pcm(),
                 .pcm16_valid(), .pcm16_out(), .dac_bclk(dac_bclk),
                 .dac_lrck(dac_lrck), .dac_din(dac_din)
@@ -134,7 +137,8 @@ module guitar_audio_top #(
                 .sustain_reverb_enable(sustain_reverb_enable),
                 .note_on(), .note_off(), .slide_valid(), .control_voice_active(),
                 .current_fret_id(), .target_phase_inc(), .phase_inc(), .slide_busy(),
-                .sample_tick(), .pcm_mix_valid(), .pcm_mix(),
+                .sample_tick(), .pcm_mix_valid(final_pcm_valid),
+                .pcm_mix(final_pcm),
                 .audio_voice_active(audio_voice_active), .voice_pcm(),
                 .timbre_blend(), .timbre_busy(),
                 .chorus_blend(), .chorus_busy(),
