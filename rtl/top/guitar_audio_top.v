@@ -22,6 +22,7 @@ module guitar_audio_top #(
     output wire        adc_mosi,
     input  wire        adc_miso,
     input  wire        timbre_select,
+    input  wire        chorus_enable,
 
     output wire [3:0]  fret_row_oe,
     output wire [3:0]  fret_row_drive_n,
@@ -128,11 +129,13 @@ module guitar_audio_top #(
                 .stable_valid(stable_valid_audio), .stable_fret_id(stable_fret_id_audio),
                 .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level_audio),
                 .timbre_select(timbre_select),
+                .chorus_enable(chorus_enable),
                 .note_on(), .note_off(), .slide_valid(), .control_voice_active(),
                 .current_fret_id(), .target_phase_inc(), .phase_inc(), .slide_busy(),
                 .sample_tick(), .pcm_mix_valid(), .pcm_mix(),
                 .audio_voice_active(audio_voice_active), .voice_pcm(),
                 .timbre_blend(), .timbre_busy(),
+                .chorus_blend(), .chorus_busy(),
                 .pcm16_valid(), .pcm16_out(), .dac_bclk(dac_bclk),
                 .dac_lrck(dac_lrck), .dac_din(dac_din)
             );

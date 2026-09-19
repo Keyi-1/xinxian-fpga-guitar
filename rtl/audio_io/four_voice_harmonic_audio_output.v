@@ -14,6 +14,7 @@ module four_voice_harmonic_audio_output #(
     input  wire [7:0]    velocity_level,
     input  wire [127:0]  phase_inc,
     input  wire          timbre_select,
+    input  wire          chorus_enable,
 
     output wire          sample_tick,
     output wire          pcm_mix_valid,
@@ -24,6 +25,8 @@ module four_voice_harmonic_audio_output #(
     output wire [3:0]    deadline_miss,
     output wire [8:0]    timbre_blend,
     output wire          timbre_busy,
+    output wire [8:0]    chorus_blend,
+    output wire          chorus_busy,
     output wire          pcm16_valid,
     output wire signed [15:0] pcm16_out,
     output wire          dac_bclk,
@@ -33,6 +36,8 @@ module four_voice_harmonic_audio_output #(
 
     wire                 pcm_mix_raw_valid;
     wire signed [23:0]   pcm_mix_raw;
+    wire                 pcm_clip_valid;
+    wire signed [23:0]   pcm_clip;
     reg [1:0]            rock_drive_level;
 
     four_voice_harmonic_audio_core #(
@@ -72,8 +77,21 @@ module four_voice_harmonic_audio_output #(
         .pcm_in         (pcm_mix_raw),
         .drive_level    (rock_drive_level),
         .timbre_blend   (timbre_blend),
+        .sample_valid   (pcm_clip_valid),
+        .pcm_out        (pcm_clip)
+    );
+
+    pcm24_chorus u_pcm24_chorus (
+        .clk            (clk_audio_ref),
+        .rst_n          (rst_n),
+        .sample_valid_in(pcm_clip_valid),
+        .pcm_in         (pcm_clip),
+        .chorus_enable  (chorus_enable),
         .sample_valid   (pcm_mix_valid),
-        .pcm_out        (pcm_mix)
+        .pcm_out        (pcm_mix),
+        .effect_blend   (chorus_blend),
+        .effect_busy    (chorus_busy),
+        .lfo_position   ()
     );
 
     pcm24_to_16 u_pcm24_to_16 (

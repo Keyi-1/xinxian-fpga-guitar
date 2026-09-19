@@ -31,11 +31,13 @@ module tb_four_voice_harmonic_audio_output;
         .clk_audio_ref(clk_audio_ref), .rst_n(rst_n),
         .note_on(note_on), .note_off(note_off), .velocity_level(8'hFF),
         .phase_inc(phase_inc), .timbre_select(timbre_select),
+        .chorus_enable(1'b0),
         .sample_tick(sample_tick),
         .pcm_mix_valid(pcm_mix_valid), .pcm_mix(pcm_mix),
         .voice_active(voice_active), .voice_pcm(voice_pcm),
         .voice_busy(voice_busy), .deadline_miss(deadline_miss),
         .timbre_blend(timbre_blend), .timbre_busy(timbre_busy),
+        .chorus_blend(), .chorus_busy(),
         .pcm16_valid(pcm16_valid), .pcm16_out(pcm16_out),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din)
     );
