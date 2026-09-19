@@ -4,7 +4,8 @@
 // legacy sine-only core so the production path remains selectable unchanged.
 module four_voice_harmonic_audio_core #(
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
-    parameter integer HARMONICS  = `HARMONICS_MAX
+    parameter integer HARMONICS  = `HARMONICS_MAX,
+    parameter integer TIMBRE_BLEND_SAMPLES = `TIMBRE_BLEND_SAMPLES
 ) (
     input  wire          clk_audio_ref,
     input  wire          rst_n,
@@ -12,6 +13,7 @@ module four_voice_harmonic_audio_core #(
     input  wire [3:0]    note_off,
     input  wire [7:0]    velocity_level,
     input  wire [127:0]  phase_inc,
+    input  wire          timbre_select,
 
     output wire          sample_tick,
     output wire          sample_valid,
@@ -19,7 +21,9 @@ module four_voice_harmonic_audio_core #(
     output wire [3:0]    voice_active,
     output wire signed [95:0] voice_pcm,
     output wire [3:0]    voice_busy,
-    output wire [3:0]    deadline_miss
+    output wire [3:0]    deadline_miss,
+    output wire [8:0]    timbre_blend,
+    output wire          timbre_busy
 );
 
     wire sample_tick_i;
@@ -79,10 +83,22 @@ module four_voice_harmonic_audio_core #(
         .sample_tick  (sample_tick_i)
     );
 
+    timbre_blend_smoother #(
+        .BLEND_SAMPLES(TIMBRE_BLEND_SAMPLES)
+    ) u_timbre_blend_smoother (
+        .clk           (clk_audio_ref),
+        .rst_n         (rst_n),
+        .sample_ce     (sample_tick_i),
+        .timbre_select (timbre_select),
+        .blend         (timbre_blend),
+        .busy          (timbre_busy)
+    );
+
     harmonic_voice_core #(.HARMONICS(HARMONICS)) u_voice0 (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[0]), .note_off(delivered_note_off[0]),
         .velocity_level(velocity_level[1:0]), .phase_inc(phase_inc[31:0]),
+        .timbre_blend(timbre_blend),
         .sample_valid(sample_valid0), .pcm_out(pcm0), .env_level(),
         .active(active0), .busy(busy0), .deadline_miss(deadline_miss0)
     );
@@ -91,6 +107,7 @@ module four_voice_harmonic_audio_core #(
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[1]), .note_off(delivered_note_off[1]),
         .velocity_level(velocity_level[3:2]), .phase_inc(phase_inc[63:32]),
+        .timbre_blend(timbre_blend),
         .sample_valid(sample_valid1), .pcm_out(pcm1), .env_level(),
         .active(active1), .busy(busy1), .deadline_miss(deadline_miss1)
     );
@@ -99,6 +116,7 @@ module four_voice_harmonic_audio_core #(
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[2]), .note_off(delivered_note_off[2]),
         .velocity_level(velocity_level[5:4]), .phase_inc(phase_inc[95:64]),
+        .timbre_blend(timbre_blend),
         .sample_valid(sample_valid2), .pcm_out(pcm2), .env_level(),
         .active(active2), .busy(busy2), .deadline_miss(deadline_miss2)
     );
@@ -107,6 +125,7 @@ module four_voice_harmonic_audio_core #(
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[3]), .note_off(delivered_note_off[3]),
         .velocity_level(velocity_level[7:6]), .phase_inc(phase_inc[127:96]),
+        .timbre_blend(timbre_blend),
         .sample_valid(sample_valid3), .pcm_out(pcm3), .env_level(),
         .active(active3), .busy(busy3), .deadline_miss(deadline_miss3)
     );

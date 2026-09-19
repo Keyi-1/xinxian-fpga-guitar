@@ -59,6 +59,7 @@ module tb_guitar_audio_top;
         .adc_sclk         (adc_sclk),
         .adc_mosi         (adc_mosi),
         .adc_miso         (adc_miso),
+        .timbre_select    (1'b0),
         .fret_row_oe      (fret_row_oe),
         .fret_row_drive_n (fret_row_drive_n),
         .dac_bclk         (dac_bclk),

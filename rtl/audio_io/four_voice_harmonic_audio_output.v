@@ -13,6 +13,7 @@ module four_voice_harmonic_audio_output #(
     input  wire [3:0]    note_off,
     input  wire [7:0]    velocity_level,
     input  wire [127:0]  phase_inc,
+    input  wire          timbre_select,
 
     output wire          sample_tick,
     output wire          pcm_mix_valid,
@@ -21,6 +22,8 @@ module four_voice_harmonic_audio_output #(
     output wire signed [95:0] voice_pcm,
     output wire [3:0]    voice_busy,
     output wire [3:0]    deadline_miss,
+    output wire [8:0]    timbre_blend,
+    output wire          timbre_busy,
     output wire          pcm16_valid,
     output wire signed [15:0] pcm16_out,
     output wire          dac_bclk,
@@ -35,10 +38,12 @@ module four_voice_harmonic_audio_output #(
         .clk_audio_ref(clk_audio_ref), .rst_n(rst_n),
         .note_on(note_on), .note_off(note_off),
         .velocity_level(velocity_level), .phase_inc(phase_inc),
+        .timbre_select(timbre_select),
         .sample_tick(sample_tick), .sample_valid(pcm_mix_valid),
         .pcm_mix(pcm_mix), .voice_active(voice_active),
         .voice_pcm(voice_pcm), .voice_busy(voice_busy),
-        .deadline_miss(deadline_miss)
+        .deadline_miss(deadline_miss), .timbre_blend(timbre_blend),
+        .timbre_busy(timbre_busy)
     );
 
     pcm24_to_16 u_pcm24_to_16 (

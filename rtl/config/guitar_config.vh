@@ -22,6 +22,7 @@
 `define VOICE_COUNT       4
 `define HARMONICS_MAX     32
 `define PHASE_ACC_BITS 32
+`define TIMBRE_BLEND_SAMPLES 256
 
 // Left-hand matrix
 `define FRET_STRINGS      4

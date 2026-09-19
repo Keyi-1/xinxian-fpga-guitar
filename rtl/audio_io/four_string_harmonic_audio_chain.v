@@ -15,6 +15,7 @@ module four_string_harmonic_audio_chain #(
     input  wire [15:0]  stable_fret_id,
     input  wire [3:0]   pluck_valid,
     input  wire [7:0]   velocity_level,
+    input  wire         timbre_select,
     output wire [3:0]   note_on,
     output wire [3:0]   note_off,
     output wire [3:0]   slide_valid,
@@ -28,6 +29,8 @@ module four_string_harmonic_audio_chain #(
     output wire signed [23:0] pcm_mix,
     output wire [3:0]   audio_voice_active,
     output wire signed [95:0] voice_pcm,
+    output wire [8:0]   timbre_blend,
+    output wire         timbre_busy,
     output wire         pcm16_valid,
     output wire signed [15:0] pcm16_out,
     output wire         dac_bclk,
@@ -49,10 +52,12 @@ module four_string_harmonic_audio_chain #(
     ) u_four_voice_harmonic_audio_output (
         .clk_audio_ref(clk_audio_ref), .rst_n(rst_n),
         .note_on(note_on), .note_off(note_off), .velocity_level(velocity_level),
-        .phase_inc(phase_inc), .sample_tick(sample_tick),
+        .phase_inc(phase_inc), .timbre_select(timbre_select),
+        .sample_tick(sample_tick),
         .pcm_mix_valid(pcm_mix_valid), .pcm_mix(pcm_mix),
         .voice_active(audio_voice_active), .voice_pcm(voice_pcm),
-        .voice_busy(), .deadline_miss(), .pcm16_valid(pcm16_valid),
+        .voice_busy(), .deadline_miss(), .timbre_blend(timbre_blend),
+        .timbre_busy(timbre_busy), .pcm16_valid(pcm16_valid),
         .pcm16_out(pcm16_out), .dac_bclk(dac_bclk), .dac_lrck(dac_lrck),
         .dac_din(dac_din)
     );

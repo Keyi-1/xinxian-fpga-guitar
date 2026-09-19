@@ -24,10 +24,11 @@ module tb_four_voice_harmonic_audio_core;
         .clk_audio_ref(clk), .rst_n(rst_n),
         .note_on(note_on), .note_off(note_off),
         .velocity_level(velocity_level), .phase_inc(phase_inc),
+        .timbre_select(1'b0),
         .sample_tick(sample_tick), .sample_valid(sample_valid),
         .pcm_mix(pcm_mix), .voice_active(voice_active),
         .voice_pcm(voice_pcm), .voice_busy(voice_busy),
-        .deadline_miss(deadline_miss)
+        .deadline_miss(deadline_miss), .timbre_blend(), .timbre_busy()
     );
 
     always #5 clk = ~clk;
