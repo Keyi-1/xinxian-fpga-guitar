@@ -31,6 +31,10 @@ module four_voice_harmonic_audio_output #(
     output wire          dac_din
 );
 
+    wire                 pcm_mix_raw_valid;
+    wire signed [23:0]   pcm_mix_raw;
+    reg [1:0]            rock_drive_level;
+
     four_voice_harmonic_audio_core #(
         .SAMPLE_DIV(SAMPLE_DIV),
         .HARMONICS (HARMONICS)
@@ -39,11 +43,37 @@ module four_voice_harmonic_audio_output #(
         .note_on(note_on), .note_off(note_off),
         .velocity_level(velocity_level), .phase_inc(phase_inc),
         .timbre_select(timbre_select),
-        .sample_tick(sample_tick), .sample_valid(pcm_mix_valid),
-        .pcm_mix(pcm_mix), .voice_active(voice_active),
+        .sample_tick(sample_tick), .sample_valid(pcm_mix_raw_valid),
+        .pcm_mix(pcm_mix_raw), .voice_active(voice_active),
         .voice_pcm(voice_pcm), .voice_busy(voice_busy),
         .deadline_miss(deadline_miss), .timbre_blend(timbre_blend),
         .timbre_busy(timbre_busy)
+    );
+
+    always @* begin
+        rock_drive_level = 2'd0;
+        if (voice_active[0])
+            rock_drive_level = velocity_level[1:0];
+        if (voice_active[1] &&
+            (velocity_level[3:2] > rock_drive_level))
+            rock_drive_level = velocity_level[3:2];
+        if (voice_active[2] &&
+            (velocity_level[5:4] > rock_drive_level))
+            rock_drive_level = velocity_level[5:4];
+        if (voice_active[3] &&
+            (velocity_level[7:6] > rock_drive_level))
+            rock_drive_level = velocity_level[7:6];
+    end
+
+    pcm24_rock_soft_clip u_pcm24_rock_soft_clip (
+        .clk            (clk_audio_ref),
+        .rst_n          (rst_n),
+        .sample_valid_in(pcm_mix_raw_valid),
+        .pcm_in         (pcm_mix_raw),
+        .drive_level    (rock_drive_level),
+        .timbre_blend   (timbre_blend),
+        .sample_valid   (pcm_mix_valid),
+        .pcm_out        (pcm_mix)
     );
 
     pcm24_to_16 u_pcm24_to_16 (

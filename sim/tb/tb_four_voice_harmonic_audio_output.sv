@@ -6,6 +6,7 @@ module tb_four_voice_harmonic_audio_output;
     reg rst_n;
     reg [3:0] note_on;
     reg [3:0] note_off;
+    reg timbre_select;
     reg [127:0] phase_inc;
     wire sample_tick;
     wire pcm_mix_valid;
@@ -14,6 +15,8 @@ module tb_four_voice_harmonic_audio_output;
     wire signed [95:0] voice_pcm;
     wire [3:0] voice_busy;
     wire [3:0] deadline_miss;
+    wire [8:0] timbre_blend;
+    wire timbre_busy;
     wire pcm16_valid;
     wire signed [15:0] pcm16_out;
     wire dac_bclk;
@@ -27,12 +30,12 @@ module tb_four_voice_harmonic_audio_output;
     ) dut (
         .clk_audio_ref(clk_audio_ref), .rst_n(rst_n),
         .note_on(note_on), .note_off(note_off), .velocity_level(8'hFF),
-        .phase_inc(phase_inc), .timbre_select(1'b0),
+        .phase_inc(phase_inc), .timbre_select(timbre_select),
         .sample_tick(sample_tick),
         .pcm_mix_valid(pcm_mix_valid), .pcm_mix(pcm_mix),
         .voice_active(voice_active), .voice_pcm(voice_pcm),
         .voice_busy(voice_busy), .deadline_miss(deadline_miss),
-        .timbre_blend(), .timbre_busy(),
+        .timbre_blend(timbre_blend), .timbre_busy(timbre_busy),
         .pcm16_valid(pcm16_valid), .pcm16_out(pcm16_out),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din)
     );
@@ -67,6 +70,7 @@ module tb_four_voice_harmonic_audio_output;
     integer frame_count;
     integer error_count;
     integer nonzero_frame_count;
+    integer clipped_sample_count;
     reg [15:0] expected_left;
     reg [15:0] expected_right;
 
@@ -74,6 +78,13 @@ module tb_four_voice_harmonic_audio_output;
         #1;
         if (pcm16_out !== pcm24_to_16_reference(pcm_mix))
             error_count = error_count + 1;
+    end
+
+    always @(posedge pcm_mix_valid) begin
+        #1;
+        if ((timbre_blend == 9'd256) &&
+            (pcm_mix !== dut.pcm_mix_raw))
+            clipped_sample_count = clipped_sample_count + 1;
     end
 
     always @(posedge dac_bclk) begin
@@ -106,12 +117,14 @@ module tb_four_voice_harmonic_audio_output;
         rst_n = 1'b0;
         note_on = 4'd0;
         note_off = 4'd0;
+        timbre_select = 1'b0;
         phase_inc = {32'h00C879A3, 32'h010B9A2B,
                      32'h0151285D, 32'h01C20D2F};
         bit_count = 0;
         frame_count = 0;
         error_count = 0;
         nonzero_frame_count = 0;
+        clipped_sample_count = 0;
         expected_left = 16'd0;
         expected_right = 16'd0;
 
@@ -121,6 +134,11 @@ module tb_four_voice_harmonic_audio_output;
         note_on = 4'b1111;
         @(negedge clk_audio_ref);
         note_on = 4'd0;
+
+        wait (frame_count >= 100);
+        @(negedge clk_audio_ref);
+        timbre_select = 1'b1;
+        wait (timbre_blend == 9'd256);
 
         wait (frame_count >= 2000);
         #1;
@@ -141,9 +159,14 @@ module tb_four_voice_harmonic_audio_output;
             $display("FAIL: harmonic output produced only zero PT8211 frames");
             $finish;
         end
+        if (timbre_busy || (clipped_sample_count == 0)) begin
+            $display("FAIL: rock soft clip was not active busy=%b count=%0d",
+                     timbre_busy, clipped_sample_count);
+            $finish;
+        end
 
-        $display("PASS: four-voice harmonic PCM24 to PT8211, frames=%0d nonzero=%0d",
-                 frame_count, nonzero_frame_count);
+        $display("PASS: four-voice harmonic rock soft clip to PT8211, frames=%0d nonzero=%0d clipped=%0d",
+                 frame_count, nonzero_frame_count, clipped_sample_count);
         $finish;
     end
 
