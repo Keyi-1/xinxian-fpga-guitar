@@ -48,6 +48,16 @@ module guitar_audio_top #(
     wire [3:0]  pluck_valid_sys;
     wire [3:0]  pluck_valid_audio;
     wire [7:0]  velocity_level_audio;
+    wire        sys_rst_n;
+    wire        audio_rst_n;
+
+    reset_sync u_sys_reset_sync (
+        .clk(sys_clk_50m), .arst_n(rst_n), .srst_n(sys_rst_n)
+    );
+
+    reset_sync u_audio_reset_sync (
+        .clk(audio_clk_12m288), .arst_n(rst_n), .srst_n(audio_rst_n)
+    );
 
     matrix_scanner #(
         .CLK_DIV        (MATRIX_CLK_DIV),
@@ -55,7 +65,7 @@ module guitar_audio_top #(
         .DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES)
     ) u_matrix_scanner (
         .clk             (sys_clk_50m),
-        .rst_n           (rst_n),
+        .rst_n           (sys_rst_n),
         .col_in_n        (fret_col_in_n),
         .row_oe          (fret_row_oe),
         .row_drive_n     (fret_row_drive_n),
@@ -69,11 +79,11 @@ module guitar_audio_top #(
 
     stable_fret_cdc u_stable_fret_cdc (
         .src_clk    (sys_clk_50m),
-        .src_rst_n  (rst_n),
+        .src_rst_n  (sys_rst_n),
         .src_valid  (stable_valid_sys),
         .src_fret_id(stable_fret_id),
         .dst_clk    (audio_clk_12m288),
-        .dst_rst_n  (rst_n),
+        .dst_rst_n  (audio_rst_n),
         .dst_valid  (stable_valid_audio),
         .dst_fret_id(stable_fret_id_audio)
     );
@@ -83,7 +93,7 @@ module guitar_audio_top #(
         .DEAD_SAMPLES(ADC_DEAD_SAMPLES)
     ) u_mcp3208_pluck_frontend (
         .clk            (sys_clk_50m),
-        .rst_n          (rst_n),
+        .rst_n          (sys_rst_n),
         .adc_cs_n       (adc_cs_n),
         .adc_sclk       (adc_sclk),
         .adc_mosi       (adc_mosi),
@@ -97,11 +107,11 @@ module guitar_audio_top #(
 
     pluck_event_cdc u_pluck_event_cdc (
         .src_clk  (sys_clk_50m),
-        .src_rst_n(rst_n),
+        .src_rst_n(sys_rst_n),
         .src_event(pluck_valid_sys),
         .src_velocity_level(velocity_level),
         .dst_clk  (audio_clk_12m288),
-        .dst_rst_n(rst_n),
+        .dst_rst_n(audio_rst_n),
         .dst_event(pluck_valid_audio),
         .dst_velocity_level(velocity_level_audio)
     );
@@ -112,7 +122,7 @@ module guitar_audio_top #(
                 .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV),
                 .SLIDE_SAMPLES(SLIDE_SAMPLES)
             ) u_four_string_audio_chain (
-                .clk_audio_ref(audio_clk_12m288), .rst_n(rst_n),
+                .clk_audio_ref(audio_clk_12m288), .rst_n(audio_rst_n),
                 .stable_valid(stable_valid_audio), .stable_fret_id(stable_fret_id_audio),
                 .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level_audio),
                 .note_on(), .note_off(), .slide_valid(), .control_voice_active(),
@@ -129,7 +139,7 @@ module guitar_audio_top #(
                 .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV),
                 .SLIDE_SAMPLES(SLIDE_SAMPLES)
             ) u_four_string_harmonic_audio_chain (
-                .clk_audio_ref(audio_clk_12m288), .rst_n(rst_n),
+                .clk_audio_ref(audio_clk_12m288), .rst_n(audio_rst_n),
                 .stable_valid(stable_valid_audio), .stable_fret_id(stable_fret_id_audio),
                 .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level_audio),
                 .timbre_select(timbre_select),

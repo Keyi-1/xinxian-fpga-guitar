@@ -1,0 +1,91 @@
+Xinxian FPGA Guitar - FULL reset, implementation and timing acceptance
+Date: 2026-09-19
+Simulator: ModelSim SE-64 10.6d
+Implementation: Gowin EDA V1.9.12.03 Education
+Device: GW5AT-60B / PBG484A / Device Version B
+
+1. Reset-domain design acceptance
+
+The external active-low reset asserts asynchronously in every local clock
+domain. Each local reset deasserts only after three rising clock edges of that
+domain. No functional RTL or timing constraints were changed after the
+implementation run documented below.
+
+Dedicated test result:
+PASS: reset asynchronous assertion and three-edge synchronous release
+
+Post-change regression results:
+PASS: FULL matrix/ADC/four-voice/effects/PT8211/FFT/RGB frames=2000 spectrum=1 pixels=8558
+PASS: FULL real-time 10000-frame endurance pcm=10003 spectrum=6 display=6 interval_ns=32916582..32916583
+PASS: real-clock four-string ADC-to-PT8211-queue latency measurements=32 sine_max_ns=357448 harmonic_max_ns=151882
+PASS: NEO board wrapper tri-state/buttons/CDC/PA/LCD boundary
+PASS: PCM-to-1024FFT-to-32bars-to-RGB asynchronous display colored=74
+
+All five functional regressions and the dedicated reset test completed
+sequentially with 0 ModelSim errors and 0 warnings.
+
+2. Preserved post-reset FULL implementation
+
+Directory:
+T:\Documents\AMD\gowin_full_reset_build\impl\pnr
+
+Static timing:
+- analyzed endpoints: 35,241
+- setup violated endpoints: 0
+- hold violated endpoints: 0
+- setup TNS: 0 on every reported clock
+- hold TNS: 0 on every reported clock
+- worst setup slack: 12.995 ns
+- worst hold slack: 0.158 ns
+- sys_clk_50m Fmax: 142.758 MHz (required 50.000 MHz)
+- audio_clk_12m288 Fmax: 21.825 MHz (required 12.288 MHz)
+- pixel_clk Fmax: 132.019 MHz (required 33.333 MHz)
+
+Post-place-and-route resources:
+- Logic: 25,779 / 59,904 (44%); 22,081 LUT and 3,698 ALU
+- Register: 11,343 / 60,780 (19%); latch count 0
+- CLS: 18,985 / 29,952 (64%)
+- BSRAM: 14 / 118 (12%)
+- DSP: 40 / 118 (34%)
+- I/O: 65 / 297 (22%)
+- Primary clocks: 3 / 8
+- Long-wire clocks: 7 / 8
+
+Power is a tool estimate only: 105.893 mW total (83.563 mW quiescent,
+22.330 mW dynamic). It is not a hardware acceptance result because real I/O
+loads and measured switching activity are not yet available.
+
+Artifact SHA-256:
+- full_guitar_impl.fs:
+  00521A36E5A2ABF6C5CBF51D8C44B584FAFE6AAFA9E38D9046D7CBC47188EFF5
+- full_guitar_impl.rpt.txt:
+  F57049C5ECC7C795D80EFFE1FA813F91404E7F85322DA0F6B51389C580E33356
+- full_guitar_impl_tr_content.html:
+  112EF0793245382F0BCBBCD602243EC9369E719513431EEC1856E71CB6BC1044
+
+The implementation uses automatic pin assignment. Its .fs file proves
+logical place-and-route feasibility only and MUST NOT be programmed into
+hardware.
+
+3. NEO board-boundary synthesis check
+
+Directory:
+T:\Documents\AMD\gowin_neo_reset_synth\impl\gwsynthesis
+
+Result:
+- GowinSynthesis finished without reported errors or warnings
+- Logic: 25,646 / 59,904 (43%); 22,044 LUT and 3,602 ALU
+- Register: 11,461 / 60,780 (19%); latch count 0
+- BSRAM: 12 / 118 (11%)
+- I/O buffers: 16 IBUF, 36 OBUF and exactly 4 TBUF
+- netlist TBUF primitive count: 4
+
+Artifact SHA-256:
+- neo_full_guitar_top_syn.rpt.html:
+  1E8673710DF4D336A9D2229F068D3C57B61A8E3579362E60BDEC85C2B64EA17F
+- neo_full_guitar_top.vg:
+  ADAE5EB97224130E7AA65A24B3D403ABCE42B18F0E3577BEE95138118B3CA717
+
+This synthesis check does not authorize physical pin constraints or a board
+bitstream. The actual NEO Dock PCB revision, 60K pin map, LCD/FPC definition
+and external clock/ADC/matrix wiring must be confirmed first.

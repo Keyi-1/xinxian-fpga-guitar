@@ -43,11 +43,12 @@ Coverage:
 - no harmonic scheduling deadline miss
 
 Result:
-PASS: real-clock four-string ADC-to-PT8211-queue latency measurements=32 sine_max_ns=357264 harmonic_max_ns=151698
+PASS: real-clock four-string ADC-to-PT8211-queue latency measurements=32 sine_max_ns=357448 harmonic_max_ns=151882
 
 Maximum measured latency:
-- sine path: 0.357264 ms
-- 32-harmonic FULL path: 0.151698 ms
+- sine path: 0.357448 ms
+- 32-harmonic FULL path: 0.151882 ms
 - README internal limit: 5 ms
 
 All three simulations completed with 0 errors and 0 warnings.
+The latency figures above are the post-reset-domain-synchronization regression values.

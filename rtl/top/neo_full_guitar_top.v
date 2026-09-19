@@ -79,25 +79,39 @@ module neo_full_guitar_top #(
     wire timbre_select_audio;
     wire chorus_enable_audio;
     wire sustain_reverb_enable_audio;
+    wire sys_control_rst_n;
+    wire audio_control_rst_n;
+
+    reset_sync u_sys_control_reset_sync (
+        .clk(sys_clk_50m), .arst_n(rst_n), .srst_n(sys_control_rst_n)
+    );
+
+    reset_sync u_audio_control_reset_sync (
+        .clk(audio_clk_12m288), .arst_n(rst_n),
+        .srst_n(audio_control_rst_n)
+    );
 
     debounced_toggle #(
         .DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES)
     ) u_timbre_button (
-        .clk(sys_clk_50m), .rst_n(rst_n), .button_n(key_timbre_n),
+        .clk(sys_clk_50m), .rst_n(sys_control_rst_n),
+        .button_n(key_timbre_n),
         .toggle_state(timbre_select_sys), .pressed_pulse(timbre_pressed)
     );
 
     debounced_toggle #(
         .DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES)
     ) u_chorus_button (
-        .clk(sys_clk_50m), .rst_n(rst_n), .button_n(key_chorus_n),
+        .clk(sys_clk_50m), .rst_n(sys_control_rst_n),
+        .button_n(key_chorus_n),
         .toggle_state(chorus_enable_sys), .pressed_pulse(chorus_pressed)
     );
 
     debounced_toggle #(
         .DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES)
     ) u_sustain_button (
-        .clk(sys_clk_50m), .rst_n(rst_n), .button_n(key_sustain_n),
+        .clk(sys_clk_50m), .rst_n(sys_control_rst_n),
+        .button_n(key_sustain_n),
         .toggle_state(sustain_reverb_enable_sys),
         .pressed_pulse(sustain_pressed)
     );
@@ -105,7 +119,7 @@ module neo_full_guitar_top #(
     // The button states change only after a long debounce interval, but they
     // still cross into the audio clock domain through explicit synchronizers.
     always @(posedge audio_clk_12m288) begin
-        if (!rst_n) begin
+        if (!audio_control_rst_n) begin
             effect_sync1 <= 3'b000;
             effect_sync2 <= 3'b000;
         end

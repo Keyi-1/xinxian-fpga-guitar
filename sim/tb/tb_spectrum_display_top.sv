@@ -51,6 +51,8 @@ module tb_spectrum_display_top;
         colored_pixels = 0;
         repeat (4) @(posedge audio_clk);
         #1 rst_n = 1'b1;
+        // Allow the independent audio/pixel reset release pipelines to empty.
+        repeat (4) @(posedge audio_clk);
 
         for (n = 0; n < 1024; n = n + 1) begin
             angle = 2.0 * 3.141592653589793 * 32.0 * n / 1024.0;

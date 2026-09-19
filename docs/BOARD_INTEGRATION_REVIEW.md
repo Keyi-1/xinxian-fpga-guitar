@@ -55,15 +55,21 @@ ModelSim 通过信息：
 
 ```text
 PASS: NEO board wrapper tri-state/buttons/CDC/PA/LCD boundary
-PASS: FULL matrix/ADC/four-voice/effects/PT8211/FFT/RGB frames=2000 spectrum=1 pixels=8557
+PASS: FULL matrix/ADC/four-voice/effects/PT8211/FFT/RGB frames=2000 spectrum=1 pixels=8558
 ```
 
-Gowin 综合确认板级顶层可综合，并推断出 4 个 `TBUF`，对应四根矩阵扫描线的真实三态驱动。综合资源为：
+Gowin 综合确认板级顶层可综合，并推断出 4 个 `TBUF`，对应四根矩阵扫描线的真实三态驱动。加入各时钟域复位同步后的最新综合资源为：
 
-- Logic：25,731 / 59,904（43%）
-- Register：11,443 / 60,780（19%，Latch=0）
+- Logic：25,646 / 59,904（43%）
+- Register：11,461 / 60,780（19%，Latch=0）
 - BSRAM：12 / 118（11%）
 - I/O buffer：16 IBUF、36 OBUF、4 TBUF
+
+该综合结果保存在：
+
+```text
+T:\Documents\AMD\gowin_neo_reset_synth\impl\gwsynthesis
+```
 
 ## 5. 保留的 FULL 实现基线
 
@@ -82,6 +88,22 @@ T:\Documents\AMD\gowin_full_build\impl\pnr
 | `pixel_clk` | 33.333 MHz | 140.181 MHz |
 
 该结果使用自动引脚，只证明逻辑规模和时序可实现；对应 `.fs` 不可烧录。
+
+完成异步置位、各时钟域同步释放的复位修正后，又在独立目录完成了一次 FULL 布局布线；上述原始基线未被覆盖。最新结果保存在：
+
+```text
+T:\Documents\AMD\gowin_full_reset_build\impl\pnr
+```
+
+| 时钟域 | 要求 | 最新 Fmax |
+| --- | ---: | ---: |
+| `sys_clk_50m` | 50.000 MHz | 142.758 MHz |
+| `audio_clk_12m288` | 12.288 MHz | 21.825 MHz |
+| `pixel_clk` | 33.333 MHz | 132.019 MHz |
+
+最新实现分析 35,241 个端点，setup/hold 违例均为 0，最差 setup slack 为 12.995 ns，最差 hold slack 为 0.158 ns。资源为 Logic 25,779/59,904（44%）、Register 11,343/60,780（19%，Latch=0）、BSRAM 14/118（12%）、DSP 40/118（34%）、I/O 65/297（22%）。工具功耗估算为 105.893 mW，但在没有实测负载和活动率前不作为硬件验收数据。
+
+最新结果仍为自动引脚实现，只证明复位修正后的逻辑规模和时序可实现；对应 `.fs` 同样不可烧录。完整哈希和回归结果见 `docs/evidence/full_reset_timing_acceptance.txt`。
 
 ## 6. 下一步门槛与决定
 

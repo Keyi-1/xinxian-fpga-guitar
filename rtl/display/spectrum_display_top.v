@@ -40,17 +40,27 @@ module spectrum_display_top #(
     wire [4:0] display_read_index;
     wire [8:0] display_bar_height;
     wire [8:0] display_peak_height;
+    wire audio_rst_n;
+    wire pixel_rst_n;
+
+    reset_sync u_audio_reset_sync (
+        .clk(audio_clk), .arst_n(rst_n), .srst_n(audio_rst_n)
+    );
+
+    reset_sync u_pixel_reset_sync (
+        .clk(pixel_clk), .arst_n(rst_n), .srst_n(pixel_rst_n)
+    );
 
     spectrum_fft1024 #(
         .FRAME_GAP_SAMPLES(FFT_FRAME_GAP_SAMPLES)
     ) u_spectrum_fft1024 (
-        .clk(audio_clk), .rst_n(rst_n), .sample_valid_in(pcm_valid),
+        .clk(audio_clk), .rst_n(audio_rst_n), .sample_valid_in(pcm_valid),
         .pcm_in(pcm_in), .bin_valid(bin_valid), .bin_index(bin_index),
         .bin_magnitude(bin_magnitude), .frame_done(fft_frame_done), .busy()
     );
 
     spectrum_bars32 #(.DISPLAY_HEIGHT(V_ACTIVE)) u_spectrum_bars32 (
-        .clk(audio_clk), .rst_n(rst_n), .bin_valid(bin_valid),
+        .clk(audio_clk), .rst_n(audio_rst_n), .bin_valid(bin_valid),
         .bin_index(bin_index), .bin_magnitude(bin_magnitude),
         .frame_done(fft_frame_done), .read_index(bars_read_index),
         .bar_height_read(bars_read_height),
@@ -59,11 +69,11 @@ module spectrum_display_top #(
     );
 
     spectrum_bar_cdc u_spectrum_bar_cdc (
-        .src_clk(audio_clk), .src_rst_n(rst_n),
+        .src_clk(audio_clk), .src_rst_n(audio_rst_n),
         .src_frame_update(spectrum_frame_update),
         .src_read_index(bars_read_index), .src_bar_height(bars_read_height),
         .src_peak_height(peaks_read_height), .src_overrun(cdc_overrun),
-        .dst_clk(pixel_clk), .dst_rst_n(rst_n),
+        .dst_clk(pixel_clk), .dst_rst_n(pixel_rst_n),
         .dst_read_index(display_read_index),
         .dst_bar_height(display_bar_height),
         .dst_peak_height(display_peak_height),
@@ -76,7 +86,7 @@ module spectrum_display_top #(
         .V_SYNC(V_SYNC), .V_BACK(V_BACK), .BAR_SLOT(BAR_SLOT),
         .BAR_WIDTH(BAR_WIDTH)
     ) u_rgb_spectrum_timing (
-        .pixel_clk(pixel_clk), .rst_n(rst_n),
+        .pixel_clk(pixel_clk), .rst_n(pixel_rst_n),
         .bar_read_index(display_read_index),
         .bar_height(display_bar_height), .peak_height(display_peak_height),
         .lcd_hsync(lcd_hsync), .lcd_vsync(lcd_vsync), .lcd_de(lcd_de),

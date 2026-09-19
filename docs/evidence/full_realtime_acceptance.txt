@@ -32,4 +32,5 @@ Derived spectrum rate:
 ModelSim result:
 - Errors: 0
 - Warnings: 0
-- Simulated duration: 208.416255190 ms
+- Simulated duration: 208.416499330 ms
+- This is the post-reset-domain-synchronization regression result.
