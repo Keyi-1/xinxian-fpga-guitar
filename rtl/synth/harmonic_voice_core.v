@@ -32,8 +32,10 @@ module harmonic_voice_core #(
     reg signed [15:0] harmonic_gain [0:HARMONICS-1];
     reg signed [15:0] harmonic_gain_rock [0:HARMONICS-1];
     reg signed [15:0] harmonic_decay [0:HARMONICS-1];
+    reg signed [15:0] harmonic_decay_rock [0:HARMONICS-1];
     reg signed [15:0] harmonic_amplitude [0:HARMONICS-1];
     reg signed [15:0] harmonic_amplitude_rock [0:HARMONICS-1];
+    reg [1:0] velocity_latched;
 
     wire [`ENV_LEVEL_BITS-1:0] envelope_level;
     wire envelope_active;
@@ -59,6 +61,7 @@ module harmonic_voice_core #(
         $readmemh("../../mem/harmonic_gain_default.mem", harmonic_gain);
         $readmemh("../../mem/harmonic_gain_rock.mem", harmonic_gain_rock);
         $readmemh("../../mem/harmonic_decay_default.mem", harmonic_decay);
+        $readmemh("../../mem/harmonic_decay_rock.mem", harmonic_decay_rock);
     end
 
     voice_envelope u_voice_envelope (
@@ -88,6 +91,53 @@ module harmonic_voice_core #(
         end
     endfunction
 
+    function signed [15:0] velocity_scaled_gain;
+        input signed [15:0] gain;
+        input integer index;
+        input [1:0] velocity;
+        input rock_profile;
+        reg signed [31:0] scaled;
+        begin
+            if (index < 4) begin
+                case (velocity)
+                    2'd0: scaled = gain - (gain >>> 2);
+                    2'd1: scaled = gain - (gain >>> 3);
+                    2'd2: scaled = gain - (gain >>> 4);
+                    default: scaled = gain;
+                endcase
+            end
+            else begin
+                case (velocity)
+                    2'd0: scaled = gain >>> 2;
+                    2'd1: scaled = gain >>> 1;
+                    2'd2: scaled = rock_profile ? gain :
+                            (gain - (gain >>> 2));
+                    default: scaled = rock_profile ?
+                                      (gain + (gain >>> 2)) : gain;
+                endcase
+            end
+            if (scaled > 32767)
+                velocity_scaled_gain = 16'sh7fff;
+            else if (scaled < 0)
+                velocity_scaled_gain = 16'sd0;
+            else
+                velocity_scaled_gain = scaled[15:0];
+        end
+    endfunction
+
+    function signed [15:0] velocity_decay_coefficient;
+        input signed [15:0] base_coefficient;
+        input [1:0] velocity;
+        reg signed [16:0] adjusted;
+        begin
+            adjusted = $signed({1'b0, base_coefficient}) + velocity;
+            if (adjusted > 17'sd32767)
+                velocity_decay_coefficient = 16'sh7fff;
+            else
+                velocity_decay_coefficient = adjusted[15:0];
+        end
+    endfunction
+
     always @* begin
         harmonic_phase_wide = phase_latched * (harmonic_index + 1'b1);
         harmonic_phase = harmonic_phase_wide[`PHASE_ACC_BITS-1:0];
@@ -111,10 +161,14 @@ module harmonic_voice_core #(
         component_pcm = envelope_product >>> 7;
         accumulator_next = accumulator + component_pcm;
         decay_product = $signed(harmonic_amplitude[harmonic_index]) *
-                        $signed(harmonic_decay[harmonic_index]);
+                        $signed(velocity_decay_coefficient(
+                            harmonic_decay[harmonic_index],
+                            velocity_latched));
         decay_product_rock =
             $signed(harmonic_amplitude_rock[harmonic_index]) *
-            $signed(harmonic_decay[harmonic_index]);
+            $signed(velocity_decay_coefficient(
+                harmonic_decay_rock[harmonic_index],
+                velocity_latched));
     end
 
     always @(posedge clk) begin
@@ -127,6 +181,7 @@ module harmonic_voice_core #(
             pcm_out       <= 24'sd0;
             busy          <= 1'b0;
             deadline_miss <= 1'b0;
+            velocity_latched <= 2'd0;
             for (i = 0; i < HARMONICS; i = i + 1) begin
                 harmonic_amplitude[i] <= 16'sd0;
                 harmonic_amplitude_rock[i] <= 16'sd0;
@@ -146,10 +201,13 @@ module harmonic_voice_core #(
                     busy          <= 1'b1;
 
                     if (note_on) begin
+                        velocity_latched <= velocity_level;
                         for (i = 0; i < HARMONICS; i = i + 1) begin
-                            harmonic_amplitude[i] <= harmonic_gain[i];
+                            harmonic_amplitude[i] <= velocity_scaled_gain(
+                                harmonic_gain[i], i, velocity_level, 1'b0);
                             harmonic_amplitude_rock[i] <=
-                                harmonic_gain_rock[i];
+                                velocity_scaled_gain(harmonic_gain_rock[i], i,
+                                                     velocity_level, 1'b1);
                         end
                     end
                 end
