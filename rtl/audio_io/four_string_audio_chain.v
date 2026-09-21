@@ -4,7 +4,8 @@
 module four_string_audio_chain #(
     parameter integer SAMPLE_DIV    = `AUDIO_SAMPLE_DIV,
     parameter integer REF_DIV       = `PT8211_REF_DIV,
-    parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES
+    parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
+    parameter integer VIBRATO_EXIT_INTERVAL = `VIBRATO_EXIT_SAMPLES
 ) (
     input  wire         clk_audio_ref,
     input  wire         rst_n,
@@ -36,7 +37,8 @@ module four_string_audio_chain #(
 );
 
     four_string_voice_control #(
-        .SLIDE_SAMPLES(SLIDE_SAMPLES)
+        .SLIDE_SAMPLES(SLIDE_SAMPLES),
+        .VIBRATO_EXIT_INTERVAL(VIBRATO_EXIT_INTERVAL)
     ) u_four_string_voice_control (
         .clk             (clk_audio_ref),
         .rst_n           (rst_n),
@@ -51,7 +53,8 @@ module four_string_audio_chain #(
         .current_fret_id (current_fret_id),
         .target_phase_inc(target_phase_inc),
         .phase_inc       (phase_inc),
-        .slide_busy      (slide_busy)
+        .slide_busy      (slide_busy),
+        .vibrato_enable  ()
     );
 
     four_voice_audio_output #(

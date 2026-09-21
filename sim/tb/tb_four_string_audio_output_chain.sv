@@ -30,7 +30,8 @@ module tb_four_string_audio_output_chain;
     four_string_audio_chain #(
         .SAMPLE_DIV   (64),
         .REF_DIV      (1),
-        .SLIDE_SAMPLES(4)
+        .SLIDE_SAMPLES(4),
+        .VIBRATO_EXIT_INTERVAL(0)
     ) dut (
         .clk_audio_ref       (clk_audio_ref),
         .rst_n               (rst_n),

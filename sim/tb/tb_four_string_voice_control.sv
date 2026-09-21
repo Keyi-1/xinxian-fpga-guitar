@@ -19,7 +19,7 @@ module tb_four_string_voice_control;
     wire [3:0]   slide_busy;
 
     four_string_voice_control #(
-        .SLIDE_SAMPLES(4)
+        .SLIDE_SAMPLES(4), .VIBRATO_EXIT_INTERVAL(0)
     ) dut (
         .clk             (clk),
         .rst_n           (rst_n),

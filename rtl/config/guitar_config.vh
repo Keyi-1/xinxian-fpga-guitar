@@ -59,6 +59,17 @@
 `define SLIDE_SAMPLES        960
 `define RETRIGGER_DEAD_MS    25
 
+// Same-fret tap vibrato gesture, counted at the 48 kHz sample rate.
+// Three valid re-presses at 5..16.7 Hz enter vibrato; a final release
+// longer than 250 ms exits into the ordinary note release.
+`define VIBRATO_TAP_COUNT           3
+`define VIBRATO_MIN_TAP_SAMPLES     2880
+`define VIBRATO_MAX_TAP_SAMPLES     9600
+`define VIBRATO_EXIT_SAMPLES        12000
+`define VIBRATO_WINDOW_SAMPLES      28800
+`define VIBRATO_LFO_PHASE_INC       32'd536871
+`define VIBRATO_DEPTH_Q15           16'd380
+
 //正弦查找表配置
 `define SINE_LUT_ADDR_BITS  10
 `define SINE_LUT_SIZE       1024

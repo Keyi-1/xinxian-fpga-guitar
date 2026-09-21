@@ -29,7 +29,7 @@ module tb_four_string_audio_chain;
     wire signed [23:0] voice_pcm3 = voice_pcm[95:72];
 
     four_string_voice_control #(
-        .SLIDE_SAMPLES(4)
+        .SLIDE_SAMPLES(4), .VIBRATO_EXIT_INTERVAL(0)
     ) u_control (
         .clk             (clk),
         .rst_n           (rst_n),
