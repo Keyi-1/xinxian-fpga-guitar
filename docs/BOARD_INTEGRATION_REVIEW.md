@@ -1,30 +1,32 @@
 # Tang Mega 60K / NEO Dock 板级集成审查
 
-审查日期：2026-09-19
+审查日期：2026-09-27
 
 ## 1. 审查结论
 
-当前 `full_guitar_top` 已经覆盖产品的完整逻辑链路，但它此前仍是“逻辑顶层”，不是可直接烧录的 NEO Dock 板级顶层。现新增 `neo_full_guitar_top` 作为电气边界层，仅处理已确认的接口语义，不写入任何未经核验的物理引脚。
+当前 `full_guitar_top` 已经覆盖产品的完整逻辑链路，但它仍是“逻辑顶层”，不是可直接烧录的 NEO Dock 板级顶层。`neo_full_guitar_top` 作为电气边界层处理矩阵三态、按键、PT8211、功放和 LCD 端口语义，尚未绑定正式物理引脚。
 
-在取得实物底板版本号、LCD 模组/FPC 定义、琴颈与 MCP3208 的最终接线表之前，不应为该板级顶层创建 CST，也不应生成或烧录带自动引脚的 bitstream。
+实物底板已确认是 NEO Dock 31005。核心板因无法从底板拆下，只能确定为 30353 或 30354；两版主体定义相同，但第 6 页电源设计存在差异，因此在核心板版本确认前禁止使用 Bank 1。已新增 `docs/NEO_31005_60K_PIN_MATRIX.md` 作为正式 CST/SDC 的前置真值表。PMOD 线束、按键资源冲突和 12.288 MHz 断电重启行为审核完成前，不生成或烧录实物 bitstream。
 
 ## 2. 已确认的硬件资源
 
 - 核心器件：`GW5AT-LV60PG484AC1/I0`，Gowin 选择 `GW5AT-60B / PBG484A / Device Version B`。
-- NEO Dock 与 Tang Mega 60K/138K 共用同一系列底板外设，但不同 SOM、底板修订版与复用接口仍需用对应版本资料核验。
+- 实物 NEO Dock 修订版为 31005；Tang Mega 60K 核心板为 30353/30354 之一，暂时不能进一步确认。
 - 核心板固定 50 MHz 输入在官方 60K 示例中使用 `V22`。
 - NEO Dock 包含 PT8211、耳机/扬声器输出、3 个用户按键、并行 RGB LCD 接口、2 路差分 ADC、SD、HDMI、DDR3、USB3/CH569、以太网等资源。
 - 板载 ADC 只有 2 路差分输入，不满足四根弦的独立采样需求；外接 MCP3208 方案合理且继续保留。
-- NEO Dock 31004 音频原理图的功放控制语义为高电平关闭、低电平开启。板级输出因此使用 `pa_en_n`，并在复位及无声部活动时保持高电平静音。
-- 官方 138K 共用底板音频示例给出的 PT8211 网络候选为 `BCLK=Y17`、`LRCK=AB17`、`DIN=AA16`、`PA_EN=AB16`。这些值只作为交叉核对证据，未直接写入本项目 60K CST。
-- LCD 连接器宣称支持 RGB888，但官方示例常使用 RGB666；最终输出位宽、PCLK 极性、同步极性、背光控制和 FPC 引脚必须以实际面板和底板版本确认。
-- MS5351 的用户时钟输入脚随 NEO Dock 修订版变化，31004 与 31005+ 不同；目前不把它作为产品固定时钟源。音频继续使用外部 12.288 MHz 有源晶振，显示时钟最终由 FPGA PLL 产生。
+- NEO Dock 31005 音频原理图确认功放控制语义为高电平关闭、低电平开启。板级输出因此使用 `pa_en_n`，并在复位及无声部活动时保持高电平静音。
+- PT8211 网络已经由 31005 原理图、30353/30354 共同 BTB 定义、官方 60K CST和官方 138K 共用底板音频示例交叉确认：`BCLK=Y17`、`LRCK=AB17`、`DIN=AA16`、`PA_EN=AB16`，均为不受核心板版本差异影响的 Bank 7 3.3 V 球位。
+- NEO Dock 31005 的 J5 使用 RGB888 针脚排列，但底板只把 R2-R7、G2-G7、B2-B7 连接到 FPGA/CH569 复用总线。FPGA 可控颜色数据是 RGB666/18 bit，接口为并行 TTL/DPI RGB，不是 LVDS。
+- MS5351M 的 CLK2 通过 `USR_CLK_IN` 接入 V13。实物已经把 CLK2 设置为 12.288 MHz，并在 CLK2 对 GND 之间用示波器确认频率；仍需验证 FPGA 端接收和断电重启后的独立恢复能力。
 
 官方资料入口：
 
 - Sipeed Tang Mega 60K Wiki：<https://wiki.sipeed.com/hardware/en/tang/tang-mega-60k/mega-60k.html>
 - Sipeed 60K 示例：<https://github.com/sipeed/TangMega-60K-example>
-- Sipeed 138K 共用底板示例：<https://github.com/sipeed/TangMega-138K-example>
+- Sipeed 138K 共用底板音频说明：<https://github.com/sipeed/TangMega-138K-example/blob/main/audio_i2s/audio_i2s.md>
+- Sipeed 138K PT8211 串行器：<https://github.com/sipeed/TangMega-138K-example/blob/main/audio_i2s/eda_proj/src/audio_drive.v>
+- Sipeed 138K 音频顶层与约束：<https://github.com/sipeed/TangMega-138K-example/blob/main/audio_i2s/eda_proj/src/top.v>、<https://github.com/sipeed/TangMega-138K-example/blob/main/audio_i2s/eda_proj/src/audio.cst>
 
 ### 2.1 官方资料快照与约束可信度
 
@@ -35,37 +37,39 @@
 
 60K 官方 `pmod_led_neo` 约束可以确认：50 MHz 时钟使用 `V22/LVCMOS33`；`Y12`、`AA13`、`AB13` 是 1.5 V 上拉按键输入所用的球位集合；两组 PMOD 候选共给出 16 根 3.3 V GPIO，并且与 DVP/顶部 2×20 排针复用。不同官方示例对三枚按键使用 `rst_n`、`key0`、`key1` 的命名并不一致，因此只确认球位集合，不在本项目中猜测 KEY1/2/3 的物理对应关系。
 
-同一 60K 官方快照中，`audio_i2s/README.md` 和 `audio_sd/README.md` 仍为 `TBD`，也没有 60K 专用 PT8211 或 RGB LCD 约束可直接复用。138K 示例里的 PT8211 和 RGB666 约束只能证明共用 NEO Dock 的网络候选，不能替代 60K、实际 PCB 版本和 LCD FPC 的最终核验。
+同一 60K 官方快照中，`audio_i2s/README.md` 和 `audio_sd/README.md` 仍为 `TBD`，没有可直接复用的 60K 音频 RTL。官方 138K `audio_i2s` 示例已作为次级参考审查：它确认相同 NEO Dock 上的 PT8211/功放球位，并演示 16-bit、MSB-first、每帧 32 个 BCLK 的串行发送。该示例面向 `GW5AST-138`，使用 138K 专用 CST、内部振荡器、138K PLL 和一个甚至带有 GW2AR 器件头信息的 `CLKDIV` 包装，因此这些器件原语、时钟 IP、复位脚和工程文件不得复制到 60K 工程。
 
-MS5351 资料还存在官方来源间的不一致：60K `pmod_led_neo` 对 31005+ 的注释写 `V13`，而后续官方时钟说明写 `V10`；31004 均指向 `AB12`。在实物版本和原理图确认前，本项目不会使用其中任何一个值。
+138K 示例把 `PA_EN` 直接置 `0` 以常开功放，这与 31005 原理图的低有效语义一致，但其顶层注释写成“高电平有效”，注释与实际电路行为不一致。本项目继续以原理图为准，并保持复位/空闲时高电平静音。其简单 400 Hz 波形 ROM和串行器也不替换本项目已经通过 testbench 的 E4 `MINIMAL`、PCM16 转换和 `pt8211_tx`；只用于上板时比对 BCLK/LRCK/DIN 波形。
+
+此前不同官方页面对 MS5351 31005+ 的球位描述存在 `V13` 与 `V10` 不一致。现在以 31005 实物、31005 原理图 J2-88、两版 60K 核心板共同 BTB 定义和实际 CLK2 测量为依据，`USR_CLK_IN=V13` 已进入连接矩阵；V10 不使用。
 
 ## 3. 当前接口覆盖
 
 | 板级功能 | FULL RTL 状态 | 板级处理 | 结论 |
 | --- | --- | --- | --- |
-| 50 MHz 系统时钟 | 已使用 | 顶层输入 | 待写入经核验 CST |
-| 12.288 MHz 音频时钟 | 已使用 | 顶层输入 | 使用外部晶振，待确认接线脚 |
+| 50 MHz 系统时钟 | 已使用 | 顶层输入，V22 | 已确认，待审核后写入专用 CST |
+| 12.288 MHz 音频时钟 | 已使用 | MS5351 CLK2 -> `USR_CLK_IN` -> V13 | 频率已实测；待 FPGA 接收与断电重启验证 |
 | LCD 像素时钟 | 逻辑已使用 | 当前仍为顶层输入，输出 `lcd_pclk` 极性参数化 | 板级 PLL 尚未接入 |
-| 4×8 琴颈矩阵 | 已使用 | 四根扫描线实现低电平/高阻切换 | 待确认 12 根 GPIO |
-| MCP3208 四通道 | 已使用 | SPI 已接入 FULL 链路 | 待确认外接插座和 SPI GPIO |
-| KEY1/2/3 | 已接入 | 去抖、单次切换、2FF CDC | 对应音色/合唱/延音混响 |
-| PT8211 | 已接入 | BCLK/LRCK/DIN 输出 | 待以 60K 对应资料确认物理脚 |
+| 4×8 琴颈矩阵 | 已使用 | PMOD0 八线加 PMOD1 四线安全候选 | 待实际线束确认 |
+| MCP3208 四通道 | 已使用 | PMOD1 余下四线 SPI 安全候选 | 待实际线束确认 |
+| KEY1/2/3 | 已接入 | 三枚 Bank 9 1.5 V 用户按键 | 与独立复位合计需要四路，当前存在资源冲突 |
+| PT8211 | 已接入 | BCLK/LRCK/DIN 输出 | Y17/AB17/AA16 已确认 |
 | 功放使能 | 已接入 | 修正为低有效 `pa_en_n` | 复位和空闲时静音 |
-| RGB LCD | 已接入 | RGB888、HS/VS/DE/PCLK/BL | 位宽和面板时序待实物确认 |
+| RGB LCD | 已接入 | 内部 RGB888；未来板级只输出 `[7:2]` | 31005 物理数据为 RGB666，面板未采购，暂缓约束 |
 | 运行健康信号 | RTL 内已有 | `deadline_miss`、显示 CDC overrun、ADC/琴颈观测点未接到板级调试出口 | 上板验收前应做最小可观测性接入 |
 | DDR3/HDMI/SD/USB3/网口 | 未使用 | 无 | 首版无需求，不为提高利用率而加入 |
 
 ### 3.1 已完成逻辑但尚未完成的板级接入
 
 1. `neo_full_guitar_top` 已覆盖琴颈矩阵、MCP3208、三个功能键、PT8211、功放静音和 RGB LCD 电气边界；音频主链路本身没有待补接的功能模块。
-2. `pixel_clk` 仍从板级顶层输入，尚未实例化面向最终 LCD 时序的 Gowin PLL；这是当前最明确的板级时钟缺口。
-3. 12.288 MHz 音频参考按需求继续采用外部有源晶振，但其输入插座、3.3 V 兼容球位和布线尚未冻结。若未来考虑由 MS5351 提供，必须使用纯 HDL 配置并先解决上述版本/引脚冲突，不能依赖 MCU 运行时服务。
-4. RGB888 到 RGB666 的可选边界收窄尚未加入，因为实际连接器位宽、FPC 和面板仍未确认；现在提前加入只会固化猜测。
+2. `minimal_top.pa_en` 是高有效的声部活动请求，不能直接约束到低有效的物理 `PA_EN=AB16`。首次 MINIMAL 烧录前需增加板级包装层，输出复位安全的 `pa_en_n`；这是极性适配，不改动已经验证的音频链。
+3. MS5351M CLK2 到 V13 的物理路径和 12.288 MHz 频率已确认，但仍需用 FPGA 计数器或 GAO 验证输入质量，并做完整断电重启测试。若其频率只能靠 BL616 或上位机在运行时配置，则不能作为最终产品时钟源，需改用不依赖 MCU 的纯硬件方案。
+4. `pixel_clk` 仍从板级顶层输入，最终 LCD 的 PLL、RGB888 到物理 RGB666 的边界截位以及同步/背光配置均等待实际面板定型；LCD 未采购前不实现、不约束。
 5. `deadline_miss` 在谐波输出链内部生成后未向 FULL 顶层引出；显示 CDC overrun、声部活动、原始 ADC、峰值、品位状态和事件时间戳也主要停留在内部观测点。仿真已覆盖这些条件，但实机验收仍需要 GAO 或少量粘滞故障标志。
 
 ### 3.2 外设取舍
 
-首版应继续使用现有三枚按键、PT8211、耳机/扬声器和 RGB LCD，并把外接 MCP3208、4×8 琴颈矩阵及音频参考时钟接到经核验的 3.3 V 扩展 GPIO。两组 PMOD 只有 16 根候选 GPIO，恰好等于矩阵 12 根加 MCP3208 四线 SPI，不能在未做完整复用/冲突表前再假定其中还有音频时钟余量。
+首版应先使用现有三枚按键、PT8211 和耳机/扬声器；LCD 等待采购及接口确认。外接 MCP3208 与 4×8 琴颈矩阵使用连接矩阵中列出的 3.3 V PMOD 候选。两组 PMOD 只有 16 根候选 GPIO，恰好等于矩阵 12 根加 MCP3208 四线 SPI，不能再假定其中还有其他功能余量。12.288 MHz 已经由板载 MS5351M CLK2 经 `USR_CLK_IN` 独立送入 V13，不占用 PMOD。
 
 可以合理保留的后续扩展只有两类：
 
@@ -140,13 +144,12 @@ T:\Documents\AMD\gowin_full_reset_build\impl\pnr
 
 ## 6. 下一步门槛与决定
 
-下一项合理工作不是增加新音效或占用更多外设，而是完成“可核验的物理板级连接矩阵”。需要先取得：
+“顶层端口—底板连接器—底板网络—BTB 针脚—FPGA 球位—实际 Bank—VCCIO—复用冲突—确认状态”表已经建立。下一步不是增加新音效、LCD 或其他外设，而是按以下顺序解除首次上板门槛：
 
-1. 实物 NEO Dock PCB 版本（尤其 31004 或 31005+）；
-2. Tang Mega 60K 对应版本的官方完整 pin constraints；
-3. 实际 LCD 模组型号、FPC pinout、RGB666/888 位宽和时序；
-4. 外部 12.288 MHz 晶振、MCP3208 和 4×8 琴颈矩阵的接线表。
+1. 用户确认 PMOD0/1 的矩阵与 MCP3208 线束候选是否可作为最终接线，并确定三枚用户按键与 `rst_n`、三个效果键之间的取舍；
+2. 对 MS5351M CLK2 完成 FPGA 侧计数/锁定观测和完整断电重启测试，确认 12.288 MHz 不依赖 MCU、软核 CPU、BL616 运行时服务或上位机持续配置；
+3. 增加仅负责复位、`pa_en_n` 极性和必要时钟观测的 MINIMAL 板级包装层，不重构 `minimal_top` 或音频 RTL；
+4. 创建明确排除 Bank 1 与 LCD 的首版专用 CST/SDC，重新综合、布局布线并审核 I/O 标准、bank 电压、未约束端口、资源及 setup/hold；
+5. 只有上述报告无冲突、无关键警告后，才生成首个 MINIMAL 可烧录 bitstream，先验证 PT8211、耳机输出和功放静音。
 
-资料到齐后先形成端口—连接器—FPGA 球位—I/O bank—电压—复用冲突表，并由实物丝印/原理图复核。通过该表后，下一项 RTL 工作确定为板级时钟包装：从 50 MHz 产生最终 LCD 像素时钟，保留已经验证的外部 12.288 MHz 音频域，同时把 `deadline_miss`/CDC overrun 做成可观测的粘滞健康状态。然后才创建独立板级 CST，重新执行 `neo_full_guitar_top` 的布局布线与 I/O 电气检查。
-
-资料确认前停止继续猜测引脚，不实现时钟包装，不生成可烧录 bitstream，也不扩展 DDR3、HDMI、SD、USB3 或软核 CPU。
+LCD 继续等待面板型号、FPC、DPI 时序、同步极性、像素时钟和背光要求；核心板版本仍标为 30353/30354 未确认，Bank 1 继续禁用。不得扩展 DDR3、HDMI、SD、USB3、CH569 或软核 CPU 来提高资源利用率，也不得覆盖现有自动引脚综合/布局布线基线。
