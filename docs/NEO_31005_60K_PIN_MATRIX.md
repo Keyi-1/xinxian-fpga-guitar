@@ -28,7 +28,7 @@
 | RTL 顶层端口/功能 | 方向/有效电平 | 底板器件或连接器 | 底板网络 | BTB | FPGA 球位 | 实际 Bank | VCCIO / IO_TYPE | 复用与限制 | 状态 |
 | --- | --- | --- | --- | --- | --- | ---: | --- | --- | --- |
 | `sys_clk_50m` | 输入，50 MHz | 核心板 Y1100 有源晶振 | `EMCCLK_50Mhz` | 核心板内部 | V22 | 7 | 3.3 V / LVCMOS33 | 固定板载时钟 | `CONFIRMED` |
-| `audio_clk_12m288` | 输入，12.288 MHz | NEO Dock MS5351M U7 `CLK2` | `USR_CLK_IN` | J2-88 | V13 | 7 | 3.3 V / LVCMOS33 | CLK2 经 2.2 ohm 与 100 nF 串联耦合；仍需确认断电重启后无需上位机或 BL616 运行时配置 | `MEASURED`：CLK2 对 GND 示波器实测 12.288 MHz |
+| `audio_clk_12m288` | 输入，12.288 MHz | NEO Dock MS5351M U7 `CLK2` | `USR_CLK_IN` | J2-88 | V13 | 7 | 3.3 V / LVCMOS33 | CLK2 经 2.2 ohm 与 100 nF 串联耦合；完整断电后可独立恢复，不依赖电脑、MCU、BL616 运行时服务或软核 CPU | `CONFIRMED`：示波器及 MINIMAL 实物音频链验证 |
 | `dac_bclk` | 输出 | PT8211-S U16 pin 1 | `I2S_BCLK` | J2-26 | Y17 | 7 | 3.3 V / LVCMOS33 | 板载音频专用 | `CONFIRMED` |
 | `dac_lrck` | 输出 | PT8211-S U16 pin 2 | `I2S_LRCK` | J2-28 | AB17 | 7 | 3.3 V / LVCMOS33 | 板载音频专用 | `CONFIRMED` |
 | `dac_din` | 输出 | PT8211-S U16 pin 3 | `I2S_DIN` | J2-30 | AA16 | 7 | 3.3 V / LVCMOS33 | 板载音频专用 | `CONFIRMED` |
@@ -38,16 +38,33 @@
 
 | 底板按键 | 电气语义 | 底板网络 | BTB | FPGA 球位 | 实际 Bank | VCCIO / IO_TYPE | 可分配 RTL 功能 | 状态 |
 | --- | --- | --- | --- | --- | ---: | --- | --- | --- |
-| S4 / USER_BUTTON0 | 按下接地，需内部上拉 | `EX_KEY.0` | J2-60 | AA13 | 9 | 1.5 V / LVCMOS15 / PULL_UP | `rst_n`、`key_timbre_n`、`key_chorus_n`、`key_sustain_n` 四者之一 | `BLOCKED`：逻辑映射未冻结 |
+| S4 / USER_BUTTON0 | 按下接地，需内部上拉 | `EX_KEY.0` | J2-60 | AA13 | 9 | 1.5 V / LVCMOS15 / PULL_UP | `rst_n` | `CONFIRMED`：MINIMAL 按下静音、释放重新发声 |
 | S2 / USER_BUTTON1 | 按下接地，需内部上拉 | `EX_KEY.1` | J2-62 | AB13 | 9 | 1.5 V / LVCMOS15 / PULL_UP | 同上 | `BLOCKED`：逻辑映射未冻结 |
 | S1 / USER_BUTTON2 | 按下接地，需内部上拉 | `EX_KEY.2` | J2-64 | Y12 | 9 | 1.5 V / LVCMOS15 / PULL_UP | 同上 | `BLOCKED`：逻辑映射未冻结 |
 | SW7 | 配置/重配置按钮 | `BANK10_N12_RECONFIG` | J0-61 | N12 | 配置专用 | 配置专用 | 不作为普通用户复位或功能键 | `CONFIRMED`：禁止分配为普通 GPIO |
 
-当前 `neo_full_guitar_top` 需要 `rst_n` 加三个独立功能键，共四路输入；底板只有三枚普通用户按键。正式 CST 前必须从以下方案中明确选择一种：增加外部按键、改变复位来源，或经过单独需求评审后修改交互方式。现在不在 RTL 中猜测解决方案。
+`KEY0/S4=AA13` 已固定为本工程 `rst_n`。当前 `neo_full_guitar_top` 还需要三个独立功能键，但底板只剩两枚普通用户按键；FULL 正式 CST 前必须增加外部按键或经过单独需求评审修改交互方式。`SW7/RECONFIG=N12` 是配置专用按钮，SRAM 模式下按下会清除当前 FPGA 配置，不能代替 RTL reset。
 
 ## 3. PMOD0/PMOD1 安全候选分配
 
-下面的分配避开 Bank 1，并且每个球位都由两版核心板共同部分与官方 60K CST 的 3.3 V 配置支持。它使用两组 PMOD 的全部 16 根 GPIO：4 根矩阵行、8 根矩阵列和 4 根 MCP3208 SPI。确认线束之前状态保持 `PROPOSED`。
+下面存在两种必须互斥的 PMOD 用法。当前已实测的是 ROW0 固定接地的临时 COL+LED 接法；最终候选是 4 ROW + 8 COL + MCP3208 SPI。不得把两者的约束合并到同一个 bitstream。
+
+### 3.0 ROW0 单组临时实测接法
+
+| 功能 | 品位板 H1 | NEO Dock | FPGA 球位 | 状态 |
+| --- | --- | --- | --- | --- |
+| 3.3 V | H1-1 | J8-1 | 电源 | `CONFIRMED` |
+| GND | H1-2 | J8-3 | 地 | `CONFIRMED` |
+| ROW0 固定低 | H1-3 | J8-4/GND | 非 FPGA GPIO | `CONFIRMED`：只用于单组测试 |
+| ROW1～ROW3 | H1-4～H1-6 | 不连接 | 非 FPGA GPIO | `DEFERRED`：本次未测试 |
+| COL0～COL3 | H1-7～H1-10 | J8-11/J8-12/J8-9/J8-10 | Y21/Y22/AB21/AB22 | `CONFIRMED`：ROW0 初测通过 |
+| COL4～COL7 | H1-11～H1-14 | J8-7/J8-8/J8-5/J8-6 | AA20/AA21/AA19/AB20 | `CONFIRMED`：ROW0 初测通过 |
+| LED0～LED3 | 外接调试 LED | J9-11/J9-12/J9-9/J9-10 | P19/R19/T21/U21 | `CONFIRMED`：`CPU=true` 后作为普通 GPIO |
+| LED4～LED7 | 外接调试 LED | J9-7/J9-8/J9-5/J9-6 | P16/R17/R18/T18 | `CONFIRMED` |
+
+该配置只证明 ROW0 八触点、COL 对应、同步/防抖/LED 和相关 PMOD 连接。它不包含行扫描。完整矩阵阶段必须释放 PMOD0 的 LED 用途。
+
+下面的最终候选分配避开 Bank 1，并且每个球位都由两版核心板共同部分与官方 60K CST 的 3.3 V 配置支持。它使用两组 PMOD 的全部 16 根 GPIO：4 根矩阵行、8 根矩阵列和 4 根 MCP3208 SPI。完整线束确认前状态保持 `PROPOSED`。
 
 ### 3.1 4x8 琴颈矩阵
 
@@ -97,11 +114,11 @@ FULL 内部继续保留 RGB888；未来仅在板级包装层截取 `[7:2]`。LCD
 
 ## 5. 尚未解除的约束门槛
 
-1. 确认三枚用户按键如何覆盖复位和三个效果键，或提供第四路外部按键。
-2. 确认上述 PMOD 线束分配与实际矩阵、MCP3208 模块接线一致。
-3. 对 `USR_CLK_IN` 在 FPGA 侧执行时钟计数/锁定测试，并验证完整断电重启后 12.288 MHz 是否自动恢复，且不依赖上位机或 BL616 的运行时配置。
-4. 首次 CST 仅包含已经达到 `CONFIRMED`、`MEASURED` 或经用户确认转为 `CONFIRMED` 的 `PROPOSED` 行；不包含 Bank 1 和 LCD。
-5. 完成 I/O 电气审查、未约束端口检查、综合、布局布线和时序分析后，才允许生成 `MINIMAL` 首次上板 bitstream。
+1. MINIMAL 固定接口及专用 CST/SDC 已通过综合、布局布线、时序和实物验证；成功 `.fs` 只保留在现有 Gowin 工程中，目前使用 SRAM Program/Configure，不写外部 Flash。
+2. FULL 仍需解决 KEY0 已用于复位后，只剩两枚板载用户按键却需要三个效果键的问题。
+3. 在取得 MCP3208 模块型号、正反面照片、针脚标注、VDD/VREF/AGND/DGND 接法前，四根 SPI 候选保持 `PROPOSED`，不得上电接线或冻结 CST。
+4. 确认 MCP3208 后先建立独立单通道测试工程，使用 3.3 V 逻辑和共地，输入限制在 0～VREF；不直接连接压电片，也不直接烧录 FULL。
+5. Bank 1 和 LCD 继续排除在近期约束外；现有 FULL 自动引脚 `.fs` 仍禁止烧录。
 
 ## 6. 资料来源
 

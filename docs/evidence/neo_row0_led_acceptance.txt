@@ -1,0 +1,167 @@
+Xinxian FPGA Guitar - NEO ROW0 single-group contact acceptance
+Date: 2026-09-27
+Simulator: ModelSim SE-64 10.6d
+Implementation: Gowin EDA V1.9.12.03 Education
+Device: GW5AT-LV60PG484AC1/I0; GW5AT-60B / PBG484A / Device Version B
+
+1. Acceptance scope
+
+This evidence records ROW0 single-group preliminary hardware acceptance only.
+ROW0 is tied directly to ground, ROW1 through ROW3 are disconnected, all eight
+columns are FPGA inputs, and eight temporary LEDs show the debounced states.
+There is no row scanning in this build.
+
+The result proves only:
+- all eight ROW0 contacts can be detected;
+- COL0 through COL7 and LED0 through LED7 mapping is correct for this setup;
+- the two-stage input synchronizer, approximately 10 ms debounce and reset
+  behavior work;
+- the listed PMOD physical connections are usable.
+
+It does not prove ROW1 through ROW3, full 4x8 scanning, high impedance on
+unselected rows, simultaneous four-string input, highest-fret priority,
+multi-row diode ghost prevention, or integration with fret_note_event, glide
+and voice control.
+
+2. Source hardware
+
+Matrix board project:
+T:\xwechat_files\wxid_gyjv6pre2b0a12_c379\msg\file\2026-09\ProPrj_qianrushi_2026-09-27.epro
+
+Matrix project SHA-256:
+FB957928F22166501B03A058A4527016B5892D998C56937987D91ECA9CD17347
+
+H1 pinout:
+- H1-1=3V3; H1-2=GND;
+- H1-3..H1-6=ROW0..ROW3;
+- H1-7..H1-14=COL0..COL7.
+
+The board contains 3.3 V column pull-ups, 470 ohm series resistors on the four
+rows, 32 contacts and one independent diode per contact.
+
+3. Preserved successful Gowin project
+
+Project:
+T:\Documents\AMD\xinxian-fpga-guitar\gowin\neo_row0_led_test\neo_row0_led_test
+
+Successful bitstream:
+T:\Documents\AMD\xinxian-fpga-guitar\gowin\neo_row0_led_test\neo_row0_led_test\impl\pnr\neo_row0_led_test.fs
+
+Repository source of truth:
+- rtl/top/neo_row0_led_test.v
+- constraints/neo_row0_led_test.cst
+- constraints/neo_row0_led_test.sdc
+- sim/tb/tb_neo_row0_led_test.sv
+
+The successful project remains independent from:
+T:\Documents\AMD\xinxian-fpga-guitar\gowin\neo_minimal_audio\neo_minimal_audio
+
+No MINIMAL audio or FULL implementation artifact was rebuilt or overwritten.
+
+4. Physical mapping used by this test
+
+- H1-1/3V3 -> J8-1/3.3 V
+- H1-2/GND -> J8-3/GND
+- H1-3/ROW0 -> J8-4/GND
+- ROW1..ROW3 -> disconnected
+- COL0..COL7 -> J8-11, J8-12, J8-9, J8-10, J8-7, J8-8, J8-5, J8-6
+- COL0..COL7 balls -> Y21, Y22, AB21, AB22, AA20, AA21, AA19, AB20
+- LED0..LED7 -> J9-11, J9-12, J9-9, J9-10, J9-7, J9-8, J9-5, J9-6
+- LED0..LED7 balls -> P19, R19, T21, U21, P16, R17, R18, T18
+- KEY0/S4/rst_n -> AA13
+- sys_clk_50m -> V22
+
+5. Dual-purpose pin and PnR acceptance
+
+The preserved process configuration contains:
+"CPU": true
+
+This makes P19/R19/T21/U21 available as regular FPGA GPIO. It does not use a
+hard CPU, soft CPU, MCU or software runtime.
+
+Latest PnR log results:
+- PR2017 count: 0;
+- PR2028 count: 0;
+- the only PnR warning is PR1014 for generic routing into the global clock
+  resource for sys_clk_50m_d;
+- placement, routing, timing analysis and bitstream generation completed.
+
+Timing report:
+- analyzed paths: 124;
+- analyzed endpoints: 158;
+- setup violated endpoints: 0;
+- hold violated endpoints: 0;
+- required sys_clk_50m: 50.000 MHz;
+- actual Fmax: 148.111 MHz;
+- worst setup slack: 13.248 ns;
+- worst hold slack: 0.247 ns.
+
+Resources:
+- Logic: 51 / 59,904 (<1%);
+- Register: 50 / 60,780 (<1%), latch count 0;
+- I/O ports: 18 / 297;
+- Bank 1 usage: 0;
+- PRIMARY global clocks: 1 / 8.
+
+The final Pin Report places all COL0..COL7 and LED0..LED7 ports at exactly the
+balls listed in section 4, with LVCMOS33. rst_n is AA13/LVCMOS15/PULL_UP and
+sys_clk_50m is V22/LVCMOS33.
+
+Artifact SHA-256:
+- neo_row0_led_test.fs:
+  3F400583BB8A9C64754BE321E49A9E5509266FADD658F1BF75347DE5615BE858
+- neo_row0_led_test.rpt.txt:
+  3FCA80872E1B42621F93CF256CFA37B83B84AA308D67AF05ECE6487A661BF6FC
+- neo_row0_led_test_tr_content.html:
+  CFA3387E4AFCD6CBD7675BAC7FC2E7E72058B4F655D4B11499D891795F47A2A5
+
+6. ModelSim acceptance
+
+The testbench runs the real 50 MHz/250,000-cycle sampling interval and does not
+shorten the synthesized debounce setting. It checks all columns high, each
+individual active-low column, simultaneous columns, rejection of a short
+pulse, retention of a stable debounced state and asynchronous KEY0 reset.
+
+Result:
+PASS: ROW0 columns debounce, mapping, multi-press and reset
+
+The run completed with zero ModelSim errors and zero warnings.
+
+Commands:
+
+vlib work
+vlog -sv ../../rtl/top/neo_row0_led_test.v ../tb/tb_neo_row0_led_test.sv
+vsim -c work.tb_neo_row0_led_test -do "run -all; quit -f"
+
+7. Hardware observation
+
+The user reports that the eight ROW0 fret/contact selections currently show no
+mapping or detection problem. This is recorded as:
+
+ROW0 single-group preliminary hardware PASS
+
+It must not be relabeled as full 4x8 matrix acceptance.
+
+8. Next-stage plan
+
+Stage A - remaining fixed-ground row checks:
+- power off before every wiring change;
+- keep the same eight COL inputs and eight LED outputs;
+- move only the ground jumper from ROW0 to ROW1, then ROW2, then ROW3;
+- keep all other rows disconnected and record all eight contacts for each row.
+
+Stage B - full 4x8 scan:
+- remove the temporary PMOD0 LED connections;
+- restore the reviewed 4 ROW + 8 COL allocation in the board matrix document;
+- keep CPU pins as regular I/O for P19/R19/T21/U21;
+- instantiate the existing matrix_scanner, with active row low and unselected
+  rows high impedance;
+- observe row select, synchronized columns and stable matrix through GAO/JTAG;
+- test single contacts, same-row multiple contacts, cross-row contacts and
+  rectangular combinations that exercise the per-contact diodes.
+
+Stage C - control-chain integration:
+- verify highest-fret priority and open-string fallback in fret_note_event;
+- verify matrix-to-four_string_voice_control integration;
+- verify glide without Attack retrigger and final-fret release behavior;
+- only then combine the matrix with the already verified audio path.

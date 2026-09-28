@@ -6,7 +6,7 @@
 
 当前 `full_guitar_top` 已经覆盖产品的完整逻辑链路，但它仍是“逻辑顶层”，不是可直接烧录的 NEO Dock 板级顶层。`neo_full_guitar_top` 作为电气边界层处理矩阵三态、按键、PT8211、功放和 LCD 端口语义，尚未绑定正式物理引脚。
 
-实物底板已确认是 NEO Dock 31005。核心板因无法从底板拆下，只能确定为 30353 或 30354；两版主体定义相同，但第 6 页电源设计存在差异，因此在核心板版本确认前禁止使用 Bank 1。已新增 `docs/NEO_31005_60K_PIN_MATRIX.md` 作为正式 CST/SDC 的前置真值表。PMOD 线束、按键资源冲突和 12.288 MHz 断电重启行为审核完成前，不生成或烧录实物 bitstream。
+实物底板已确认是 NEO Dock 31005。核心板因无法从底板拆下，只能确定为 30353 或 30354；两版主体定义相同，但第 6 页电源设计存在差异，因此在核心板版本确认前禁止使用 Bank 1。`MINIMAL` 专用 CST/SDC、布局布线、SRAM bitstream 和实物 E4 音频闭环已经验证成功；FULL 自动引脚实现继续仅作为规模/时序基线，严禁烧录。MCP3208、矩阵和 LCD 仍须分别审核后接入。
 
 ## 2. 已确认的硬件资源
 
@@ -18,7 +18,7 @@
 - NEO Dock 31005 音频原理图确认功放控制语义为高电平关闭、低电平开启。板级输出因此使用 `pa_en_n`，并在复位及无声部活动时保持高电平静音。
 - PT8211 网络已经由 31005 原理图、30353/30354 共同 BTB 定义、官方 60K CST和官方 138K 共用底板音频示例交叉确认：`BCLK=Y17`、`LRCK=AB17`、`DIN=AA16`、`PA_EN=AB16`，均为不受核心板版本差异影响的 Bank 7 3.3 V 球位。
 - NEO Dock 31005 的 J5 使用 RGB888 针脚排列，但底板只把 R2-R7、G2-G7、B2-B7 连接到 FPGA/CH569 复用总线。FPGA 可控颜色数据是 RGB666/18 bit，接口为并行 TTL/DPI RGB，不是 LVDS。
-- MS5351M 的 CLK2 通过 `USR_CLK_IN` 接入 V13。实物已经把 CLK2 设置为 12.288 MHz，并在 CLK2 对 GND 之间用示波器确认频率；仍需验证 FPGA 端接收和断电重启后的独立恢复能力。
+- MS5351M 的 CLK2 通过 `USR_CLK_IN` 接入 V13。示波器和 MINIMAL 实物音频链均已验证 12.288 MHz；完整断电后 CLK2 可独立自动恢复，不依赖电脑、MCU、BL616 运行时服务或软核 CPU。
 
 官方资料入口：
 
@@ -48,9 +48,9 @@
 | 板级功能 | FULL RTL 状态 | 板级处理 | 结论 |
 | --- | --- | --- | --- |
 | 50 MHz 系统时钟 | 已使用 | 顶层输入，V22 | 已确认，待审核后写入专用 CST |
-| 12.288 MHz 音频时钟 | 已使用 | MS5351 CLK2 -> `USR_CLK_IN` -> V13 | 频率已实测；待 FPGA 接收与断电重启验证 |
+| 12.288 MHz 音频时钟 | 已使用 | MS5351 CLK2 -> `USR_CLK_IN` -> V13 | 示波器、FPGA 音频链及断电重启已验证 |
 | LCD 像素时钟 | 逻辑已使用 | 当前仍为顶层输入，输出 `lcd_pclk` 极性参数化 | 板级 PLL 尚未接入 |
-| 4×8 琴颈矩阵 | 已使用 | PMOD0 八线加 PMOD1 四线安全候选 | 待实际线束确认 |
+| 4×8 琴颈矩阵 | 已使用 | ROW0 临时使用 PMOD1 八列输入和 PMOD0 八 LED；最终仍为 12 线候选 | ROW0 单组初步实物通过；完整扫描未验收 |
 | MCP3208 四通道 | 已使用 | PMOD1 余下四线 SPI 安全候选 | 待实际线束确认 |
 | KEY1/2/3 | 已接入 | 三枚 Bank 9 1.5 V 用户按键 | 与独立复位合计需要四路，当前存在资源冲突 |
 | PT8211 | 已接入 | BCLK/LRCK/DIN 输出 | Y17/AB17/AA16 已确认 |
@@ -62,8 +62,8 @@
 ### 3.1 已完成逻辑但尚未完成的板级接入
 
 1. `neo_full_guitar_top` 已覆盖琴颈矩阵、MCP3208、三个功能键、PT8211、功放静音和 RGB LCD 电气边界；音频主链路本身没有待补接的功能模块。
-2. `minimal_top.pa_en` 是高有效的声部活动请求，不能直接约束到低有效的物理 `PA_EN=AB16`。首次 MINIMAL 烧录前需增加板级包装层，输出复位安全的 `pa_en_n`；这是极性适配，不改动已经验证的音频链。
-3. MS5351M CLK2 到 V13 的物理路径和 12.288 MHz 频率已确认，但仍需用 FPGA 计数器或 GAO 验证输入质量，并做完整断电重启测试。若其频率只能靠 BL616 或上位机在运行时配置，则不能作为最终产品时钟源，需改用不依赖 MCU 的纯硬件方案。
+2. `neo_minimal_audio_top` 已把 `minimal_top.pa_en` 高有效活动请求转换为复位安全的低有效 `pa_en_n`，并对外部 KEY0 复位执行音频域异步置位、两拍同步释放；实物和专用 testbench 均已通过。
+3. MS5351M CLK2 到 V13 的物理路径、12.288 MHz 频率和完整断电后的独立恢复均已确认，当前 MINIMAL 不依赖 MCU、软核 CPU、BL616 运行时服务或上位机。
 4. `pixel_clk` 仍从板级顶层输入，最终 LCD 的 PLL、RGB888 到物理 RGB666 的边界截位以及同步/背光配置均等待实际面板定型；LCD 未采购前不实现、不约束。
 5. `deadline_miss` 在谐波输出链内部生成后未向 FULL 顶层引出；显示 CDC overrun、声部活动、原始 ADC、峰值、品位状态和事件时间戳也主要停留在内部观测点。仿真已覆盖这些条件，但实机验收仍需要 GAO 或少量粘滞故障标志。
 
@@ -79,6 +79,27 @@
 当前不建议接入板载双通道 ADC、DDR3、HDMI、SD、USB3/CH569、以太网、摄像头、麦克风阵列或风扇。板载 ADC 无法替代四弦独立采样；其余外设不解决首版乐器闭环中的缺口，反而增加引脚复用、时钟或协议风险。
 
 ## 4. 本阶段验证
+
+### 4.1 MINIMAL 实物音频闭环
+
+- 成功工程：`gowin/neo_minimal_audio/neo_minimal_audio`；成功 bitstream 为 `impl/pnr/neo_minimal_audio.fs`，目前仅通过 SRAM Program/Configure 使用，没有写入外部 Flash。
+- 实物链路：12.288 MHz CLK2→E4 phase increment→`voice_audio_core`→PCM24/PCM16→`pt8211_tx`→NEO Dock PT8211→3.5 mm 左右声道。
+- 输出频率约 329.63 Hz，左右声道正常，可持续发声，没有明显周期性爆音或断音。
+- `KEY0/S4/AA13` 按住时静音，松开后 E4 自动恢复；`SW7/RECONFIG/N12` 是 FPGA 专用重配置按钮，SRAM 模式下按下会清除当前配置，并非 RTL reset。
+- 运行中复位仿真通过：`PASS: MINIMAL runtime reset mutes and retriggers continuous E4`。完整记录见 `docs/evidence/neo_minimal_audio_acceptance.txt`。
+
+### 4.2 ROW0 单组触点实物验证
+
+- 独立工程：`gowin/neo_row0_led_test/neo_row0_led_test`，未覆盖音频 MINIMAL 或 FULL 实现。
+- ROW0 固定接地，ROW1～ROW3 不连接；PMOD1 接八列，PMOD0 接八路调试 LED。用户实测 ROW0 八个品位的触点对应未发现问题。
+- `process_config` 为 `"CPU": true`，允许 P19/R19/T21/U21 作为普通 GPIO；最终 P&R 日志中 PR2017=0、PR2028=0。
+- 时序报告分析 158 个端点，setup/hold 违例均为 0；50 MHz 时钟实际 Fmax 148.111 MHz，最差 setup/hold slack 分别为 13.248 ns 和 0.247 ns。
+- Pin Report 已确认 COL0～COL7 与 LED0～LED7 全部位于指定球位，Bank 1 使用量为 0。
+- ModelSim 通过：`PASS: ROW0 columns debounce, mapping, multi-press and reset`。完整记录见 `docs/evidence/neo_row0_led_acceptance.txt`。
+
+此结果严格限定为“ROW0 单组初步实物通过”，不能推导 ROW1～ROW3、完整 4×8 扫描、未选中行高阻、多行二极管防鬼键、四弦同时按键、同弦最高品优先或后续选音链已通过。
+
+### 4.3 FULL 与板级封装既有验证
 
 板级封装 testbench 验证：
 
@@ -144,12 +165,12 @@ T:\Documents\AMD\gowin_full_reset_build\impl\pnr
 
 ## 6. 下一步门槛与决定
 
-“顶层端口—底板连接器—底板网络—BTB 针脚—FPGA 球位—实际 Bank—VCCIO—复用冲突—确认状态”表已经建立。下一步不是增加新音效、LCD 或其他外设，而是按以下顺序解除首次上板门槛：
+“顶层端口—底板连接器—底板网络—BTB 针脚—FPGA 球位—实际 Bank—VCCIO—复用冲突—确认状态”表已经建立，MINIMAL 音频和 ROW0 单组均已完成初步实物闭环。矩阵下一阶段按以下顺序推进：
 
-1. 用户确认 PMOD0/1 的矩阵与 MCP3208 线束候选是否可作为最终接线，并确定三枚用户按键与 `rst_n`、三个效果键之间的取舍；
-2. 对 MS5351M CLK2 完成 FPGA 侧计数/锁定观测和完整断电重启测试，确认 12.288 MHz 不依赖 MCU、软核 CPU、BL616 运行时服务或上位机持续配置；
-3. 增加仅负责复位、`pa_en_n` 极性和必要时钟观测的 MINIMAL 板级包装层，不重构 `minimal_top` 或音频 RTL；
-4. 创建明确排除 Bank 1 与 LCD 的首版专用 CST/SDC，重新综合、布局布线并审核 I/O 标准、bank 电压、未约束端口、资源及 setup/hold；
-5. 只有上述报告无冲突、无关键警告后，才生成首个 MINIMAL 可烧录 bitstream，先验证 PT8211、耳机输出和功放静音。
+1. 继续使用现有临时 COL+LED 工程，断电后依次把固定接地线从 ROW0 移到 ROW1、ROW2、ROW3，每次只接地一行，其余行悬空，分别核对八触点；该阶段不改 CST、不做行扫描；
+2. 四行单组通过后移除 PMOD0 调试 LED，恢复矩阵表中的 4 ROW + 8 COL 共 12 根 GPIO；P19/R19/T21/U21 继续要求 `CPU pins as regular I/O`；
+3. 新的完整矩阵板级顶层直接实例化现有 `matrix_scanner`，用 GAO/JTAG 观察行选择、未选中行高阻、同步列输入、稳定矩阵和扫描周期，不复制扫描逻辑；
+4. 依次验证单点、同行多点、跨行多点和会形成矩形组合的防鬼键测试，再验证 `fret_note_event` 的最高品优先及后续滑音/声部控制；
+5. MCP3208 继续等待实际模块资料，LCD、三效果键资源冲突和物理延迟测试仍保留为独立后续门槛。
 
-LCD 继续等待面板型号、FPC、DPI 时序、同步极性、像素时钟和背光要求；核心板版本仍标为 30353/30354 未确认，Bank 1 继续禁用。不得扩展 DDR3、HDMI、SD、USB3、CH569 或软核 CPU 来提高资源利用率，也不得覆盖现有自动引脚综合/布局布线基线。
+核心板版本继续标为 30353/30354 未确认，Bank 1 继续禁用。不得扩展 DDR3、HDMI、SD、USB3、CH569 或软核 CPU 来提高资源利用率，也不得覆盖成功 MINIMAL 工程或现有 FULL 自动引脚综合/布局布线基线。

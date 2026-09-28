@@ -1,0 +1,1 @@
+create_clock -name audio_clk_12m288 -period 81.380208 [get_ports {audio_clk_12m288}]

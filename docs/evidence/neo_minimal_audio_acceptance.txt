@@ -1,0 +1,160 @@
+Xinxian FPGA Guitar - NEO MINIMAL audio acceptance
+Date: 2026-09-27
+Simulator: ModelSim SE-64 10.6d
+Implementation: Gowin EDA V1.9.12.03 Education
+Device: GW5AT-LV60PG484AC1/I0; GW5AT-60B / PG484A / Device Version B
+
+1. Preserved successful project
+
+Project:
+T:\Documents\AMD\xinxian-fpga-guitar\gowin\neo_minimal_audio\neo_minimal_audio
+
+SRAM bitstream:
+T:\Documents\AMD\xinxian-fpga-guitar\gowin\neo_minimal_audio\neo_minimal_audio\impl\pnr\neo_minimal_audio.fs
+
+The bitstream has been tested with SRAM Program/Configure only. It has not
+been written to external Flash. The successful Gowin project and the existing
+FULL automatic-pin implementation were not rebuilt or overwritten during the
+repository normalization documented here.
+
+2. Repository source of truth
+
+Board top:
+rtl/top/neo_minimal_audio_top.v
+
+Physical constraints:
+constraints/neo_minimal_audio.cst
+
+Timing constraints:
+constraints/neo_minimal_audio.sdc
+
+The board top asserts reset asynchronously and releases it through a two-stage
+synchronizer in the 12.288 MHz audio domain. It also converts the core's
+active-high PA request into the NEO Dock's active-low pa_en_n and forces the
+amplifier off while the audio domain is in reset.
+
+The SDC contains exactly three single-line commands: one clock constraint for
+50 MHz, one for 12.288 MHz, and one asynchronous clock-group declaration. It
+does not use backslash line continuation.
+
+The Gowin project contains flat copied sources with local include/readmemh
+paths. Those project-only path changes were intentionally not copied back into
+the repository's normal rtl/mem directory structure.
+
+3. ModelSim runtime-reset acceptance
+
+Dedicated board-level testbench:
+sim/tb/tb_neo_minimal_audio_top.sv
+
+Observed sequence:
+- initial reset holds pa_en_n high and PT8211 outputs idle;
+- reset release is synchronized in the audio domain;
+- the first trigger produces non-zero, identical left/right PT8211 frames;
+- asserting KEY0/rst_n low during playback immediately mutes the PA;
+- PT8211 outputs return to idle while reset is active;
+- releasing reset retriggers continuous E4 and restores non-zero frames.
+
+Dedicated result:
+PASS: MINIMAL runtime reset mutes and retriggers continuous E4
+
+Related passing regression results:
+PASS: fixed E4 dual-clock MINIMAL top, frames=6 nonzero=4
+PASS: minimal single-voice PCM chain, nonzero=10
+PASS: MINIMAL audio chain, frames=6 nonzero_frames=5
+PASS: 24-bit to 16-bit rounding and saturation
+PASS: PT8211 16-bit MSB-first LSB-justified frames=4
+
+The dedicated test and the five listed related tests completed with zero
+ModelSim errors and zero warnings in their successful runs.
+
+The existing tb_voice_audio_core waits only 12 release samples, while the
+current configured release is 12,288 samples; that old assumption is unrelated
+to this board-wrapper change and is not counted as a MINIMAL regression. The
+PCM golden-export test was not required because EX3791/voice_audio_core was not
+modified in this work.
+
+Reference ModelSim commands, run from sim/modelsim:
+
+vlib work
+vlog -sv +incdir+../../rtl/config ../../rtl/audio_io/sample_tick_gen.v ../../rtl/control/voice_envelope.v ../../rtl/synth/sine_nco.v ../../rtl/audio_io/voice_audio_core.v ../../rtl/audio_io/pcm24_to_16.v ../../rtl/audio_io/pt8211_tx.v ../../rtl/audio_io/minimal_audio_output.v ../../rtl/control/note_phase_rom.v ../../rtl/control/test_tone_trigger.v ../../rtl/top/minimal_top.v ../../rtl/top/neo_minimal_audio_top.v ../tb/tb_neo_minimal_audio_top.sv
+vsim -c work.tb_neo_minimal_audio_top -do "run -all; quit -f"
+
+4. Hardware acceptance
+
+Verified physical chain:
+12.288 MHz MS5351M CLK2 -> USR_CLK_IN/V13 -> E4 phase increment ->
+voice_audio_core -> PCM24-to-PCM16 -> pt8211_tx -> NEO Dock PT8211 ->
+3.5 mm left and right outputs.
+
+Observed results:
+- CLK2 independently returns to 12.288 MHz after a complete power cycle;
+- no computer, external MCU, BL616 runtime configuration, or soft CPU is
+  required during operation;
+- measured output pitch is E4, approximately 329.63 Hz, with small error;
+- both left and right 3.5 mm channels produce output;
+- continuous playback is stable, with no obvious periodic pop or dropout;
+- holding KEY0/S4/AA13 mutes the output;
+- releasing KEY0 retriggers E4 automatically.
+
+SW7/RECONFIG/N12 is a dedicated FPGA reconfiguration input. Pressing it after
+an SRAM download clears the current configuration and requires another
+Program/Configure operation. This is normal and is not an RTL reset failure.
+
+5. Preserved implementation report
+
+The PnR artifact currently present in the successful project reports:
+- setup violated endpoints: 0;
+- hold violated endpoints: 0;
+- audio_clk_12m288 actual Fmax: 125.534 MHz (required 12.288 MHz);
+- worst setup slack: 73.414 ns;
+- worst hold slack: 0.247 ns;
+- Logic: 323 / 59,904 (<1%);
+- Register: 206 / 60,780 (<1%), latch count 0;
+- BSRAM: 1 / 118 (<1%);
+- DSP: 1 / 118 (<1%);
+- I/O ports: 7 / 297; Bank 1 usage is 0;
+- audio_clk_12m288_d is promoted to a PRIMARY global clock.
+
+The handoff notes cited an earlier/alternate successful report with about
+137.753 MHz Fmax, 74.121 ns worst setup slack and 0.216 ns worst hold slack.
+Both sets pass comfortably, but the values above are the ones tied to the
+preserved on-disk .fs and reports identified by the hashes below. No new PnR
+was run to reconcile the reporting difference.
+
+Known accepted warnings:
+- EX3780: phase_rom is initialized by initial/readmemh;
+- NL0002: fixed E4 constant propagation removes note_phase_rom;
+- EX3791: a 25-bit expression is truncated into the 24-bit PCM target; no RTL
+  change was made, and any future explicit-width cleanup requires PCM golden
+  model and regression checks before and after;
+- CV0016: sys_clk_50m becomes unused after the unconnected LED logic is swept;
+- PR1014: V13 uses generic routing before reaching PRIMARY global clock
+  resources; the timing margin and stable hardware output are accepted for
+  this MINIMAL build, and the ball must not be changed without board review.
+
+Artifact SHA-256:
+- neo_minimal_audio.fs:
+  2EA7B5750B7C2CF1A794A4E7B4F5CB2004EF875981928FA7A18FBD66B29D5201
+- neo_minimal_audio.rpt.txt:
+  4BAE8B89DF8CA166AC8A1E6A305330032873669840422599ED368B440E7D45C0
+- neo_minimal_audio_tr_content.html:
+  569EDDC405706DBD71790E2E6CDBD9FA16097E0356C6249D548D958DFD4CCA4E
+
+6. Next hardware gate
+
+Existing pre-hardware MCP3208 digital regressions were rerun without changing
+their RTL or testbenches:
+
+PASS: MCP3208 four-channel samples, velocity and retrigger
+PASS: MCP3208 all strings x all velocity levels events=16
+
+Both completed with zero ModelSim errors and zero warnings. This establishes
+the existing SPI/reader/pluck logic as the baseline; it does not validate a
+particular physical MCP3208 module or authorize wiring.
+
+The next task is a separate neo_mcp3208_test build for CH0 fixed-DC sampling
+and GAO/JTAG observation. The four proposed PMOD1 pins must remain unfrozen
+until the actual MCP3208 module model, front/back photographs, pin labels and
+VDD/VREF/AGND/DGND wiring are reviewed. Use 3.3 V logic, common ground and an
+input limited to 0..VREF. Do not connect a piezo element directly, do not start
+with four channels, and do not program FULL for this test.
