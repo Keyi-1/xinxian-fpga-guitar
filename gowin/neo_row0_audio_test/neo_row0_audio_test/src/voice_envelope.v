@@ -112,15 +112,15 @@ module voice_envelope #(
         end
         else if (sample_ce) begin
             if (note_on) begin
-                env_level <= 0;
-                active    <= 1'b1;
-                state     <= STATE_ATTACK;
-                attack_target <= velocity_attack_target(velocity_level);
-                sustain_target <= velocity_sustain_target(velocity_level);
-                attack_step <= velocity_attack_step(velocity_level);
-                decay_step <= velocity_decay_step(velocity_level);
-                release_step <= velocity_release_step(velocity_level);
-                active_release_step <= velocity_release_step(velocity_level);
+              // 不将 env_level 清零，保持当前水平往上平滑过渡
+               active    <= 1'b1;
+               state     <= STATE_ATTACK;
+               attack_target       <= velocity_attack_target(velocity_level);
+               sustain_target      <= velocity_sustain_target(velocity_level);
+               attack_step         <= velocity_attack_step(velocity_level);
+               decay_step          <= velocity_decay_step(velocity_level);
+               release_step        <= velocity_release_step(velocity_level);
+               active_release_step <= velocity_release_step(velocity_level);
             end
             else if (note_off &&
                      state != STATE_IDLE &&

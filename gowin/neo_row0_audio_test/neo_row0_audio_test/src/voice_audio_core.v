@@ -47,15 +47,15 @@ module voice_audio_core #(
     );
 
     voice_envelope u_voice_envelope (
-        .clk       (clk_audio_ref),
-        .rst_n     (rst_n),
-        .sample_ce (sample_tick),
-        .note_on   (note_on),
-        .note_off  (note_off),
+        .clk           (clk_audio_ref),
+        .rst_n         (rst_n),
+        .sample_ce     (sample_tick),
+        .note_on       (note_on),
+        .note_off      (note_off),
         .velocity_level(velocity_level),
         .sustain_enable(1'b0),
-        .env_level (envelope_level),
-        .active    (envelope_active)
+        .env_level     (envelope_level),
+        .active        (envelope_active)
     );
 
     assign env_level = envelope_level;
@@ -70,8 +70,7 @@ module voice_audio_core #(
             sample_valid <= nco_sample_valid;
 
             if (nco_sample_valid) begin
-                // Q1.15 包络增益乘以 16-bit 正弦样本
-                pcm_out <= pcm_product >>> 7;
+                pcm_out <= pcm_product[30:7];
             end
         end
     end
