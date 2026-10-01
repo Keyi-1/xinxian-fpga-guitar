@@ -3,7 +3,14 @@
 // Four independent voice cores followed by a saturated 24-bit mixer.
 // Short event pulses are latched until the next audio sample tick.
 module four_voice_audio_core #(
-    parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV
+    parameter integer SAMPLE_DIV               = `AUDIO_SAMPLE_DIV,
+    parameter integer PLUCK_MODE               = 0,
+    parameter integer PLUCK_ATTACK_SAMPLES     = 96,
+    parameter integer PLUCK_FAST_DECAY_SAMPLES = 9600,
+    parameter integer PLUCK_FAST_SHIFT         = 13,
+    parameter integer PLUCK_SLOW_SHIFT         = 16,
+    parameter integer PLUCK_RELEASE_SHIFT      = 10,
+    parameter integer PLUCK_IDLE_LEVEL         = 64
 ) (
     input  wire          clk_audio_ref,
     input  wire          rst_n,
@@ -64,7 +71,16 @@ module four_voice_audio_core #(
         end
     end
 
-    voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV)) u_voice0 (
+    voice_audio_core #(
+        .SAMPLE_DIV              (SAMPLE_DIV),
+        .PLUCK_MODE              (PLUCK_MODE),
+        .PLUCK_ATTACK_SAMPLES    (PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT        (PLUCK_FAST_SHIFT),
+        .PLUCK_SLOW_SHIFT        (PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT     (PLUCK_RELEASE_SHIFT),
+        .PLUCK_IDLE_LEVEL        (PLUCK_IDLE_LEVEL)
+    ) u_voice0 (
         .clk_audio_ref(clk_audio_ref),
         .rst_n        (rst_n),
         .note_on      (delivered_note_on[0]),
@@ -78,7 +94,16 @@ module four_voice_audio_core #(
         .active       (active0)
     );
 
-    voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV)) u_voice1 (
+    voice_audio_core #(
+        .SAMPLE_DIV              (SAMPLE_DIV),
+        .PLUCK_MODE              (PLUCK_MODE),
+        .PLUCK_ATTACK_SAMPLES    (PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT        (PLUCK_FAST_SHIFT),
+        .PLUCK_SLOW_SHIFT        (PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT     (PLUCK_RELEASE_SHIFT),
+        .PLUCK_IDLE_LEVEL        (PLUCK_IDLE_LEVEL)
+    ) u_voice1 (
         .clk_audio_ref(clk_audio_ref),
         .rst_n        (rst_n),
         .note_on      (delivered_note_on[1]),
@@ -92,7 +117,16 @@ module four_voice_audio_core #(
         .active       (active1)
     );
 
-    voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV)) u_voice2 (
+    voice_audio_core #(
+        .SAMPLE_DIV              (SAMPLE_DIV),
+        .PLUCK_MODE              (PLUCK_MODE),
+        .PLUCK_ATTACK_SAMPLES    (PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT        (PLUCK_FAST_SHIFT),
+        .PLUCK_SLOW_SHIFT        (PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT     (PLUCK_RELEASE_SHIFT),
+        .PLUCK_IDLE_LEVEL        (PLUCK_IDLE_LEVEL)
+    ) u_voice2 (
         .clk_audio_ref(clk_audio_ref),
         .rst_n        (rst_n),
         .note_on      (delivered_note_on[2]),
@@ -106,7 +140,16 @@ module four_voice_audio_core #(
         .active       (active2)
     );
 
-    voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV)) u_voice3 (
+    voice_audio_core #(
+        .SAMPLE_DIV              (SAMPLE_DIV),
+        .PLUCK_MODE              (PLUCK_MODE),
+        .PLUCK_ATTACK_SAMPLES    (PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT        (PLUCK_FAST_SHIFT),
+        .PLUCK_SLOW_SHIFT        (PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT     (PLUCK_RELEASE_SHIFT),
+        .PLUCK_IDLE_LEVEL        (PLUCK_IDLE_LEVEL)
+    ) u_voice3 (
         .clk_audio_ref(clk_audio_ref),
         .rst_n        (rst_n),
         .note_on      (delivered_note_on[3]),

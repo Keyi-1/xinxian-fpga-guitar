@@ -1,0 +1,25 @@
+<?xml version="1" encoding="UTF-8"?>
+<!DOCTYPE gowin-fpga-project>
+<Project>
+    <Template>FPGA</Template>
+    <Version>5</Version>
+    <Device name="GW5AT-60B" pn="GW5AT-LV60PG484AC1/I0">gw5at60b-002</Device>
+    <FileList>
+        <File path="src/four_voice_audio_core.v" type="file.verilog" enable="1"/>
+        <File path="src/guitar_config.vh" type="file.verilog" enable="1"/>
+        <File path="src/matrix_scanner.v" type="file.verilog" enable="1"/>
+        <File path="src/neo_four_string_matrix_audio_test_top.v" type="file.verilog" enable="1"/>
+        <File path="src/note_phase_table.v" type="file.verilog" enable="1"/>
+        <File path="src/pcm24_mixer.v" type="file.verilog" enable="1"/>
+        <File path="src/pcm24_to_16.v" type="file.verilog" enable="1"/>
+        <File path="src/pt8211_tx.v" type="file.verilog" enable="1"/>
+        <File path="src/sample_tick_gen.v" type="file.verilog" enable="1"/>
+        <File path="src/sine_nco.v" type="file.verilog" enable="1"/>
+        <File path="src/voice_audio_core.v" type="file.verilog" enable="1"/>
+        <File path="src/voice_envelope.v" type="file.verilog" enable="1"/>
+        <File path="src/neo_four_string_matrix_audio_test.cst" type="file.cst" enable="1"/>
+        <File path="src/neo_four_string_matrix_audio_test.sdc" type="file.sdc" enable="1"/>
+        <File path="src/note_phase_inc.mem" type="file.other" enable="1"/>
+        <File path="src/sine_lut.mem" type="file.other" enable="1"/>
+    </FileList>
+</Project>

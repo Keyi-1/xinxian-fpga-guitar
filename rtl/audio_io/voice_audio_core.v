@@ -1,7 +1,14 @@
 `include "../config/guitar_config.vh"
 
 module voice_audio_core #(
-    parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV
+    parameter integer SAMPLE_DIV               = `AUDIO_SAMPLE_DIV,
+    parameter integer PLUCK_MODE               = 0,
+    parameter integer PLUCK_ATTACK_SAMPLES     = 96,
+    parameter integer PLUCK_FAST_DECAY_SAMPLES = 9600,
+    parameter integer PLUCK_FAST_SHIFT         = 13,
+    parameter integer PLUCK_SLOW_SHIFT         = 16,
+    parameter integer PLUCK_RELEASE_SHIFT      = 10,
+    parameter integer PLUCK_IDLE_LEVEL         = 64
 ) (
     input  wire                                  clk_audio_ref,
     input  wire                                  rst_n,
@@ -46,7 +53,15 @@ module voice_audio_core #(
         .sample_valid(nco_sample_valid)
     );
 
-    voice_envelope u_voice_envelope (
+    voice_envelope #(
+        .PLUCK_MODE              (PLUCK_MODE),
+        .PLUCK_ATTACK_SAMPLES    (PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT        (PLUCK_FAST_SHIFT),
+        .PLUCK_SLOW_SHIFT        (PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT     (PLUCK_RELEASE_SHIFT),
+        .PLUCK_IDLE_LEVEL        (PLUCK_IDLE_LEVEL)
+    ) u_voice_envelope (
         .clk       (clk_audio_ref),
         .rst_n     (rst_n),
         .sample_ce (sample_tick),
@@ -71,7 +86,9 @@ module voice_audio_core #(
 
             if (nco_sample_valid) begin
                 // Q1.15 包络增益乘以 16-bit 正弦样本
-                pcm_out <= pcm_product >>> 7;
+                // The proven post-shift range fits signed 24-bit exactly.
+                // Bits [30:7] are the explicit 24-bit form of >>> 7.
+                pcm_out <= pcm_product[30:7];
             end
         end
     end
