@@ -6,6 +6,7 @@ from gen_voice_golden import (
     LUT_ADDR_BITS,
     LUT_VALUE_BITS,
     PHASE_BITS,
+    PCM_PRODUCT_SHIFT,
     load_mem,
     to_hex,
 )
@@ -66,7 +67,7 @@ def main() -> None:
             note_off=note_off,
         )
 
-        pcm24 = (nco_sample * env_level) >> 7
+        pcm24 = (nco_sample * env_level) >> PCM_PRODUCT_SHIFT
 
         if pcm24 < 0:
             magnitude = -pcm24

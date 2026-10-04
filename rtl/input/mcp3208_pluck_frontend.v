@@ -1,9 +1,12 @@
 `include "../config/guitar_config.vh"
 
-// System-clock front end from MCP3208 SPI data to four pluck events.
+// Audio-clock board front end from MCP3208 SPI data to four pluck events.
 module mcp3208_pluck_frontend #(
     parameter integer SPI_CLK_DIV = `ADC_SPI_CLK_DIV,
-    parameter integer DEAD_SAMPLES = `RETRIGGER_DEAD_SAMPLES
+    parameter integer DEAD_SAMPLES = `RETRIGGER_DEAD_SAMPLES,
+    parameter integer SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
+    parameter [11:0] BASELINE_CODE = `ADC_BASELINE_CODE,
+    parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE
 ) (
     input  wire        clk,
     input  wire        rst_n,
@@ -38,7 +41,9 @@ module mcp3208_pluck_frontend #(
     );
 
     four_string_pluck_detector #(
-        .DEAD_SAMPLES(DEAD_SAMPLES)
+        .DEAD_SAMPLES(DEAD_SAMPLES),
+        .SETTLE_SAMPLES(SETTLE_SAMPLES), .BASELINE_CODE(BASELINE_CODE),
+        .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE)
     ) u_four_string_pluck_detector (
         .clk            (clk),
         .rst_n          (rst_n),

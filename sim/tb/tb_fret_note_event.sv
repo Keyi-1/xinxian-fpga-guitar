@@ -26,6 +26,7 @@ module tb_fret_note_event;
         .note_on          (note_on),
         .note_off         (note_off),
         .slide_valid      (slide_valid),
+        .vibrato_enable(),
         .voice_active     (voice_active),
         .current_fret_id  (current_fret_id),
         .phase_inc        (phase_inc)
@@ -114,6 +115,15 @@ module tb_fret_note_event;
         audio_sample;
         if ((note_off !== 4'b0001) || (voice_active !== 4'b0000)) begin
             $display("FAIL: delayed release event");
+            $finish;
+        end
+
+        // A fresh open-string pluck must reset pitch even though no new stable
+        // frame changed the fret after the delayed final release.
+        pulse_pluck(4'b0001);
+        if (note_on !== 4'b0001 || note_off !== 0 ||
+            phase_inc[31:0] !== 32'h01c20d2f) begin
+            $display("FAIL: fresh open-string pluck kept the old fretted pitch");
             $finish;
         end
 

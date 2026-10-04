@@ -91,7 +91,8 @@ module tb_voice_audio_core;
         end
         note_off = 1'b0;
 
-        while (release_count < 12) begin
+        // Use the configured ADSR duration instead of the old 12-sample stub.
+        while (active && release_count < 13000) begin
             @(posedge clk_audio_ref);
             #1;
 

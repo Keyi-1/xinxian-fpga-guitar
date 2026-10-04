@@ -1,0 +1,91 @@
+GarageBand classical grand piano reference analysis, 2026-10-04
+
+Scope: four supplied stereo recordings, two strikes per file.
+User settings: compressor/treble/bass/echo 0, reverb on; manually similar velocity.
+User direction: move toward classical grand piano timbre.
+No RTL, note ROM, constraints or bitstream modifications in this analysis step.
+No FPGA programming, Git commit or push.
+
+Reproduction:
+  E:\anaconda3\python.exe tools/analyze_garageband_reference.py
+  Requires NumPy, SciPy, Matplotlib.
+  Local outputs: build/garageband_analysis (ignored by Git).
+
+Original source SHA-256, checked again after generating artifacts:
+  C4:    8679449c3edd1cd3428a785a975bca4de091931eb6f3dd0062862d6c9773ccde
+  E4:    94e564c9905d68781c4047032e7ebb7e474f2ec54df554caa722087bcf97d88a
+  G4:    33c1a2ef75a99362509f52cae5c1225426bd2b3b4283be5b4e8f2d9069a524cb
+  chord: 7fd3fccd8373121ddaaab0d3047e8723fc6f92d2bd1d3df30301856f780839c1
+PASS: supplied WAV bytes unchanged.
+
+Source formats: 44100 Hz, stereo PCM16.
+Durations seconds: C 6.545465, E 6.545465, G 7.429887, chord 8.727279.
+All source absolute peaks: 32391/32768 = 0.9884948730.
+This suggests but does not prove per-file normalization.
+Approximate onsets seconds:
+  C:     0.000000, 2.536825 (first attack at file edge)
+  E:     0.185850, 2.718844
+  G:     0.298844, 3.900862
+  chord: 0.454853, 4.438844
+
+Spectral window: 0.08..0.70 seconds after each estimated onset, Hann.
+Mean of L/R power spectra, not FFT of mono average.
+Zero padding: 262144 points; displayed frequency grid 0.168228 Hz.
+Actual window resolution scale: 1/0.62 = 1.612903 Hz.
+Peak interpolation/repeatability does not establish physical tuning precision.
+
+First-hit primary peaks Hz: C 523.3788, E 659.8534, G 785.1072.
+Nominal half-frequency peaks are about 40.6/39.5/38.5 dB weaker.
+Chord first-hit matching peaks Hz: 523.2819, 659.7929, 785.0833.
+Chord second-hit matching peaks Hz: 523.2822, 659.8411, 784.9975.
+Single-hit repeat primary-peak differences Hz: 0.002591, 0.000064, 0.002226.
+First-six-partial repeat relative-level max differences dB: 0.09657, 0.00151, 0.01377.
+
+Observed stretching model f_n=n*f1*sqrt((1+B*n*n)/(1+B)):
+  B: C 0.0010330, E 0.0012363, G 0.0015063.
+  Frequency fit RMSE Hz: C 1.110, E 0.634, G 0.872.
+  First six detected candidates filtered by relative level and local SNR.
+  C partial 3 / G partial 2 separation is approximately 3.15 Hz.
+  These are empirical estimates, not identification of GarageBand's engine.
+
+Chord nonnegative POWER-spectrum combination, 350..5000 Hz:
+  Weights: C 0.324157, E 0.501403, G 0.353768.
+  Relative L2 residual: 0.0739.
+  Residual emphasizes strong peaks; it is not a perceptual quality score.
+  Cannot infer compression/nonlinearity or absence of resonance from this fit.
+
+Modal envelopes: +/-24 Hz complex demodulation, stereo energy, 5 ms output grid.
+Includes reverb and nearby modes. Initial C attack may be truncated.
+Key release timing, dry damping and room impulse response are unidentified.
+Dual-exponential fits describe observed wet envelopes only; bounds may be active.
+
+Preview outputs checked: stereo PCM16, 44100 Hz, non-silent, no clipping,
+first and last sample frames zero after short edit-edge fades.
+One common additive gain: 0.5526027636, no per-variant normalization.
+Measured-partial chord body RMS: 0.0999969005 (PCM16 playback units).
+Recorded-chord comparison body RMS: 0.0999969907.
+All additive variants share measured fundamentals, first-partial envelopes,
+panning and fixed synthetic room. They do not reproduce full hammer transients.
+These are offline parameter-based previews, not actual FPGA audio.
+
+Artifact duration / absolute peak / SHA-256:
+  additive_sine.wav: 7.3 s / 0.448090
+    5171ad25200bb70fbc5ce225d1b9205f2e4da38041ec39b84e78bb3ac4ba7fc4
+  additive_harmonic.wav: 7.3 s / 0.598206
+    c3a40bd60da259db6aeb949d330e91c948022273c5123e0aece779b8e928af22
+  additive_measured.wav: 7.3 s / 0.524597
+    bbf76e1a5fe4d86e1a491142538d3cd19f9b6d97e67747e315606d5223de98a9
+  additive_comparison.wav: 22.7 s / 0.598206
+    02070dc645fc6f4d5b285d8a116597a39e61a84a2684625a9063c5860887f5a9
+  reference_chord_vs_single_sum.wav: 4.4 s / 0.568481
+    c13f49de6cd63f4a18e10a7cc47d004570ee7763a1dd66d5e09c58022c220680
+
+Parameter files: analysis.json, piano_reference_modes.csv,
+observed_wet_modal_envelopes.csv.
+Figures visually reviewed: recordings_and_onsets.png, spectra_and_envelopes.png.
+Limitations and proposed FPGA implementation: docs/PIANO_REFERENCE_ANALYSIS.md.
+Three high-register notes and unknown velocities do not calibrate all 36 notes.
+
+Existing MAIN bitstream SHA-256 still:
+  4607DD5E9E09EFD8F0F3AC9B27D12DF59528403FCAF4976F63D7E9910E0A5C16
+This records preservation of the preceding build, not piano-tone validation.

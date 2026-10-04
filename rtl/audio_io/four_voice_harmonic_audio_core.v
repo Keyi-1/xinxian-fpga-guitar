@@ -5,7 +5,14 @@
 module four_voice_harmonic_audio_core #(
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer HARMONICS  = `HARMONICS_MAX,
-    parameter integer TIMBRE_BLEND_SAMPLES = `TIMBRE_BLEND_SAMPLES
+    parameter integer TIMBRE_BLEND_SAMPLES = `TIMBRE_BLEND_SAMPLES,
+    parameter integer PLUCK_MODE = 0,
+    parameter integer PLUCK_ATTACK_SAMPLES = 96,
+    parameter integer PLUCK_FAST_DECAY_SAMPLES = 9600,
+    parameter integer PLUCK_FAST_SHIFT = 13,
+    parameter integer PLUCK_SLOW_SHIFT = 16,
+    parameter integer PLUCK_RELEASE_SHIFT = 10,
+    parameter integer PLUCK_IDLE_LEVEL = 64
 ) (
     input  wire          clk_audio_ref,
     input  wire          rst_n,
@@ -95,7 +102,10 @@ module four_voice_harmonic_audio_core #(
         .busy          (timbre_busy)
     );
 
-    harmonic_voice_core #(.HARMONICS(HARMONICS)) u_voice0 (
+    harmonic_voice_core #(.HARMONICS(HARMONICS), .PLUCK_MODE(PLUCK_MODE), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT(PLUCK_RELEASE_SHIFT), .PLUCK_IDLE_LEVEL(PLUCK_IDLE_LEVEL)) u_voice0 (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[0]), .note_off(delivered_note_off[0]),
         .velocity_level(velocity_level[1:0]), .phase_inc(phase_inc[31:0]),
@@ -105,7 +115,10 @@ module four_voice_harmonic_audio_core #(
         .active(active0), .busy(busy0), .deadline_miss(deadline_miss0)
     );
 
-    harmonic_voice_core #(.HARMONICS(HARMONICS)) u_voice1 (
+    harmonic_voice_core #(.HARMONICS(HARMONICS), .PLUCK_MODE(PLUCK_MODE), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT(PLUCK_RELEASE_SHIFT), .PLUCK_IDLE_LEVEL(PLUCK_IDLE_LEVEL)) u_voice1 (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[1]), .note_off(delivered_note_off[1]),
         .velocity_level(velocity_level[3:2]), .phase_inc(phase_inc[63:32]),
@@ -115,7 +128,10 @@ module four_voice_harmonic_audio_core #(
         .active(active1), .busy(busy1), .deadline_miss(deadline_miss1)
     );
 
-    harmonic_voice_core #(.HARMONICS(HARMONICS)) u_voice2 (
+    harmonic_voice_core #(.HARMONICS(HARMONICS), .PLUCK_MODE(PLUCK_MODE), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT(PLUCK_RELEASE_SHIFT), .PLUCK_IDLE_LEVEL(PLUCK_IDLE_LEVEL)) u_voice2 (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[2]), .note_off(delivered_note_off[2]),
         .velocity_level(velocity_level[5:4]), .phase_inc(phase_inc[95:64]),
@@ -125,7 +141,10 @@ module four_voice_harmonic_audio_core #(
         .active(active2), .busy(busy2), .deadline_miss(deadline_miss2)
     );
 
-    harmonic_voice_core #(.HARMONICS(HARMONICS)) u_voice3 (
+    harmonic_voice_core #(.HARMONICS(HARMONICS), .PLUCK_MODE(PLUCK_MODE), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT(PLUCK_RELEASE_SHIFT), .PLUCK_IDLE_LEVEL(PLUCK_IDLE_LEVEL)) u_voice3 (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick_i),
         .note_on(delivered_note_on[3]), .note_off(delivered_note_off[3]),
         .velocity_level(velocity_level[7:6]), .phase_inc(phase_inc[127:96]),

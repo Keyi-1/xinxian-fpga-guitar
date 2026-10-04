@@ -112,8 +112,8 @@ module tb_neo_full_guitar_top;
             $display("FAIL: LCD backlight did not enable after reset");
             $fatal;
         end
-        if (pa_en_n !== 1'b1) begin
-            $display("FAIL: speaker amplifier is not muted while idle");
+        if (pa_en_n !== 1'b0) begin
+            $display("FAIL: speaker amplifier did not stay enabled while idle");
             $fatal;
         end
 
@@ -167,16 +167,9 @@ module tb_neo_full_guitar_top;
             $fatal;
         end
 
-        force dut.core_pa_enable = 1'b1;
-        #1;
+        // PA remains enabled throughout idle and all button activity.
         if (pa_en_n !== 1'b0) begin
-            $display("FAIL: active-low PA enable polarity is wrong");
-            $fatal;
-        end
-        release dut.core_pa_enable;
-        #1;
-        if (pa_en_n !== 1'b1) begin
-            $display("FAIL: PA did not return to idle mute");
+            $display("FAIL: PA changed during idle/button processing");
             $fatal;
         end
 

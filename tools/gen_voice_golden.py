@@ -8,6 +8,7 @@ PHASE_BITS = 32
 LUT_ADDR_BITS = 10
 LUT_VALUE_BITS = 16
 VECTOR_LENGTH = 48
+PCM_PRODUCT_SHIFT = 7  # Q1.15 gain with eight fractional bits retained in PCM24.
 
 ATTACK_SAMPLES = 32
 DECAY_SAMPLES = 8192
@@ -211,7 +212,7 @@ def main() -> None:
             note_off=note_off,
         )
 
-        pcm24 = (nco_sample * env_level) >> 15
+        pcm24 = (nco_sample * env_level) >> PCM_PRODUCT_SHIFT
         pcm16 = convert_pcm24_to_16(pcm24)
 
         rows.append(
@@ -276,6 +277,7 @@ def main() -> None:
         "vector_length": VECTOR_LENGTH,
         "note_on_index": 0,
         "note_off_index": 24,
+        "pcm_product_shift": PCM_PRODUCT_SHIFT,
         "sine_lut_sha256": sha256(
             sine_path.read_bytes()
         ).hexdigest(),

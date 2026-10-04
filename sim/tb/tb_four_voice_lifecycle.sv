@@ -58,7 +58,7 @@ module tb_four_voice_lifecycle;
     wire signed [23:0] ref_pcm3 = ref_voice_pcm[95:72];
 
     four_string_voice_control #(
-        .SLIDE_SAMPLES(4)
+        .SLIDE_SAMPLES(4), .VIBRATO_EXIT_INTERVAL(0)
     ) u_dut_control (
         .clk             (clk),
         .rst_n           (rst_n),
@@ -69,6 +69,7 @@ module tb_four_voice_lifecycle;
         .note_on         (dut_note_on),
         .note_off        (dut_note_off),
         .slide_valid     (),
+        .vibrato_enable(),
         .voice_active    (dut_control_active),
         .current_fret_id (),
         .target_phase_inc(dut_target_phase_inc),
@@ -93,7 +94,7 @@ module tb_four_voice_lifecycle;
     );
 
     four_string_voice_control #(
-        .SLIDE_SAMPLES(4)
+        .SLIDE_SAMPLES(4), .VIBRATO_EXIT_INTERVAL(0)
     ) u_ref_control (
         .clk             (clk),
         .rst_n           (rst_n),
@@ -104,6 +105,7 @@ module tb_four_voice_lifecycle;
         .note_on         (ref_note_on),
         .note_off        (ref_note_off),
         .slide_valid     (),
+        .vibrato_enable(),
         .voice_active    (ref_control_active),
         .current_fret_id (),
         .target_phase_inc(ref_target_phase_inc),

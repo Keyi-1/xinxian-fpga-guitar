@@ -71,21 +71,13 @@ module tb_full_realtime_acceptance;
 
     wire final_pcm_valid = dut.final_pcm_valid;
     wire [3:0] harmonic_deadline_miss =
-        dut.u_guitar_audio_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain
-        .u_four_voice_harmonic_audio_output.deadline_miss;
+        dut.u_guitar_audio_top.u_board_audio_chain.deadline_miss;
     wire [8:0] timbre_blend =
-        dut.u_guitar_audio_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain
-        .u_four_voice_harmonic_audio_output.timbre_blend;
+        dut.u_guitar_audio_top.u_board_audio_chain.timbre_blend;
     wire [8:0] chorus_blend =
-        dut.u_guitar_audio_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain
-        .u_four_voice_harmonic_audio_output.chorus_blend;
+        dut.u_guitar_audio_top.u_board_audio_chain.chorus_blend;
     wire [8:0] reverb_blend =
-        dut.u_guitar_audio_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain
-        .u_four_voice_harmonic_audio_output.reverb_blend;
+        dut.u_guitar_audio_top.u_board_audio_chain.reverb_blend;
 
     assign fret_col_in_n = fret_row_oe[0] ? ~pressed[7:0] :
                            fret_row_oe[1] ? ~pressed[15:8] :
@@ -97,7 +89,7 @@ module tb_full_realtime_acceptance;
         .MATRIX_DEBOUNCE_FRAMES(2),
         .SAMPLE_DIV(256), .PT8211_REF_DIV(4),
         .SLIDE_SAMPLES(960),
-        .ADC_SPI_CLK_DIV(25), .ADC_DEAD_SAMPLES(250),
+        .ADC_SPI_CLK_DIV(4), .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0),
         .FFT_FRAME_GAP_SAMPLES(512)
     ) dut (
         .sys_clk_50m(sys_clk_50m),
@@ -160,8 +152,8 @@ module tb_full_realtime_acceptance;
 
     always @(negedge adc_sclk) begin
         if (!adc_cs_n) begin
-            if ((adc_rising_count >= 6) && (adc_rising_count <= 17))
-                adc_miso = adc_selected_data[17-adc_rising_count];
+            if ((adc_rising_count >= 7) && (adc_rising_count <= 18))
+                adc_miso = adc_selected_data[18-adc_rising_count];
             else
                 adc_miso = 1'b0;
         end
@@ -170,12 +162,8 @@ module tb_full_realtime_acceptance;
     // Serial checker samples exactly where PT8211 samples: BCLK rising edge.
     always @(posedge dac_bclk) begin
         if (bit_count == 0) begin
-            expected_left = dut.u_guitar_audio_top.u_harmonic_audio_path
-                .u_four_string_harmonic_audio_chain
-                .u_four_voice_harmonic_audio_output.u_pt8211_tx.current_left;
-            expected_right = dut.u_guitar_audio_top.u_harmonic_audio_path
-                .u_four_string_harmonic_audio_chain
-                .u_four_voice_harmonic_audio_output.u_pt8211_tx.current_right;
+            expected_left = dut.u_guitar_audio_top.u_board_audio_chain.u_pt8211_tx.current_left;
+            expected_right = dut.u_guitar_audio_top.u_board_audio_chain.u_pt8211_tx.current_right;
         end
 
         if (bit_count < 16) begin
@@ -261,10 +249,10 @@ module tb_full_realtime_acceptance;
         timbre_select = 1'b0;
         chorus_enable = 1'b0;
         sustain_reverb_enable = 1'b0;
-        adc_value0 = 12'd1200;
-        adc_value1 = 12'd1700;
-        adc_value2 = 12'd2400;
-        adc_value3 = 12'd3300;
+        adc_value0 = 12'd2153;
+        adc_value1 = 12'd2253;
+        adc_value2 = 12'd2453;
+        adc_value3 = 12'd2853;
         adc_command = 5'd0;
         adc_channel = 3'd0;
         adc_selected_data = 12'd0;

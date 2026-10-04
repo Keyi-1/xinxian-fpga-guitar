@@ -3,7 +3,14 @@
 // One scheduled harmonic engine per voice. It completes HARMONICS logical
 // components between two 48 kHz sample enables and emits one saturated PCM24.
 module harmonic_voice_core #(
-    parameter integer HARMONICS = `HARMONICS_MAX
+    parameter integer HARMONICS = `HARMONICS_MAX,
+    parameter integer PLUCK_MODE = 0,
+    parameter integer PLUCK_ATTACK_SAMPLES = 96,
+    parameter integer PLUCK_FAST_DECAY_SAMPLES = 9600,
+    parameter integer PLUCK_FAST_SHIFT = 13,
+    parameter integer PLUCK_SLOW_SHIFT = 16,
+    parameter integer PLUCK_RELEASE_SHIFT = 10,
+    parameter integer PLUCK_IDLE_LEVEL = 64
 ) (
     input  wire                         clk,
     input  wire                         rst_n,
@@ -64,7 +71,10 @@ module harmonic_voice_core #(
         $readmemh("../../mem/harmonic_decay_rock.mem", harmonic_decay_rock);
     end
 
-    voice_envelope u_voice_envelope (
+    voice_envelope #(.PLUCK_MODE(PLUCK_MODE), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
+        .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
+        .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),
+        .PLUCK_RELEASE_SHIFT(PLUCK_RELEASE_SHIFT), .PLUCK_IDLE_LEVEL(PLUCK_IDLE_LEVEL)) u_voice_envelope (
         .clk           (clk),
         .rst_n         (rst_n),
         .sample_ce     (sample_ce),

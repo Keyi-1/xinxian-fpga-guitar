@@ -1,0 +1,109 @@
+NEO dual-PCB full-chain audio validation
+Date: 2026-10-03 (Asia/Shanghai)
+Status: RTL simulation and fixed-pin implementation PASS; dual-PCB hardware test PENDING.
+
+Sources reviewed
+----------------
+Local HEAD and GitHub latest commit agree:
+2cb7419f72d1b8cc74420711e298c1972143dd38
+https://github.com/Keyi-1/xinxian-fpga-guitar/commit/2cb7419f72d1b8cc74420711e298c1972143dd38
+Previous optimization baseline:
+27cace8bd437bd9e07889aa3fcd8421274955d30
+https://github.com/Keyi-1/xinxian-fpga-guitar/commit/27cace8bd437bd9e07889aa3fcd8421274955d30
+Also reviewed recent history: 64ae5cd, df0553d, 40a0c2a, cd72347.
+Hardware baseline confirmations are from the user and repository records.
+No new physical-board measurements were performed in this task.
+
+Project audit
+-------------
+Project: gowin/neo_full_chain_audio_test/neo_full_chain_audio_test.gprj
+Top: neo_full_chain_audio_test_top
+Part: GW5AT-LV60PG484AC1/I0, version B
+Project XML parsed successfully; all 21 referenced files exist.
+CST: 26 ports mapped to 26 distinct balls.
+Both board-verified CST maps are preserved exactly, including shared audio/reset pins.
+Every final Pin Report assignment matches the new CST, with Constraint=Y.
+12 audio/matrix helper files match the optimized matrix project byte-for-byte.
+3 ADC helper files match test3 byte-for-byte.
+The private configuration copy uses test3 ADC_SPI_CLK_DIV=4, not the matrix copy's 25.
+Generated netlist contains four TBUF instances, one per row.
+
+ModelSim regression
+-------------------
+Tool: ModelSim SE-64 10.6d
+Command: gowin/neo_full_chain_audio_test/run_sim.ps1
+Compilation: Errors: 0, Warnings: 0
+Each of the three simulation runs: Errors: 0, Warnings: 0
+
+tb_neo_full_chain_audio_test:
+PASS: all 36 pitches select silently and launch only from pin-level MCP3208 plucks
+PASS: hysteresis, dead time, bipolar detection and same-string repluck isolation
+PASS: highest-fret slides, final-release pitch hold and new open-string pluck
+PASS: natural decay, all six stereo pairs, constant PA and decoded PT8211 frames
+PASS: integrated link regression; max detected-pluck-to-Attack delay=59 clocks (limit 64)
+
+tb_neo_guitar_link_control:
+PASS: queued/on-tick events, release/pluck priority, frozen Release pitch and four-string batching
+
+tb_neo_full_chain_default_timing:
+PASS: shipped defaults select silently; Fs=48 kHz; PT8211 BCLK=1.536 MHz; ADC excursion to Attack=20.955 us
+PASS: shipped-default debounce, Attack and final-fret Release
+
+The main regression accelerates counters. The default-timing smoke uses a
+12.288 MHz reference and no DUT parameter overrides. The reported 20.955 us
+is one simulated ADC-code-excursion-to-Attack measurement. It is not a
+worst-case physical piezo-to-analogue-output latency measurement.
+SPI model reproduces null on rising edge 7, B11 on edge 8, and B0 on edge 19;
+the unchanged test3 reader's forced-odd-code alignment compensation is covered.
+PT8211 serial data bits are compared to submitted stereo PCM at frame boundaries.
+
+Final fixed-pin Gowin build
+--------------------------
+Tool: Gowin V1.9.12.03 (64-bit)
+Command: gw_sh.exe build.tcl (from project directory)
+Final report creation time: 2026-10-03 20:48:36 +08:00
+Synthesis: completed
+Placement and routing: completed
+Bitstream generation: completed
+Clock constraint: 12.288 MHz, period 81.380208 ns
+Endpoints analyzed: 4750
+Setup violated endpoints: 0
+Hold violated endpoints: 0
+Setup/Hold TNS: 0.000 / 0.000 ns
+Actual Fmax: 14.496 MHz
+Worst reported setup slack: 12.397 ns
+Logic: 8202/59904 (14%)
+Register: 1497/60780 (3%)
+Logic and I/O latches: 0
+BSRAM: 4/118 (4%)
+DSP: 4/118 (4%)
+I/O ports: 26/297 (9%)
+
+Retained tool warnings (not a zero-warning synthesis/P&R claim):
+NL0002: note_phase_table hierarchy swept by optimization; pitch ROM contents
+        are compiled into combinational logic (no separate pitch BSRAM).
+PA1001: dangling unused mapped arithmetic, RAM and DSP output nets.
+PR1014: V13 clock uses generic routing to reach the clock resource. V13 is
+        the existing board-verified clock pin; final internal timing still passes.
+No duplicate-pin, unusable-pin, latch, or width-truncation warning was reported.
+The inherited SDC checks the internal audio-clock domain; it does not replace
+physical SPI/DAC timing measurements or analogue audio verification.
+
+Bitstream
+---------
+Path: gowin/neo_full_chain_audio_test/impl/pnr/neo_full_chain_audio_test.fs
+SHA256: A13AAC6F3B3995FFE08D263547BB91BB53F9DD4247E66F5AB98D81251D45200F
+Generated files in impl/ and simulation logs in temp/ are Git-ignored.
+Hardware programming was not performed.
+Existing test3, matrix audio, MINIMAL and FULL project files were not modified.
+
+
+2026-10-03 hardware follow-up (user report)
+-------------------------------------------
+The user confirmed that the two-PCB full-chain hardware test worked very well.
+This is functional acceptance from the user's test, without new quantitative
+acoustic measurements. The successful flattened test sources are preserved.
+The standard main RTL/project has since been synchronized; see
+main_engine_sync_acceptance.txt for its separate digital validation.
+The original build hash above identifies the earlier generated artifact;
+subsequent IDE builds can produce a different bitstream file hash.

@@ -4,14 +4,18 @@
 // Pin locations deliberately remain outside this module until the actual Dock
 // revision, LCD FPC and external sensor wiring have been confirmed.
 module neo_full_guitar_top #(
-    parameter integer MATRIX_CLK_DIV = 50000,
-    parameter integer MATRIX_SETTLE_CYCLES = 1,
+    parameter integer MATRIX_CLK_DIV = `MATRIX_CLK_DIV,
+    parameter integer MATRIX_SETTLE_CYCLES = `MATRIX_SETTLE_CYCLES,
     parameter integer MATRIX_DEBOUNCE_FRAMES = `DEBOUNCE_SCANS,
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer PT8211_REF_DIV = `PT8211_REF_DIV,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer ADC_SPI_CLK_DIV = `ADC_SPI_CLK_DIV,
     parameter integer ADC_DEAD_SAMPLES = `RETRIGGER_DEAD_SAMPLES,
+    parameter integer ADC_SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
+    parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE,
+    parameter integer USE_HARMONIC = 1,
+    parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
     parameter integer H_ACTIVE = 800,
     parameter integer H_FRONT = 40,
@@ -151,6 +155,9 @@ module neo_full_guitar_top #(
         .SLIDE_SAMPLES(SLIDE_SAMPLES),
         .ADC_SPI_CLK_DIV(ADC_SPI_CLK_DIV),
         .ADC_DEAD_SAMPLES(ADC_DEAD_SAMPLES),
+        .ADC_SETTLE_SAMPLES(ADC_SETTLE_SAMPLES),
+        .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE), .USE_HARMONIC(USE_HARMONIC),
+        .ANTI_BEAT_ENABLE(ANTI_BEAT_ENABLE),
         .FFT_FRAME_GAP_SAMPLES(FFT_FRAME_GAP_SAMPLES),
         .H_ACTIVE(H_ACTIVE), .H_FRONT(H_FRONT), .H_SYNC(H_SYNC),
         .H_BACK(H_BACK), .V_ACTIVE(V_ACTIVE), .V_FRONT(V_FRONT),
@@ -178,7 +185,7 @@ module neo_full_guitar_top #(
         .display_cdc_overrun(display_cdc_overrun_internal)
     );
 
-    // NEO Dock 31004: PA_EN high mutes the speaker amplifier.
+    // NEO amplifier mute is high; the core stays enabled after audio reset.
     assign pa_en_n = rst_n ? ~core_pa_enable : 1'b1;
 
     // Keep pixel-clock polarity and backlight polarity explicit until the

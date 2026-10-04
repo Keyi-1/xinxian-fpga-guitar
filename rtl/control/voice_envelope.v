@@ -6,7 +6,7 @@ module voice_envelope #(
     parameter integer RELEASE_SAMPLES = `ENV_RELEASE_SAMPLES,
     parameter integer SUSTAIN_LEVEL   = `ENV_SUSTAIN_LEVEL,
     // Optional multiplier-free plucked-string mode.  The default keeps the
-    // original ADSR behaviour for every existing MINIMAL/FULL instance.
+    // original ADSR behaviour for legacy callers; current main tops opt in.
     parameter integer PLUCK_MODE               = 0,
     parameter integer PLUCK_ATTACK_SAMPLES     = 96,
     parameter integer PLUCK_FAST_DECAY_SAMPLES = 9600,
@@ -43,6 +43,7 @@ module voice_envelope #(
     reg [`ENV_LEVEL_BITS-1:0] release_step;
     reg [`ENV_LEVEL_BITS-1:0] active_release_step;
     reg [31:0] pluck_decay_age;
+    reg pluck_release_sustain;
 
     wire [`ENV_LEVEL_BITS-1:0] pluck_fast_delta;
     wire [`ENV_LEVEL_BITS-1:0] pluck_slow_delta;
@@ -55,9 +56,13 @@ module voice_envelope #(
     assign pluck_slow_delta =
         ((env_level >> PLUCK_SLOW_SHIFT) == 0) ? 1'b1 :
         (env_level >> PLUCK_SLOW_SHIFT);
-    assign pluck_release_delta =
-        ((env_level >> PLUCK_RELEASE_SHIFT) == 0) ? 1'b1 :
-        (env_level >> PLUCK_RELEASE_SHIFT);
+    // KEY3 can prolong damping in the optional harmonic path. Capture it at
+    // note_off, like ADSR, so switching later cannot abruptly change this tail.
+    assign pluck_release_delta = pluck_release_sustain ?
+        (((env_level >> (PLUCK_RELEASE_SHIFT + 2)) == 0) ? 1'b1 :
+         (env_level >> (PLUCK_RELEASE_SHIFT + 2))) :
+        (((env_level >> PLUCK_RELEASE_SHIFT) == 0) ? 1'b1 :
+         (env_level >> PLUCK_RELEASE_SHIFT));
 
     function [`ENV_LEVEL_BITS-1:0] velocity_attack_target;
         input [1:0] velocity;
@@ -143,6 +148,7 @@ module voice_envelope #(
             release_step <= 0;
             active_release_step <= 0;
             pluck_decay_age <= 0;
+            pluck_release_sustain <= 1'b0;
         end
         else if (sample_ce) begin
             if (note_on) begin
@@ -159,11 +165,13 @@ module voice_envelope #(
                 release_step <= velocity_release_step(velocity_level);
                 active_release_step <= velocity_release_step(velocity_level);
                 pluck_decay_age <= 0;
+                pluck_release_sustain <= 1'b0;
             end
             else if (note_off &&
                      state != STATE_IDLE &&
                      state != STATE_RELEASE) begin
                 state  <= STATE_RELEASE;
+                pluck_release_sustain <= sustain_enable;
                 active <= 1'b1;
                 if (sustain_enable) begin
                     if ((release_step >> 2) == 0)

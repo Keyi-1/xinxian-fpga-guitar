@@ -49,7 +49,7 @@ module tb_guitar_audio_top;
         .PT8211_REF_DIV        (1),
         .SLIDE_SAMPLES         (4),
         .ADC_SPI_CLK_DIV       (2),
-        .ADC_DEAD_SAMPLES      (2)
+        .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0)
     ) dut (
         .sys_clk_50m      (sys_clk_50m),
         .audio_clk_12m288 (audio_clk_12m288),
@@ -73,10 +73,11 @@ module tb_guitar_audio_top;
         .velocity_level   (velocity_level),
         .raw_adc          (raw_adc),
         .peak_adc         (peak_adc),
-        .event_timestamp  (event_timestamp)
+        .event_timestamp  (event_timestamp),
+        .pluck_events(), .final_pcm_valid(), .final_pcm()
     );
 
-    // Deliberately unrelated periods exercise both CDC paths.
+    // System clock is unrelated; all matrix/ADC/audio processing uses audio_clk.
     always #5 sys_clk_50m = ~sys_clk_50m;
     always #7 audio_clk_12m288 = ~audio_clk_12m288;
 
@@ -115,8 +116,8 @@ module tb_guitar_audio_top;
 
     always @(negedge adc_sclk) begin
         if (!adc_cs_n) begin
-            if ((adc_rising_count >= 6) && (adc_rising_count <= 17))
-                adc_miso = adc_selected_data[17-adc_rising_count];
+            if ((adc_rising_count >= 7) && (adc_rising_count <= 18))
+                adc_miso = adc_selected_data[18-adc_rising_count];
             else
                 adc_miso = 1'b0;
         end
@@ -162,16 +163,15 @@ module tb_guitar_audio_top;
     integer frame_count;
     integer error_count;
     integer nonzero_frame_count;
+    integer stereo_frame_count;
     reg [15:0] expected_left;
     reg [15:0] expected_right;
 
     always @(posedge dac_bclk) begin
         if (bit_count == 0) begin
-            expected_left = dut.u_sine_audio_path.u_four_string_audio_chain
-                               .u_four_voice_audio_output
+            expected_left = dut.u_board_audio_chain
                                .u_pt8211_tx.current_left;
-            expected_right = dut.u_sine_audio_path.u_four_string_audio_chain
-                                .u_four_voice_audio_output
+            expected_right = dut.u_board_audio_chain
                                 .u_pt8211_tx.current_right;
         end
 
@@ -189,7 +189,7 @@ module tb_guitar_audio_top;
         if (bit_count == 31) begin
             frame_count = frame_count + 1;
             if (expected_left !== expected_right)
-                error_count = error_count + 1;
+                stereo_frame_count = stereo_frame_count + 1;
             if (expected_left !== 16'd0)
                 nonzero_frame_count = nonzero_frame_count + 1;
             bit_count = 0;
@@ -205,10 +205,10 @@ module tb_guitar_audio_top;
         rst_n             = 1'b0;
         pressed           = 32'd0;
         adc_miso          = 1'b0;
-        adc_value0        = 12'd0;
-        adc_value1        = 12'd0;
-        adc_value2        = 12'd0;
-        adc_value3        = 12'd0;
+        adc_value0        = 12'd2053;
+        adc_value1        = 12'd2053;
+        adc_value2        = 12'd2053;
+        adc_value3        = 12'd2053;
         adc_command       = 5'd0;
         adc_channel       = 3'd0;
         adc_selected_data = 12'd0;
@@ -217,6 +217,7 @@ module tb_guitar_audio_top;
         frame_count       = 0;
         error_count       = 0;
         nonzero_frame_count = 0;
+        stereo_frame_count = 0;
         expected_left     = 16'd0;
         expected_right    = 16'd0;
 
@@ -228,32 +229,24 @@ module tb_guitar_audio_top;
         wait_stable_fret(16'h7421);
 
         // Four MCP3208 envelope levels map to velocity levels 0 through 3.
-        adc_value0 = 12'd1200;
-        adc_value1 = 12'd1700;
-        adc_value2 = 12'd2400;
-        adc_value3 = 12'd3300;
+        adc_value0 = 12'd2153;
+        adc_value1 = 12'd2253;
+        adc_value2 = 12'd2453;
+        adc_value3 = 12'd2853;
         wait_audio_active(4'b1111);
         if (velocity_level !== 8'hE4) begin
             $display("FAIL: ADC velocity levels=%h", velocity_level);
             $finish;
         end
-        if ((dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                .u_four_voice_audio_core.u_voice0.u_voice_envelope.attack_target !== 16'd12288) ||
-            (dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                .u_four_voice_audio_core.u_voice1.u_voice_envelope.attack_target !== 16'd16384) ||
-            (dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                .u_four_voice_audio_core.u_voice2.u_voice_envelope.attack_target !== 16'd24576) ||
-            (dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                .u_four_voice_audio_core.u_voice3.u_voice_envelope.attack_target !== 16'd32767)) begin
+        if ((dut.u_board_audio_chain.g_sine.u_core.u_voice0.u_voice_envelope.attack_target !== 16'd12288) ||
+            (dut.u_board_audio_chain.g_sine.u_core.u_voice1.u_voice_envelope.attack_target !== 16'd16384) ||
+            (dut.u_board_audio_chain.g_sine.u_core.u_voice2.u_voice_envelope.attack_target !== 16'd24576) ||
+            (dut.u_board_audio_chain.g_sine.u_core.u_voice3.u_voice_envelope.attack_target !== 16'd32767)) begin
             $display("FAIL: ADC velocity attack targets %0d %0d %0d %0d",
-                     dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                         .u_four_voice_audio_core.u_voice0.u_voice_envelope.attack_target,
-                     dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                         .u_four_voice_audio_core.u_voice1.u_voice_envelope.attack_target,
-                     dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                         .u_four_voice_audio_core.u_voice2.u_voice_envelope.attack_target,
-                     dut.u_sine_audio_path.u_four_string_audio_chain.u_four_voice_audio_output
-                         .u_four_voice_audio_core.u_voice3.u_voice_envelope.attack_target);
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice0.u_voice_envelope.attack_target,
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice1.u_voice_envelope.attack_target,
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice2.u_voice_envelope.attack_target,
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice3.u_voice_envelope.attack_target);
             $finish;
         end
 
@@ -268,12 +261,12 @@ module tb_guitar_audio_top;
             $display("FAIL: PT8211 protocol errors=%0d", error_count);
             $finish;
         end
-        if (nonzero_frame_count == 0) begin
+        if (nonzero_frame_count == 0 || stereo_frame_count == 0) begin
             $display("FAIL: top chain produced only zero PT8211 frames");
             $finish;
         end
 
-        $display("PASS: matrix and pluck CDC through four-string PT8211 top, frames=%0d nonzero=%0d",
+        $display("PASS: matrix and pluck through stereo four-string PT8211 top, frames=%0d nonzero=%0d",
                  frame_count, nonzero_frame_count);
         $finish;
     end

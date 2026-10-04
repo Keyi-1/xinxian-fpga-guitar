@@ -43,7 +43,7 @@ module tb_full_guitar_top;
         .MATRIX_CLK_DIV(2), .MATRIX_SETTLE_CYCLES(1),
         .MATRIX_DEBOUNCE_FRAMES(2), .SAMPLE_DIV(64),
         .PT8211_REF_DIV(1), .SLIDE_SAMPLES(4),
-        .ADC_SPI_CLK_DIV(2), .ADC_DEAD_SAMPLES(2),
+        .ADC_SPI_CLK_DIV(2), .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0),
         .FFT_FRAME_GAP_SAMPLES(8),
         .H_ACTIVE(64), .H_FRONT(2), .H_SYNC(4), .H_BACK(2),
         .V_ACTIVE(32), .V_FRONT(1), .V_SYNC(2), .V_BACK(1),
@@ -102,8 +102,8 @@ module tb_full_guitar_top;
     end
     always @(negedge adc_sclk) begin
         if (!adc_cs_n) begin
-            if ((adc_rising_count >= 6) && (adc_rising_count <= 17))
-                adc_miso = adc_selected_data[17-adc_rising_count];
+            if ((adc_rising_count >= 7) && (adc_rising_count <= 18))
+                adc_miso = adc_selected_data[18-adc_rising_count];
             else
                 adc_miso = 1'b0;
         end
@@ -121,12 +121,8 @@ module tb_full_guitar_top;
 
     always @(posedge dac_bclk) begin
         if (bit_count == 0) begin
-            expected_left = dut.u_guitar_audio_top.u_harmonic_audio_path
-                .u_four_string_harmonic_audio_chain
-                .u_four_voice_harmonic_audio_output.u_pt8211_tx.current_left;
-            expected_right = dut.u_guitar_audio_top.u_harmonic_audio_path
-                .u_four_string_harmonic_audio_chain
-                .u_four_voice_harmonic_audio_output.u_pt8211_tx.current_right;
+            expected_left = dut.u_guitar_audio_top.u_board_audio_chain.u_pt8211_tx.current_left;
+            expected_right = dut.u_guitar_audio_top.u_board_audio_chain.u_pt8211_tx.current_right;
         end
         if (bit_count < 16) begin
             if ((dut.dac_lrck !== 1'b0) ||
@@ -161,10 +157,10 @@ module tb_full_guitar_top;
         rst_n = 1'b0;
         pressed = 32'd0;
         adc_miso = 1'b0;
-        adc_value0 = 0;
-        adc_value1 = 0;
-        adc_value2 = 0;
-        adc_value3 = 0;
+        adc_value0 = 12'd2053;
+        adc_value1 = 12'd2053;
+        adc_value2 = 12'd2053;
+        adc_value3 = 12'd2053;
         adc_command = 0;
         adc_channel = 0;
         adc_selected_data = 0;
@@ -180,10 +176,10 @@ module tb_full_guitar_top;
         repeat (5) @(posedge sys_clk_50m);
         #1 rst_n = 1'b1;
         pressed = 32'h40080201;
-        adc_value0 = 12'd1200;
-        adc_value1 = 12'd1700;
-        adc_value2 = 12'd2400;
-        adc_value3 = 12'd3300;
+        adc_value0 = 12'd2153;
+        adc_value1 = 12'd2253;
+        adc_value2 = 12'd2453;
+        adc_value3 = 12'd2853;
         wait (audio_voice_active == 4'b1111);
         wait (frame_count >= 2000);
         #1;

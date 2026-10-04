@@ -28,7 +28,7 @@ module tb_mcp3208_pluck_frontend;
 
     mcp3208_pluck_frontend #(
         .SPI_CLK_DIV (2),
-        .DEAD_SAMPLES(2)
+        .DEAD_SAMPLES(2), .SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0)
     ) dut (
         .clk            (clk),
         .rst_n          (rst_n),
@@ -87,8 +87,8 @@ module tb_mcp3208_pluck_frontend;
 
     always @(negedge adc_sclk) begin
         if (!adc_cs_n) begin
-            if ((rising_count >= 6) && (rising_count <= 17))
-                adc_miso = selected_data[17-rising_count];
+            if ((rising_count >= 7) && (rising_count <= 18))
+                adc_miso = selected_data[18-rising_count];
             else
                 adc_miso = 1'b0;
         end
@@ -158,10 +158,10 @@ module tb_mcp3208_pluck_frontend;
         clk                 = 1'b0;
         rst_n               = 1'b0;
         adc_miso            = 1'b0;
-        adc_value0          = 12'd1200;
-        adc_value1          = 12'd1700;
-        adc_value2          = 12'd2400;
-        adc_value3          = 12'd3300;
+        adc_value0          = 12'd2153;
+        adc_value1          = 12'd2253;
+        adc_value2          = 12'd2453;
+        adc_value3          = 12'd2853;
         command_bits        = 5'd0;
         captured_command    = 5'd0;
         selected_channel    = 3'd0;
@@ -189,19 +189,19 @@ module tb_mcp3208_pluck_frontend;
                      velocity2_at_event, velocity3_at_event);
             $finish;
         end
-        if ((raw_adc[11:0] !== 12'd1200) ||
-            (raw_adc[23:12] !== 12'd1700) ||
-            (raw_adc[35:24] !== 12'd2400) ||
-            (raw_adc[47:36] !== 12'd3300)) begin
+        if ((raw_adc[11:0] !== 12'd2153) ||
+            (raw_adc[23:12] !== 12'd2253) ||
+            (raw_adc[35:24] !== 12'd2453) ||
+            (raw_adc[47:36] !== 12'd2853)) begin
             $display("FAIL: MCP3208 channel sample ordering");
             $finish;
         end
 
         // Let string 0 fall below the rearm threshold for more than its
         // two-sample dead time, then verify a new pluck can be emitted.
-        adc_value0 = 12'd700;
+        adc_value0 = 12'd2053;
         repeat (1000) @(posedge clk);
-        adc_value0 = 12'd1700;
+        adc_value0 = 12'd2253;
 
         wait_for_string0_events(2);
         #1;

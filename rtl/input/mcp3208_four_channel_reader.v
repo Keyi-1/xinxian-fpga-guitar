@@ -1,6 +1,5 @@
 `include "../config/guitar_config.vh"
 
-// Continuously polls MCP3208 channels 0 through 3 in round-robin order.
 module mcp3208_four_channel_reader #(
     parameter integer CLK_DIV = `ADC_SPI_CLK_DIV
 ) (
@@ -62,7 +61,10 @@ module mcp3208_four_channel_reader #(
             if (spi_sample_valid) begin
                 sample_valid       <= 1'b1;
                 sample_string      <= spi_sample_channel[1:0];
-                sample_data        <= spi_sample_data;
+                // Preserve the board-tested null/B11..B1 capture: discard the
+                // null, restore the upper 11 bits and force B0=1 (odd codes).
+                // This is intentionally not a full 12-bit conversion result.
+                sample_data        <= {spi_sample_data[10:0], 1'b1};
                 current_string     <= current_string + 1'b1;
                 waiting_for_sample <= 1'b0;
             end

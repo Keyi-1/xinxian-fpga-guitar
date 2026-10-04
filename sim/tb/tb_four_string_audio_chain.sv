@@ -40,6 +40,7 @@ module tb_four_string_audio_chain;
         .note_on         (note_on),
         .note_off        (note_off),
         .slide_valid     (slide_valid),
+        .vibrato_enable(),
         .voice_active    (control_voice_active),
         .current_fret_id (current_fret_id),
         .target_phase_inc(target_phase_inc),

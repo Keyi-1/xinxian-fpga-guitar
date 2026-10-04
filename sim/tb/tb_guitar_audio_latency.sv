@@ -30,7 +30,7 @@ module tb_guitar_audio_latency;
     guitar_audio_top #(
         .SAMPLE_DIV      (256),
         .PT8211_REF_DIV  (4),
-        .ADC_SPI_CLK_DIV (25),
+        .ADC_SPI_CLK_DIV(4),
         .USE_HARMONIC    (0)
     ) u_sine_top (
         .sys_clk_50m       (sys_clk_50m),
@@ -57,13 +57,14 @@ module tb_guitar_audio_latency;
         .peak_adc          (),
         .event_timestamp   (),
         .final_pcm_valid   (),
+        .pluck_events(),
         .final_pcm         ()
     );
 
     guitar_audio_top #(
         .SAMPLE_DIV      (256),
         .PT8211_REF_DIV  (4),
-        .ADC_SPI_CLK_DIV (25),
+        .ADC_SPI_CLK_DIV(4),
         .USE_HARMONIC    (1)
     ) u_harmonic_top (
         .sys_clk_50m       (sys_clk_50m),
@@ -90,6 +91,7 @@ module tb_guitar_audio_latency;
         .peak_adc          (),
         .event_timestamp   (),
         .final_pcm_valid   (),
+        .pluck_events(),
         .final_pcm         ()
     );
 
@@ -137,27 +139,23 @@ module tb_guitar_audio_latency;
 
     always @(negedge sine_adc_sclk) begin
         if (!sine_adc_cs_n) begin
-            if ((adc_rising_count >= 6) && (adc_rising_count <= 17))
-                adc_miso = adc_selected_data[17-adc_rising_count];
+            if ((adc_rising_count >= 7) && (adc_rising_count <= 18))
+                adc_miso = adc_selected_data[18-adc_rising_count];
             else
                 adc_miso = 1'b0;
         end
     end
 
     wire sine_pcm16_valid =
-        u_sine_top.u_sine_audio_path.u_four_string_audio_chain.pcm16_valid;
+        u_sine_top.u_board_audio_chain.pcm16_left_valid;
     wire signed [15:0] sine_pcm16 =
-        u_sine_top.u_sine_audio_path.u_four_string_audio_chain.pcm16_out;
+        (u_sine_top.u_board_audio_chain.pcm16_left_out != 0) ? u_sine_top.u_board_audio_chain.pcm16_left_out : u_sine_top.u_board_audio_chain.pcm16_right_out;
     wire harmonic_pcm16_valid =
-        u_harmonic_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain.pcm16_valid;
+        u_harmonic_top.u_board_audio_chain.pcm16_left_valid;
     wire signed [15:0] harmonic_pcm16 =
-        u_harmonic_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain.pcm16_out;
+        (u_harmonic_top.u_board_audio_chain.pcm16_left_out != 0) ? u_harmonic_top.u_board_audio_chain.pcm16_left_out : u_harmonic_top.u_board_audio_chain.pcm16_right_out;
     wire [3:0] harmonic_deadline_miss =
-        u_harmonic_top.u_harmonic_audio_path
-        .u_four_string_harmonic_audio_chain
-        .u_four_voice_harmonic_audio_output.deadline_miss;
+        u_harmonic_top.u_board_audio_chain.deadline_miss;
 
     reg measurement_active;
     integer current_string;
@@ -221,10 +219,10 @@ module tb_guitar_audio_latency;
 
     task clear_adc_values;
         begin
-            adc_value0 = 12'd0;
-            adc_value1 = 12'd0;
-            adc_value2 = 12'd0;
-            adc_value3 = 12'd0;
+            adc_value0 = 12'd2053;
+            adc_value1 = 12'd2053;
+            adc_value2 = 12'd2053;
+            adc_value3 = 12'd2053;
         end
     endtask
 
@@ -270,11 +268,11 @@ module tb_guitar_audio_latency;
             harmonic_stream_count = 0;
             stream_interval_errors = 0;
 
-            set_adc_value(string_index, 12'd3300);
+            set_adc_value(string_index, 12'd2853);
 
             guard = 0;
-            while (((u_sine_top.pluck_valid_sys[string_index] !== 1'b1) ||
-                    (u_harmonic_top.pluck_valid_sys[string_index] !== 1'b1)) &&
+            while (((u_sine_top.pluck_valid_audio[string_index] !== 1'b1) ||
+                    (u_harmonic_top.pluck_valid_audio[string_index] !== 1'b1)) &&
                    (guard < 200000)) begin
                 @(posedge sys_clk_50m);
                 #1;

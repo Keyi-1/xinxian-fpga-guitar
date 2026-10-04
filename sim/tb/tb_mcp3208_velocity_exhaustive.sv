@@ -34,7 +34,7 @@ module tb_mcp3208_velocity_exhaustive;
     integer level_index;
 
     mcp3208_pluck_frontend #(
-        .SPI_CLK_DIV(2), .DEAD_SAMPLES(2)
+        .SPI_CLK_DIV(2), .DEAD_SAMPLES(2), .SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0)
     ) dut (
         .clk(clk), .rst_n(rst_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk),
@@ -62,10 +62,10 @@ module tb_mcp3208_velocity_exhaustive;
         input integer level;
         begin
             case (level)
-                0: adc_value_for_level = 12'd1200;
-                1: adc_value_for_level = 12'd1700;
-                2: adc_value_for_level = 12'd2400;
-                default: adc_value_for_level = 12'd3300;
+                0: adc_value_for_level = 12'd2153;
+                1: adc_value_for_level = 12'd2253;
+                2: adc_value_for_level = 12'd2453;
+                default: adc_value_for_level = 12'd2853;
             endcase
         end
     endfunction
@@ -109,8 +109,8 @@ module tb_mcp3208_velocity_exhaustive;
 
     always @(negedge adc_sclk) begin
         if (!adc_cs_n) begin
-            if ((rising_count >= 6) && (rising_count <= 17))
-                adc_miso = selected_data[17-rising_count];
+            if ((rising_count >= 7) && (rising_count <= 18))
+                adc_miso = selected_data[18-rising_count];
             else
                 adc_miso = 1'b0;
         end
@@ -139,7 +139,7 @@ module tb_mcp3208_velocity_exhaustive;
         integer guard;
         reg [1:0] observed_level;
         begin
-            set_adc_value(selected_string, 12'd700);
+            set_adc_value(selected_string, 12'd2053);
             repeat (1000) @(posedge clk);
 
             event_count_before = event_count;
@@ -171,7 +171,7 @@ module tb_mcp3208_velocity_exhaustive;
                 $fatal;
             end
             previous_timestamp = last_timestamp;
-            set_adc_value(selected_string, 12'd700);
+            set_adc_value(selected_string, 12'd2053);
         end
     endtask
 
@@ -179,10 +179,10 @@ module tb_mcp3208_velocity_exhaustive;
         clk = 1'b0;
         rst_n = 1'b0;
         adc_miso = 1'b0;
-        adc_value0 = 12'd700;
-        adc_value1 = 12'd700;
-        adc_value2 = 12'd700;
-        adc_value3 = 12'd700;
+        adc_value0 = 12'd2053;
+        adc_value1 = 12'd2053;
+        adc_value2 = 12'd2053;
+        adc_value3 = 12'd2053;
         command_bits = 5'd0;
         captured_command = 5'd0;
         selected_channel = 3'd0;
@@ -216,10 +216,10 @@ module tb_mcp3208_velocity_exhaustive;
                      command_error_count);
             $fatal;
         end
-        if ((raw_adc[11:0] > 12'd800) ||
-            (raw_adc[23:12] > 12'd800) ||
-            (raw_adc[35:24] > 12'd800) ||
-            (raw_adc[47:36] > 12'd800)) begin
+        if ((raw_adc[11:0] !== 12'd2053) ||
+            (raw_adc[23:12] !== 12'd2053) ||
+            (raw_adc[35:24] !== 12'd2053) ||
+            (raw_adc[47:36] !== 12'd2053)) begin
             $display("FAIL: one or more ADC channels did not return below rearm threshold raw=%h",
                      raw_adc);
             $fatal;

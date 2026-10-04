@@ -3,14 +3,18 @@
 // FULL logical product top.  All performance-path behavior is RTL; pixel_clk
 // is supplied by the board clock/PLL wrapper so this module remains portable.
 module full_guitar_top #(
-    parameter integer MATRIX_CLK_DIV = 50000,
-    parameter integer MATRIX_SETTLE_CYCLES = 1,
+    parameter integer MATRIX_CLK_DIV = `MATRIX_CLK_DIV,
+    parameter integer MATRIX_SETTLE_CYCLES = `MATRIX_SETTLE_CYCLES,
     parameter integer MATRIX_DEBOUNCE_FRAMES = `DEBOUNCE_SCANS,
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer PT8211_REF_DIV = `PT8211_REF_DIV,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer ADC_SPI_CLK_DIV = `ADC_SPI_CLK_DIV,
     parameter integer ADC_DEAD_SAMPLES = `RETRIGGER_DEAD_SAMPLES,
+    parameter integer ADC_SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
+    parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE,
+    parameter integer USE_HARMONIC = 1,
+    parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
     parameter integer H_ACTIVE = 800,
     parameter integer H_FRONT = 40,
@@ -63,7 +67,10 @@ module full_guitar_top #(
         .MATRIX_DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES),
         .SAMPLE_DIV(SAMPLE_DIV), .PT8211_REF_DIV(PT8211_REF_DIV),
         .SLIDE_SAMPLES(SLIDE_SAMPLES), .ADC_SPI_CLK_DIV(ADC_SPI_CLK_DIV),
-        .ADC_DEAD_SAMPLES(ADC_DEAD_SAMPLES), .USE_HARMONIC(1)
+        .ADC_DEAD_SAMPLES(ADC_DEAD_SAMPLES),
+        .ADC_SETTLE_SAMPLES(ADC_SETTLE_SAMPLES),
+        .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE), .USE_HARMONIC(USE_HARMONIC),
+        .ANTI_BEAT_ENABLE(ANTI_BEAT_ENABLE)
     ) u_guitar_audio_top (
         .sys_clk_50m(sys_clk_50m), .audio_clk_12m288(audio_clk_12m288),
         .rst_n(rst_n), .fret_col_in_n(fret_col_in_n),
@@ -76,6 +83,7 @@ module full_guitar_top #(
         .stable_fret_mask(), .stable_fret_id(),
         .audio_voice_active(audio_voice_active), .velocity_level(),
         .raw_adc(), .peak_adc(), .event_timestamp(),
+        .pluck_events(),
         .final_pcm_valid(final_pcm_valid), .final_pcm(final_pcm)
     );
 
@@ -95,6 +103,11 @@ module full_guitar_top #(
         .cdc_overrun(display_cdc_overrun)
     );
 
-    assign pa_en = |audio_voice_active;
+    // Match the board-verified policy: no amplifier power cycling per note.
+    wire audio_pa_rst_n;
+    reset_sync u_pa_reset_sync (
+        .clk(audio_clk_12m288), .arst_n(rst_n), .srst_n(audio_pa_rst_n)
+    );
+    assign pa_en = audio_pa_rst_n;
 
 endmodule

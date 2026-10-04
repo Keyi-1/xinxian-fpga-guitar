@@ -1,0 +1,152 @@
+MAIN engine synchronization and anti-beat digital acceptance
+Date: 2026-10-03..2026-10-04, Asia/Shanghai
+Repository HEAD before local changes: 2cb7419f72d1b8cc74420711e298c1972143dd38
+This record describes the modified working tree, not a published commit.
+
+Hardware baseline
+-----------------
+The user confirmed ideal functional results with both PCBs connected to
+Mega 60K using gowin/neo_full_chain_audio_test. Its flattened source remains
+unchanged during canonical MAIN synchronization and anti-beat work.
+The new MAIN bitstream has not been downloaded or acoustically measured here.
+The original test, variable velocity, harmonic effects and LCD have distinct
+acceptance boundaries; a digital PASS is not a new physical-board PASS.
+
+Canonical input/control/audio changes
+------------------------------------
+Physical MAIN: neo_guitar_main_top, default sine, fixed velocity 2.
+12.288 MHz domain for matrix, ADC, control and audio; 48 kHz sample rate.
+Matrix columns use two synchronizer stages; reset release uses three stages.
+ADC baseline 2053, abs-deviation trigger 100, rearm 30; divider 4.
+Dead/settle = 400/80 per-channel ADC samples, not audio samples.
+Hardware-verified SPI behavior retained: 18 rising edges; high 11 bits
+restored and B0 forced to one. This is not a true 12-bit ADC result.
+Pressing a fret selects pitch silently; real pluck starts Attack.
+New pluck wins same-sample release; final release holds actual slide pitch.
+Release/fresh-open-pluck and naturally idle slot ownership are corrected.
+Pluck envelope: Attack 96, fast decay 9600, fast/slow/release shifts 13/16/10,
+idle threshold 64. Slide duration 960 samples. PA remains on after reset.
+Optional harmonic MAIN/FULL uses pluck mode and independent stereo effects.
+Optional sustain latches on note_off and slows Release by an extra shift of 2.
+FFT receives the final left/right average. No new LCD/button pinout invented.
+
+Anti-beat changes and evidence
+-----------------------------
+BOARD_ANTI_BEAT_ENABLE=1 by default in the new MAIN and FULL paths.
+Pitch-aware tie choice for third voice; existing active voices keep their side.
+At most two active voices per channel; first pair separated as before.
+For a same-channel non-unison gap <80 Hz, the older voice gain moves toward
+128/256; new voice stays at full gain. Gain step=2/256 per 48 kHz sample.
+Mix headroom /2 retained. No retuning or change to per-voice synthesis.
+Set BOARD_ANTI_BEAT_ENABLE=0 and rebuild to restore baseline mixing.
+The range/gain are engineering choices, not a universal perceptual model.
+See docs/ANTI_BEAT_AUDIO.md and antibeat_pcm_comparison.txt for limits.
+Actual RTL A/B: 96,000 PCM16 stereo frames per variant, repeated 3/4-note
+chords at F#4/E4/D#4/A#3, same velocity/plucks. Per-voice PCM, sample cadence
+and lifecycle asserted identical. No separate WAV loudness normalization.
+Constructed 3-note example normalized envelope depth: 0.838158 -> 0.489251.
+These numbers do not measure perceived roughness or physical speaker output.
+WAV/plot: build/antibeat/, regenerated with tools/generate_antibeat_preview.py.
+
+ModelSim regression
+-------------------
+Tool: ModelSim SE-64 10.6d.
+Command: sim/run_main_regression.ps1 -ModelSimBin <installed win64 directory>
+Final run completed 2026-10-04 00:21:45: MAIN REGRESSION PASSED: 66 benches.
+Every final simulation log contains Errors: 0, Warnings: 0; compile also has
+no Error/Fatal/Warning. Logs and generated reference copies: sim/temp/.
+The three standalone flattened-source benches use their own earlier runner
+and are excluded here to avoid duplicate module-name bindings.
+Canonical runner independently renames all flattened reference modules ref_*.
+Bounded/factored slide arithmetic is cycle-equivalent to the original for
+8 divisors (1/3/8/15/64/960/1000/1024), 32-bit and 26-bit ranges,
+12,000 gated input clocks (16 parallel parameter cases),
+up/down completion, retarget, inactive voice and repluck cases.
+All 36 ROM values fit exactly in 26 bits, maximum 0x02CA6987. Board slide
+arithmetic uses this range; 32-bit DDS accumulators and full increments remain.
+Regression checks the ROM bound. Future ROM expansion must increase
+NOTE_PHASE_VALUE_BITS accordingly; generic slide modules default to 32 bits.
+With ANTI_BEAT_ENABLE=0 and 2/3-stage reset release aligned:
+  tb_neo_guitar_main_equivalence compared 1,045,456 clocks, including
+  36 silent pitch selections/real plucks, bipolar detector/hysteresis/dead time,
+  replucks, slides, final-release/open-pluck, natural tail and all six pairs.
+  Matrix, SPI, per-voice PCM/pitch/lifecycle, PT8211 bits, PA/LED match reference.
+Shipped-default smoke checks actual matrix timing, ADC/PT8211 clocks,
+Attack and final-fret Release. Internal boundary/control tests also pass.
+Anti-beat tests cover pair separation, pitch choice, capacity, gain step,
+repluck priority, exact unison, partner ending and actual PCM export.
+Other benches cover legacy ADSR/vibrato modules, 4-string/4-level velocity,
+harmonic scheduling, mono/stereo effects, reset, FFT, LCD and PCM conversions.
+FULL endurance: 10,000 frames, pcm=10002, spectrum=6, display=6,
+display interval=32,916,582..32,916,583 ns. No harmonic deadline miss.
+32 real-clock detector-to-first-nonzero-PCM16-queue trials:
+  sine maximum 38,815 ns; harmonic maximum 41,582 ns.
+This excludes pre-detector sensor/ADC delay and the downstream analog path.
+Short independent golden model PCM product shift corrected to existing RTL
+shift 7; 48 PCM16 samples match. Long PCM16 model 48,800 samples match.
+The short/long comparisons are independent model checks, not new acoustics.
+
+Fixed-pin physical MAIN implementation
+--------------------------------------
+Tool: Gowin V1.9.12.03 (64-bit), device GW5AT-LV60PG484AC1/I0, Version B.
+Project: gowin/xinxian_mega60k/xinxian_mega60k.gprj
+Top: neo_guitar_main_top. Default sine, fixed velocity 2, anti-beat enabled.
+Command: gw_sh.exe gowin/xinxian_mega60k/build.tcl
+PnR report time: 2026-10-04 00:20:57.
+Latest canonical RTL source modification predates this generated bitstream.
+Pins: 26 unique balls, equal to verified full-chain CST; every implemented
+signal/ball pair checked against neo_guitar_main.rpt.txt.
+Analyzed endpoints: 4850; setup violated endpoints=0; hold violated endpoints=0.
+Clock requirement 12.288 MHz; actual Fmax 12.503 MHz; worst setup slack 1.404 ns.
+Logic=11126/59904 (19%); registers=1529/60780 (3%); BSRAM=4/118 (4%);
+DSP=8/118 (7%); logic/I/O latches=0.
+Reports: gowin/xinxian_mega60k/impl/pnr/neo_guitar_main.rpt.txt,
+neo_guitar_main_tr_content.html, neo_guitar_main.log.
+Bitstream: gowin/xinxian_mega60k/impl/pnr/neo_guitar_main.fs
+SHA256: 4607DD5E9E09EFD8F0F3AC9B27D12DF59528403FCAF4976F63D7E9910E0A5C16
+Synthesis retained NL0002 optimization warnings. PnR retained PA1001 unused
+arithmetic/DSP-output warnings and PR1014 generic clock routing at V13.
+No build error. Zero timing violations do not mean these warnings disappeared.
+SDC proves constrained internal paths; it is not quantitative external I/O
+or analog-audio characterization. Existing physical wiring remains applicable.
+
+Optional NEO FULL synthesis
+--------------------------
+Command: gw_sh.exe gowin/synth_neo_full.tcl
+Completed 2026-10-04 00:25:23; GowinSynthesis finish; no build error.
+Four TBUF matrix-row primitives retained; register-as-latch count=0.
+Retained EX3791 width truncation and NL0002 optimization warnings in the
+advanced path. Functional/golden/FFT/effect regressions remain passing.
+No NEO FULL physical implementation or LCD electrical acceptance claimed.
+
+Optional logical FULL implementation
+------------------------------------
+Command: gw_sh.exe gowin/build_full.tcl
+Final report time: 2026-10-04 00:25:44; default harmonic/effects/FFT/LCD path
+and anti-beat enabled. Device/tool same as MAIN above; no physical CST.
+Analyzed endpoints: 45279; setup violated endpoints=0; hold violated endpoints=0.
+Audio required 12.288 MHz, actual Fmax 12.293 MHz; worst setup slack 0.036 ns.
+Pixel required 33.333 MHz, actual Fmax 138.015 MHz.
+sys_clk_50m has no active timing paths because current input/audio logic
+uses the audio domain; compatibility port retained (CV0016 warning).
+Logic=33878/59904 (57%); registers=14532/60780 (24%); BSRAM=17/118 (15%);
+DSP=51/118 (44%); logic/I/O latches=0.
+Reports: gowin/full_main_build/impl/pnr/full_guitar_top.rpt.txt,
+full_guitar_top_tr_content.html; build log: gowin/full_main_build.log.
+Bitstream: gowin/full_main_build/impl/pnr/full_guitar_top.fs
+SHA256: 64B4CB344E60098D4CC0A25D3FEC27A5948F396C32E174DD1A4D8FBC63A39912
+Retained EX3791 intentional width truncation, NL0002 optimization, PA1001
+unused arithmetic/DSP-output and CV0016 unused compatibility-clock warnings.
+Timing passes with very little audio margin; not a reserve for further features.
+After LCD/pixel-clock source/buttons and physical pins are frozen, repeat
+implementation and improve timing as necessary before physical FULL acceptance.
+Its automatic-pin bitstream is solely a logic/timing check, not for hardware.
+
+Repository/workspace checks
+--------------------------
+git diff --check: PASS (only repository CRLF conversion notices).
+gprj XML and relative source/CST/SDC/ROM references valid.
+Current main constraints retain the user-verified J13/J8 and audio wiring.
+Prior broad Bank-1 prohibition and PMOD candidates documented as historical.
+Generated simulation/build files are ignored; evidence and reproducible
+scripts are source files. No commit, push or physical programming performed.

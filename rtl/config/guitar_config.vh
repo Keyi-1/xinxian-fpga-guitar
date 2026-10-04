@@ -9,7 +9,13 @@
 `define BUILD_DEBUG   2
 
 // Current default build
-`define GUITAR_BUILD_MODE `BUILD_MINIMAL
+`define GUITAR_BUILD_MODE `BUILD_FULL
+// Current physical main project defaults to the listening-verified sine path.
+// FULL with LCD retains the optional 32-harmonic engine through USE_HARMONIC.
+`define BOARD_USE_HARMONIC 0
+`define BOARD_ANTI_BEAT_ENABLE 1
+`define BOARD_FIXED_VELOCITY_ENABLE 1
+`define BOARD_FIXED_VELOCITY 2'd2
 
 // System clocks
 `define SYSTEM_CLK_HZ     50000000
@@ -22,6 +28,9 @@
 `define VOICE_COUNT       4
 `define HARMONICS_MAX     32
 `define PHASE_ACC_BITS 32
+// Exact current 36-note ROM increments fit in 26 bits (max 0x02CA6987).
+// This bounds slide arithmetic only; DDS accumulators remain 32-bit.
+`define NOTE_PHASE_VALUE_BITS 26
 `define TIMBRE_BLEND_SAMPLES 256
 `define FX_BLEND_SAMPLES 256
 `define CHORUS_BASE_DELAY_SAMPLES 48
@@ -38,14 +47,18 @@
 
 // ADC
 `define ADC_CHANNELS_USED 4
-`define ADC_SPI_HZ        1000000
-`define ADC_SPI_CLK_DIV   25
-`define PLUCK_TRIGGER_THRESHOLD 12'd1000
-`define PLUCK_REARM_THRESHOLD   12'd800
-`define VELOCITY_LEVEL_1_THRESHOLD 12'd1500
-`define VELOCITY_LEVEL_2_THRESHOLD 12'd2200
-`define VELOCITY_LEVEL_3_THRESHOLD 12'd3000
-`define RETRIGGER_DEAD_SAMPLES 250
+// ADC and matrix run in the 12.288 MHz audio domain, as on the verified board.
+`define ADC_SPI_HZ        1536000
+`define ADC_SPI_CLK_DIV   4
+`define ADC_BASELINE_CODE 12'd2053
+`define PLUCK_TRIGGER_THRESHOLD 12'd100
+`define PLUCK_REARM_THRESHOLD   12'd30
+// Optional magnitude-based velocity bins; physical calibration is pending.
+`define VELOCITY_LEVEL_1_THRESHOLD 12'd150
+`define VELOCITY_LEVEL_2_THRESHOLD 12'd300
+`define VELOCITY_LEVEL_3_THRESHOLD 12'd600
+`define RETRIGGER_DEAD_SAMPLES 400
+`define PLUCK_SETTLE_SAMPLES 80
 
 // Display and FFT
 `define FFT_SIZE          1024
@@ -54,12 +67,16 @@
 
 // Provisional control parameters
 `define MATRIX_SCAN_HZ       1000
-`define DEBOUNCE_SCANS       3
+`define MATRIX_CLK_DIV       768
+`define MATRIX_SETTLE_CYCLES 3
+`define DEBOUNCE_SCANS       5
 `define SLIDE_TIME_MS        20
 `define SLIDE_SAMPLES        960
+// Legacy metadata only; current board dead time counts ADC channel samples.
 `define RETRIGGER_DEAD_MS    25
 
-// Same-fret tap vibrato gesture, counted at the 48 kHz sample rate.
+// Legacy optional same-fret tap gesture, outside the current board play path.
+// Counted at the 48 kHz sample rate.
 // Three valid re-presses at 5..16.7 Hz enter vibrato; a final release
 // longer than 250 ms exits into the ordinary note release.
 `define VIBRATO_TAP_COUNT           3

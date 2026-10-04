@@ -196,6 +196,8 @@ module fret_note_event #(
 
             // A pluck starts or retriggers only the selected string.
             if (pluck_valid[0]) begin
+                phase_inc[31:0] <= target_phase0;
+                note_off[0] <= 1'b0;
                 note_on[0]      <= 1'b1;
                 voice_active[0] <= 1'b1;
                 vibrato_enable[0] <= 1'b0;
@@ -203,6 +205,8 @@ module fret_note_event #(
                 release_pending[0] <= 1'b0;
             end
             if (pluck_valid[1]) begin
+                phase_inc[63:32] <= target_phase1;
+                note_off[1] <= 1'b0;
                 note_on[1]      <= 1'b1;
                 voice_active[1] <= 1'b1;
                 vibrato_enable[1] <= 1'b0;
@@ -210,6 +214,8 @@ module fret_note_event #(
                 release_pending[1] <= 1'b0;
             end
             if (pluck_valid[2]) begin
+                phase_inc[95:64] <= target_phase2;
+                note_off[2] <= 1'b0;
                 note_on[2]      <= 1'b1;
                 voice_active[2] <= 1'b1;
                 vibrato_enable[2] <= 1'b0;
@@ -217,6 +223,8 @@ module fret_note_event #(
                 release_pending[2] <= 1'b0;
             end
             if (pluck_valid[3]) begin
+                phase_inc[127:96] <= target_phase3;
+                note_off[3] <= 1'b0;
                 note_on[3]      <= 1'b1;
                 voice_active[3] <= 1'b1;
                 vibrato_enable[3] <= 1'b0;
