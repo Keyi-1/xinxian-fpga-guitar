@@ -4,9 +4,11 @@
 
 上一轮音频修改：主工程默认启用按音高声道分配和近邻音增益平滑，66 组回归通过，但用户反馈前后版本的和弦听感仍不理想。原成功全链路测试源码保留。[参数、试听与数字证据](docs/ANTI_BEAT_AUDIO.md)。
 
-最新音色进展（2026-10-04）：已分析用户提供的库乐队“古典大钢琴”三个单音及合音录音，提取分音和观察包络，并生成可试听的离线参数重合成对照。后续音色方向为钢琴；当前主工程仍为正弦，尚未替换音源。[分析、试听说明与 FPGA 实现方向](docs/PIANO_REFERENCE_ANALYSIS.md)。
+最新钢琴试验（2026-10-04，`feat/piano-hammer-voice`）：物理主工程默认启用 8 分音钢琴音源、短击弦起音、固定窄弦位声像与公共轻混响，基音表和双 PCB 接线保持原样。已生成实际 RTL 试听及固定引脚位流，仍需 SRAM 下载试听。[钢琴主工程说明](docs/PIANO_FPGA_TRIAL.md) / [录音分析与离线样音](docs/PIANO_REFERENCE_ANALYSIS.md)。
 
-**当前状态（2026-10-03）：用户已确认双 PCB 全链路验证工程实物测试结果理想。正式主工程已同步为同一输入与优化音频行为，入口是 `gowin/xinxian_mega60k/xinxian_mega60k.gprj`、Top=`neo_guitar_main_top`；默认正弦、固定力度 2，接线与成功验证工程一致。** 主 RTL 已通过逐周期参考对比、完整回归和固定引脚布局布线；新主位流仍需 SRAM 下载复核。可选 32 分量谐波、双声道音效和 FFT/LCD 逻辑也已同步并进行数字验证；四级力度实物标定、LCD 及效果按键接线仍待完成。详见 [主工程同步说明](docs/MAIN_ENGINE_SYNC.md)。下文同时保留最终需求和历史验收记录，以最新进度和当前源码为准。
+上板反馈修复：已复现“WAV 正常、上板单音嘈杂”的综合后包络计算偏移，改用等价的无符号插值。当前修正版保持原试听 WAV 不变，69 项回归及 6696 帧实际 DAC 引脚数据的综合后对照通过；`build/piano/neo_guitar_main_piano_interp_fix.fs` 等待再次上板试听。
+
+**输入链验证基线（2026-10-03）：用户已确认双 PCB 全链路验证工程实物测试结果理想。正式主工程已同步为同一输入与优化音频行为，入口是 `gowin/xinxian_mega60k/xinxian_mega60k.gprj`、Top=`neo_guitar_main_top`；当时默认正弦、固定力度 2，接线与成功验证工程一致。** 主 RTL 已通过逐周期参考对比、完整回归和固定引脚布局布线；当前分支的钢琴主位流仍需 SRAM 下载复核。可选 32 分量谐波、双声道音效和 FFT/LCD 逻辑保留；四级力度实物标定、LCD 及效果按键接线仍待完成。详见 [主工程同步说明](docs/MAIN_ENGINE_SYNC.md)。下文同时保留最终需求和历史验收记录，以最新进度和当前源码为准。
 
 芯弦 FPGA 电子吉他是一套以 Sipeed Tang Mega 60K FPGA 为硬件核心的四弦实时电子乐器。系统通过琴颈按弦矩阵和桥位压电传感器采集演奏动作，由 FPGA 内部可综合 HDL 逻辑完成音高选择、力度分级、声部管理、谐波／模态加法合成、包络、数字音效、频谱分析和音频输出。演奏期间，音频生成主链路不依赖软核 CPU、外部 MCU 或上位机程序。
 
@@ -40,6 +42,7 @@
 - [主工程同步、构建与可选功能说明](docs/MAIN_ENGINE_SYNC.md)
 - [三音以上减拍频策略、参数及 A/B 试听](docs/ANTI_BEAT_AUDIO.md)
 - [古典大钢琴参考录音分析与离线音色样音](docs/PIANO_REFERENCE_ANALYSIS.md)
+- [钢琴音源、击弦起音与 FPGA 主工程试验](docs/PIANO_FPGA_TRIAL.md)
 - [当前主工程与 FULL 数字验收证据](docs/evidence/main_engine_sync_acceptance.txt)
 - [Tang Mega 60K / NEO Dock 板级集成审查](docs/BOARD_INTEGRATION_REVIEW.md)
 - [NEO Dock 31005 / Mega 60K 板级连接矩阵](docs/NEO_31005_60K_PIN_MATRIX.md)

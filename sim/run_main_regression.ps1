@@ -1,6 +1,7 @@
 param(
     [string]$ModelSimBin = '',
-    [string[]]$Benches = @()
+    [string[]]$Benches = @(),
+    [string]$PythonExe = ''
 )
 $ErrorActionPreference = 'Stop'
 if (!$ModelSimBin) { $ModelSimBin = Split-Path (Get-Command vsim.exe -ErrorAction Stop).Source }
@@ -23,10 +24,15 @@ foreach ($file in $referenceFiles) {
 Copy-Item -LiteralPath (Join-Path $sourceDir 'guitar_config.vh') -Destination $refDir
 Copy-Item -LiteralPath (Join-Path $sourceDir 'note_phase_inc.mem') -Destination $simDir
 Copy-Item -LiteralPath (Join-Path $sourceDir 'sine_lut.mem') -Destination $simDir
-$excluded = @('tb_neo_full_chain_audio_test','tb_neo_full_chain_default_timing','tb_neo_guitar_link_control')
+$excluded = @('tb_neo_full_chain_audio_test','tb_neo_full_chain_default_timing','tb_neo_guitar_link_control','tb_piano_gate_audio')
 $tbFiles = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'tb') -Filter '*.sv' |
     Where-Object { $_.BaseName -notin $excluded }
 if (!$Benches.Count) { $Benches = $tbFiles | ForEach-Object BaseName }
+if ('tb_piano_voice_core' -in $Benches) {
+    if (!$PythonExe) { $PythonExe = (Get-Command python.exe -ErrorAction Stop).Source }
+    & $PythonExe (Join-Path $repoDir 'tools\gen_piano_golden.py')
+    if ($LASTEXITCODE) { throw 'piano oracle generation failed' }
+}
 Push-Location $simDir
 try {
     if (!(Test-Path -LiteralPath 'work')) {

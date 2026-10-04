@@ -14,6 +14,9 @@ module guitar_audio_top #(
     parameter integer ADC_SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
     parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE,
     parameter integer USE_HARMONIC            = 0,
+    parameter integer USE_PIANO = 0,
+    parameter integer PIANO_HAMMER_ENABLE = 1,
+    parameter integer PIANO_ROOM_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer ANTI_BEAT_GAP_HZ = 80,
     parameter [8:0] ANTI_BEAT_PAIR_GAIN_Q8 = 9'd128,
@@ -88,6 +91,8 @@ module guitar_audio_top #(
     four_string_board_audio_chain #(
         .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV),
         .SLIDE_SAMPLES(SLIDE_SAMPLES), .USE_HARMONIC(USE_HARMONIC),
+        .USE_PIANO(USE_PIANO), .PIANO_HAMMER_ENABLE(PIANO_HAMMER_ENABLE),
+        .PIANO_ROOM_ENABLE(PIANO_ROOM_ENABLE),
         .ANTI_BEAT_ENABLE(ANTI_BEAT_ENABLE), .ANTI_BEAT_GAP_HZ(ANTI_BEAT_GAP_HZ),
         .ANTI_BEAT_PAIR_GAIN_Q8(ANTI_BEAT_PAIR_GAIN_Q8),
         .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),

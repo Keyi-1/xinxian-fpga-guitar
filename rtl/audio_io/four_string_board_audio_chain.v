@@ -1,12 +1,16 @@
 `include "../config/guitar_config.vh"
 
 // Shared main audio path promoted from the listening-verified dual-PCB test.
-// Each stereo channel retains independent effects; FFT receives their average.
+// Legacy stereo effects are independent; piano uses a shared room.
+// FFT receives the average of the final stereo channels.
 module four_string_board_audio_chain #(
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer REF_DIV = `PT8211_REF_DIV,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer USE_HARMONIC = 0,
+    parameter integer USE_PIANO = 0,
+    parameter integer PIANO_HAMMER_ENABLE = 1,
+    parameter integer PIANO_ROOM_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer ANTI_BEAT_GAP_HZ = 80,
     parameter [8:0] ANTI_BEAT_PAIR_GAIN_Q8 = 9'd128,
@@ -35,6 +39,7 @@ module four_string_board_audio_chain #(
     wire [3:0] deadline_miss;
     wire [8:0] timbre_blend, chorus_blend, reverb_blend;
     wire timbre_busy, chorus_busy, reverb_busy;
+    wire [7:0] piano_profile;
 
     guitar_play_control u_play_control (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_tick(sample_tick),
@@ -56,7 +61,15 @@ module four_string_board_audio_chain #(
             target_phase_inc[g*32 +: 32] : smoothed_phase_inc[g*32 +: 32];
     end endgenerate
 
-    generate if (USE_HARMONIC == 0) begin : g_sine
+    generate if (USE_PIANO != 0) begin : g_piano
+        four_voice_piano_audio_core #(.SAMPLE_DIV(SAMPLE_DIV),
+            .HAMMER_ENABLE(PIANO_HAMMER_ENABLE)) u_core (
+            .clk_audio_ref(clk_audio_ref),.rst_n(rst_n),.note_on(note_on),.note_off(note_off),
+            .velocity_level(velocity_level),.phase_inc(phase_inc),.sample_tick(sample_tick),
+            .sample_valid(voice_sample_valid),.voice_active(voice_active),.voice_pcm(voice_pcm),
+            .voice_profile(piano_profile),.deadline_miss(deadline_miss));
+        assign timbre_blend=0;assign timbre_busy=0;
+    end else if (USE_HARMONIC == 0) begin : g_sine
         four_voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV), .PLUCK_MODE(1), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
                 .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
                 .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),
@@ -110,7 +123,30 @@ module four_string_board_audio_chain #(
     reg signed [23:0] pcm_left_scaled;
     reg signed [23:0] pcm_right_scaled;
 
-    generate if (ANTI_BEAT_ENABLE == 0) begin : legacy_stereo
+    generate if (USE_PIANO != 0) begin : piano_stereo
+        reg signed [27:0] lsum,rsum;
+        reg signed [27:0] value, half, eighth, sixteenth;
+        integer p;
+        always @* begin
+            lsum=0;rsum=0;value=0;half=0;eighth=0;sixteenth=0;
+            for(p=0;p<4;p=p+1) begin
+                value=$signed({{4{voice_pcm[p*24+23]}},voice_pcm[p*24+:24]});
+                half=value>>>1;eighth=value>>>3;sixteenth=value>>>4;
+                // Fixed string positions avoid a gain/pan jump when a live
+                // voice is re-struck with another pitch/timbre profile.
+                case(p)
+                    0: begin lsum=lsum+half+eighth;rsum=rsum+half+(value>>>2);end
+                    1: begin lsum=lsum+half+eighth+(value>>>5);rsum=rsum+half+eighth+sixteenth+(value>>>5);end
+                    2: begin lsum=lsum+half+eighth+sixteenth+(value>>>5);rsum=rsum+half+eighth+(value>>>5);end
+                    default: begin lsum=lsum+half+(value>>>2);rsum=rsum+half+eighth;end
+                endcase
+            end
+            // Static /2 headroom, every note audible in both channels. The ROM
+            // amplitude bounds include the hammer and all four aligned voices.
+            pcm_left_scaled=lsum[24:1];pcm_right_scaled=rsum[24:1];
+            mix_left_primary=lsum;mix_right_primary=rsum;
+        end
+    end else if (ANTI_BEAT_ENABLE == 0) begin : legacy_stereo
     always @* begin
         mix_left_primary  = 28'sd0;
         mix_right_primary = 28'sd0;
@@ -187,6 +223,13 @@ module four_string_board_audio_chain #(
     end
     wire stereo_valid;
     wire signed [23:0] pcm_left_final, pcm_right_final;
+    generate if(USE_PIANO!=0) begin : piano_room
+        piano_stereo_room #(.ENABLE(PIANO_ROOM_ENABLE)) u_room (
+            .clk(clk_audio_ref),.rst_n(rst_n),.sample_valid_in(voice_sample_valid),
+            .left_in(pcm_left_scaled),.right_in(pcm_right_scaled),
+            .sample_valid(stereo_valid),.left_out(pcm_left_final),.right_out(pcm_right_final));
+        assign chorus_blend=0;assign chorus_busy=0;assign reverb_blend=0;assign reverb_busy=0;
+    end else begin : legacy_effects
     stereo_audio_effects #(.ENABLE(USE_HARMONIC)) u_effects (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_valid_in(voice_sample_valid),
         .pcm_left(pcm_left_scaled), .pcm_right(pcm_right_scaled),
@@ -196,6 +239,7 @@ module four_string_board_audio_chain #(
         .chorus_blend(chorus_blend), .chorus_busy(chorus_busy),
         .reverb_blend(reverb_blend), .reverb_busy(reverb_busy)
     );
+    end endgenerate
     wire signed [24:0] spectrum_sum =
         $signed({pcm_left_final[23],pcm_left_final}) +
         $signed({pcm_right_final[23],pcm_right_final});
