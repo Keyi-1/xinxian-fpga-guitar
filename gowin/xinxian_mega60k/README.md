@@ -1,4 +1,8 @@
-# 双 PCB 主工程
+# 双 PCB 主工程：成功固定钢琴基线
+
+**2026-10-05：用户已确认本工程插值修复后的钢琴实物音色成功。**
+新三键 FULL 音频位于 [`../neo_guitar_audio_full`](../neo_guitar_audio_full/README.md)，
+它采用上电内部初始化，AA13 已改为音色键。本工程保留旧固定音色／AA13 复位基线。
 
 打开 `xinxian_mega60k.gprj`，Top=`neo_guitar_main_top`，器件
 `GW5AT-LV60PG484AC1/I0`，Version B。本工程直接使用仓库标准 `rtl/`，
@@ -6,7 +10,7 @@
 复位后 PA 常开、固定力度 2。当前 `feat/piano-hammer-voice` 试验分支默认启用
 8 分音钢琴音源、短击弦起音、固定窄弦位立体声和公共轻混响。
 音符表和接线未改变。用户报告上一版上板单音嘈杂，已复现并修复综合后包络偏移；
-6696 帧真实 DAC 串行数据与 RTL 逐比特一致，当前修正版尚待再次实物试听。
+6696 帧真实 DAC 串行数据与 RTL 逐比特一致，当前修正版已由用户确认实物音色成功。
 详见 [`docs/PIANO_FPGA_TRIAL.md`](../../docs/PIANO_FPGA_TRIAL.md)。
 在 `rtl/config/guitar_config.vh` 设置 `BOARD_USE_PIANO=0` 并重新构建可恢复前一版音源；
 同时设置 `BOARD_ANTI_BEAT_ENABLE=0` 可恢复原成功正弦混音。

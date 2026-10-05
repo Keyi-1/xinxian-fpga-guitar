@@ -21,7 +21,7 @@ module tb_full_realtime_acceptance;
     reg adc_miso;
     reg timbre_select;
     reg chorus_enable;
-    reg sustain_reverb_enable;
+    reg sustain_enable;
 
     wire [3:0] fret_row_oe;
     wire [3:0] fret_row_drive_n;
@@ -98,7 +98,8 @@ module tb_full_realtime_acceptance;
         .fret_col_in_n(fret_col_in_n), .adc_miso(adc_miso),
         .timbre_select(timbre_select),
         .chorus_enable(chorus_enable),
-        .sustain_reverb_enable(sustain_reverb_enable),
+        .sustain_enable(sustain_enable),.reverb_enable(sustain_enable),
+        .harmony_enable(1'b0),
         .fret_row_oe(fret_row_oe),
         .fret_row_drive_n(fret_row_drive_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk),
@@ -248,7 +249,7 @@ module tb_full_realtime_acceptance;
         adc_miso = 1'b0;
         timbre_select = 1'b0;
         chorus_enable = 1'b0;
-        sustain_reverb_enable = 1'b0;
+        sustain_enable = 1'b0;
         adc_value0 = 12'd2153;
         adc_value1 = 12'd2253;
         adc_value2 = 12'd2453;
@@ -292,7 +293,7 @@ module tb_full_realtime_acceptance;
 
         wait (dac_frame_count >= acceptance_start_frame + 7500);
         @(negedge audio_clk_12m288);
-        sustain_reverb_enable = 1'b1;
+        sustain_enable = 1'b1;
 
         wait (dac_frame_count >=
               acceptance_start_frame + REQUIRED_DAC_FRAMES);

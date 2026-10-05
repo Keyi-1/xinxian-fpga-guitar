@@ -7,7 +7,7 @@ module tb_piano_stereo_room;
     wire signed [23:0] out_l,out_r;
     piano_stereo_room #(.DELAY_A(7),.DELAY_B(11),.DELAY_C(17)) dut (
         .clk(clk),.rst_n(rst_n),.sample_valid_in(valid_in),.left_in(left),.right_in(right),
-        .sample_valid(valid),.left_out(out_l),.right_out(out_r));
+        .room_enable(1'b0),.effect_blend(),.effect_busy(),.sample_valid(valid),.left_out(out_l),.right_out(out_r));
     integer k,tail=0,different=0;
     task step(input integer x);
         @(negedge clk);left=x;right=x;valid_in=1;

@@ -15,6 +15,9 @@ module neo_full_guitar_top #(
     parameter integer ADC_SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
     parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE,
     parameter integer USE_HARMONIC = 1,
+    parameter integer USE_PIANO = 1,
+    parameter integer PIANO_MODES = 32,
+    parameter integer PIANO_CONTROL_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
     parameter integer H_ACTIVE = 800,
@@ -27,7 +30,8 @@ module neo_full_guitar_top #(
     parameter integer V_BACK = 31,
     parameter integer BAR_SLOT = 25,
     parameter integer BAR_WIDTH = 21,
-    parameter integer KEY_DEBOUNCE_CYCLES = 1000000,
+    parameter integer KEY_DEBOUNCE_CYCLES = 245760,
+    parameter integer KEY_LONG_PRESS_CYCLES = 12288000,
     parameter integer LCD_PCLK_INVERT = 1,
     parameter integer LCD_BL_ACTIVE_HIGH = 1
 ) (
@@ -71,72 +75,21 @@ module neo_full_guitar_top #(
     wire       display_frame_update_internal;
     wire       display_cdc_overrun_internal;
 
-    wire timbre_select_sys;
-    wire chorus_enable_sys;
-    wire sustain_reverb_enable_sys;
-    wire timbre_pressed;
-    wire chorus_pressed;
-    wire sustain_pressed;
-    reg  [2:0] effect_sync1;
-    reg  [2:0] effect_sync2;
-
-    wire timbre_select_audio;
-    wire chorus_enable_audio;
-    wire sustain_reverb_enable_audio;
-    wire sys_control_rst_n;
+    wire timbre_select_audio,chorus_enable_audio,sustain_enable_audio;
+    wire reverb_enable_audio,harmony_enable_audio;
+    wire [1:0] space_mode_audio;
     wire audio_control_rst_n;
-
-    reset_sync u_sys_control_reset_sync (
-        .clk(sys_clk_50m), .arst_n(rst_n), .srst_n(sys_control_rst_n)
-    );
-
     reset_sync u_audio_control_reset_sync (
-        .clk(audio_clk_12m288), .arst_n(rst_n),
-        .srst_n(audio_control_rst_n)
-    );
-
-    debounced_toggle #(
-        .DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES)
-    ) u_timbre_button (
-        .clk(sys_clk_50m), .rst_n(sys_control_rst_n),
-        .button_n(key_timbre_n),
-        .toggle_state(timbre_select_sys), .pressed_pulse(timbre_pressed)
-    );
-
-    debounced_toggle #(
-        .DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES)
-    ) u_chorus_button (
-        .clk(sys_clk_50m), .rst_n(sys_control_rst_n),
-        .button_n(key_chorus_n),
-        .toggle_state(chorus_enable_sys), .pressed_pulse(chorus_pressed)
-    );
-
-    debounced_toggle #(
-        .DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES)
-    ) u_sustain_button (
-        .clk(sys_clk_50m), .rst_n(sys_control_rst_n),
-        .button_n(key_sustain_n),
-        .toggle_state(sustain_reverb_enable_sys),
-        .pressed_pulse(sustain_pressed)
-    );
-
-    // The button states change only after a long debounce interval, but they
-    // still cross into the audio clock domain through explicit synchronizers.
-    always @(posedge audio_clk_12m288) begin
-        if (!audio_control_rst_n) begin
-            effect_sync1 <= 3'b000;
-            effect_sync2 <= 3'b000;
-        end
-        else begin
-            effect_sync1 <= {sustain_reverb_enable_sys,
-                             chorus_enable_sys, timbre_select_sys};
-            effect_sync2 <= effect_sync1;
-        end
-    end
-
-    assign timbre_select_audio         = effect_sync2[0];
-    assign chorus_enable_audio         = effect_sync2[1];
-    assign sustain_reverb_enable_audio = effect_sync2[2];
+        .clk(audio_clk_12m288),.arst_n(rst_n),.srst_n(audio_control_rst_n));
+    // Condition the asynchronous physical keys directly in the audio domain;
+    // the multi-state space selector therefore needs no multi-bit CDC.
+    guitar_effect_buttons #(.DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES),
+        .LONG_PRESS_CYCLES(KEY_LONG_PRESS_CYCLES)) u_buttons (
+        .clk(audio_clk_12m288),.rst_n(audio_control_rst_n),
+        .key_timbre_n(key_timbre_n),.key_chorus_n(key_chorus_n),.key_space_n(key_sustain_n),
+        .timbre_select(timbre_select_audio),.chorus_enable(chorus_enable_audio),
+        .sustain_enable(sustain_enable_audio),.reverb_enable(reverb_enable_audio),
+        .space_mode(space_mode_audio),.harmony_enable(harmony_enable_audio));
 
     genvar row_index;
     generate
@@ -157,6 +110,7 @@ module neo_full_guitar_top #(
         .ADC_DEAD_SAMPLES(ADC_DEAD_SAMPLES),
         .ADC_SETTLE_SAMPLES(ADC_SETTLE_SAMPLES),
         .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE), .USE_HARMONIC(USE_HARMONIC),
+        .USE_PIANO(USE_PIANO),.PIANO_MODES(PIANO_MODES),.PIANO_CONTROL_ENABLE(PIANO_CONTROL_ENABLE),
         .ANTI_BEAT_ENABLE(ANTI_BEAT_ENABLE),
         .FFT_FRAME_GAP_SAMPLES(FFT_FRAME_GAP_SAMPLES),
         .H_ACTIVE(H_ACTIVE), .H_FRONT(H_FRONT), .H_SYNC(H_SYNC),
@@ -170,7 +124,8 @@ module neo_full_guitar_top #(
         .fret_col_in_n(fret_col_in_n), .adc_miso(adc_miso),
         .timbre_select(timbre_select_audio),
         .chorus_enable(chorus_enable_audio),
-        .sustain_reverb_enable(sustain_reverb_enable_audio),
+        .sustain_enable(sustain_enable_audio),.reverb_enable(reverb_enable_audio),
+        .harmony_enable(harmony_enable_audio),
         .fret_row_oe(fret_row_oe_internal),
         .fret_row_drive_n(fret_row_drive_n_internal),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk),

@@ -33,6 +33,7 @@ module tb_neo_full_guitar_top;
     integer z_count;
 
     neo_full_guitar_top #(
+        .USE_PIANO(0),
         .MATRIX_CLK_DIV(1), .MATRIX_SETTLE_CYCLES(0),
         .MATRIX_DEBOUNCE_FRAMES(1), .SAMPLE_DIV(8),
         .PT8211_REF_DIV(1), .SLIDE_SAMPLES(8),
@@ -130,7 +131,7 @@ module tb_neo_full_guitar_top;
         end
 
         press_timbre();
-        if (dut.timbre_select_sys !== 1'b1) begin
+        if (dut.timbre_select_audio !== 1'b1) begin
             $display("FAIL: first KEY1 press did not toggle timbre");
             $fatal;
         end
@@ -142,12 +143,12 @@ module tb_neo_full_guitar_top;
 
         key_timbre_n = 1'b0;
         repeat (16) @(posedge sys_clk_50m);
-        if (dut.timbre_select_sys !== 1'b0) begin
+        if (dut.timbre_select_audio !== 1'b0) begin
             $display("FAIL: second KEY1 press did not toggle timbre off");
             $fatal;
         end
         repeat (12) @(posedge sys_clk_50m);
-        if (dut.timbre_select_sys !== 1'b0) begin
+        if (dut.timbre_select_audio !== 1'b0) begin
             $display("FAIL: held KEY1 generated more than one toggle");
             $fatal;
         end
@@ -162,7 +163,7 @@ module tb_neo_full_guitar_top;
         repeat (8) @(posedge sys_clk_50m);
         repeat (4) @(posedge audio_clk_12m288);
         if ((dut.chorus_enable_audio !== 1'b1) ||
-            (dut.sustain_reverb_enable_audio !== 1'b1)) begin
+            (dut.sustain_enable_audio !== 1'b1)) begin
             $display("FAIL: KEY2/KEY3 toggle or CDC mismatch");
             $fatal;
         end

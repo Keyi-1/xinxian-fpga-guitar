@@ -11,6 +11,8 @@ module four_string_board_audio_chain #(
     parameter integer USE_PIANO = 0,
     parameter integer PIANO_HAMMER_ENABLE = 1,
     parameter integer PIANO_ROOM_ENABLE = 1,
+    parameter integer PIANO_MODES = 8,
+    parameter integer PIANO_CONTROL_ENABLE = 0,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer ANTI_BEAT_GAP_HZ = 80,
     parameter [8:0] ANTI_BEAT_PAIR_GAIN_Q8 = 9'd128,
@@ -25,7 +27,8 @@ module four_string_board_audio_chain #(
     input wire [15:0] stable_fret_id,
     input wire [3:0] pluck_valid,
     input wire [7:0] velocity_level,
-    input wire timbre_select, chorus_enable, sustain_reverb_enable,
+    input wire timbre_select, chorus_enable, sustain_enable,
+    input wire harmony_enable, reverb_enable,
     output wire sample_tick, pcm_mix_valid,
     output wire signed [23:0] pcm_mix,
     output wire [3:0] voice_active,
@@ -63,12 +66,14 @@ module four_string_board_audio_chain #(
 
     generate if (USE_PIANO != 0) begin : g_piano
         four_voice_piano_audio_core #(.SAMPLE_DIV(SAMPLE_DIV),
-            .HAMMER_ENABLE(PIANO_HAMMER_ENABLE)) u_core (
+            .HAMMER_ENABLE(PIANO_HAMMER_ENABLE),.MODES(PIANO_MODES),
+            .CONTROL_ENABLE(PIANO_CONTROL_ENABLE)) u_core (
             .clk_audio_ref(clk_audio_ref),.rst_n(rst_n),.note_on(note_on),.note_off(note_off),
             .velocity_level(velocity_level),.phase_inc(phase_inc),.sample_tick(sample_tick),
+            .timbre_select(timbre_select),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),
             .sample_valid(voice_sample_valid),.voice_active(voice_active),.voice_pcm(voice_pcm),
-            .voice_profile(piano_profile),.deadline_miss(deadline_miss));
-        assign timbre_blend=0;assign timbre_busy=0;
+            .voice_profile(piano_profile),.deadline_miss(deadline_miss),
+            .timbre_blend(timbre_blend),.timbre_busy(timbre_busy));
     end else if (USE_HARMONIC == 0) begin : g_sine
         four_voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV), .PLUCK_MODE(1), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
                 .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
@@ -93,7 +98,7 @@ module four_string_board_audio_chain #(
             .clk_audio_ref(clk_audio_ref), .rst_n(rst_n),
             .note_on(note_on), .note_off(note_off), .velocity_level(velocity_level),
             .phase_inc(phase_inc), .timbre_select(timbre_select),
-            .sustain_enable(sustain_reverb_enable), .sample_tick(sample_tick),
+            .sustain_enable(sustain_enable), .sample_tick(sample_tick),
             .sample_valid(voice_sample_valid), .pcm_mix(unused_saturated_mix),
             .voice_active(voice_active), .voice_pcm(voice_pcm),
             .voice_busy(), .deadline_miss(deadline_miss),
@@ -223,10 +228,20 @@ module four_string_board_audio_chain #(
     end
     wire stereo_valid;
     wire signed [23:0] pcm_left_final, pcm_right_final;
-    generate if(USE_PIANO!=0) begin : piano_room
+    generate if(USE_PIANO!=0 && PIANO_CONTROL_ENABLE!=0)begin : piano_effects
+        piano_stereo_effects #(.ROOM_ENABLE(PIANO_ROOM_ENABLE)) u_effects (
+            .clk(clk_audio_ref),.rst_n(rst_n),.sample_valid_in(voice_sample_valid),
+            .left_in(pcm_left_scaled),.right_in(pcm_right_scaled),
+            .drive_level(rock_drive_level),.timbre_blend(timbre_blend),
+            .chorus_enable(chorus_enable),.room_enable(reverb_enable),
+            .sample_valid(stereo_valid),.left_out(pcm_left_final),.right_out(pcm_right_final),
+            .chorus_blend(chorus_blend),.reverb_blend(reverb_blend),
+            .chorus_busy(chorus_busy),.reverb_busy(reverb_busy));
+    end else if(USE_PIANO!=0) begin : piano_room
         piano_stereo_room #(.ENABLE(PIANO_ROOM_ENABLE)) u_room (
             .clk(clk_audio_ref),.rst_n(rst_n),.sample_valid_in(voice_sample_valid),
             .left_in(pcm_left_scaled),.right_in(pcm_right_scaled),
+            .room_enable(1'b0),.effect_blend(),.effect_busy(),
             .sample_valid(stereo_valid),.left_out(pcm_left_final),.right_out(pcm_right_final));
         assign chorus_blend=0;assign chorus_busy=0;assign reverb_blend=0;assign reverb_busy=0;
     end else begin : legacy_effects
@@ -234,7 +249,7 @@ module four_string_board_audio_chain #(
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_valid_in(voice_sample_valid),
         .pcm_left(pcm_left_scaled), .pcm_right(pcm_right_scaled),
         .drive_level(rock_drive_level), .timbre_blend(timbre_blend),
-        .chorus_enable(chorus_enable), .reverb_enable(sustain_reverb_enable),
+        .chorus_enable(chorus_enable), .reverb_enable(reverb_enable),
         .sample_valid(stereo_valid), .left_out(pcm_left_final), .right_out(pcm_right_final),
         .chorus_blend(chorus_blend), .chorus_busy(chorus_busy),
         .reverb_blend(reverb_blend), .reverb_busy(reverb_busy)

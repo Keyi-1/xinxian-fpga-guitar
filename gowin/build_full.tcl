@@ -1,5 +1,5 @@
 # Logic/resource verification only: LCD pins are not yet confirmed.
-# Use xinxian_mega60k/build.tcl for the downloadable two-PCB physical main.
+# Use neo_guitar_audio_full/build.tcl for the downloadable three-key audio FULL.
 set script_dir [file dirname [file normalize [info script]]]
 set repo_root [file dirname $script_dir]
 set work_dir [file join $script_dir full_main_build]

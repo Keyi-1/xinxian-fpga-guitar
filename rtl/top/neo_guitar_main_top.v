@@ -59,7 +59,7 @@ module neo_guitar_main_top #(
         .sys_clk_50m(1'b0), .audio_clk_12m288(audio_clk_12m288), .rst_n(rst_n),
         .fret_col_in_n({COL7,COL6,COL5,COL4,COL3,COL2,COL1,COL0}),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk), .adc_mosi(adc_mosi), .adc_miso(adc_miso),
-        .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_reverb_enable(1'b0),
+        .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.reverb_enable(1'b0),.harmony_enable(1'b0),
         .fret_row_oe(row_oe), .fret_row_drive_n(row_drive_n),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din),
         .stable_fret_mask(), .stable_fret_id(), .audio_voice_active(),

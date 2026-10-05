@@ -61,7 +61,7 @@ module tb_guitar_audio_top;
         .adc_miso         (adc_miso),
         .timbre_select    (1'b0),
         .chorus_enable    (1'b0),
-        .sustain_reverb_enable(1'b0),
+        .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
         .fret_row_oe      (fret_row_oe),
         .fret_row_drive_n (fret_row_drive_n),
         .dac_bclk         (dac_bclk),

@@ -14,6 +14,9 @@ module full_guitar_top #(
     parameter integer ADC_SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
     parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE,
     parameter integer USE_HARMONIC = 1,
+    parameter integer USE_PIANO = 1,
+    parameter integer PIANO_MODES = 32,
+    parameter integer PIANO_CONTROL_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
     parameter integer H_ACTIVE = 800,
@@ -35,7 +38,9 @@ module full_guitar_top #(
     input  wire        adc_miso,
     input  wire        timbre_select,
     input  wire        chorus_enable,
-    input  wire        sustain_reverb_enable,
+    input  wire        sustain_enable,
+    input  wire        harmony_enable,
+    input  wire        reverb_enable,
 
     output wire [3:0]  fret_row_oe,
     output wire [3:0]  fret_row_drive_n,
@@ -70,6 +75,7 @@ module full_guitar_top #(
         .ADC_DEAD_SAMPLES(ADC_DEAD_SAMPLES),
         .ADC_SETTLE_SAMPLES(ADC_SETTLE_SAMPLES),
         .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE), .USE_HARMONIC(USE_HARMONIC),
+        .USE_PIANO(USE_PIANO),.PIANO_MODES(PIANO_MODES),.PIANO_CONTROL_ENABLE(PIANO_CONTROL_ENABLE),
         .ANTI_BEAT_ENABLE(ANTI_BEAT_ENABLE)
     ) u_guitar_audio_top (
         .sys_clk_50m(sys_clk_50m), .audio_clk_12m288(audio_clk_12m288),
@@ -77,7 +83,8 @@ module full_guitar_top #(
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk), .adc_mosi(adc_mosi),
         .adc_miso(adc_miso), .timbre_select(timbre_select),
         .chorus_enable(chorus_enable),
-        .sustain_reverb_enable(sustain_reverb_enable),
+        .sustain_enable(sustain_enable),
+        .harmony_enable(harmony_enable),.reverb_enable(reverb_enable),
         .fret_row_oe(fret_row_oe), .fret_row_drive_n(fret_row_drive_n),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din),
         .stable_fret_mask(), .stable_fret_id(),

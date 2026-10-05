@@ -24,6 +24,8 @@ set rtl_files [list \
     [file join $repo_root rtl/audio_io/four_voice_audio_core.v] \
     [file join $repo_root rtl/audio_io/four_voice_harmonic_audio_core.v] \
     [file join $repo_root rtl/audio_io/four_voice_piano_audio_core.v] \
+    [file join $repo_root rtl/audio_io/piano_stereo_chorus.v] \
+    [file join $repo_root rtl/audio_io/piano_stereo_effects.v] \
     [file join $repo_root rtl/audio_io/piano_stereo_room.v] \
     [file join $repo_root rtl/audio_io/voice_audio_core.v] \
     [file join $repo_root rtl/audio_io/sample_tick_gen.v] \
