@@ -7,7 +7,8 @@ module tb_full_piano_voice;
     reg [8:0] blend=0;
     wire valid,active,busy,miss;
     wire signed [23:0] pcm;
-    piano_voice_core #(.MODES(32),.CONTROL_ENABLE(1)) dut(
+    piano_voice_core #(.MODES(32),.CONTROL_ENABLE(1),.ROCK_ENABLE(1)) dut(
+        .rock_blend(9'd0),
         .clk(clk),.rst_n(rst_n),.sample_ce(ce),.note_on(on),.note_off(off),
         .velocity_level(velocity),.phase_inc(inc),.timbre_blend(blend),
         .sustain_enable(sustain),.harmony_enable(harmony),.sample_valid(valid),

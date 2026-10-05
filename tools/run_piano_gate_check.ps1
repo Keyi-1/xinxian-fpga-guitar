@@ -22,6 +22,7 @@ foreach($file in $rtlFiles){
     $body=[regex]::Replace($body,$pattern,{param($m)'rtlref_'+$m.Value})
     $body=$body.Replace('`include "../config/guitar_config.vh"','`include "guitar_config.vh"')
     $body=$body.Replace('`include "../config/piano_bright_coeffs.vh"','`include "piano_bright_coeffs.vh"')
+    $body=$body.Replace('`include "../config/rock_coeffs.vh"','`include "rock_coeffs.vh"')
     $body=$body.Replace('"../../mem/','"../../../mem/')
     Set-Content -LiteralPath (Join-Path $refDir $file.Name) -Value $body -Encoding UTF8
 }

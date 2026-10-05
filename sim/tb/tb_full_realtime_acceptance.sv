@@ -92,6 +92,7 @@ module tb_full_realtime_acceptance;
         .ADC_SPI_CLK_DIV(4), .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0),
         .FFT_FRAME_GAP_SAMPLES(512)
     ) dut (
+        .rock_select(1'b0),
         .sys_clk_50m(sys_clk_50m),
         .audio_clk_12m288(audio_clk_12m288),
         .pixel_clk(pixel_clk), .rst_n(rst_n),

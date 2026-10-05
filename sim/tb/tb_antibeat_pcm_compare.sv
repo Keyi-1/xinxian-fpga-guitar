@@ -10,6 +10,7 @@ module tb_antibeat_pcm_compare;
     wire [3:0] active0, active1;
     wire [95:0] voices0, voices1;
     four_string_board_audio_chain #(.ANTI_BEAT_ENABLE(0)) old_chain (
+        .rock_select(1'b0),
         .clk_audio_ref(clk), .rst_n(rst_n), .stable_valid(stable_valid),
         .stable_fret_id(frets), .pluck_valid(pluck), .velocity_level(8'haa),
         .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
@@ -17,6 +18,7 @@ module tb_antibeat_pcm_compare;
         .voice_active(active0), .voice_pcm(voices0), .dac_bclk(), .dac_lrck(), .dac_din()
     );
     four_string_board_audio_chain #(.ANTI_BEAT_ENABLE(1)) new_chain (
+        .rock_select(1'b0),
         .clk_audio_ref(clk), .rst_n(rst_n), .stable_valid(stable_valid),
         .stable_fret_id(frets), .pluck_valid(pluck), .velocity_level(8'haa),
         .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),

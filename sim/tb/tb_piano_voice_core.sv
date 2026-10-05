@@ -8,10 +8,12 @@ module tb_piano_voice_core;
     wire signed [23:0] wet,dry;
     wire [1:0] profile0,profile1;
     piano_voice_core #(.HAMMER_ENABLE(1)) hammer (
+        .rock_blend(9'd0),
         .clk(clk),.rst_n(rst_n),.sample_ce(ce),.note_on(on),.note_off(off),
         .velocity_level(velocity),.phase_inc(increment),.timbre_blend(9'd0),.sustain_enable(1'b0),.harmony_enable(1'b0),.sample_valid(valid[0]),
         .pcm_out(wet),.active(active[0]),.busy(busy[0]),.deadline_miss(miss[0]),.profile(profile0));
     piano_voice_core #(.HAMMER_ENABLE(0)) body (
+        .rock_blend(9'd0),
         .clk(clk),.rst_n(rst_n),.sample_ce(ce),.note_on(on),.note_off(off),
         .velocity_level(velocity),.phase_inc(increment),.timbre_blend(9'd0),.sustain_enable(1'b0),.harmony_enable(1'b0),.sample_valid(valid[1]),
         .pcm_out(dry),.active(active[1]),.busy(busy[1]),.deadline_miss(miss[1]),.profile(profile1));

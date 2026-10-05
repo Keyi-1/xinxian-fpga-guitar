@@ -1,4 +1,4 @@
-// Key 1 cycles two timbres. Key 2 short release toggles chorus, long hold
+// Key 1 cycles piano/bright/rock. Key 2 short release toggles chorus, long hold
 // toggles harmony. Key 3 cycles dry/sustain/light room once per qualified press.
 module guitar_effect_buttons #(
     parameter integer DEBOUNCE_CYCLES=245760,
@@ -6,16 +6,17 @@ module guitar_effect_buttons #(
     parameter integer LONG_PRESS_ENABLE=1
 )(
     input wire clk,rst_n,key_timbre_n,key_chorus_n,key_space_n,
-    output wire timbre_select,
+    output wire timbre_select,rock_select,
+    output reg [1:0] timbre_mode,
     output reg chorus_enable,
     output wire sustain_enable,reverb_enable,
     output reg [1:0] space_mode,
     output reg harmony_enable
 );
-    wire unused_timbre_press,unused_space_state,space_press;
+    wire timbre_press,unused_timbre_state,unused_space_state,space_press;
     debounced_toggle #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES)) u_timbre(
         .clk(clk),.rst_n(rst_n),.button_n(key_timbre_n),
-        .toggle_state(timbre_select),.pressed_pulse(unused_timbre_press));
+        .toggle_state(unused_timbre_state),.pressed_pulse(timbre_press));
     debounced_toggle #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES)) u_space(
         .clk(clk),.rst_n(rst_n),.button_n(key_space_n),
         .toggle_state(unused_space_state),.pressed_pulse(space_press));
@@ -23,12 +24,15 @@ module guitar_effect_buttons #(
     reg [31:0] debounce_count,hold_count;
     assign sustain_enable=space_mode==1;
     assign reverb_enable=space_mode==2;
+    assign timbre_select=timbre_mode==1;
+    assign rock_select=timbre_mode==2;
     always @(posedge clk) begin
         if(!rst_n)begin
             sync1<=1;sync2<=1;stable_n<=1;long_sent<=0;
-            debounce_count<=0;hold_count<=0;space_mode<=0;harmony_enable<=0;chorus_enable<=0;
+            debounce_count<=0;hold_count<=0;space_mode<=0;timbre_mode<=0;harmony_enable<=0;chorus_enable<=0;
         end else begin
             sync1<=key_chorus_n;sync2<=sync1;
+            if(timbre_press)timbre_mode<=timbre_mode==2 ? 2'd0 : timbre_mode+1'b1;
             if(space_press)space_mode<=space_mode==2 ? 2'd0 : space_mode+1'b1;
             if(sync2==stable_n)debounce_count<=0;
             else if(DEBOUNCE_CYCLES<=1 || debounce_count>=DEBOUNCE_CYCLES-1)begin

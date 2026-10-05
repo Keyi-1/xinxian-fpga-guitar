@@ -50,6 +50,7 @@ module tb_full_guitar_top;
         .V_ACTIVE(32), .V_FRONT(1), .V_SYNC(2), .V_BACK(1),
         .BAR_SLOT(2), .BAR_WIDTH(1)
     ) dut (
+        .rock_select(1'b0),
         .sys_clk_50m(sys_clk_50m), .audio_clk_12m288(audio_clk_12m288),
         .pixel_clk(pixel_clk), .rst_n(rst_n),
         .fret_col_in_n(fret_col_in_n), .adc_miso(adc_miso),

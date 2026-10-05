@@ -38,6 +38,11 @@ if ('tb_full_piano_voice' -in $Benches) {
     & $PythonExe (Join-Path $repoDir 'tools\gen_full_piano_golden.py')
     if ($LASTEXITCODE) { throw 'full piano oracle generation failed' }
 }
+if ('tb_rock_voice_core' -in $Benches) {
+    if (!$PythonExe) { $PythonExe = (Get-Command python.exe -ErrorAction Stop).Source }
+    & $PythonExe (Join-Path $repoDir 'tools\gen_rock_golden.py')
+    if ($LASTEXITCODE) { throw 'rock oracle generation failed' }
+}
 Push-Location $simDir
 try {
     if (!(Test-Path -LiteralPath 'work')) {

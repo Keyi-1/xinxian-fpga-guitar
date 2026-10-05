@@ -1,0 +1,94 @@
+DRY WAH V4 LONG DECAY — 2026-10-05 (Asia/Shanghai)
+Branch feat/rock-metal-timbre, base master 35e52e1; changes uncommitted.
+User request: slower decay and longer sound on the current wah timbre.
+No push, merge, board programming or Flash write performed.
+
+IMPLEMENTATION
+Only wah virtual age changes: first 2048 source-age samples unchanged;
+afterwards wah_age = 2048 + floor((age-2048)/2).
+Original oscillator phase, note table, pick ramp, piano/bright envelopes,
+release damper, re-strike, three buttons, harmony and pin assignments retained.
+The measured spectral movement is also slowed with the wah envelope.
+Existing sustain advances source age at 1/4 rate after the initial 2048;
+combined wah-envelope rate becomes 1/8. No sample-rate or pitch change.
+Nominal dry boundary 55552 frames / 1.157333 s; sustain boundary 216064
+frames / 4.501333 s. Low-level PCM quantization can make the last nonzero
+sample slightly earlier. Note-off damping may end a held-fret note earlier.
+No additional ROM, DSP, phase slots, states or component cycles over V3.
+32 slots/voice, 4 voices, maximum 128 components, 233/256 clocks.
+
+UNCHANGED ROM SHA256 (checked against v3_before_long_decay backup)
+rock_gain.mem c7ae5e9ccf7a9fb988ed324c01c5f411b1f081e13b49630c223999499447c4ec
+rock_envelope.mem bd85dfdb0561b278e67bc7bf5a6b36bb3d2fd98d94cd2b7691b964e40600eaff
+rock_phase.mem 7440d4c57a204f0391c9526f35ba75f9a0cef9a5056f52e19068ba96d84274e9
+rock_ratio.mem 83391c636960bfd76dcff98ad4c79c3b7939ef163b403acf6ad32ec9820bf4f6
+
+RTL REGRESSION: PASS
+ModelSim SE-64 10.6d, compilation 0 errors / 0 warnings.
+build/wah_reference/v4_regression.log: MAIN REGRESSION PASSED: 80 benches.
+212000 exact independent integer-oracle samples: complete extended tails
+for C4/E4/G4, six registers, four velocities, alias suppression, fifth,
+sustain, transitions, note-off and re-strike.
+Original piano/bright 12000 samples and original piano/hammer 32000 exact.
+2000 real 48 kHz frames: 128 NONZERO components, 233/256 clocks, no misses.
+140000 real-budget lifetime frames: saturated address, bounded interpolation,
+no tail restart, voice retirement; no audio state forced.
+240000 C4 frames per dry/sustain variant, full natural tail; dry zero after
+55700, sustain after 216500; same initial 2048, 1s dry energy < -13 dB,
+sustain late energy > 8x dry. Actual panning/effects/PCM16, no forced state.
+528000 four-voice stereo frames per dry/room variant; natural singles,
+repeated triads and four-note chord; no clipping, unknowns or deadlines.
+
+ROUTED BUILDS: PASS
+Gowin V1.9.12.03, GW5AT-LV60PG484AC1/I0, device B.
+Fixed-pin audio FULL, completed 2026-10-05 17:31:43:
+Logic 24433/59904, registers 10788/60780, latch 0;
+BSRAM 112/118, DSP 111/118, unchanged over V3; 28 fixed unique pins.
+Audio Fmax 20.356 MHz against 12.288; min setup slack +32.257 ns;
+setup/hold violated endpoints 0/0.
+FFT/LCD FULL, completed 2026-10-05 17:35:46:
+Logic 31344/59904, registers 13084/60780, latch 0;
+BSRAM 115/118, DSP 116/118, unchanged over V3.
+Audio Fmax 15.436 MHz against 12.288; pixel 101.292 against 33.333;
+setup/hold violated endpoints 0/0. Auto-pin configuration NOT DOWNLOADABLE.
+Logs v4_physical_build.log / v4_full_build.log under build/wah_reference.
+
+BITSTREAM SHA256
+Downloadable build/wah_reference/neo_guitar_audio_full_wah_v4_long_decay.fs
+c0e86fd426b5a6177ddafaa0e96659a04a80956a39dc512a86fb1d2770873ea0
+Same bytes as physical-project impl/pnr output and generic rock.fs alias.
+Physical synthesis VG ff20ec0346449e526941b2a070ae7ed333acf69f396cdc7e4b41db5dfa5bdbf0
+FFT/LCD auto-pin FS c44ea22a30382f42f101747d708318c520a05445607d6e2cf42c56ef97b6fcc9
+V3 preserved under build/wah_reference/v3_before_long_decay/.
+
+ACTUAL RTL WAVS: PASS
+48 kHz stereo PCM16, velocity 2; no normalization, resampling or software FX.
+rtl_wah_long_dry.wav / rtl_wah_long_room.wav: 11 s each, complete natural
+decays of C4/E4/G4, twice triad, G3/C4/E4/G4; no note-off truncation.
+Peak PCM16 dry/room 3582/3093, no rails. Keyed-note peaks unchanged:
+261.657715/329.589844/392.028809 Hz.
+3-12k/100-16k power at .05-.35s: C4 .043781, E4 .029211, G4 .054829.
+Same modal data; slowed spectral motion changes fixed-window proportions.
+Dry SHA 18de83bc70c7afdc0cf43d32a054732f21457e470f70d91783e8717fab71fc1a
+Room SHA 993e5cef528f2bf4191e13e6ba84ef0840062b7e40410d32d9bcbd608698189c
+Unreleased C4 last nonzero dry/sustain 1.157333 / 4.500375 s.
+Dry early .05-.10s RMS 542.424, late 1.0-1.05s 33.321 (-24.232 dB).
+Sustain same windows RMS 570.907 / 357.904 (-4.056 dB).
+Dry .50-.55s RMS 225.565 vs V3 40.718 (5.54x); decay genuinely slower.
+First 2048 actual output frames bit-identical with V3 for BOTH variants.
+C4 dry SHA 0f0ed16dc8e7f7bdec829f9fbaad64df75e1adb53b0674ab9a46958897c70c06
+C4 sustain SHA ab670afd049301858366d0107a28aed56efb1766e012810b4eea80da5f7c45ad
+rtl_wah_v3_v4_dry_comparison.wav: V3 dry 3s, gap .25s, V4 dry 5s.
+rtl_wah_long_dry_sustain_comparison.wav: V4 dry 5s, gap .25s, sustain 5s.
+Metrics rtl_long_preview_metrics.json; spectrum and decay PNGs visually checked.
+
+POST-SYNTHESIS DAC CHECK: PASS
+build/wah_reference/v4_gate_check.log: 6528 actual DAC frames bit-identical
+with RTL; 6188 nonzero. Includes 1597 frames after wah virtual envelope
+enters half speed, plus all three timbres, chorus, sustain/room, fifth,
+startup and actual ADC/matrix inputs. No audio/DSP/ROM/DAC state forced.
+Only mechanical input debounce/long-hold counters accelerated in both
+designs. Strict existing vendor-primitive warning whitelist retained.
+Functional simulation without SDF; routed timing independently passes above.
+
+Remaining: actual board/headphone/dual-speaker listening to V4 longer decay.

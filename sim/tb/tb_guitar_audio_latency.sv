@@ -33,6 +33,7 @@ module tb_guitar_audio_latency;
         .ADC_SPI_CLK_DIV(4),
         .USE_HARMONIC    (0)
     ) u_sine_top (
+        .rock_select(1'b0),
         .sys_clk_50m       (sys_clk_50m),
         .audio_clk_12m288  (audio_clk_12m288),
         .rst_n             (rst_n),
@@ -67,6 +68,7 @@ module tb_guitar_audio_latency;
         .ADC_SPI_CLK_DIV(4),
         .USE_HARMONIC    (1)
     ) u_harmonic_top (
+        .rock_select(1'b0),
         .sys_clk_50m       (sys_clk_50m),
         .audio_clk_12m288  (audio_clk_12m288),
         .rst_n             (rst_n),

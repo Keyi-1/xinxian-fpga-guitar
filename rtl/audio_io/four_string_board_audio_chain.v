@@ -13,6 +13,7 @@ module four_string_board_audio_chain #(
     parameter integer PIANO_ROOM_ENABLE = 1,
     parameter integer PIANO_MODES = 8,
     parameter integer PIANO_CONTROL_ENABLE = 0,
+    parameter integer PIANO_ROCK_ENABLE = 0,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer ANTI_BEAT_GAP_HZ = 80,
     parameter [8:0] ANTI_BEAT_PAIR_GAIN_Q8 = 9'd128,
@@ -27,7 +28,7 @@ module four_string_board_audio_chain #(
     input wire [15:0] stable_fret_id,
     input wire [3:0] pluck_valid,
     input wire [7:0] velocity_level,
-    input wire timbre_select, chorus_enable, sustain_enable,
+    input wire timbre_select, rock_select, chorus_enable, sustain_enable,
     input wire harmony_enable, reverb_enable,
     output wire sample_tick, pcm_mix_valid,
     output wire signed [23:0] pcm_mix,
@@ -41,6 +42,7 @@ module four_string_board_audio_chain #(
     wire signed [23:0] unused_saturated_mix;
     wire [3:0] deadline_miss;
     wire [8:0] timbre_blend, chorus_blend, reverb_blend;
+    wire [8:0] rock_blend;
     wire timbre_busy, chorus_busy, reverb_busy;
     wire [7:0] piano_profile;
 
@@ -67,13 +69,13 @@ module four_string_board_audio_chain #(
     generate if (USE_PIANO != 0) begin : g_piano
         four_voice_piano_audio_core #(.SAMPLE_DIV(SAMPLE_DIV),
             .HAMMER_ENABLE(PIANO_HAMMER_ENABLE),.MODES(PIANO_MODES),
-            .CONTROL_ENABLE(PIANO_CONTROL_ENABLE)) u_core (
+            .CONTROL_ENABLE(PIANO_CONTROL_ENABLE),.ROCK_ENABLE(PIANO_ROCK_ENABLE)) u_core (
             .clk_audio_ref(clk_audio_ref),.rst_n(rst_n),.note_on(note_on),.note_off(note_off),
             .velocity_level(velocity_level),.phase_inc(phase_inc),.sample_tick(sample_tick),
-            .timbre_select(timbre_select),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),
+            .timbre_select(timbre_select),.rock_select(rock_select),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),
             .sample_valid(voice_sample_valid),.voice_active(voice_active),.voice_pcm(voice_pcm),
             .voice_profile(piano_profile),.deadline_miss(deadline_miss),
-            .timbre_blend(timbre_blend),.timbre_busy(timbre_busy));
+            .timbre_blend(timbre_blend),.rock_blend(rock_blend),.timbre_busy(timbre_busy));
     end else if (USE_HARMONIC == 0) begin : g_sine
         four_voice_audio_core #(.SAMPLE_DIV(SAMPLE_DIV), .PLUCK_MODE(1), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
                 .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
@@ -88,8 +90,10 @@ module four_string_board_audio_chain #(
         );
         assign deadline_miss = 4'd0;
         assign timbre_blend = 9'd0;
+        assign rock_blend = 9'd0;
         assign timbre_busy = 1'b0;
     end else begin : g_harmonic
+        assign rock_blend = 9'd0;
         four_voice_harmonic_audio_core #(.SAMPLE_DIV(SAMPLE_DIV), .PLUCK_MODE(1), .PLUCK_ATTACK_SAMPLES(PLUCK_ATTACK_SAMPLES),
                 .PLUCK_FAST_DECAY_SAMPLES(PLUCK_FAST_DECAY_SAMPLES),
                 .PLUCK_FAST_SHIFT(PLUCK_FAST_SHIFT), .PLUCK_SLOW_SHIFT(PLUCK_SLOW_SHIFT),

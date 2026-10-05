@@ -9,6 +9,7 @@ module piano_voice_core #(
     parameter integer HAMMER_ENABLE = 1,
     parameter integer MODES = 8,
     parameter integer CONTROL_ENABLE = 0,
+    parameter integer ROCK_ENABLE = 0,
     parameter [20:0] HARMONY_RATIO_Q20 = 21'd1571089,
     parameter integer MAX_SAMPLES = 131072,
     parameter integer RELEASE_SHIFT = 10,
@@ -18,6 +19,7 @@ module piano_voice_core #(
     input wire [1:0] velocity_level,
     input wire [31:0] phase_inc,
     input wire [8:0] timbre_blend,
+    input wire [8:0] rock_blend,
     input wire sustain_enable, harmony_enable,
     output reg sample_valid,
     output reg signed [23:0] pcm_out,
@@ -28,7 +30,7 @@ module piano_voice_core #(
 );
     localparam [3:0] IDLE=0, LOAD=1, INC=2, PHASE=3, LOOKUP=4,
                      MULT=5, ACC=6, HAMMER=7, VELOCITY=8, RELEASE=9, OUT=10, ENV_B=11,
-                     TIMBRE=12, TIMBRE_SUM=13;
+                     TIMBRE=12, TIMBRE_SUM=13, ROCK_MIX=14, ROCK_SUM=15;
     reg [3:0] state;
     reg [4:0] mode_index;
     reg [16:0] age;
@@ -37,6 +39,15 @@ module piano_voice_core #(
     reg [23:0] release_level;
     reg [8:0] velocity_gain;
     reg [8:0] frame_timbre;
+    reg [8:0] frame_rock;
+    reg [24:0] rock_envelope_rom[0:3071];
+    reg [24:0] rock_env_read;
+    reg [21:0] rock_env_product;
+    reg [11:0] rock_interp_level;
+    reg [27:0] rock_amplitude_product;
+    reg signed [32:0] rock_product;
+    reg signed [27:0] rock_accumulator;
+    reg signed [37:0] prior_blend_product,rock_blend_product;
     reg [3:0] damping_shift;
     reg [1:0] sustain_age_phase;
     reg [3:0] bright_decay_phase;
@@ -80,6 +91,30 @@ module piano_voice_core #(
     wire [7:0] next_frame = (frame == 255) ? 8'd255 : frame + 1'b1;
     wire harmony_mode = CONTROL_ENABLE!=0 && MODES==32 && harmony_latched && mode_index>=16;
     wire [4:0] local_mode = harmony_mode ? mode_index-5'd16 : mode_index;
+    // Three measured dry-wah profiles, 32 modes x 32 envelope observations.
+    // Keep the first 2048 samples intact, then play only the wah envelope at
+    // half speed. DDS phase, piano/bright envelopes and pick ramp still use
+    // their original clocks. No extra ROM, DSP or component cycles required.
+    // age/2 + 1024 equals 2048 + (age-2048)/2 after the initial transient.
+    wire [16:0] rock_age=frame_age<2048 ? frame_age :
+        {1'b0,frame_age[16:1]}+17'd1024;
+    // Saturate before narrowing. Interpolation multiplies ABS(delta) unsigned
+    // and applies its sign in LUTs, with floor rounding for negative slopes.
+    wire [4:0] rock_frame=rock_age>=31744 ? 5'd31 : rock_age[14:10];
+    wire [11:0] rock_env_address={profile,local_mode,rock_frame};
+    wire [12:0] rock_delta_abs=rock_env_read[12] ?
+        (~rock_env_read[12:0]+13'd1) : rock_env_read[12:0];
+    wire [11:0] rock_mul_operand=state==ENV_B ? rock_delta_abs[11:0] : rock_interp_level;
+    wire [9:0] rock_mul_weight=state==ENV_B ? rock_age[9:0] :
+        frame_age<32 ? {5'd0,frame_age[4:0]} : 10'd32;
+    wire [22:0] rock_negative_round={1'b0,rock_env_product}+23'd1023;
+    wire [12:0] rock_interpolated=rock_env_read[12] ?
+        {1'b0,rock_env_read[24:13]}-rock_negative_round[22:10] :
+        {1'b0,rock_env_read[24:13]}+{1'b0,rock_env_product[21:10]};
+    wire [14:0] rock_amplitude=harmony_mode ? rock_amplitude_product[27:13]>>1 : rock_amplitude_product[27:13];
+    wire signed [27:0] rock_component={{2{rock_product[32]}},rock_product[32:7]};
+    wire signed [38:0] rock_body_wide=$signed({prior_blend_product[37],prior_blend_product})+
+        $signed({rock_blend_product[37],rock_blend_product});
     wire [12:0] env_addr_a = {profile,local_mode[2:0],frame};
     wire [12:0] env_addr_b = {profile,local_mode[2:0],next_frame};
     wire [12:0] env_read_address=(state==ENV_B)?env_addr_b:env_addr_a;
@@ -117,9 +152,11 @@ module piano_voice_core #(
         $readmemh("../../mem/piano_envelope.mem",envelope_rom);
         $readmemh("../../mem/piano_hammer.mem",hammer_rom);
         $readmemh("../../mem/harmonic_decay_rock.mem",bright_decay_rom);
+        if(ROCK_ENABLE!=0)$readmemh("../../mem/rock_envelope.mem",rock_envelope_rom);
     end
 
     `include "../config/piano_bright_coeffs.vh"
+    `include "../config/rock_coeffs.vh"
 
     function [8:0] gain_for_velocity;
         input [1:0] level;
@@ -148,6 +185,9 @@ module piano_voice_core #(
             profile<=0; releasing<=0; release_level<=0; velocity_gain<=0;
             increment_latched<=0; frame_active<=0; ratio<=0; env_a<=0; env_b<=0;env_read<=0;
             frame_timbre<=0; damping_shift<=RELEASE_SHIFT; harmony_latched<=0;
+            frame_rock<=0;rock_env_read<=0;rock_amplitude_product<=0;rock_product<=0;
+            rock_env_product<=0;rock_interp_level<=0;
+            rock_accumulator<=0;prior_blend_product<=0;rock_blend_product<=0;
             sustain_age_phase<=0;bright_decay_phase<=0;frame_bright_decay<=0;
             harmony_product<=0; bright_decay_product<=0; body_level<=0;
             bright_amplitude<=0; bright_product<=0; bright_accumulator<=0;
@@ -162,13 +202,21 @@ module piano_voice_core #(
             // Two neighboring frames share one physical ROM read port rather
             // than duplicating the whole envelope ROM for interpolation.
             if(state==LOAD || state==ENV_B)env_read<=envelope_rom[env_read_address];
+            if(ROCK_ENABLE!=0 && state==LOAD)
+                rock_env_read<=rock_envelope_rom[rock_env_address];
+            // One shared unsigned DSP: interpolate in ENV_B, apply the pick
+            // ramp in PHASE. The component schedule needs no extra cycles.
+            if(ROCK_ENABLE!=0 && (state==ENV_B || state==PHASE))
+                rock_env_product<=rock_mul_operand*rock_mul_weight;
             if(sample_ce) begin
                 if(busy) deadline_miss<=1;
                 else begin
                     busy<=1; state<=LOAD; mode_index<=0; accumulator<=0;
                     bright_accumulator<=0;
+                    rock_accumulator<=0;
                     increment_latched<=phase_inc;
                     frame_timbre<=CONTROL_ENABLE!=0 ? timbre_blend : 9'd0;
+                    frame_rock<=CONTROL_ENABLE!=0 && ROCK_ENABLE!=0 ? rock_blend : 9'd0;
                     harmony_product<=phase_inc*HARMONY_RATIO_Q20;
                     frame_active<=active | note_on;
                     frame_age<=age;
@@ -188,7 +236,9 @@ module piano_voice_core #(
                         // Preserve waveform continuity on rapid re-strikes.
                         continuity<=pcm_out;
                         for(i=0;i<MODES;i=i+1)begin
-                            mode_phase[i]<=i<8 ? phase_seed[{selected_profile,3'b000}+i] :
+                            mode_phase[i]<=ROCK_ENABLE!=0 && rock_blend>=128 ?
+                                rock_phase_for(selected_profile,harmony_enable && i>=16 ? i-16 : i) :
+                                i<8 ? phase_seed[{selected_profile,3'b000}+i] :
                                 (CONTROL_ENABLE!=0 && harmony_enable && i>=16 && i<24) ?
                                     phase_seed[{selected_profile,3'b000}+i-16] : 32'd0;
                             bright_gain[i]<={piano_bright_gain_for(CONTROL_ENABLE!=0 && harmony_enable && i>=16 ? i-16 : i),8'd0};
@@ -221,7 +271,8 @@ module piano_voice_core #(
             end
             case(state)
                 LOAD: begin
-                    ratio<=local_mode<8 ? {2'd0,ratio_rom[{profile,local_mode[2:0]}]} :
+                    ratio<=ROCK_ENABLE!=0 && frame_rock>=128 ? rock_ratio_for(local_mode) :
+                        local_mode<8 ? {2'd0,ratio_rom[{profile,local_mode[2:0]}]} :
                         ({21'd0,local_mode}+26'd1)<<20;
                     state<=ENV_B;
                 end
@@ -231,6 +282,7 @@ module piano_voice_core #(
                 end
                 INC: begin
                     env_b<=env_read;
+                    if(ROCK_ENABLE!=0)rock_interp_level<=rock_age>=ROCK_DRY_CUTOFF ? 12'd0 : rock_interpolated[11:0];
                     ratio_product<=(harmony_mode ? harmony_product[51:20] : increment_latched)*ratio;
                     state<=PHASE;
                 end
@@ -249,17 +301,21 @@ module piano_voice_core #(
                     if(local_mode==0)body_level<=envelope_sum[24:9];
                     bright_amplitude<=CONTROL_ENABLE!=0 && mode_enabled ?
                         (harmony_mode ? bright_amplitude_wide[38:23]>>1 : bright_amplitude_wide[38:23]) : 16'd0;
+                    rock_amplitude_product<=ROCK_ENABLE!=0 && mode_enabled ?
+                        rock_env_product[16:5]*rock_gain_for(profile,local_mode) : 28'd0;
                     state<=MULT;
                 end
                 MULT: begin
                     mode_product<=$signed(sine_value)*$signed({1'b0,amplitude});
                     bright_product<=$signed(sine_value)*$signed({1'b0,bright_amplitude});
+                    rock_product<=$signed(sine_value)*$signed({1'b0,rock_amplitude});
                     bright_decay_product<=bright_gain[mode_index]*bright_decay_rom[local_mode];
                     state<=ACC;
                 end
                 ACC: begin
                     accumulator<=accumulator+component;
                     bright_accumulator<=bright_accumulator+bright_component;
+                    rock_accumulator<=rock_accumulator+rock_component;
                     if(frame_bright_decay)bright_gain[mode_index]<=bright_decay_product[38:15];
                     if(mode_index==MODES-1) state<=HAMMER;
                     else begin mode_index<=mode_index+1'b1; state<=LOAD; end
@@ -275,7 +331,16 @@ module piano_voice_core #(
                     bright_blend_product<=bright_accumulator*$signed({1'b0,frame_timbre});
                     state<=TIMBRE_SUM;
                 end
-                TIMBRE_SUM: begin blended_body<=blended_body_wide[35:8];state<=VELOCITY;end
+                TIMBRE_SUM: begin blended_body<=blended_body_wide[35:8];state<=ROCK_ENABLE!=0 ? ROCK_MIX : VELOCITY;end
+                ROCK_MIX: begin
+                    // Modal-sum bound <= 16388 PCM16 units plus 2048 hammer;
+                    // both sums fit far below signed 27 bits. Narrowing only
+                    // redundant sign bits maps each product to one DSP slice.
+                    prior_blend_product<=$signed(blended_body[26:0])*$signed({1'b0,(9'd256-frame_rock)});
+                    rock_blend_product<=$signed(rock_accumulator[26:0])*$signed({1'b0,frame_rock});
+                    state<=ROCK_SUM;
+                end
+                ROCK_SUM: begin blended_body<=rock_body_wide[35:8];state<=VELOCITY;end
                 VELOCITY: begin
                     velocity_product<=velocity_source*$signed({1'b0,velocity_gain});
                     state<=RELEASE;

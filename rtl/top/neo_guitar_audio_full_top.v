@@ -29,12 +29,14 @@ module neo_guitar_audio_full_top #(
     wire audio_rst_n;
     reset_sync u_startup(.clk(audio_clk_12m288),.arst_n(startup_done),.srst_n(audio_rst_n));
     wire timbre_select,chorus_enable,sustain_enable,reverb_enable,harmony_enable;
+    wire rock_select;
+    wire [1:0] timbre_mode;
     wire [1:0] space_mode;
     guitar_effect_buttons #(.DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES),
         .LONG_PRESS_CYCLES(KEY_LONG_PRESS_CYCLES)) u_buttons (
         .clk(audio_clk_12m288),.rst_n(audio_rst_n),
         .key_timbre_n(USER_BUTTON1_n),.key_chorus_n(USER_BUTTON2_n),.key_space_n(USER_BUTTON3_n),
-        .timbre_select(timbre_select),.chorus_enable(chorus_enable),
+        .timbre_select(timbre_select),.rock_select(rock_select),.timbre_mode(timbre_mode),.chorus_enable(chorus_enable),
         .sustain_enable(sustain_enable),.reverb_enable(reverb_enable),
         .space_mode(space_mode),.harmony_enable(harmony_enable));
     wire [3:0] row_oe,row_drive_n;
@@ -43,12 +45,12 @@ module neo_guitar_audio_full_top #(
         .MATRIX_DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES),
         .ADC_SPI_CLK_DIV(ADC_SPI_CLK_DIV),.ADC_DEAD_SAMPLES(PLUCK_DEAD_SAMPLES),
         .ADC_SETTLE_SAMPLES(PLUCK_SETTLE_SAMPLES),.FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE),
-        .USE_PIANO(1),.PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1)
+        .USE_PIANO(1),.PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1)
     ) u_audio (
         .sys_clk_50m(1'b0),.audio_clk_12m288(audio_clk_12m288),.rst_n(startup_done),
         .fret_col_in_n({COL7,COL6,COL5,COL4,COL3,COL2,COL1,COL0}),
         .adc_cs_n(adc_cs_n),.adc_sclk(adc_sclk),.adc_mosi(adc_mosi),.adc_miso(adc_miso),
-        .timbre_select(timbre_select),.chorus_enable(chorus_enable),
+        .timbre_select(timbre_select),.rock_select(rock_select),.chorus_enable(chorus_enable),
         .sustain_enable(sustain_enable),.reverb_enable(reverb_enable),.harmony_enable(harmony_enable),
         .fret_row_oe(row_oe),.fret_row_drive_n(row_drive_n),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),
@@ -59,8 +61,16 @@ module neo_guitar_audio_full_top #(
     assign ROW2=row_oe[2]?row_drive_n[2]:1'bz;
     assign ROW3=row_oe[3]?row_drive_n[3]:1'bz;
     assign pa_en_n=~audio_rst_n;
-    // LEDs active low: bright timbre, chorus, sustain, light room.
+    // LED0: off=piano, steady=bright, 2Hz blink=rock; other LEDs keep effects.
     // Harmony status is indicated by both space LEDs while space mode is dry.
+    reg [21:0] rock_led_count;
+    reg rock_led_on;
+    always @(posedge audio_clk_12m288)begin
+        if(!audio_rst_n || !rock_select)begin rock_led_count<=0;rock_led_on<=1;end
+        else if(rock_led_count==3071999)begin rock_led_count<=0;rock_led_on<=~rock_led_on;end
+        else rock_led_count<=rock_led_count+1'b1;
+    end
     assign event_led=~{(reverb_enable||(harmony_enable&&space_mode==0)),
-                      (sustain_enable||(harmony_enable&&space_mode==0)),chorus_enable,timbre_select};
+                      (sustain_enable||(harmony_enable&&space_mode==0)),chorus_enable,
+                      (timbre_select||(rock_select&&rock_led_on))};
 endmodule

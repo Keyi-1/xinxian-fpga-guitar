@@ -6,7 +6,8 @@ module tb_full_piano_budget;
     wire tick,valid;
     wire [3:0] active,miss;
     wire [95:0] pcm;
-    four_voice_piano_audio_core #(.MODES(32),.CONTROL_ENABLE(1)) dut(
+    four_voice_piano_audio_core #(.MODES(32),.CONTROL_ENABLE(1),.ROCK_ENABLE(1)) dut(
+        .rock_select(1'b0),.rock_blend(),
         .clk_audio_ref(clk),.rst_n(rst_n),.note_on(on),.note_off(4'd0),
         .velocity_level(8'hff),.phase_inc({32'd26276679,32'd23409859,32'd20933131,32'd19685267}),
         .timbre_select(1'b1),.sustain_enable(1'b0),.harmony_enable(1'b0),

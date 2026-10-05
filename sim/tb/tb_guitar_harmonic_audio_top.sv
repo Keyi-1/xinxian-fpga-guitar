@@ -39,6 +39,7 @@ module tb_guitar_harmonic_audio_top;
         .SLIDE_SAMPLES(4), .ADC_SPI_CLK_DIV(2), .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0),
         .USE_HARMONIC(1)
     ) dut (
+        .rock_select(1'b0),
         .sys_clk_50m(sys_clk_50m), .audio_clk_12m288(audio_clk_12m288),
         .rst_n(rst_n), .fret_col_in_n(fret_col_in_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk), .adc_mosi(adc_mosi),

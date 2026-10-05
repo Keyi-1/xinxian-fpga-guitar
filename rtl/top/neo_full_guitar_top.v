@@ -18,6 +18,7 @@ module neo_full_guitar_top #(
     parameter integer USE_PIANO = 1,
     parameter integer PIANO_MODES = 32,
     parameter integer PIANO_CONTROL_ENABLE = 1,
+    parameter integer PIANO_ROCK_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
     parameter integer H_ACTIVE = 800,
@@ -76,6 +77,7 @@ module neo_full_guitar_top #(
     wire       display_cdc_overrun_internal;
 
     wire timbre_select_audio,chorus_enable_audio,sustain_enable_audio;
+    wire rock_select_audio;
     wire reverb_enable_audio,harmony_enable_audio;
     wire [1:0] space_mode_audio;
     wire audio_control_rst_n;
@@ -87,7 +89,7 @@ module neo_full_guitar_top #(
         .LONG_PRESS_CYCLES(KEY_LONG_PRESS_CYCLES)) u_buttons (
         .clk(audio_clk_12m288),.rst_n(audio_control_rst_n),
         .key_timbre_n(key_timbre_n),.key_chorus_n(key_chorus_n),.key_space_n(key_sustain_n),
-        .timbre_select(timbre_select_audio),.chorus_enable(chorus_enable_audio),
+        .timbre_select(timbre_select_audio),.rock_select(rock_select_audio),.timbre_mode(),.chorus_enable(chorus_enable_audio),
         .sustain_enable(sustain_enable_audio),.reverb_enable(reverb_enable_audio),
         .space_mode(space_mode_audio),.harmony_enable(harmony_enable_audio));
 
@@ -111,6 +113,7 @@ module neo_full_guitar_top #(
         .ADC_SETTLE_SAMPLES(ADC_SETTLE_SAMPLES),
         .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE), .USE_HARMONIC(USE_HARMONIC),
         .USE_PIANO(USE_PIANO),.PIANO_MODES(PIANO_MODES),.PIANO_CONTROL_ENABLE(PIANO_CONTROL_ENABLE),
+        .PIANO_ROCK_ENABLE(PIANO_ROCK_ENABLE),
         .ANTI_BEAT_ENABLE(ANTI_BEAT_ENABLE),
         .FFT_FRAME_GAP_SAMPLES(FFT_FRAME_GAP_SAMPLES),
         .H_ACTIVE(H_ACTIVE), .H_FRONT(H_FRONT), .H_SYNC(H_SYNC),
@@ -123,6 +126,7 @@ module neo_full_guitar_top #(
         .pixel_clk(pixel_clk), .rst_n(rst_n),
         .fret_col_in_n(fret_col_in_n), .adc_miso(adc_miso),
         .timbre_select(timbre_select_audio),
+        .rock_select(rock_select_audio),
         .chorus_enable(chorus_enable_audio),
         .sustain_enable(sustain_enable_audio),.reverb_enable(reverb_enable_audio),
         .harmony_enable(harmony_enable_audio),

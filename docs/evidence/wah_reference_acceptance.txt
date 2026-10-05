@@ -1,0 +1,150 @@
+HISTORICAL DRY WAH / THIRD TIMBRE V3 — 2026-10-05 (Asia/Shanghai)
+Current V4 long-decay evidence: wah_long_decay_acceptance.txt.
+Branch feat/rock-metal-timbre, base master / 35e52e1.
+Source changes uncommitted. No push, merge, board programming or Flash write.
+User explicitly replaced the prior heavy-metal reference with four new dry WAVs.
+Current preparation reads ONLY these new WAVs, not the old recordings.
+
+NEW SOURCE SHA256
+C4 T:/Downloads/C4哇音.wav
+d2c64f409bcae6a83def9c644eb7ee08e56f119b0ce9c21d3e17dcf5ec91fb89
+E4 T:/Downloads/E4哇音.wav
+1ee4e7624b717b9710cc427a43a54f343ad7306bbf7496f11e2213a43ee44109
+G4 T:/Downloads/G4哇音.wav
+b233b7bd4f1955f0f976b1485735a02a4c6b8d0ddd78b248f35ffb0b873c0c5c
+Chord T:/Downloads/合音哇音.wav
+ec30787f9d4f32c77380cb2a9c77ab7191ec0568539d4a7e72c01b3234e9aabb
+All distinct; 44.1 kHz stereo PCM16; two detected strikes each.
+Compression/treble/bass/echo 0; reverb OFF, per user.
+Onsets C4 .443991/3.726531; E4 .873016/3.975964;
+G4 .538776/3.422222; chord .339229/2.973243 s.
+Stereo correlation .997065/.998314/.999289/.998018.
+
+ANALYSIS
+Observed integer AND half-integer note-frequency multiples, including octave
+below. Strong E4 peaks near 493/823/1154 Hz; G4 near 586/1372 Hz.
+Integer-grid residuals .265-.632 mostly belong to half-grid tones, not noise.
+Half-grid residuals .00666-.02786. Six normalized strikes rank 32 selected
+modes; captured half-grid energy .992429-.999986. This is not total waveform
+or preset identification. 32 strongest modes, moving envelopes and per-key
+phases retained in three C4/E4/G4 profiles; low residual detuning omitted.
+Selected ratios (slot 0 is nominal keyed note):
+1,1.5,2,2.5,3.5,4,3,.5,4.5,9.5,6,10.5,9,5.5,5,8.5,
+10,7.5,7,6.5,11,8,11.5,13.5,12,12.5,14.5,13,14,15,15.5,17.
+3-12 kHz / 100 Hz-16 kHz power, .05-.65 s window:
+C4 .05115/.05844; E4 .08263/.07379; G4 .05864/.06192;
+chord about .09-.10. Chord NNLS power-spectrum residual .305726, allowing
+free note gains for manual velocity; residual does not uniquely identify FX.
+Artifacts build/wah_reference/analysis.json, modal_curves.npz,
+onsets.png, spectrum_motion.png. Original WAVs read-only.
+
+CURRENT IMPLEMENTATION
+No prior metal WAVs, tanh overdrive, forced-root weighting or cabinet rolloff.
+Names rock_* / rock_select retain the slot-3 interface; contents are new wah.
+32 shared DDS phase slots per voice; 4 voices, maximum 128 components.
+Gain Q15 sum 32760 EACH profile; 32 nonzero coefficients in each.
+Conservative modal sum bound 16380 PCM16 units; alias suppression unchanged.
+Three profiles x 32 modes x 32 time observations, 3072 x 25-bit ROM.
+12-bit base and 13-bit signed delta; unsigned ABS(delta)*fraction plus
+external sign and negative ceil subtraction gives signed floor interpolation.
+One shared extra unsigned multiplier per voice handles interpolation in
+ENV_B then the 32-sample pick ramp in PHASE; no extra scheduling stages.
+Nominal dry lifetime .600 s, common .25 s pluck adaptation to held references,
+final .45-.60 s fade; no early independent high-frequency rolloff.
+Sustain first 2048 samples unchanged, then virtual age advances every 4 frames.
+Time index saturates before narrowing; hard end gate prevents tail revival.
+Original piano/bright samples, three keys, effects, note table and CST retained.
+Third key slot cycles piano/bright/new wah; LED0 off/steady/2 Hz blink.
+Key2 short chorus, long fifth; key3 dry/sustain/room. No external reset key.
+
+SIMULATION: PASS
+ModelSim SE-64 10.6d, user RTL compilation 0 warnings / 0 errors.
+build/wah_reference/regression.log: MAIN REGRESSION PASSED: 80 benches.
+116000 independent integer-oracle comparisons include all three COMPLETE
+dry-wah envelopes, positive/negative interpolation, six pitches including
+Nyquist cases, four velocities, fifth, sustain, transitions and re-strike.
+12000 original piano/bright samples exact with rock hardware enabled;
+32000 original piano/hammer samples exact with rock disabled.
+128 NONZERO components (bright setting), 2000 real 48 kHz frames,
+latency 233/256 clocks; no misses.
+140000 real-budget lifetime samples: saturated index, interpolated bounds,
+no tail revival, retired voice zero; no forced audio state.
+144000 real-budget C4 frames per dry/sustain variant, board panning/effects/
+PCM16. Same initial 2048 samples; dry zero after .602 s, sustain after
+2.282 s; late dry energy < -13 dB, sustain late energy > 8x dry.
+384000 actual four-voice stereo frames per dry/room export; no clipping,
+unknown values or deadline misses. Existing ADC/matrix/keys/FFT/LCD pass.
+
+POST-SYNTHESIS GATE: PASS (2026-10-05 16:31:31)
+build/wah_reference/gate_check.log: 3936 actual serial DAC frames bit-identical
+with RTL, 3596 nonzero; all three timbres, chorus, sustain/room, fifth,
+startup and actual board input stimulus. No DSP/ROM/audio/DAC output forced.
+0 errors, 208 known unused-width warnings in vendor prim_sim.v;
+same strict whitelist, not expanded. Functional simulation has no SDF;
+routed timing independently verified below.
+
+ROUTED IMPLEMENTATIONS: PASS
+Gowin V1.9.12.03, GW5AT-LV60PG484AC1/I0, device B.
+Physical fixed-pin audio FULL completed 2026-10-05 16:22:56:
+Logic 24727/59904, registers 10788/60780, latches 0;
+BSRAM 112/118, DSP 111/118 (24 MULT27X36 x2 +63 MULTALU27X18).
+28 fixed ports, unchanged unique pin assignments.
+Audio target 12.288 MHz, Fmax 20.232 MHz, min setup slack +31.954 ns;
+setup/hold violated endpoints 0/0.
+Reports gowin/neo_guitar_audio_full/impl/pnr/neo_guitar_audio_full.rpt.txt
+and neo_guitar_audio_full_tr_content.html.
+FFT/LCD FULL completed 2026-10-05 16:23:43:
+Logic 31471/59904, registers 13084/60780, latches 0;
+BSRAM 115/118, DSP 116/118 (24 MULT27X36 x2 +68 MULTALU27X18).
+Audio Fmax 14.553 MHz vs 12.288; pixel 95.456 MHz vs 33.333;
+setup/hold violated endpoints 0/0; sys_clk_50m no frequency-bearing paths.
+Reports gowin/full_main_build/impl/pnr/full_guitar_top.rpt.txt and
+full_guitar_top_tr_content.html. Auto-pins: NOT DOWNLOADABLE.
+Remaining capacity 3 BSRAM / 2 DSP in FULL; future profile expansion needs
+resource reorganization. LCD hardware acceptance remains pending.
+
+CURRENT BITSTREAM SHA256
+build/wah_reference/neo_guitar_audio_full_wah_v3.fs
+d563066bccf2088cd64a5c887a22d461e49ceba38512ba02cc293046dbd1970a
+Same bytes as normal physical-project output and generic rock.fs alias.
+Physical synthesized VG:
+87f1a86f5f6cbe7ba59a0ef59c77df52ac440d5b9e59367bc8174c47506026e9
+FULL auto-pin FS, NOT downloadable:
+d9615050003212f98079fa74dcfed33c9e36734e805a1a3424fbbec40b6c442d
+Old V2 snapshot build/wah_reference/replaced_rock_v2/; not used at runtime.
+
+CURRENT ROM SHA256
+rock_gain.mem
+c7ae5e9ccf7a9fb988ed324c01c5f411b1f081e13b49630c223999499447c4ec
+rock_envelope.mem
+bd85dfdb0561b278e67bc7bf5a6b36bb3d2fd98d94cd2b7691b964e40600eaff
+rock_phase.mem
+7440d4c57a204f0391c9526f35ba75f9a0cef9a5056f52e19068ba96d84274e9
+rock_ratio.mem
+83391c636960bfd76dcff98ad4c79c3b7939ef163b403acf6ad32ec9820bf4f6
+
+ACTUAL RTL WAVS, NO NORMALIZATION OR SOFTWARE EFFECTS
+48 kHz stereo PCM16, 8 s, velocity 2, C4/E4/G4 then twice triad then
+G3/C4/E4/G4 four voices. Dry peak 3582, room 3093, 0 rail samples.
+Dry note peaks 261.657715/329.589844/392.028809 Hz (nominal keyed-note
+components, not claiming the lowest periodic component is the nominal key).
+3-12 kHz /100 Hz-16 kHz power .05-.35 s: C4 .051003, E4 .074480, G4 .069269.
+Old V2 C4 same window .000007680; high band now retained in actual output.
+rtl_wah_dry.wav:
+3fa5bbca93516dbb19511be24d7195108b508b5f151c3a4befb3e6148f10fe1a
+rtl_wah_room.wav:
+35769f04bc1f3e49ac2d1c28b510fdaa3db4b9a5035b2152509af737416a504a
+C4 dry .05-.10 s RMS 505.232, .50-.55 s RMS 40.718, -21.874 dB;
+sustain 561.304/365.318, -3.731 dB. Last nonzero .600/2.272 s.
+rtl_wah_c4_dry.wav:
+c2ca994631c3d4e39d4603e0c9e17feae9eeee60f01a640338fda8ce45b1353d
+rtl_wah_c4_sustain.wav:
+42c655519e7e78e2a09f5750196056b59d3c504627598beb74abc345e2698934
+rtl_wah_dry_sustain_comparison.wav: dry 3 s, gap .25 s, sustain 3 s.
+Metrics rtl_preview_metrics.json; plots rtl_wah_spectrum.png,
+rtl_wah_decay.png visually checked.
+
+Remaining: physical DAC/headphone/dual-speaker listening to the new reference
+timbre and effects. Digital passes are not subjective listening approval.
+HISTORICAL V3 acceptance. Current V4 long-decay evidence is recorded in
+wah_long_decay_acceptance.txt. V3 artifacts remain for comparison/recovery.

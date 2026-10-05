@@ -22,6 +22,7 @@ module tb_full_effects_pcm_export;
                 .pcm_out(voice_pcm[g*24+:24]),.active(),.busy(),.deadline_miss(bad[g]),.profile());
         end else begin : updated
             piano_voice_core #(.MODES(32),.CONTROL_ENABLE(1)) u_voice(
+        .rock_blend(9'd0),
                 .clk(clk),.rst_n(rst_n),.sample_ce(ce),.note_on(on),.note_off(1'b0),
                 .phase_inc(32'd23409859),.velocity_level(2'd2),.timbre_blend(BRIGHT?9'd256:9'd0),
                 .sustain_enable(SUSTAIN!=0),.harmony_enable(1'b0),.sample_valid(voice_valid[g]),

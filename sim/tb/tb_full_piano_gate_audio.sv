@@ -47,7 +47,7 @@ module tb_full_piano_gate_audio;
     full_piano_gate_adc_model adc_gate(cs_gate,sclk_gate,mosi_gate,adc_mask,miso_gate);
     full_piano_gate_adc_model adc_rtl(cs_rtl,sclk_rtl,mosi_rtl,adc_mask,miso_rtl);
     reg [31:0] word_gate=0,word_rtl=0;
-    integer bit_index=0,frames=0,mismatches=0,nonzero=0;
+    integer bit_index=0,frames=0,mismatches=0,nonzero=0,slow_wah_frames=0;
     integer output_file;
     always @(posedge bclk_gate)begin
         #1;
@@ -60,6 +60,8 @@ module tb_full_piano_gate_audio;
                 bit_index=0;frames=frames+1;
                 $fwrite(output_file,"%08h %08h\n",word_gate,word_rtl);
                 if(word_rtl!=0)nonzero=nonzero+1;
+                if(reference.rock_select && reference.u_audio.u_board_audio_chain.g_piano.u_core.voice[0].u_voice.frame_age>=2048)
+                    slow_wah_frames=slow_wah_frames+1;
                 if(word_gate!==word_rtl)begin
                     mismatches=mismatches+1;
                     if(mismatches<=8)$display("MISMATCH frame=%0d gate=%08h rtl=%08h",frames,word_gate,word_rtl);
@@ -126,14 +128,19 @@ module tb_full_piano_gate_audio;
         pluck();#6000000; // actual additional fifth oscillators on new strike
         if(reference.u_audio.u_board_audio_chain.voice_active!==15)
             $fatal(1,"FAIL: four FULL voices");
-        short_key(1);#6000000; // piano + fifth + chorus + light room
+        short_key(1);#6000000; // rock crossfade + fifth + chorus + light room
+        if(!reference.rock_select||reference.timbre_mode!=2)$fatal(1,"FAIL: rock key state");
+        pluck();#60000000; // measured wah, including transition to half-speed envelope after 2048 samples
+        short_key(1);#6000000; // return piano + fifth + chorus + light room
+        if(reference.rock_select||reference.timbre_mode!=0)$fatal(1,"FAIL: three-tone wrap");
         short_key(2);short_key(3);long_key2();#6000000;
         if(reference.space_mode!=0||reference.chorus_enable||reference.harmony_enable)
             $fatal(1,"FAIL: controls did not return to dry");
         $fclose(output_file);
         if(nonzero<100)$fatal(1,"FAIL: no nonzero FULL audio");
+        if(slow_wah_frames<500)$fatal(1,"FAIL: half-speed wah gate coverage %0d",slow_wah_frames);
         if(mismatches)$fatal(1,"FAIL: FULL synthesized DAC differs %0d/%0d",mismatches,frames);
-        $display("PASS: %0d actual DAC frames bit-identical; 4x32 piano/bright, chorus, independent sustain/light room, fifth harmony, power-on initialization; %0d nonzero",frames,nonzero);
+        $display("PASS: %0d actual DAC frames bit-identical; 4x32 piano/bright/rock, chorus, independent sustain/light room, fifth harmony, power-on initialization; %0d nonzero, %0d half-speed wah frames",frames,nonzero,slow_wah_frames);
         $finish;
     end
 endmodule

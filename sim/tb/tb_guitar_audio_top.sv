@@ -51,6 +51,7 @@ module tb_guitar_audio_top;
         .ADC_SPI_CLK_DIV       (2),
         .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0)
     ) dut (
+        .rock_select(1'b0),
         .sys_clk_50m      (sys_clk_50m),
         .audio_clk_12m288 (audio_clk_12m288),
         .rst_n            (rst_n),

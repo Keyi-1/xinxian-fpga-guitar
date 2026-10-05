@@ -4,7 +4,10 @@ module tb_guitar_effect_buttons_defaults;
     reg clk=0;always #40.690104 clk=~clk;
     reg rst_n=0,k1=1,k2=1,k3=1;
     wire timbre,chorus,sustain,reverb,harmony;
+    wire rock;
+    wire [1:0] tone;
     guitar_effect_buttons dut(
+        .rock_select(rock),.timbre_mode(tone),
         .clk(clk),.rst_n(rst_n),.key_timbre_n(k1),.key_chorus_n(k2),.key_space_n(k3),
         .timbre_select(timbre),.chorus_enable(chorus),.sustain_enable(sustain),
         .reverb_enable(reverb),.space_mode(),.harmony_enable(harmony));
@@ -25,6 +28,9 @@ module tb_guitar_effect_buttons_defaults;
         k2=1;clocks(250000);if(chorus)$fatal(1,"FAIL: long release switched chorus");
         k2=0;clocks(250000);k2=1;clocks(250000);
         if(!chorus||!harmony)$fatal(1,"FAIL: hardware short key 2");
+        k1=0;clocks(250000);if(!rock||timbre||tone!=2)$fatal(1,"FAIL: hardware rock cycle");
+        k1=1;clocks(250000);k1=0;clocks(250000);k1=1;clocks(250000);
+        if(rock||timbre||tone!=0)$fatal(1,"FAIL: hardware piano wrap");
         $display("PASS: actual 245760-cycle debounce and 12288000-cycle long hold; default hardware key mappings; no forced state");
         $finish;
     end
