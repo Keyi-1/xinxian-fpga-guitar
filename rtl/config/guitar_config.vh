@@ -10,9 +10,14 @@
 
 // Current default build
 `define GUITAR_BUILD_MODE `BUILD_FULL
-// Current physical main project defaults to the listening-verified sine path.
+// Legacy physical-main tone when BOARD_USE_PIANO is disabled.
 // FULL with LCD retains the optional 32-harmonic engine through USE_HARMONIC.
 `define BOARD_USE_HARMONIC 0
+// Experimental piano branch: eight measured modes and a short hammer ROM.
+// Set to 0 to restore the preceding sine/anti-beat main path.
+`define BOARD_USE_PIANO 1
+`define BOARD_PIANO_HAMMER_ENABLE 1
+`define BOARD_PIANO_ROOM_ENABLE 1
 `define BOARD_ANTI_BEAT_ENABLE 1
 `define BOARD_FIXED_VELOCITY_ENABLE 1
 `define BOARD_FIXED_VELOCITY 2'd2

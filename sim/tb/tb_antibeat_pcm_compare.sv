@@ -12,14 +12,14 @@ module tb_antibeat_pcm_compare;
     four_string_board_audio_chain #(.ANTI_BEAT_ENABLE(0)) old_chain (
         .clk_audio_ref(clk), .rst_n(rst_n), .stable_valid(stable_valid),
         .stable_fret_id(frets), .pluck_valid(pluck), .velocity_level(8'haa),
-        .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_reverb_enable(1'b0),
+        .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
         .sample_tick(tick0), .pcm_mix_valid(valid0), .pcm_mix(),
         .voice_active(active0), .voice_pcm(voices0), .dac_bclk(), .dac_lrck(), .dac_din()
     );
     four_string_board_audio_chain #(.ANTI_BEAT_ENABLE(1)) new_chain (
         .clk_audio_ref(clk), .rst_n(rst_n), .stable_valid(stable_valid),
         .stable_fret_id(frets), .pluck_valid(pluck), .velocity_level(8'haa),
-        .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_reverb_enable(1'b0),
+        .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
         .sample_tick(tick1), .pcm_mix_valid(valid1), .pcm_mix(),
         .voice_active(active1), .voice_pcm(voices1), .dac_bclk(), .dac_lrck(), .dac_din()
     );

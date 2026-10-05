@@ -1,0 +1,135 @@
+FPGA piano/hammer trial acceptance evidence
+Date: 2026-10-04, Asia/Shanghai
+Branch: feat/piano-hammer-voice
+Base commit: eb2a596
+Scope: physical dual-PCB main project; local uncommitted changes, no push.
+
+FUNCTIONAL CHECKS
+Final regression log: build/piano/main_regression.log
+Result: MAIN REGRESSION PASSED: 69 benches
+The runner rejects Verilog compilation errors/warnings.
+Post-synthesis check: tools/run_piano_gate_check.ps1
+Vendor model: Gowin IDE/simlib/gw5a/prim_sim.v
+Log: sim/temp/piano_gate/run.log
+Result: 6696 real 256/4 DAC frames bit-identical to renamed RTL reference;
+6187 nonzero frames; F4 single, C/E/G/G3 triad/four voices, three timbre
+banks, hammer, all room delays, and reset. Zero simulation errors.
+130 vendor-model vopt-2697 warnings concern out-of-bounds slices in unused
+ROM/RAM width branches (prim_sim.v lines 1860-1893 and 3130-3142); output comparison
+passes. This is a zero-delay functional netlist check, without PNR SDF.
+
+REPRODUCED AND FIXED SYNTHESIS DISCREPANCY
+The former netlist differed in 476/792 serialized DAC frames from RTL.
+The signed envelope interpolation DSP pre-adder narrowed env_a to 14 bits
+and extended its upper input with ones. Subtracting this operand introduced
+an extra +16384 into b-a. The 9-bit fraction then created a repeating
+93.75-Hz amplitude ramp that did not exist in RTL or its preview WAVs.
+Use registered unsigned products a*(512-fraction) and b*fraction instead,
+then add and shift by 9. Correct sample-domain floor rounding is unchanged.
+The original independent oracle and preview WAV hashes still match.
+Before-fix bitstream/netlist/trace/failing DAC export:
+build/piano/pre_fix_20261004/
+New piano checks cover:
+- 32000 samples against an independent integer sample-domain reference,
+  hammer enabled/disabled, three timbre profiles, four velocities,
+  release, slides, same-sample note-on priority and cross-profile re-strikes.
+- Shared room startup/reset and delayed output.
+- Actual board-chain PCM export: 288000 samples per variant at 48 kHz,
+  C4/E4/G4 singles, repeated triads, and G3/C4/E4/G4 four-note playback.
+- No deadline misses or clipping in the exported sequence.
+- Physical main default 256/4 timing and original input behavior.
+- Legacy sine path cycle comparison against the retained flat hardware baseline.
+Export acceleration uses sample/DAC dividers 64/1; sample-domain equations
+are unchanged. Physical 256/4 defaults have a separate integration check.
+
+GOWIN BUILD
+Tool: Gowin V1.9.12.03, gw_sh.exe
+Project: gowin/xinxian_mega60k/xinxian_mega60k.gprj
+Build script: gowin/xinxian_mega60k/build.tcl
+Top: neo_guitar_main_top
+Device: GW5AT-LV60PG484AC1/I0, Version B
+Completed: 2026-10-04 22:29:10
+Log: build/piano/gowin_piano_build.log
+Reports: gowin/xinxian_mega60k/impl/pnr/neo_guitar_main.rpt.txt
+         gowin/xinxian_mega60k/impl/pnr/neo_guitar_main_tr_content.html
+Result: synthesis, placement/routing and bitstream generation completed.
+Logic: 10687/59904 (18%)
+Registers: 3350/60780 (6%)
+Latches: 0
+BSRAM: 76/118 (65%; 12 SDPB, 64 pROM)
+DSP: 36/118 (31%)
+Clock constraint: audio_clk_12m288, 12.288 MHz
+Reported Fmax: 20.825 MHz
+Worst setup slack: +33.361 ns
+Analyzed paths: 11810; analyzed endpoints: 12762
+Setup violated endpoints: 0; hold violated endpoints: 0; TNS: 0
+
+Warnings retained:
+- EX3791: pre-existing bounded phase_slide_smoother 32-to-27-bit assignment.
+- NL0002: unused legacy allocator/table instances optimized away.
+- PA1001: discarded arithmetic bits and unused ROM/RAM padding outputs.
+- PR1014: existing V13 clock pin uses generic routing. Current internal
+  timing passes; this does not characterize external ADC/DAC analog behavior.
+The intermediate PA2122 memory-mode failure was fixed by inferring SDPB
+with separate registered write addresses; it is absent from the final build.
+
+PIN AND BUILD FRESHNESS CHECKS
+constraints/neo_guitar_main.cst and .sdc are unchanged from the base commit.
+26 I/O locations, 26 unique ball positions; all 26 match the final pin report.
+No project source/ROM/constraint file is newer than the final bitstream
+(44 input files listed in the project were checked).
+Port -> ball:
+audio_clk_12m288 V13; rst_n AA13
+ROW0 E14; ROW1 E13; ROW2 C15; ROW3 C14
+COL0 B13; COL1 C13; COL2 A14; COL3 A13
+COL4 B21; COL5 A21; COL6 B20; COL7 A20
+dac_bclk Y17; dac_lrck AB17; dac_din AA16; pa_en_n AB16
+adc_cs_n AA20; adc_sclk AA21; adc_mosi AA19; adc_miso AB20
+event_led[0] P16; event_led[1] R17; event_led[2] R18; event_led[3] T18
+
+FINAL FILE SHA256
+gowin/xinxian_mega60k/impl/pnr/neo_guitar_main.fs
+f74d926bcd300a187154338c236df87fe3609cd287479db7c62860ac20327af3
+build/piano/neo_guitar_main_piano_interp_fix.fs (same fixed bitstream)
+f74d926bcd300a187154338c236df87fe3609cd287479db7c62860ac20327af3
+build/piano/pre_fix_20261004/neo_guitar_main.fs (defective piano trial)
+7be077720e7fc74bd5645f249b2dc769fdcd5200e8f7e40a152c7f903dd8e622
+build/piano/baseline_neo_guitar_main.fs (prior main bitstream backup)
+4607dd5e9e09efd8f0f3ac9b27d12df59528403fcaf4976f63d7e9910e0a5c16
+mem/piano_envelope.mem
+d4a2a7c92a16aebbae3f9f839ed14ab5be97137f72d8d8dd9d5a80d474972bfd
+mem/piano_ratio.mem
+0dafdd7d402fe30a47d398fcd41cb164b27f2d354e2b887a4a801cb6c3e30259
+mem/piano_hammer.mem
+bf626d9cbb8813921cc185921f744b7ddfdde4522e562dc6a5b84aebfb005cfa
+mem/piano_phase.mem
+2d63e8bd2a2cecce8eef2015672d4152b959a8d9926e27b1d23c4ec83c705810
+build/piano/rtl_piano_body.wav
+c4c725895d5ba76f8cb78a62157ae6f250667f5e0bb6d95fcea57ac3a1ddd14e
+build/piano/rtl_piano_hammer.wav
+160413cf9a44594bf14c1337eb2ff30da8ffb250510d3eadc78c0a0ea474071d
+build/piano/rtl_piano_hammer_comparison.wav
+da308335cc62a306aafc5d062d19735013ad88ca0734c41f76586e9dba4d36cc
+
+LISTENING OUTPUT
+Actual RTL PCM16, stereo, 48 kHz; no normalization, resampling, or added
+offline effects. Each variant is 6 seconds. Comparison: body 6 seconds,
+silence 0.4 seconds, hammer 6 seconds.
+Body: peak 9342, RMS 868.111649, clipped samples 0.
+Hammer: peak 9340, RMS 868.397000, clipped samples 0.
+First-note hammer difference peak: 238 PCM16 units (a light transient).
+Single-note FFT peaks: 261.657715, 329.589844, 392.028809 Hz.
+The reference recordings' main frequencies were near C5/E5/G5; this export
+uses C4/E4/G4. The existing note-phase table has not been transposed.
+
+LIMITS AND HARDWARE STATUS
+No FPGA download or Flash programming was performed by this agent.
+The user reports the preceding piano trial sounded noisy on hardware;
+the interpolation fix still needs a new hardware listening run.
+The wet GarageBand reference is approximated with three timbre profiles,
+eight modes per voice, a short residual transient and a lightweight room.
+There is no complete multi-register/multi-velocity piano sampling model.
+Digital verification does not establish subjective sound quality, all
+possible chord combinations, or the analog headphone/amplifier response.
+Use the existing main-board wiring for SRAM listening before deciding
+whether to retain this experimental default or program Flash.

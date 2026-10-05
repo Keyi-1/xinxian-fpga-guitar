@@ -40,6 +40,7 @@ module tb_full_guitar_top;
                            fret_row_oe[3] ? ~pressed[31:24] : 8'hff;
 
     full_guitar_top #(
+        .USE_PIANO(0), // Retain the legacy harmonic integration check.
         .MATRIX_CLK_DIV(2), .MATRIX_SETTLE_CYCLES(1),
         .MATRIX_DEBOUNCE_FRAMES(2), .SAMPLE_DIV(64),
         .PT8211_REF_DIV(1), .SLIDE_SAMPLES(4),
@@ -53,7 +54,8 @@ module tb_full_guitar_top;
         .pixel_clk(pixel_clk), .rst_n(rst_n),
         .fret_col_in_n(fret_col_in_n), .adc_miso(adc_miso),
         .timbre_select(1'b1), .chorus_enable(1'b1),
-        .sustain_reverb_enable(1'b1),
+        .sustain_enable(1'b1),.reverb_enable(1'b0),
+        .harmony_enable(1'b0),
         .fret_row_oe(fret_row_oe), .fret_row_drive_n(fret_row_drive_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk), .adc_mosi(adc_mosi),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din),

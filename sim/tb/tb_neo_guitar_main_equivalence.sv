@@ -14,6 +14,7 @@ module tb_neo_guitar_main_equivalence;
     reg miso = 0;
     wire [3:0] leds;
     neo_guitar_main_top #(
+        .USE_PIANO(0),
         .ANTI_BEAT_ENABLE(0),
         .MATRIX_CLK_DIV(2), .MATRIX_SETTLE_CYCLES(2),
         .MATRIX_DEBOUNCE_FRAMES(2), .ADC_SPI_CLK_DIV(2),

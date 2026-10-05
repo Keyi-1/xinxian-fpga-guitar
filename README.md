@@ -2,11 +2,23 @@
 
 > 面向开发团队的设计与实施规格书
 
+**最新 FULL 更新（2026-10-05，`feat/full-piano-effects`）：** 用户已确认修复后的钢琴实物音色成功。
+FULL 已同步该音源，支持每声部 32／每帧 128 个分量，以及音色、合唱、独立延音／轻混响和自动五度和声。
+当前三键上板入口是 `gowin/neo_guitar_audio_full/neo_guitar_audio_full.gprj`，Top=`neo_guitar_audio_full_top`；
+没有复位键。1 键循环钢琴／明亮弦音，2 键短按合唱、长按和声，3 键循环无效果／延音／轻混响。
+用户已确认三键功能正常；V2 针对空弦延音不明显和音效难区分，增加自然包络延长、
+左右反向调制合唱和更明显的轻混响。原默认钢琴无效果输出逐样本保持一致。
+新音效听感待上板比较，LCD 待采购。
+[使用与验收说明](docs/FULL_PIANO_EFFECTS.md) / [上板工程](gowin/neo_guitar_audio_full/README.md) /
+[V2 音效和数字证据](docs/FULL_EFFECTS_V2.md)。下列旧分支和 KEY0 复位记录作为历史基线保留。
+
 上一轮音频修改：主工程默认启用按音高声道分配和近邻音增益平滑，66 组回归通过，但用户反馈前后版本的和弦听感仍不理想。原成功全链路测试源码保留。[参数、试听与数字证据](docs/ANTI_BEAT_AUDIO.md)。
 
-最新音色进展（2026-10-04）：已分析用户提供的库乐队“古典大钢琴”三个单音及合音录音，提取分音和观察包络，并生成可试听的离线参数重合成对照。后续音色方向为钢琴；当前主工程仍为正弦，尚未替换音源。[分析、试听说明与 FPGA 实现方向](docs/PIANO_REFERENCE_ANALYSIS.md)。
+最新钢琴试验（2026-10-04，`feat/piano-hammer-voice`）：物理主工程默认启用 8 分音钢琴音源、短击弦起音、固定窄弦位声像与公共轻混响，基音表和双 PCB 接线保持原样。已生成实际 RTL 试听及固定引脚位流，仍需 SRAM 下载试听。[钢琴主工程说明](docs/PIANO_FPGA_TRIAL.md) / [录音分析与离线样音](docs/PIANO_REFERENCE_ANALYSIS.md)。
 
-**当前状态（2026-10-03）：用户已确认双 PCB 全链路验证工程实物测试结果理想。正式主工程已同步为同一输入与优化音频行为，入口是 `gowin/xinxian_mega60k/xinxian_mega60k.gprj`、Top=`neo_guitar_main_top`；默认正弦、固定力度 2，接线与成功验证工程一致。** 主 RTL 已通过逐周期参考对比、完整回归和固定引脚布局布线；新主位流仍需 SRAM 下载复核。可选 32 分量谐波、双声道音效和 FFT/LCD 逻辑也已同步并进行数字验证；四级力度实物标定、LCD 及效果按键接线仍待完成。详见 [主工程同步说明](docs/MAIN_ENGINE_SYNC.md)。下文同时保留最终需求和历史验收记录，以最新进度和当前源码为准。
+上板反馈修复：已复现“WAV 正常、上板单音嘈杂”的综合后包络计算偏移，改用等价的无符号插值。当前修正版保持原试听 WAV 不变，69 项回归及 6696 帧实际 DAC 引脚数据的综合后对照通过；用户已确认 `build/piano/neo_guitar_main_piano_interp_fix.fs` 上板音色成功。
+
+**输入链验证基线（2026-10-03）：用户已确认双 PCB 全链路验证工程实物测试结果理想。正式主工程已同步为同一输入与优化音频行为，入口是 `gowin/xinxian_mega60k/xinxian_mega60k.gprj`、Top=`neo_guitar_main_top`；当时默认正弦、固定力度 2，接线与成功验证工程一致。** 主 RTL 已通过逐周期参考对比、完整回归和固定引脚布局布线；当前分支的钢琴主位流仍需 SRAM 下载复核。可选 32 分量谐波、双声道音效和 FFT/LCD 逻辑保留；四级力度实物标定、LCD 及效果按键接线仍待完成。详见 [主工程同步说明](docs/MAIN_ENGINE_SYNC.md)。下文同时保留最终需求和历史验收记录，以最新进度和当前源码为准。
 
 芯弦 FPGA 电子吉他是一套以 Sipeed Tang Mega 60K FPGA 为硬件核心的四弦实时电子乐器。系统通过琴颈按弦矩阵和桥位压电传感器采集演奏动作，由 FPGA 内部可综合 HDL 逻辑完成音高选择、力度分级、声部管理、谐波／模态加法合成、包络、数字音效、频谱分析和音频输出。演奏期间，音频生成主链路不依赖软核 CPU、外部 MCU 或上位机程序。
 
@@ -40,6 +52,7 @@
 - [主工程同步、构建与可选功能说明](docs/MAIN_ENGINE_SYNC.md)
 - [三音以上减拍频策略、参数及 A/B 试听](docs/ANTI_BEAT_AUDIO.md)
 - [古典大钢琴参考录音分析与离线音色样音](docs/PIANO_REFERENCE_ANALYSIS.md)
+- [钢琴音源、击弦起音与 FPGA 主工程试验](docs/PIANO_FPGA_TRIAL.md)
 - [当前主工程与 FULL 数字验收证据](docs/evidence/main_engine_sync_acceptance.txt)
 - [Tang Mega 60K / NEO Dock 板级集成审查](docs/BOARD_INTEGRATION_REVIEW.md)
 - [NEO Dock 31005 / Mega 60K 板级连接矩阵](docs/NEO_31005_60K_PIN_MATRIX.md)
@@ -57,7 +70,7 @@
 | 完整 4×8 矩阵扫描 | **双板全链路实物通过** | 已与 MCP3208 拨弦和优化音频同接验证 |
 | MCP3208 采集板 | **单板及双板集成实物通过** | 基线偏置/拨弦功能已验证；四级力度标定仍待完成 |
 | 双 PCB 输入到优化音频链路 | **实物通过，用户确认结果理想** | 成功测试源码保留；标准主工程同步后已完成数字验证，新主位流需 SRAM 复核 |
-| `FULL` 实物闭环 | 尚未验证 | 不得使用现有自动引脚 `.fs`；需在各输入外设分别通过后生成审核约束版本 |
+| `FULL` 实物闭环 | 三键功能已上板；V2 音效待听感比较，LCD 待采购 | 使用 `neo_guitar_audio_full` 的固定引脚位流；LCD 实物等采购后验收 |
 | LCD | 尚未购买/验证 | 面板、FPC、RGB666 时序、同步极性、像素时钟和背光均待确认 |
 
 - 底板为 NEO Dock 31005，核心板仍标为 30353/30354 之一。当前 J13 矩阵接线已实物通过并包含 Bank 1；沿用其既有 LVCMOS33、电源与接线，本次没有修改供电或扩展其它 Bank 1 接口。早期连接矩阵中的通用禁用规则和 PMOD 候选分配由此实测方案取代。
@@ -65,7 +78,7 @@
 - NEO Dock MS5351M 的 CLK2 已设置为 12.288 MHz；示波器及 MINIMAL 实物音频链均已确认 FPGA 可稳定使用该时钟，完整断电后会独立自动恢复，不需要电脑、MCU、BL616 运行时配置或软核 CPU。
 - 正式主 CST 已冻结为矩阵 J13、ADC J8、现有音频/KEY0/调试 LED 共 26 个端口，沿用双板实测方案；早期两组 PMOD 的候选表只作为历史备选。
 - LCD 尚未购买。31005 的 40-pin 连接器采用 RGB888 针脚排列，但 FPGA 实际只连接 R2-R7、G2-G7、B2-B7 共 18 bit，并与 CH569 HSPI 复用；面板及其时序确认前暂不约束 LCD。
-- `KEY0/S4/USER_BUTTON0=AA13` 已固定为本工程低有效 `rst_n`。`SW7/RECONFIG=N12` 是 FPGA 专用重配置按钮：SRAM 下载后按下会清除当前配置，必须重新 Program/Configure，不属于 RTL 复位。FULL 仍需解决其余两枚用户按键无法同时覆盖三个效果键的问题。
+- `KEY0/S4/USER_BUTTON0=AA13` 已固定为本工程低有效 `rst_n`。`SW7/RECONFIG=N12` 是 FPGA 专用重配置按钮：SRAM 下载后按下会清除当前配置，必须重新 Program/Configure，不属于 RTL 复位。这是旧固定钢琴基线的复位接口；新的 `neo_guitar_audio_full` 已把 AA13 改为音色键，三个功能键均已接入，使用内部上电初始化。
 - ROW0 LED 初测曾使用 PMOD1 的全部八根 GPIO 作为 COL0～COL7、PMOD0 的八根 GPIO 作为调试 LED。随后进行的 ROW0 音频闭环测试已移除 LED，只保留 PMOD1 八列输入，ROW0 直接接地、ROW1～ROW3 悬空，并通过 PT8211 输出判断所选音高。两种临时接法都与最终 12 线矩阵分配互斥，只能用于逐组诊断。
 
 现有 **FULL 自动引脚** `.fs` 只能证明逻辑规模与时序可实现，**严禁烧录到实物板**。原始与复位修正后的 FULL 结果均已保留，不应覆盖。`neo_minimal_audio`、`neo_row0_led_test`、`neo_row0_audio_test` 与 `neo_four_string_matrix_audio_test` 是采用各自专用约束的独立实物测试构建，不属于这条自动引脚禁令，但仍应保留在各自工程中且不得混烧。

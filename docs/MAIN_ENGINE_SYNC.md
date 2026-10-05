@@ -1,5 +1,13 @@
 # 主工程同步：双 PCB 实测链路
 
+最新 `feat/full-piano-effects` 已同步成功钢琴到 32 分量 FULL，并加入无复位三键控制和自动五度和声。
+本轮下载入口与完整数字验收以 [FULL_PIANO_EFFECTS.md](FULL_PIANO_EFFECTS.md) 为准。
+下面保留原正弦／固定钢琴主工程同步记录。
+
+当前分支更新：`feat/piano-hammer-voice` 已将物理主入口默认音源改为钢琴模态与击弦起音，
+输入链和接线沿用本文的同步基线。钢琴版本以 [PIANO_FPGA_TRIAL.md](PIANO_FPGA_TRIAL.md) 为准；
+下文保留正弦/谐波主工程同步时的参数和验证记录。
+
 更新：2026-10-04。用户已确认 `neo_full_chain_audio_test` 双 PCB 实物测试结果理想。
 本次把该行为同步到标准 `rtl/` 与主 Gowin 工程。成功的独立测试工程源码保留原样。
 新主工程位流已通过仿真和固定引脚实现；它本身仍需用同一接线进行 SRAM 下载复核。

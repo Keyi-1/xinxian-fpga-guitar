@@ -79,9 +79,10 @@ module tb_neo_guitar_main_default_timing;
               "default digital ADC-excursion-to-Attack delay below 100 us");
         repeat (100) @(negedge clk);
         check(dut.u_audio.u_board_audio_chain.phase_inc[31:0] == 32'h01DCD01D, "default F4 phase increment");
-        #2500000; // Past the original 2 ms Attack.
-        check(dut.u_audio.u_board_audio_chain.g_sine.u_core.u_voice0.envelope_level > 0 &&
-              dut.u_audio.u_board_audio_chain.voice_active == 1 && pa == 0, "default optimized envelope and PA");
+        #2500000;
+        check(dut.u_audio.u_board_audio_chain.g_piano.u_core.voice[0].u_voice.age > 0 &&
+              dut.u_audio.u_board_audio_chain.deadline_miss == 0 &&
+              dut.u_audio.u_board_audio_chain.voice_active == 1 && pa == 0, "default piano voice, cadence and PA");
         $display("PASS: shipped defaults select silently; Fs=48 kHz; PT8211 BCLK=1.536 MHz; ADC excursion to Attack=%0.3f us", (attack_time-excursion_time)/1000.0);
         pressed = 0;
         #6500000;

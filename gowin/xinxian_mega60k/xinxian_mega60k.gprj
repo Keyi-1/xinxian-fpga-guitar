@@ -21,6 +21,11 @@
         <File path="../../rtl/control/timbre_blend_smoother.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/synth/sine_nco.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/synth/harmonic_voice_core.v" type="file.verilog" enable="1"/>
+        <File path="../../rtl/synth/piano_voice_core.v" type="file.verilog" enable="1"/>
+        <File path="../../rtl/audio_io/four_voice_piano_audio_core.v" type="file.verilog" enable="1"/>
+        <File path="../../rtl/audio_io/piano_stereo_chorus.v" type="file.verilog" enable="1"/>
+        <File path="../../rtl/audio_io/piano_stereo_effects.v" type="file.verilog" enable="1"/>
+        <File path="../../rtl/audio_io/piano_stereo_room.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/audio_io/four_string_board_audio_chain.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/audio_io/four_voice_antibeat_allocator.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/audio_io/stereo_audio_effects.v" type="file.verilog" enable="1"/>
@@ -42,5 +47,11 @@
         <File path="../../mem/harmonic_gain_rock.mem" type="file.other" enable="1"/>
         <File path="../../mem/harmonic_decay_default.mem" type="file.other" enable="1"/>
         <File path="../../mem/harmonic_decay_rock.mem" type="file.other" enable="1"/>
+        <File path="../../mem/piano_ratio.mem" type="file.other" enable="1"/>
+        <File path="../../mem/piano_phase.mem" type="file.other" enable="1"/>
+        <File path="../../mem/piano_envelope.mem" type="file.other" enable="1"/>
+        <File path="../../mem/piano_hammer.mem" type="file.other" enable="1"/>
+        <File path="../../mem/piano_bright_gain.mem" type="file.other" enable="1"/>
+        <File path="../../rtl/config/piano_bright_coeffs.vh" type="file.other" enable="1"/>
     </FileList>
 </Project>
