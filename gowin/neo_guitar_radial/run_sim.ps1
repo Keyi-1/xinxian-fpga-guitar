@@ -1,0 +1,27 @@
+param([string]$ModelSimBin='',[string]$PythonExe='')
+$ErrorActionPreference='Stop'
+$taskRepo=Split-Path (Split-Path $PSScriptRoot)
+& (Join-Path $taskRepo 'sim/run_main_regression.ps1') -ModelSimBin $ModelSimBin -PythonExe $PythonExe -Benches @(
+    'tb_guitar_pcm_cdc',
+    'tb_guitar_radial_fft',
+    'tb_guitar_radial_bands',
+    'tb_guitar_radial_palette',
+    'tb_guitar_radial_renderer',
+    'tb_neo_guitar_radial',
+    'tb_guitar_visual_cdc',
+    'tb_guitar_visual_telemetry',
+    'tb_guitar_audio_top',
+    'tb_guitar_harmonic_audio_top',
+    'tb_guitar_audio_latency',
+    'tb_neo_guitar_main_equivalence',
+    'tb_piano_voice_core',
+    'tb_full_piano_voice',
+    'tb_rock_voice_core',
+    'tb_guitar_effect_buttons',
+    'tb_guitar_play_control',
+    'tb_antibeat_pcm_compare',
+    'tb_rgb_spectrum_timing',
+    'tb_spectrum_display_top',
+    'tb_full_guitar_top',
+    'tb_neo_full_guitar_top',
+    'tb_rgb_panel_defaults')
