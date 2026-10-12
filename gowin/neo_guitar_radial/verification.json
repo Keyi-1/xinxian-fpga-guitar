@@ -6,11 +6,11 @@
   "clocks": {
     "audio_clk_12m288": {
       "required_mhz": 12.288,
-      "actual_fmax_mhz": 14.683
+      "actual_fmax_mhz": 17.382
     },
     "sys_clk_50m": {
       "required_mhz": 50.0,
-      "actual_fmax_mhz": 50.184
+      "actual_fmax_mhz": 50.041
     }
   },
   "violations": {
@@ -19,11 +19,11 @@
   },
   "resources": {
     "Logic": {
-      "used": 41475,
+      "used": 40670,
       "available": 59904
     },
     "Register": {
-      "used": 16280,
+      "used": 16210,
       "available": 60780
     },
     "BSRAM": {
@@ -67,11 +67,11 @@
     "modes_per_voice": 32,
     "sample_rate_hz": 48000
   },
-  "audio_clocks_compared_exact": 6271622,
+  "audio_clocks_compared_exact": 7214423,
   "scanlines_checked": 1632,
   "worst_scanline_clocks": 2266,
   "scanline_clock_budget": 3186,
-  "bench_count": 23,
+  "bench_count": 27,
   "test_results": {
     "tb_guitar_pcm_cdc": [
       "PASS: 2000 atomic PCM24 transfers at 48 kHz, independent 12.288/50 MHz clocks, no overrun"
@@ -101,9 +101,9 @@
     "tb_neo_guitar_radial": [
       "PASS: integrated captured radial_four_voices.ppm active=1111 hz=1b84189315d fret=7531",
       "PASS: integrated captured radial_slide_c5.ppm active=1111 hz=1b84189320b fret=7538",
-      "PASS: integrated captured radial_release.ppm active=1110 hz=1b84189320b fret=7530",
-      "PASS: radial FFT windows 23, no PCM loss or row misses",
-      "PASS: integrated four-fret/four-pluck, slide/release, all three 32-mode timbres, effects and harmony; 6271622 audio clocks EXACTLY match FULL baseline, nonzero samples=23527"
+      "PASS: integrated captured radial_release.ppm active=1111 hz=1b84189314a fret=7530",
+      "PASS: radial FFT windows 26, no PCM loss or row misses",
+      "PASS: integrated four-fret/four-pluck, slide/release, all three 32-mode timbres, effects and harmony; 7214423 audio clocks EXACTLY match FULL baseline, nonzero samples=27210"
     ],
     "tb_guitar_visual_cdc": [
       "PASS: 20 atomic 400-bit mailbox transfers under asynchronous changing inputs"
@@ -123,9 +123,9 @@
     "tb_neo_guitar_main_equivalence": [
       "PASS: all 36 pitches select silently and launch only from pin-level MCP3208 plucks",
       "PASS: hysteresis, dead time, bipolar detection and same-string repluck isolation",
-      "PASS: highest-fret slides, final-release pitch hold and new open-string pluck",
+      "PASS: highest-fret slides, open-string continuation and new real pluck",
       "PASS: natural decay, all six stereo pairs, constant PA and decoded PT8211 frames",
-      "PASS: main/reference equivalent_clocks=1045456",
+      "PASS: main/reference equivalent_clocks=1046096",
       "PASS: integrated link regression; max detected-pluck-to-Attack delay=59 clocks (limit 64)"
     ],
     "tb_piano_voice_core": [
@@ -141,7 +141,7 @@
       "PASS: key 1 piano/bright/rock wrap; key 2 short chorus / long harmony without double action; key 3 dry/sustain/light room; bounce and held-key rejection"
     ],
     "tb_guitar_play_control": [
-      "PASS: queued/on-tick events, release/pluck priority, frozen Release pitch and four-string batching"
+      "PASS: queued/on-tick plucks, open-string release without note_off/retrigger, silent selection, four-string batching"
     ],
     "tb_antibeat_pcm_compare": [
       "PASS: 96000-frame actual RTL A/B export; per-voice PCM/cadence/lifecycle identical"
@@ -160,11 +160,31 @@
     ],
     "tb_rgb_panel_defaults": [
       "PASS: default 480x272 spectrum, 531x292 totals, 32 bars, porch/sync and all 130560 pixels"
+    ],
+    "tb_guitar_open_release": [
+      "PASS: FULL open-release mode=0, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+      "PASS: FULL open-release mode=1, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+      "PASS: FULL open-release mode=2, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+      "PASS: FULL open-release mode=3, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+      "PASS: fret duration independent of sound lifetime; piano/bright/wah, sustain, chorus/room/fifth and both fret/pluck orders"
+    ],
+    "tb_neo_guitar_main_default_timing": [
+      "PASS: shipped defaults select silently; Fs=48 kHz; PT8211 BCLK=1.536 MHz; ADC excursion to Attack=21.037 us",
+      "PASS: shipped-default debounce, single Attack and open-string natural continuation"
+    ],
+    "tb_neo_guitar_lissajous": [
+      "PASS: integrated captured performance_four_voices.ppm active=1111 hz=1b84189315d fret=7531",
+      "PASS: integrated captured performance_slide_c5.ppm active=1111 hz=1b84189320b fret=7538",
+      "PASS: integrated captured performance_release.ppm active=1111 hz=1b84189314a fret=7530",
+      "PASS: integrated four-fret/four-pluck, slide/release, all three 32-mode timbres, effects and harmony; 7214423 audio clocks EXACTLY match FULL baseline, nonzero samples=27210"
+    ],
+    "tb_full_realtime_acceptance": [
+      "PASS: FULL real-time 10000-frame endurance pcm=10002 spectrum=6 display=6 interval_ns=32916582..32916583"
     ]
   },
-  "synthesized_dac_frames_exact": 6528,
-  "synthesized_lcd_pixels_exact": 951405,
-  "synthesized_netlist_sha256": "ff9462e38e8f1221e9eeab79486c118a1247f76a00767fbb1568159486aab871",
+  "synthesized_dac_frames_exact": 7632,
+  "synthesized_lcd_pixels_exact": 1115060,
+  "synthesized_netlist_sha256": "d494d2920da7fa8a4ff44bdd033a6f7e11b3082a4f1a4268faecd7e778f107e0",
   "vendor_primitive_unused_width_warning_filter": "prim_sim\\.v\\((1860|1864|1868|1884|1888|1893|3130|3134|3138|3142|3313|3317)\\): \\(vopt-2697\\)",
   "unchanged_audio_sources_sha256": {
     "rtl/synth/piano_voice_core.v": "afffc975f1d26a890a91ce9e4bb056f9e04b4394dd4ef5b22869e34ed43f942b",
@@ -173,7 +193,6 @@
     "rtl/audio_io/piano_stereo_chorus.v": "a485c6b364cb9253060354b8b19740b1ce64420692ee8570807a6a5d05ee394a",
     "rtl/audio_io/piano_stereo_room.v": "0625da457f8340217d2a7ddf3bc081da131ab96261527fb6367f77e6bc60a41c",
     "rtl/audio_io/pt8211_tx.v": "e68a8cfb955781dc4a1ec608292e2a5c7058b861ba94743286eef8e4682969b0",
-    "rtl/control/guitar_play_control.v": "35699b1a804ca0cec9ef24bda2d281cf294c00725639b77edef9142899fc737b",
     "rtl/control/phase_slide_smoother.v": "6a5af6220aa3191882648309841b1a4585782ccdd76f71cbb30d53c92bad0371",
     "rtl/control/guitar_effect_buttons.v": "8dd8203444b00ae258df3f25a2aeb6484aa72362eefda8eee06383b32f2c6c44",
     "rtl/config/guitar_config.vh": "a975d2c9912d423da0e933a4700361c91980dbe9c1e05c8dfa09c73538a60fcc",
@@ -197,11 +216,19 @@
     "mem/rock_ratio.mem": "83391c636960bfd76dcff98ad4c79c3b7939ef163b403acf6ad32ec9820bf4f6",
     "mem/sine_lut.mem": "39d6e76e2dcf7f8337257c5948d6f525a94ffe09f5cf481e9e75a1300082b3c5"
   },
+  "playing_policy": "Fret zero slides to open; frets never generate note_off or restart natural envelopes; only real plucks start notes",
+  "open_release_results": [
+    "PASS: FULL open-release mode=0, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+    "PASS: FULL open-release mode=1, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+    "PASS: FULL open-release mode=2, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+    "PASS: FULL open-release mode=3, four natural envelope ages/lifetimes, no damp/retrigger; unchanged 32-mode sound engine",
+    "PASS: fret duration independent of sound lifetime; piano/bright/wah, sustain, chorus/room/fifth and both fret/pluck orders"
+  ],
   "warning_codes": {
     "EX3791": 23,
     "EX2526": 1,
-    "NL0002": 5,
-    "PA1001": 11153,
+    "NL0002": 1,
+    "PA1001": 11151,
     "PR1014": 2
   },
   "warning_notes": [
@@ -211,12 +238,13 @@
     "PA1001: unused arithmetic outputs removed by synthesis"
   ],
   "external_panel_timing": "60 ns RTL settling checked; external setup/hold unspecified",
-  "hardware_status": "Integrated program awaits user download; original panel timing/pins physically verified",
+  "hardware_status": "Open-release update awaits user download; previous radial layout physically accepted 2026-10-12",
   "bitstream_bytes": 20777659,
-  "bitstream_sha256": "a8de7094b081f80dcef6ef74ff67dd46729f4fa9d90883f8ef0e3692a86c2c6e",
+  "bitstream_sha256": "701ba99e1c65f5667b934ef5b860df0bc968fca73d2ac45fc7b23b17e9ee85ce",
   "source_sha256": {
     "rtl/top/neo_guitar_radial_top.v": "4a00090e2b2700e58254a68b1808e7f224828d9a44f113dc092005ab4c15886f",
     "rtl/top/guitar_audio_top.v": "0f52c1a63a0ca990ef00561d1806ba50741d0a8ed65ef412a1cc6917a1e671b4",
+    "rtl/control/guitar_play_control.v": "4c066831a16e9e305f045606db3fc6c2ff33a8f207097b64bcd16f88e5bbd30c",
     "rtl/audio_io/four_string_board_audio_chain.v": "c431ceb69f75211efa4f7a3271c5fa0025e14b84a95c70bb63b3d6bee3f30b8f",
     "rtl/display/lcd_rgb_scan_480x272.v": "3fd04c6e2d2a1ddf34e3b83dcb0b5a113994768fa11967c783942057a72fc68b",
     "rtl/display/guitar_hz_bcd.v": "2baca026534b8b6cf18380c3ad6d5bb8912d29777284e7b0180b15eb5cbf4093",
@@ -243,17 +271,36 @@
     "constraints/neo_guitar_radial.sdc": "c3521faf29a3f7f50f0e9b61f1979bdd89d69b5036172c23aee20e8e5b846d8e",
     "gowin/neo_guitar_radial/build.tcl": "37b2c05470aaa864f788742284f7349bbad15262196aeab409af40152f4c02f7",
     "gowin/neo_guitar_radial/neo_guitar_radial.gprj": "d1f762ba7e426105d07423ba992222499e4d50caa25dee278bf8a19d6e1c4855",
-    "gowin/neo_guitar_radial/run_sim.ps1": "8ddcea7c346132a8d9302e6ec385e718ddf467538e3908e3d3dbefc03af84edb",
-    "gowin/neo_guitar_radial/check_result.py": "aa2495f6e607304d0f6ce0b21c95268be37628feb12bddf436da04a32a7984a1",
+    "gowin/neo_guitar_radial/run_sim.ps1": "0bb100d5c1f15c6d745a10483243c4c4a497122b82a00fbfff3df4b675bc0045",
+    "gowin/neo_guitar_radial/check_result.py": "5b4e8f20efa500074f338fcf0a8eb5391960dfa188767adb25970b56664de116",
     "sim/tb/tb_guitar_pcm_cdc.sv": "a4bc827d791280bb4762aac401678a8fd859de0b9de32fd6e6f77be1ab69991e",
     "sim/tb/tb_guitar_radial_fft.sv": "790538d8a831201410a41e768b8cc257e66c4556f65101e904027248f91aec9c",
     "sim/tb/tb_guitar_radial_bands.sv": "adbf85812db31918decd7b18f6054b085d75aea6d8a6eac2a4f37161855faf3c",
     "sim/tb/tb_guitar_radial_palette.sv": "61247c33f43ec220862796c00d784d6048eecc14a680ebf4fff84b86cb5f04b3",
     "sim/tb/tb_guitar_radial_renderer.sv": "745e286696e19e21be1038b1446f7042a4a61396a227aa1eef5f65cadd38e773",
-    "sim/tb/tb_neo_guitar_radial.sv": "50ef8a06c2f23fd4283705c538832339f5f1e64ab859a10406d8341f7a5422f0",
+    "sim/tb/tb_neo_guitar_radial.sv": "1d77c323ecff272d8624bf2571900c0ba22ea91698936b23289be40fe42e1463",
     "sim/tb/tb_guitar_visual_cdc.sv": "57b18f23ed2492460a897c820ec3336cc50c26d919dd5406c8d539813081029c",
     "sim/tb/tb_guitar_visual_telemetry.sv": "2ee816f453dcb2af825c06b8642d0ebd7f02c9e260c43af3f6b4a9245848f737",
-    "sim/tb/tb_neo_guitar_radial_gate.sv": "cb23f78adedc397f8c3627aeec6a82175e21ebf09cdfc3528a39d11f3b4e7ef6",
+    "sim/tb/tb_guitar_audio_top.sv": "78b3b0adac042c1572783db4f3af2ad5e7edd8fe520c2ecf193dee5fcf6870a0",
+    "sim/tb/tb_guitar_harmonic_audio_top.sv": "035e0bfe5ed27dc6125cae46f5428301db91ef6c3218830f081a0e160d622baa",
+    "sim/tb/tb_guitar_audio_latency.sv": "e01b86361c198e75cfcb47a2cb1df56c8f36d8ab437e81a70d44b0bacea97d7e",
+    "sim/tb/tb_neo_guitar_main_equivalence.sv": "053e1b161a3c9d3fef3bfc0dfbd82195e81bb4c6fffab8239affd3cb27364e94",
+    "sim/tb/tb_piano_voice_core.sv": "a6c5a4f3b99a25558004f32326e00aa3ac4a1645ef5ddffa03c2d132d7d71d50",
+    "sim/tb/tb_full_piano_voice.sv": "af044106ebb87719dad7d4a6c19eedd5125b9e0d0a39c83d54dffe5fe0cefd76",
+    "sim/tb/tb_rock_voice_core.sv": "0ff9c81ba83a2f2e3b03019b80ef9210650efc65da860e0e8a78984ebf7d5506",
+    "sim/tb/tb_guitar_effect_buttons.sv": "a48e342e253e95b620099c1e7448798831fe94dffbe0c82192165441b45e206f",
+    "sim/tb/tb_guitar_play_control.sv": "4a666cce794b54cc5108db1ac9abce62d1aa05b3a1cb56dd0e1f76f80d16a8d3",
+    "sim/tb/tb_antibeat_pcm_compare.sv": "c1b0b889c5bc5f5dff2ad6823168cb5fc4f2839e36519af9398f91653bb9f679",
+    "sim/tb/tb_rgb_spectrum_timing.sv": "7e04b12d633abb7cad286a97d8eea8f196bf4d116df68b9993fbad5109006d1f",
+    "sim/tb/tb_spectrum_display_top.sv": "85630e02b3ba08521c6ebf44a43c0ad585dc5a55c8c6584ec1cc6a289db6a128",
+    "sim/tb/tb_full_guitar_top.sv": "646013a13ea192b89613c8ccea70f9be075422d64cd9d4fda81caacef08d1448",
+    "sim/tb/tb_neo_full_guitar_top.sv": "fff86861d567d228993479944a3bfc64fe46dd34a0155b86f439f047a4bf9ef8",
+    "sim/tb/tb_rgb_panel_defaults.sv": "28a4ab31051f50038c140f330be3b92f4c805d0a373fce9555418cf2a22ecf06",
+    "sim/tb/tb_guitar_open_release.sv": "68c788dbc141b2b5dd39470ff581cad4a0c66eedd59098dde05c6c892f0baaa1",
+    "sim/tb/tb_neo_guitar_main_default_timing.sv": "7e145f619f1570f4146214a7050bba724adca1b2dd0f62f8ffc092e91883b7ab",
+    "sim/tb/tb_neo_guitar_lissajous.sv": "2137b00bdc10205b48c4aac5e43d9965fab1f798255dbfe4ed864a2bb7dfc2f2",
+    "sim/tb/tb_full_realtime_acceptance.sv": "af7c448ab6a1581062efd72807d29f1e356929be6b65e8d75e1daa12b85141fe",
+    "sim/tb/tb_neo_guitar_radial_gate.sv": "a203f6ae3483a95fb244f8352575a57eb415c998bce2d291eb92aaa9296b3739",
     "gowin/neo_guitar_radial/run_gate_check.ps1": "2cdd66c9c567d5f0448a3437dff385c02260d27063cdf8b5f951ea1067a9004b"
   }
 }

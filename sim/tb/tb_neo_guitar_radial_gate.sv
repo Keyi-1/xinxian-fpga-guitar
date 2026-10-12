@@ -133,7 +133,13 @@ module tb_neo_guitar_radial_gate;
         short_key(2);#6000000; // chorus
         short_key(3);#2000000; // sustain only
         @(negedge clk);pressed=0;
-        #7000000; // real matrix damping through sustain
+        #30000000; // real matrix release plus complete 20 ms slide to open
+        if(reference.u_audio.u_board_audio_chain.phase_inc!==
+           {32'h00C879A3,32'h010B9A2B,32'h0151285D,32'h01C20D2F} ||
+           reference.u_audio.u_board_audio_chain.note_off!==0 ||
+           reference.u_audio.u_board_audio_chain.voice_active!==15)
+            $fatal(1,"FAIL: full reference release must continue at each open-string pitch");
+        $display("PASS: synthesized/RTL real-matrix four-string open release, no fret damping");
         @(negedge clk);pressed=32'h10101004;
         #7000000;
         short_key(3);#6000000; // light room, sustain off

@@ -64,6 +64,7 @@ module tb_neo_guitar_main_default_timing;
         last_bclk = $realtime;
     end
     integer j;
+    integer age_before_release;
     initial begin
         for (j = 0; j < 4; j = j + 1) adc_code[j] = 2053;
         repeat (8) @(negedge clk);
@@ -84,16 +85,21 @@ module tb_neo_guitar_main_default_timing;
               dut.u_audio.u_board_audio_chain.deadline_miss == 0 &&
               dut.u_audio.u_board_audio_chain.voice_active == 1 && pa == 0, "default piano voice, cadence and PA");
         $display("PASS: shipped defaults select silently; Fs=48 kHz; PT8211 BCLK=1.536 MHz; ADC excursion to Attack=%0.3f us", (attack_time-excursion_time)/1000.0);
+        age_before_release=dut.u_audio.u_board_audio_chain.g_piano.u_core.voice[0].u_voice.age;
         pressed = 0;
-        #6500000;
-        check(off_count == 1 && dut.u_audio.u_board_audio_chain.smoothed_phase_inc[31:0] == 32'h01DCD01D,
-              "default Release holds F4 rather than jumping to open E4");
+        #30000000; // Default debounce plus the full 20 ms slide.
+        check(off_count == 0 && dut.u_audio.u_board_audio_chain.smoothed_phase_inc[31:0] == 32'h01C20D2F,
+              "default release slides from F4 to open E4 without damping");
+        check(dut.u_audio.u_board_audio_chain.voice_active==1 &&
+              dut.u_audio.u_board_audio_chain.g_piano.u_core.voice[0].u_voice.age>age_before_release &&
+              !dut.u_audio.u_board_audio_chain.g_piano.u_core.voice[0].u_voice.releasing,
+              "default release continues the original natural envelope");
         check(note_count == 1, "held ADC excursion cannot retrigger default detector");
-        $display("PASS: shipped-default debounce, Attack and final-fret Release");
+        $display("PASS: shipped-default debounce, single Attack and open-string natural continuation");
         $finish;
     end
     initial begin
-        #20000000;
+        #50000000;
         $fatal(1, "FAIL: default-timing smoke timeout");
     end
 endmodule

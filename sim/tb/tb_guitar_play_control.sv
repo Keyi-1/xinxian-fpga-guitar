@@ -40,8 +40,9 @@ module tb_guitar_play_control;
         step(1,0,16'h0001,4'b0001,4'b0001,0); // arrival on tick
         step(1,0,16'h0001,0,0,0);
 
-        // Pending release plus a later queued pluck: new pluck wins.
+        // Releasing a sounding fret selects the open pitch without an event.
         step(0,1,0,0,0,0);
+        check(target[31:0] == 32'h01C20D2F, "release selects open pitch before repluck");
         step(0,0,0,1,0,0);
         step(1,0,0,0,1,0);
         check(target[31:0] == 32'h01C20D2F, "open pitch after queued repluck");
@@ -54,19 +55,31 @@ module tb_guitar_play_control;
 
         step(0,1,16'h0002,0,0,0);
         step(0,1,0,0,0,0);
-        step(1,0,0,0,0,1); // queued final release delivered once
-        check(target[31:0] == smooth[31:0], "Release retains audible pitch");
+        step(1,0,0,0,0,0);
+        check(target[31:0] == 32'h01C20D2F, "release never damps or freezes pitch");
         step(1,1,16'h0008,0,0,0);
-        check(target[31:0] == smooth[31:0], "press during Release cannot hammer-on");
+        check(target[31:0] == 32'h02CA6987, "press after release follows pitch without Attack");
         step(1,0,16'h0008,0,0,0);
         step(1,0,16'h0008,1,1,0);
-        check(target[31:0] == 32'h02CA6987, "new pluck can restart after Release");
+        check(target[31:0] == 32'h02CA6987, "new pluck uses latest selected fret");
 
         // Four raw events arriving together are one tick-aligned chord.
         step(0,1,16'h1234,4'b1111,0,0);
         step(1,0,16'h1234,0,4'b1111,0);
         step(1,0,16'h1234,0,0,0);
-        $display("PASS: queued/on-tick events, release/pluck priority, frozen Release pitch and four-string batching");
+        active=15;
+        step(0,1,0,0,0,0);
+        check(target=={32'h00C879A3,32'h010B9A2B,32'h0151285D,32'h01C20D2F},
+              "four-string release chooses each open pitch independently");
+        step(1,0,0,0,0,0);
+        // Uncommitted matrix data cannot change a held target.
+        step(0,0,16'h8888,0,0,0);
+        check(target=={32'h00C879A3,32'h010B9A2B,32'h0151285D,32'h01C20D2F},
+              "pitch updates require stable_valid");
+        active=0;
+        step(1,1,16'h8888,0,0,0); // finished voices are not restarted
+        step(1,1,0,0,0,0);
+        $display("PASS: queued/on-tick plucks, open-string release without note_off/retrigger, silent selection, four-string batching");
         $finish;
     end
 endmodule

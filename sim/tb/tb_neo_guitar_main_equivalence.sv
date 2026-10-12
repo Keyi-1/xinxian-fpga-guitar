@@ -33,8 +33,9 @@ module tb_neo_guitar_main_equivalence;
         .dac_bclk(bclk), .dac_lrck(lrck), .dac_din(din),
         .pa_en_n(pa), .event_led(leds)
     );
-    // Rename a generated copy of the untouched verified sources in the runner,
-    // so this comparison cannot accidentally bind to the updated main modules.
+    // The runner keeps the original verified audio arithmetic. Below, only
+    // its note_off/pitch control inputs are replaced by an independent table
+    // policy for the intentional open-release change; audio/ROMs are unforced.
     // Main reset_sync releases in 3 clocks; the reference uses 2 clocks.
     reg ref_rst_n = 0;
     always @(posedge clk or negedge rst_n)
@@ -261,6 +262,32 @@ module tb_neo_guitar_main_equivalence;
     endtask
 
     reg [31:0] notes [0:35];
+    // The frozen reference retains all its verified audio arithmetic. Only
+    // note_off/pitch inputs use this new policy oracle, fed by its own inputs.
+    reg [127:0] ref_held_pitch;
+    wire [127:0] ref_open_policy_pitch;
+    genvar policy_string;
+    generate for(policy_string=0;policy_string<4;policy_string++)begin : policy_oracle
+        wire [31:0] picked=notes[policy_string*9+reference.stable_fret_id[policy_string*4+:4]];
+        assign ref_open_policy_pitch[policy_string*32+:32]=
+            (reference.u_link_control.pending_pluck[policy_string] || reference.pluck_valid[policy_string]) ?
+            picked : ref_held_pitch[policy_string*32+:32];
+        always @(posedge clk)begin
+            if(!reference.audio_rst_n)
+                case(policy_string)
+                    0:ref_held_pitch[policy_string*32+:32]<=32'h01C20D2F;
+                    1:ref_held_pitch[policy_string*32+:32]<=32'h0151285D;
+                    2:ref_held_pitch[policy_string*32+:32]<=32'h010B9A2B;
+                    3:ref_held_pitch[policy_string*32+:32]<=32'h00C879A3;
+                endcase
+            else if(reference.stable_valid || reference.note_on[policy_string])
+                ref_held_pitch[policy_string*32+:32]<=picked;
+        end
+    end endgenerate
+    initial begin
+        force reference.note_off=4'd0;
+        force reference.target_phase_inc=ref_open_policy_pitch;
+    end
     integer s, f, j, old_count, env_early, env_late;
     reg [3:0] old_pan;
     reg [31:0] last_phase;
@@ -326,20 +353,19 @@ module tb_neo_guitar_main_equivalence;
         check(dut.u_audio.u_board_audio_chain.smoothed_phase_inc[31:0] == notes[1], "remaining lower fret slide");
         check(ons[0] == 2 && offs[0] == 0, "slides do not retrigger Attack");
 
-        // Final release freezes the audible pitch, then only that string
-        // enters fast damping. A subsequent real pluck uses open E4.
+        // Final release slides to open without damping or another Attack.
         last_phase = dut.u_audio.u_board_audio_chain.smoothed_phase_inc[31:0];
         pressed[7:0] = 0;
         wait_fret(16'h4860);
-        repeat (128) @(negedge clk);
-        check(offs[0] == 1 && dut.u_audio.u_board_audio_chain.smoothed_phase_inc[31:0] == last_phase,
-              "last fret release holds pitch and sends one Release");
-        check(dut.u_audio.u_board_audio_chain.voice_active[3:1] == 7, "release is isolated to one string");
+        repeat (640) @(negedge clk);
+        check(offs[0] == 0 && ons[0] == 2 && dut.u_audio.u_board_audio_chain.smoothed_phase_inc[31:0] == notes[0],
+              "last fret release slides to open without Release or Attack");
+        check(dut.u_audio.u_board_audio_chain.voice_active == 15, "release preserves all four natural envelopes");
         wait_armed(0);
         adc_code[0] = 2253;
         wait_on(0, 3);
         check(dut.u_audio.u_board_audio_chain.phase_inc[31:0] == notes[0], "repluck after release uses open E4");
-        $display("PASS: highest-fret slides, final-release pitch hold and new open-string pluck");
+        $display("PASS: highest-fret slides, open-string continuation and new real pluck");
 
         // Held contacts and ADC levels cannot create a sustain plateau or
         // synthetic repeat notes. Read the unchanged optimized envelope.

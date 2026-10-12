@@ -252,7 +252,7 @@ module tb_guitar_audio_top;
             $finish;
         end
 
-        // Releasing string 2 enters Release but preserves other voices.
+        // Releasing string 2 changes its pitch to open without damping.
         pressed = 32'h40000201;
         wait_stable_fret(16'h7021);
         wait_audio_active(4'b1111);

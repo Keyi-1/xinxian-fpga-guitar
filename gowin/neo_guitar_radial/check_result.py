@@ -64,6 +64,7 @@ for label in ('Logic', 'Register', 'BSRAM', 'DSP'):
     resources[label] = {'used': used, 'available': available}
 
 benches = ['tb_guitar_pcm_cdc','tb_guitar_radial_fft','tb_guitar_radial_bands','tb_guitar_radial_palette','tb_guitar_radial_renderer','tb_neo_guitar_radial','tb_guitar_visual_cdc','tb_guitar_visual_telemetry','tb_guitar_audio_top','tb_guitar_harmonic_audio_top','tb_guitar_audio_latency','tb_neo_guitar_main_equivalence','tb_piano_voice_core','tb_full_piano_voice','tb_rock_voice_core','tb_guitar_effect_buttons','tb_guitar_play_control','tb_antibeat_pcm_compare','tb_rgb_spectrum_timing','tb_spectrum_display_top','tb_full_guitar_top','tb_neo_full_guitar_top','tb_rgb_panel_defaults']
+benches += ['tb_guitar_open_release','tb_neo_guitar_main_default_timing','tb_neo_guitar_lissajous','tb_full_realtime_acceptance']
 logs = {}
 for bench in benches:
     log = (repo/'sim/temp'/f'{bench}.log').read_text(encoding='utf-8')
@@ -95,7 +96,7 @@ audio_files = [repo/path for path in [
     'rtl/synth/piano_voice_core.v','rtl/audio_io/four_voice_piano_audio_core.v',
     'rtl/audio_io/piano_stereo_effects.v','rtl/audio_io/piano_stereo_chorus.v',
     'rtl/audio_io/piano_stereo_room.v','rtl/audio_io/pt8211_tx.v',
-    'rtl/control/guitar_play_control.v','rtl/control/phase_slide_smoother.v',
+    'rtl/control/phase_slide_smoother.v',
     'rtl/control/guitar_effect_buttons.v','rtl/config/guitar_config.vh','rtl/config/rock_coeffs.vh']]
 audio_files += sorted((repo/'mem').glob('*.mem'))
 audio_hashes = {}
@@ -109,13 +110,14 @@ top = (repo/'rtl/top/neo_guitar_radial_top.v').read_text()
 assert '.PIANO_MODES(32)' in top and '.PIANO_CONTROL_ENABLE(1)' in top and '.PIANO_ROCK_ENABLE(1)' in top
 
 source_files = [repo/'rtl/top/neo_guitar_radial_top.v',repo/'rtl/top/guitar_audio_top.v',
+    repo/'rtl/control/guitar_play_control.v',
     repo/'rtl/audio_io/four_string_board_audio_chain.v',repo/'rtl/display/lcd_rgb_scan_480x272.v']
 source_files += sorted((repo/'rtl/display').glob('guitar_*.v'))
 source_files += [repo/'tools/gen_radial_display.py',repo/'tools/gen_radial_palette.py',repo/'tools/setup_radial_project.py']
 source_files += [repo/'constraints'/f'{name}.{ext}' for ext in ['cst','sdc']]
 source_files += [project/'build.tcl', project/f'{name}.gprj']
 source_files += [project/'run_sim.ps1', project/'check_result.py']
-source_files += [repo/'sim/tb'/f'{bench}.sv' for bench in benches[:8]]
+source_files += [repo/'sim/tb'/f'{bench}.sv' for bench in benches]
 source_files += [repo/'sim/tb/tb_neo_guitar_radial_gate.sv',project/'run_gate_check.ps1']
 bitstream = pnr/f'{name}.fs'
 result = {
@@ -133,6 +135,8 @@ result = {
     'synthesized_netlist_sha256':gate_evidence['netlist_sha256'],
     'vendor_primitive_unused_width_warning_filter':vendor_warning,
     'unchanged_audio_sources_sha256':audio_hashes,
+    'playing_policy':'Fret zero slides to open; frets never generate note_off or restart natural envelopes; only real plucks start notes',
+    'open_release_results':logs['tb_guitar_open_release'],
     'warning_codes':dict(Counter(re.findall(r'WARN\s+\((\w+)\)',build))),
     'warning_notes':[
         'PR1014: V13/V22 generic clock-input routing; both internal clock domains must pass STA',
@@ -140,7 +144,7 @@ result = {
         'EX2526: pre-existing rock_envelope ROM width diagnostic; audio ROMs/core unchanged',
         'PA1001: unused arithmetic outputs removed by synthesis'],
     'external_panel_timing':'60 ns RTL settling checked; external setup/hold unspecified',
-    'hardware_status':'Integrated program awaits user download; original panel timing/pins physically verified',
+    'hardware_status':'Open-release update awaits user download; previous radial layout physically accepted 2026-10-12',
     'bitstream_bytes':bitstream.stat().st_size,'bitstream_sha256':hashlib.sha256(bitstream.read_bytes()).hexdigest(),
     'source_sha256':{file.relative_to(repo).as_posix():hashlib.sha256(file.read_bytes()).hexdigest() for file in source_files},
 }
