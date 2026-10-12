@@ -55,7 +55,8 @@ module neo_guitar_audio_full_top #(
         .fret_row_oe(row_oe),.fret_row_drive_n(row_drive_n),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),
         .stable_fret_mask(),.stable_fret_id(),.audio_voice_active(),.velocity_level(),
-        .raw_adc(),.peak_adc(),.event_timestamp(),.pluck_events(),.final_pcm_valid(),.final_pcm());
+        .raw_adc(),.peak_adc(),.event_timestamp(),.pluck_events(),.final_pcm_valid(),.final_pcm(),
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
     assign ROW0=row_oe[0]?row_drive_n[0]:1'bz;
     assign ROW1=row_oe[1]?row_drive_n[1]:1'bz;
     assign ROW2=row_oe[2]?row_drive_n[2]:1'bz;

@@ -60,7 +60,12 @@ module guitar_audio_top #(
     output wire [31:0] event_timestamp,
     output wire [3:0]  pluck_events,
     output wire        final_pcm_valid,
-    output wire signed [23:0] final_pcm
+    output wire signed [23:0] final_pcm,
+    output wire [127:0] display_phase_inc,
+    output wire [3:0] display_note_on,
+    output wire display_sample_tick,
+    output wire display_voice_sample_valid,
+    output wire [95:0] display_voice_pcm
 );
 
     wire audio_rst_n;
@@ -114,8 +119,10 @@ module guitar_audio_top #(
         .timbre_select(timbre_select), .rock_select(rock_select), .chorus_enable(chorus_enable),
         .sustain_enable(sustain_enable),
         .harmony_enable(harmony_enable),.reverb_enable(reverb_enable),
-        .sample_tick(), .pcm_mix_valid(final_pcm_valid), .pcm_mix(final_pcm),
-        .voice_active(audio_voice_active), .voice_pcm(),
+        .sample_tick(display_sample_tick), .pcm_mix_valid(final_pcm_valid), .pcm_mix(final_pcm),
+        .voice_active(audio_voice_active), .voice_pcm(display_voice_pcm),
+        .display_phase_inc(display_phase_inc),.display_note_on(display_note_on),
+        .display_voice_sample_valid(display_voice_sample_valid),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din)
     );
 endmodule

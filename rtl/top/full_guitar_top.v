@@ -20,16 +20,16 @@ module full_guitar_top #(
     parameter integer PIANO_ROCK_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
-    parameter integer H_ACTIVE = 800,
-    parameter integer H_FRONT = 40,
-    parameter integer H_SYNC = 128,
-    parameter integer H_BACK = 88,
-    parameter integer V_ACTIVE = 480,
-    parameter integer V_FRONT = 13,
-    parameter integer V_SYNC = 2,
-    parameter integer V_BACK = 31,
-    parameter integer BAR_SLOT = 25,
-    parameter integer BAR_WIDTH = 21
+    parameter integer H_ACTIVE = 480,
+    parameter integer H_FRONT = 8,
+    parameter integer H_SYNC = 4,
+    parameter integer H_BACK = 39,
+    parameter integer V_ACTIVE = 272,
+    parameter integer V_FRONT = 8,
+    parameter integer V_SYNC = 4,
+    parameter integer V_BACK = 8,
+    parameter integer BAR_SLOT = 15,
+    parameter integer BAR_WIDTH = 12
 ) (
     input  wire        sys_clk_50m,
     input  wire        audio_clk_12m288,
@@ -95,7 +95,8 @@ module full_guitar_top #(
         .raw_adc(), .peak_adc(), .event_timestamp(),
         .pluck_events(),
         .final_pcm_valid(final_pcm_valid), .final_pcm(final_pcm)
-    );
+    ,
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
 
     spectrum_display_top #(
         .FFT_FRAME_GAP_SAMPLES(FFT_FRAME_GAP_SAMPLES),

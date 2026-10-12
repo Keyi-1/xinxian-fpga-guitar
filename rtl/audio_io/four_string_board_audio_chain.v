@@ -34,11 +34,18 @@ module four_string_board_audio_chain #(
     output wire signed [23:0] pcm_mix,
     output wire [3:0] voice_active,
     output wire [95:0] voice_pcm,
-    output wire dac_bclk, dac_lrck, dac_din
+    output wire dac_bclk, dac_lrck, dac_din,
+    // Passive display taps; synthesis removes them in audio-only builds.
+    output wire [127:0] display_phase_inc,
+    output wire [3:0] display_note_on,
+    output wire display_voice_sample_valid
 );
     wire [3:0] note_on, note_off, slide_busy;
     wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc;
     wire voice_sample_valid;
+    assign display_phase_inc=phase_inc;
+    assign display_note_on=note_on;
+    assign display_voice_sample_valid=voice_sample_valid;
     wire signed [23:0] unused_saturated_mix;
     wire [3:0] deadline_miss;
     wire [8:0] timbre_blend, chorus_blend, reverb_blend;

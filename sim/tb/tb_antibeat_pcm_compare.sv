@@ -16,7 +16,8 @@ module tb_antibeat_pcm_compare;
         .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
         .sample_tick(tick0), .pcm_mix_valid(valid0), .pcm_mix(),
         .voice_active(active0), .voice_pcm(voices0), .dac_bclk(), .dac_lrck(), .dac_din()
-    );
+    ,
+        .display_phase_inc(),.display_note_on(),.display_voice_sample_valid());
     four_string_board_audio_chain #(.ANTI_BEAT_ENABLE(1)) new_chain (
         .rock_select(1'b0),
         .clk_audio_ref(clk), .rst_n(rst_n), .stable_valid(stable_valid),
@@ -24,7 +25,8 @@ module tb_antibeat_pcm_compare;
         .timbre_select(1'b0), .chorus_enable(1'b0), .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
         .sample_tick(tick1), .pcm_mix_valid(valid1), .pcm_mix(),
         .voice_active(active1), .voice_pcm(voices1), .dac_bclk(), .dac_lrck(), .dac_din()
-    );
+    ,
+        .display_phase_inc(),.display_note_on(),.display_voice_sample_valid());
     integer old_file, new_file, frame = 0, voices_seen = 0;
     reg recording = 0;
     always @(posedge clk) begin

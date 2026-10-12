@@ -15,14 +15,16 @@ module tb_piano_pcm_export;
         .pluck_valid(pluck),.velocity_level(8'haa),.timbre_select(1'b0),
         .chorus_enable(1'b0),.sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),.sample_tick(tick0),
         .pcm_mix_valid(valid0),.pcm_mix(),.voice_active(active0),.voice_pcm(),
-        .dac_bclk(),.dac_lrck(),.dac_din());
+        .dac_bclk(),.dac_lrck(),.dac_din(),
+        .display_phase_inc(),.display_note_on(),.display_voice_sample_valid());
     four_string_board_audio_chain #(.USE_PIANO(1),.PIANO_HAMMER_ENABLE(1),.SAMPLE_DIV(64),.REF_DIV(1)) hammer (
         .rock_select(1'b0),
         .clk_audio_ref(clk),.rst_n(rst_n),.stable_valid(stable),.stable_fret_id(frets),
         .pluck_valid(pluck),.velocity_level(8'haa),.timbre_select(1'b0),
         .chorus_enable(1'b0),.sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),.sample_tick(tick1),
         .pcm_mix_valid(valid1),.pcm_mix(),.voice_active(active1),.voice_pcm(),
-        .dac_bclk(),.dac_lrck(),.dac_din());
+        .dac_bclk(),.dac_lrck(),.dac_din(),
+        .display_phase_inc(),.display_note_on(),.display_voice_sample_valid());
     integer file0,file1,frames=0,full_seen=0,clips=0;
     reg recording=0;
     always @(posedge clk)begin

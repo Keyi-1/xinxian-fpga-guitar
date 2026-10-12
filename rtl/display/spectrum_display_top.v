@@ -2,16 +2,16 @@
 // audio-to-pixel CDC and framebuffer-free RGB rendering.
 module spectrum_display_top #(
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
-    parameter integer H_ACTIVE = 800,
-    parameter integer H_FRONT = 40,
-    parameter integer H_SYNC = 128,
-    parameter integer H_BACK = 88,
-    parameter integer V_ACTIVE = 480,
-    parameter integer V_FRONT = 13,
-    parameter integer V_SYNC = 2,
-    parameter integer V_BACK = 31,
-    parameter integer BAR_SLOT = 25,
-    parameter integer BAR_WIDTH = 21
+    parameter integer H_ACTIVE = 480,
+    parameter integer H_FRONT = 8,
+    parameter integer H_SYNC = 4,
+    parameter integer H_BACK = 39,
+    parameter integer V_ACTIVE = 272,
+    parameter integer V_FRONT = 8,
+    parameter integer V_SYNC = 4,
+    parameter integer V_BACK = 8,
+    parameter integer BAR_SLOT = 15,
+    parameter integer BAR_WIDTH = 12
 ) (
     input  wire               audio_clk,
     input  wire               pixel_clk,

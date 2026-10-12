@@ -1,16 +1,16 @@
-// 800x480-style parallel RGB timing and direct spectrum rendering.  No full
+// Delivered 480x272 panel timing and direct spectrum rendering. No full
 // framebuffer is used: each active pixel is generated from one of 32 bars.
 module rgb_spectrum_timing #(
-    parameter integer H_ACTIVE = 800,
-    parameter integer H_FRONT  = 40,
-    parameter integer H_SYNC   = 128,
-    parameter integer H_BACK   = 88,
-    parameter integer V_ACTIVE = 480,
-    parameter integer V_FRONT  = 13,
-    parameter integer V_SYNC   = 2,
-    parameter integer V_BACK   = 31,
-    parameter integer BAR_SLOT = 25,
-    parameter integer BAR_WIDTH = 21
+    parameter integer H_ACTIVE = 480,
+    parameter integer H_FRONT  = 8,
+    parameter integer H_SYNC   = 4,
+    parameter integer H_BACK   = 39,
+    parameter integer V_ACTIVE = 272,
+    parameter integer V_FRONT  = 8,
+    parameter integer V_SYNC   = 4,
+    parameter integer V_BACK   = 8,
+    parameter integer BAR_SLOT = 15,
+    parameter integer BAR_WIDTH = 12
 ) (
     input  wire       pixel_clk,
     input  wire       rst_n,

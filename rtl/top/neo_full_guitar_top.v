@@ -1,8 +1,9 @@
 `include "../config/guitar_config.vh"
 
 // Tang Mega NEO electrical-boundary wrapper for the FULL logical design.
-// Pin locations deliberately remain outside this module until the actual Dock
-// revision, LCD FPC and external sensor wiring have been confirmed.
+// Panel defaults match the delivered 480x272 screen. An integrated FULL
+// build still needs its board clock/pin wrapper; the standalone RGB demo
+// provides the measured 8.333 MHz clock and fixed NEO Dock pin locations.
 module neo_full_guitar_top #(
     parameter integer MATRIX_CLK_DIV = `MATRIX_CLK_DIV,
     parameter integer MATRIX_SETTLE_CYCLES = `MATRIX_SETTLE_CYCLES,
@@ -21,16 +22,16 @@ module neo_full_guitar_top #(
     parameter integer PIANO_ROCK_ENABLE = 1,
     parameter integer ANTI_BEAT_ENABLE = `BOARD_ANTI_BEAT_ENABLE,
     parameter integer FFT_FRAME_GAP_SAMPLES = 512,
-    parameter integer H_ACTIVE = 800,
-    parameter integer H_FRONT = 40,
-    parameter integer H_SYNC = 128,
-    parameter integer H_BACK = 88,
-    parameter integer V_ACTIVE = 480,
-    parameter integer V_FRONT = 13,
-    parameter integer V_SYNC = 2,
-    parameter integer V_BACK = 31,
-    parameter integer BAR_SLOT = 25,
-    parameter integer BAR_WIDTH = 21,
+    parameter integer H_ACTIVE = 480,
+    parameter integer H_FRONT = 8,
+    parameter integer H_SYNC = 4,
+    parameter integer H_BACK = 39,
+    parameter integer V_ACTIVE = 272,
+    parameter integer V_FRONT = 8,
+    parameter integer V_SYNC = 4,
+    parameter integer V_BACK = 8,
+    parameter integer BAR_SLOT = 15,
+    parameter integer BAR_WIDTH = 12,
     parameter integer KEY_DEBOUNCE_CYCLES = 245760,
     parameter integer KEY_LONG_PRESS_CYCLES = 12288000,
     parameter integer LCD_PCLK_INVERT = 1,

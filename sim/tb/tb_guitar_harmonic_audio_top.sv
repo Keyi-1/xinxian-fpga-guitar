@@ -51,7 +51,8 @@ module tb_guitar_harmonic_audio_top;
         .stable_fret_id(stable_fret_id), .audio_voice_active(audio_voice_active),
         .velocity_level(velocity_level), .raw_adc(), .peak_adc(),
         .event_timestamp(), .pluck_events(), .final_pcm_valid(), .final_pcm()
-    );
+    ,
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
 
     always #5 sys_clk_50m = ~sys_clk_50m;
     always #7 audio_clk_12m288 = ~audio_clk_12m288;

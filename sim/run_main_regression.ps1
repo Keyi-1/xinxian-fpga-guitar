@@ -24,7 +24,7 @@ foreach ($file in $referenceFiles) {
 Copy-Item -LiteralPath (Join-Path $sourceDir 'guitar_config.vh') -Destination $refDir
 Copy-Item -LiteralPath (Join-Path $sourceDir 'note_phase_inc.mem') -Destination $simDir
 Copy-Item -LiteralPath (Join-Path $sourceDir 'sine_lut.mem') -Destination $simDir
-$excluded = @('tb_neo_full_chain_audio_test','tb_neo_full_chain_default_timing','tb_neo_guitar_link_control','tb_piano_gate_audio','tb_full_piano_gate_audio')
+$excluded = @('tb_neo_full_chain_audio_test','tb_neo_full_chain_default_timing','tb_neo_guitar_link_control','tb_piano_gate_audio','tb_full_piano_gate_audio','tb_neo_guitar_lissajous_gate')
 $tbFiles = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'tb') -Filter '*.sv' |
     Where-Object { $_.BaseName -notin $excluded }
 if (!$Benches.Count) { $Benches = $tbFiles | ForEach-Object BaseName }
