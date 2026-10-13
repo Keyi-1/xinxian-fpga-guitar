@@ -41,5 +41,18 @@ s = s.replace('            previous_line_condition<=line_condition;',
     '            visual_update<=0;previous_line_condition<=line_condition;')
 s = s.replace('history<=pending;pending<=snapshot;previous_valid<=0;',
     'visual_update<=1;history<=pending;pending<=snapshot;previous_valid<=0;')
+s=s.replace('input wire [399:0] snapshot,input wire [8:0] pixel_x,pixel_y,',
+    'input wire [399:0] snapshot,input wire [3:0] curve_active,input wire [8:0] pixel_x,pixel_y,')
+s=s.replace('    reg [399:0] pending,history;',
+    '    reg [399:0] pending,history;\n    reg [3:0] current_curve_active,history_curve_active;')
+s=s.replace('pending<=0;history<=0;previous_strikes<=0;',
+    'pending<=0;history<=0;current_curve_active<=0;history_curve_active<=0;previous_strikes<=0;')
+s=s.replace('visual_update<=1;history<=pending;pending<=snapshot;previous_valid<=0;',
+    'visual_update<=1;history<=pending;pending<=snapshot;previous_valid<=0;\n'
+    '                    history_curve_active<=current_curve_active;')
+s=s.replace('if(voice==3)state<=WAIT;',
+    'if(voice==3)begin current_curve_active<=curve_active;state<=WAIT;end')
+s=s.replace('!pending[332+voice] || (ghost && !history[332+voice])',
+    '!current_curve_active[voice] || (ghost && !history_curve_active[voice])')
 (display/'guitar_radial_curve_renderer.v').write_text(s,encoding='utf-8')
 print('Generated radial twiddle, arcsine and 150px native curve renderer')

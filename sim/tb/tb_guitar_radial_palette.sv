@@ -8,7 +8,7 @@ module tb_guitar_radial_palette;
     wire [17:0] rgb;
     guitar_radial_palette dut(.clk(clk),.rst_n(rst),.frame_start(1'b0),.visual_update(update),
         .x(x),.y(y),.mask(12'd0),.voice_active(4'd0),.flash(4'd0),.hz(44'd0),
-        .fret(16'd0),.level(16'd0),.strikes(strikes),.targets(targets),.rgb(rgb));
+        .fret(16'd0),.level(16'd0),.strikes(strikes),.targets(targets),.rgb(rgb),.curve_active());
     task automatic tick;
         begin @(negedge clk);update=1;@(negedge clk);update=0;end
     endtask

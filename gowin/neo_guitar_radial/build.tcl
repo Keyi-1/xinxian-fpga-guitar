@@ -56,6 +56,7 @@ foreach source {
     rtl/display/guitar_radial_arcsine.v
     rtl/display/guitar_radial_curve_renderer.v
     rtl/display/guitar_radial_palette.v
+    rtl/display/guitar_curve_envelope.v
     rtl/display/gowin_dpb_ram.v
 } { add_file -type verilog [file join $repo_root $source] }
 add_file -type cst [file join $repo_root constraints neo_guitar_radial.cst]
@@ -71,3 +72,5 @@ set_option -use_sspi_as_gpio 1
 set_option -print_all_synthesis_warning 1
 set_option -show_all_warn 1
 run all
+file copy -force [file join $project_dir impl pnr neo_guitar_radial.fs] \
+    [file join $project_dir impl pnr neo_guitar_radial_curve_fade.fs]

@@ -4,7 +4,12 @@ module guitar_radial_palette(input wire clk,rst_n,frame_start,visual_update,
     input wire [8:0] x,y,input wire [11:0] mask,
     input wire [3:0] voice_active,flash,input wire [43:0] hz,
     input wire [15:0] fret,level,input wire [31:0] strikes,
-    input wire [159:0] targets,output reg [17:0] rgb) /* synthesis syn_romstyle="logic" */;
+    input wire [159:0] targets,output reg [17:0] rgb,
+    output wire [3:0] curve_active) /* synthesis syn_romstyle="logic" */;
+    wire [31:0] curve_gain;
+    guitar_curve_envelope u_curve_envelope(.clk(clk),.rst_n(rst_n),.visual_update(visual_update),
+        .voice_active(voice_active),.level(level),.strikes(strikes),
+        .gain(curve_gain),.curve_active(curve_active));
     wire [47:0] digits;
     guitar_hz_bcd u_digits(.clk(clk),.rst_n(rst_n),.hz(hz),.digits(digits));
     reg [4:0] envelope [0:3];
@@ -233,8 +238,8 @@ module guitar_radial_palette(input wire clk,rst_n,frame_start,visual_update,
     integer c;
     always @* begin
         rr=0;gg=0;bb=0;strength=0;contribution=0;hue=0;
-        for(c=0;c<4;c=c+1)if(mask1[c*3+:3]!=0 && voice_active[c])begin
-            strength=6'd22+{1'b0,level[c*4+:4],1'b0}+(flash[c] ? 6'd8 : 6'd0);
+        for(c=0;c<4;c=c+1)if(mask1[c*3+:3]!=0 && curve_active[c])begin
+            strength=curve_gain[c*8+2+:6];
             case(mask1[c*3+:3])
                 7:strength=strength;6:strength=strength-(strength>>3);
                 4:strength=strength>>1;2:strength=strength>>2;default:strength=strength>>3;

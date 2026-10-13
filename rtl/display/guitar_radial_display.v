@@ -7,7 +7,7 @@ module guitar_radial_display(input wire audio_clk,audio_rst_n,clk,rst_n,
     wire update,frame_start,initialized,active,visual_update;
     wire [8:0] x,y;
     wire [11:0] mask;
-    wire [3:0] display_active,display_flash;
+    wire [3:0] display_active,display_flash,curve_active;
     wire renderer_deadline_miss;
     wire [43:0] hz;
     wire [15:0] fret,level;
@@ -32,12 +32,12 @@ module guitar_radial_display(input wire audio_clk,audio_rst_n,clk,rst_n,
         .lcd_pclk(lcd_pclk),.lcd_hsync(lcd_hsync),.lcd_vsync(lcd_vsync),.lcd_de(lcd_de),
         .lcd_r(lcd_r),.lcd_g(lcd_g),.lcd_b(lcd_b));
     guitar_radial_curve_renderer u_renderer(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),
-        .snapshot(snapshot),.pixel_x(x),.pixel_y(y),.pixel_active(active),.initialized(initialized),
+        .snapshot(snapshot),.curve_active(curve_active),.pixel_x(x),.pixel_y(y),.pixel_active(active),.initialized(initialized),
         .mask(mask),.display_hz(hz),.display_fret(fret),.display_level(level),
         .display_active(display_active),.display_flash(display_flash),.deadline_miss(renderer_deadline_miss),
         .display_strikes(strikes),.visual_update(visual_update));
     guitar_radial_palette u_palette(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.visual_update(visual_update),
         .x(x),.y(y),.mask(mask),.hz(hz),.fret(fret),.level(level),.voice_active(display_active),
-        .flash(display_flash),.strikes(strikes),.targets(targets),.rgb(rgb));
+        .flash(display_flash),.strikes(strikes),.targets(targets),.rgb(rgb),.curve_active(curve_active));
     assign lcd_backlight=rst_n && initialized;
 endmodule

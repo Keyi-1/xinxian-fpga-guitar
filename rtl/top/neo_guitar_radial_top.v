@@ -71,7 +71,7 @@ module neo_guitar_radial_top #(
         .display_phase_inc(visual_phase_inc),.display_note_on(visual_note_on),
         .display_sample_tick(visual_tick),.display_voice_sample_valid(visual_pcm_valid),
         .display_voice_pcm(visual_pcm));
-    guitar_visual_telemetry u_telemetry(.clk(audio_clk_12m288),.rst_n(audio_rst_n),
+    guitar_visual_telemetry #(.HOLD_INACTIVE_PITCH(1)) u_telemetry(.clk(audio_clk_12m288),.rst_n(audio_rst_n),
         .sample_tick(visual_tick),.voice_sample_valid(visual_pcm_valid),.phase_inc(visual_phase_inc),
         .note_on(visual_note_on),.voice_active(visual_active),.fret_id(visual_fret),
         .voice_pcm(visual_pcm),.snapshot(visual_snapshot));

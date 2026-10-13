@@ -73,6 +73,7 @@
         <File path="../../rtl/display/guitar_radial_arcsine.v" type="file.verilog" enable="1" />
         <File path="../../rtl/display/guitar_radial_curve_renderer.v" type="file.verilog" enable="1" />
         <File path="../../rtl/display/guitar_radial_palette.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/display/guitar_curve_envelope.v" type="file.verilog" enable="1" />
         <File path="../../rtl/display/gowin_dpb_ram.v" type="file.verilog" enable="1" />
         <File path="../../mem/hann1024_q15.mem" type="file.other" enable="1" />
         <File path="../../mem/fft1024_cos_q15.mem" type="file.other" enable="1" />

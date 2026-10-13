@@ -1,12 +1,15 @@
 // 1024-point Hann FFT. One shared 18x16 multiplier, two complex work RAMs
 // and one window ROM. Twiddles are explicit logic cases, not BSRAMs.
 // Captures consecutive 48 kHz samples; analysis pauses about 0.85 ms per FFT.
+// Register the shared multiplier operands ahead of each operation: the
+// state decode/input mux must not share a cycle with the DSP product path.
 module guitar_radial_fft(input wire clk,rst_n,sample_valid,
     input wire signed [23:0] pcm,output reg bin_valid,
     output reg [9:0] bin_index,output reg [18:0] bin_magnitude,
     output reg frame_done,output wire busy);
     localparam CAPTURE=0,WINDOW_MUL=1,CAPTURE_WRITE=2,READ=3,LOAD=4,
-        MUL0=5,MUL1=6,MUL2=7,MUL3=8,COMBINE=9,WRITE=10,OUT_READ=11,OUT_EMIT=12;
+        MUL0=5,MUL1=6,MUL2=7,MUL3=8,COMBINE=9,WRITE=10,OUT_READ=11,OUT_EMIT=12,
+        WINDOW_PREP=13;
     reg [3:0] state;
     reg [9:0] capture_count,output_count;
     reg [3:0] stage;
@@ -53,14 +56,6 @@ module guitar_radial_fft(input wire clk,rst_n,sample_valid,
     wire [18:0] abs_re=rqa[17] ? -$signed({rqa[17],rqa}) : {1'b0,rqa};
     wire [18:0] abs_im=iqa[17] ? -$signed({iqa[17],iqa}) : {1'b0,iqa};
     always @* begin
-        mul_a=b_re;mul_b=tw_cos;
-        case(state)
-            WINDOW_MUL:begin mul_a={{2{pcm16[15]}},pcm16};mul_b=hann_q;end
-            MUL1:begin mul_a=b_im;mul_b=tw_sin;end
-            MUL2:begin mul_a=b_im;mul_b=tw_cos;end
-            MUL3:begin mul_a=b_re;mul_b=tw_sin;end
-            default:begin end
-        endcase
         ena=0;enb=0;wea=0;web=0;addra=index_a;addrb=index_b;
         rdina=0;rdinb=0;idina=0;idinb=0;
         case(state)
@@ -79,10 +74,14 @@ module guitar_radial_fft(input wire clk,rst_n,sample_valid,
             bin_valid<=0;bin_index<=0;bin_magnitude<=0;frame_done<=0;
             pcm16<=0;windowed<=0;a_re<=0;a_im<=0;b_re<=0;b_im<=0;
             tw_cos<=0;tw_sin<=0;p0<=0;p1<=0;p2<=0;p3<=0;tw_re<=0;tw_im<=0;
+            mul_a<=0;mul_b<=0;
         end else begin
             bin_valid<=0;frame_done<=0;
             case(state)
-                CAPTURE:if(sample_valid)begin pcm16<=pcm[23:8];state<=WINDOW_MUL;end
+                CAPTURE:if(sample_valid)begin pcm16<=pcm[23:8];state<=WINDOW_PREP;end
+                // Allow the synchronous Hann ROM to settle after count
+                // advances, even when test inputs arrive back to back.
+                WINDOW_PREP:begin mul_a<={{2{pcm16[15]}},pcm16};mul_b<=hann_q;state<=WINDOW_MUL;end
                 WINDOW_MUL:begin windowed<=product>>>15;state<=CAPTURE_WRITE;end
                 CAPTURE_WRITE:if(capture_count==1023)begin
                     capture_count<=0;stage<=0;butterfly<=0;state<=READ;
@@ -91,10 +90,11 @@ module guitar_radial_fft(input wire clk,rst_n,sample_valid,
                 LOAD:begin
                     a_re<=rqa;a_im<=iqa;b_re<=rqb;b_im<=iqb;
                     tw_cos<=twiddle[31:16];tw_sin<=twiddle[15:0];state<=MUL0;
+                    mul_a<=rqb;mul_b<=twiddle[31:16];
                 end
-                MUL0:begin p0<=product;state<=MUL1;end
-                MUL1:begin p1<=product;state<=MUL2;end
-                MUL2:begin p2<=product;state<=MUL3;end
+                MUL0:begin p0<=product;mul_a<=b_im;mul_b<=tw_sin;state<=MUL1;end
+                MUL1:begin p1<=product;mul_a<=b_im;mul_b<=tw_cos;state<=MUL2;end
+                MUL2:begin p2<=product;mul_a<=b_re;mul_b<=tw_sin;state<=MUL3;end
                 MUL3:begin p3<=product;state<=COMBINE;end
                 COMBINE:begin tw_re<=product_re>>>15;tw_im<=product_im>>>15;state<=WRITE;end
                 WRITE:if(butterfly==511)begin

@@ -3,7 +3,7 @@
 // times, connect successive crossings, and add a faint older-phase ghost.
 // Two scanline buffers replace a framebuffer. Arithmetic is shared by voices.
 module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
-    input wire [399:0] snapshot,input wire [8:0] pixel_x,pixel_y,
+    input wire [399:0] snapshot,input wire [3:0] curve_active,input wire [8:0] pixel_x,pixel_y,
     input wire pixel_active,output reg initialized,output wire [11:0] mask,
     output reg [43:0] display_hz,output reg [15:0] display_fret,display_level,
     output reg [3:0] display_active,display_flash,output reg deadline_miss,
@@ -17,6 +17,7 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
     reg [8:0] clear_addr,row_y,plot_x,plot_end;
     reg [5:0] settle_count;
     reg [399:0] pending,history;
+    reg [3:0] current_curve_active,history_curve_active;
     assign display_strikes=pending[399:368];
     reg [31:0] previous_strikes;
     reg [3:0] flash_count [0:3];
@@ -97,7 +98,7 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
         if(!rst_n)begin
             visual_update<=0;state<=INIT;front_bank<=0;ready<=0;initialized<=0;deadline_miss<=0;
             clear_addr<=0;row_y<=0;plot_x<=0;plot_end<=0;settle_count<=0;
-            pending<=0;history<=0;previous_strikes<=0;previous_valid<=0;
+            pending<=0;history<=0;current_curve_active<=0;history_curve_active<=0;previous_strikes<=0;previous_valid<=0;
             dividend<=0;quotient<=0;remainder<=0;division_bit<=0;
             voice<=0;branch<=0;ghost<=0;delta_latched<=0;phase_product<=0;angle<=0;
             point<=0;left_edge<=0;right_edge<=0;first_point<=0;last_point<=0;
@@ -121,6 +122,7 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
                       end
                 SETTLE: if(settle_count==31)begin
                     visual_update<=1;history<=pending;pending<=snapshot;previous_valid<=0;
+                    history_curve_active<=current_curve_active;
                     display_hz<=snapshot[331:288];display_fret<=snapshot[351:336];
                     display_level<=snapshot[367:352];display_active<=snapshot[335:332];
                     previous_strikes<=snapshot[399:368];
@@ -141,7 +143,7 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
                     remainder<=subtract ? trial-REF_INCREMENT : trial;
                     if(division_bit==47)begin
                         ratios[voice]<=next_quotient[17:0];
-                        if(voice==3)state<=WAIT;
+                        if(voice==3)begin current_curve_active<=curve_active;state<=WAIT;end
                         else begin
                             voice<=voice+1'b1;dividend<={pending[128+(voice+2'd1)*32+:32],16'd0};
                             quotient<=0;remainder<=0;division_bit<=0;
@@ -153,7 +155,7 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
                     if(row_y<61 || row_y>210)begin ready<=1;previous_valid<=0;state<=WAIT;end
                     else state<=BRANCH;
                 end else clear_addr<=clear_addr+1'b1;
-                BRANCH: if(!pending[332+voice] || (ghost && !history[332+voice]) || delta<0 || delta>=WINDOW)begin
+                BRANCH: if(!current_curve_active[voice] || (ghost && !history_curve_active[voice]) || delta<0 || delta>=WINDOW)begin
                     if(!ghost)previous_valid[crossing_index]<=0;
                     state<=NEXT;
                 end else begin delta_latched<=delta[19:0];state<=PRODUCT;end

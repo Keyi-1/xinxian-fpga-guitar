@@ -40,6 +40,10 @@ assert modules['u_audio'].get('T_Bsram').startswith('112(')
 assert modules['u_display'].get('T_Bsram').startswith('6(')
 assert modules['u_fft'].get('T_Bsram').startswith('3(')
 assert modules['u_arcsine'].get('T_Bsram', '0').split('(')[0] == '0'
+assert modules['u_curve_envelope'].get('T_Bsram', '0').split('(')[0] == '0'
+for key, value in modules['u_curve_envelope'].attrib.items():
+    if key.startswith('T_MULT'):
+        assert value.split('(')[0] == '0', (key, value)
 for voice in range(4):
     assert modules[f'voice[{voice}].u_voice'].get('T_Bsram').startswith('24(')
 
@@ -65,6 +69,12 @@ for label in ('Logic', 'Register', 'BSRAM', 'DSP'):
 
 benches = ['tb_guitar_pcm_cdc','tb_guitar_radial_fft','tb_guitar_radial_bands','tb_guitar_radial_palette','tb_guitar_radial_renderer','tb_neo_guitar_radial','tb_guitar_visual_cdc','tb_guitar_visual_telemetry','tb_guitar_audio_top','tb_guitar_harmonic_audio_top','tb_guitar_audio_latency','tb_neo_guitar_main_equivalence','tb_piano_voice_core','tb_full_piano_voice','tb_rock_voice_core','tb_guitar_effect_buttons','tb_guitar_play_control','tb_antibeat_pcm_compare','tb_rgb_spectrum_timing','tb_spectrum_display_top','tb_full_guitar_top','tb_neo_full_guitar_top','tb_rgb_panel_defaults']
 benches += ['tb_guitar_open_release','tb_neo_guitar_main_default_timing','tb_neo_guitar_lissajous','tb_full_realtime_acceptance']
+benches += ['tb_guitar_curve_fade','tb_guitar_visual_tail']
+benches += ['tb_guitar_radial_fade_integration']
+fade_rerun = ['tb_guitar_curve_fade','tb_guitar_visual_tail','tb_guitar_visual_telemetry',
+    'tb_guitar_radial_palette','tb_guitar_radial_renderer','tb_neo_guitar_radial',
+    'tb_neo_guitar_lissajous','tb_guitar_open_release','tb_guitar_radial_fade_integration',
+    'tb_guitar_radial_fft']
 logs = {}
 for bench in benches:
     log = (repo/'sim/temp'/f'{bench}.log').read_text(encoding='utf-8')
@@ -97,6 +107,8 @@ audio_files = [repo/path for path in [
     'rtl/audio_io/piano_stereo_effects.v','rtl/audio_io/piano_stereo_chorus.v',
     'rtl/audio_io/piano_stereo_room.v','rtl/audio_io/pt8211_tx.v',
     'rtl/control/phase_slide_smoother.v',
+    'rtl/control/guitar_play_control.v','rtl/audio_io/four_string_board_audio_chain.v',
+    'rtl/top/guitar_audio_top.v',
     'rtl/control/guitar_effect_buttons.v','rtl/config/guitar_config.vh','rtl/config/rock_coeffs.vh']]
 audio_files += sorted((repo/'mem').glob('*.mem'))
 audio_hashes = {}
@@ -120,6 +132,8 @@ source_files += [project/'run_sim.ps1', project/'check_result.py']
 source_files += [repo/'sim/tb'/f'{bench}.sv' for bench in benches]
 source_files += [repo/'sim/tb/tb_neo_guitar_radial_gate.sv',project/'run_gate_check.ps1']
 bitstream = pnr/f'{name}.fs'
+download = pnr/f'{name}_curve_fade.fs'
+assert hashlib.sha256(download.read_bytes()).digest() == hashlib.sha256(bitstream.read_bytes()).digest(), 'stale curve-fade download alias'
 result = {
     'device': 'GW5AT-LV60PG484AC1/I0', 'device_version': 'B',
     'implemented_ports_checked': len(implemented), 'pin_voltage_check': 'PASS',
@@ -131,12 +145,21 @@ result = {
     'audio_clocks_compared_exact':int(comparison[1]),
     'scanlines_checked':int(line_match[1]), 'worst_scanline_clocks':int(line_match[2]),
     'scanline_clock_budget':3186, 'bench_count':len(benches),'test_results':logs,
+    'curve_fade_benches_rerun':fade_rerun,
+    'unchanged_bench_evidence_retained':[bench for bench in benches if bench not in fade_rerun],
     'synthesized_dac_frames_exact':int(dac_frames[1]),'synthesized_lcd_pixels_exact':int(lcd_pixels[2]),
     'synthesized_netlist_sha256':gate_evidence['netlist_sha256'],
     'vendor_primitive_unused_width_warning_filter':vendor_warning,
     'unchanged_audio_sources_sha256':audio_hashes,
     'playing_policy':'Fret zero slides to open; frets never generate note_off or restart natural envelopes; only real plucks start notes',
     'open_release_results':logs['tb_guitar_open_release'],
+    'curve_fade':{'gain_bits_per_voice':8,'attack_frames':1,'tail_frames':8,
+        'envelope_registers':int(modules['u_curve_envelope'].get('T_Register').split('(')[0]),
+        'additional_bsrams':0,'additional_dsps':0,
+        'fft_timing_fix':'Register shared multiplier operands; extra Hann-ROM preparation clock, identical integer FFT bins',
+        'tail_ms':8/(50_000_000/6/531/292)*1000,'frame_committed':True,
+        'brightness_floor':0,'inactive_pitch':'last audible DDS; phase continues',
+        'results':logs['tb_guitar_curve_fade']+logs['tb_guitar_visual_tail']+logs['tb_guitar_radial_fade_integration']},
     'warning_codes':dict(Counter(re.findall(r'WARN\s+\((\w+)\)',build))),
     'warning_notes':[
         'PR1014: V13/V22 generic clock-input routing; both internal clock domains must pass STA',
@@ -144,8 +167,9 @@ result = {
         'EX2526: pre-existing rock_envelope ROM width diagnostic; audio ROMs/core unchanged',
         'PA1001: unused arithmetic outputs removed by synthesis'],
     'external_panel_timing':'60 ns RTL settling checked; external setup/hold unspecified',
-    'hardware_status':'Open-release update awaits user download; previous radial layout physically accepted 2026-10-12',
+    'hardware_status':'Radial layout and open-release physically accepted 2026-10-12; curve-fade update awaits user download',
     'bitstream_bytes':bitstream.stat().st_size,'bitstream_sha256':hashlib.sha256(bitstream.read_bytes()).hexdigest(),
+    'download_alias':download.relative_to(repo).as_posix(),
     'source_sha256':{file.relative_to(repo).as_posix():hashlib.sha256(file.read_bytes()).hexdigest() for file in source_files},
 }
 (project/'verification.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
