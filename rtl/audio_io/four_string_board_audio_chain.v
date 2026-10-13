@@ -6,6 +6,7 @@
 module four_string_board_audio_chain #(
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer REF_DIV = `PT8211_REF_DIV,
+    parameter integer I2S_ENABLE = 0,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer USE_HARMONIC = 0,
     parameter integer USE_PIANO = 0,
@@ -38,7 +39,8 @@ module four_string_board_audio_chain #(
     // Passive display taps; synthesis removes them in audio-only builds.
     output wire [127:0] display_phase_inc,
     output wire [3:0] display_note_on,
-    output wire display_voice_sample_valid
+    output wire display_voice_sample_valid,
+    output wire i2s_bclk, i2s_ws, i2s_data
 );
     wire [3:0] note_on, note_off, slide_busy;
     wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc;
@@ -287,4 +289,18 @@ module four_string_board_audio_chain #(
         .sample_left(pcm16_left_out), .sample_right(pcm16_right_out),
         .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din)
     );
+    generate if (I2S_ENABLE != 0) begin : standard_i2s
+        // REF_DIV is even for the board's 12.288 MHz / 48 kHz clocks.
+        // Same quantized, post-effect pair; no second synthesis/effects path.
+        i2s_tx #(.REF_DIV(REF_DIV/2)) u_tx (
+            .clk_audio_ref(clk_audio_ref), .rst_n(rst_n),
+            .sample_valid(pcm16_left_valid),
+            .sample_left(pcm16_left_out), .sample_right(pcm16_right_out),
+            .i2s_bclk(i2s_bclk), .i2s_ws(i2s_ws), .i2s_data(i2s_data)
+        );
+    end else begin : no_i2s
+        assign i2s_bclk=1'b0;
+        assign i2s_ws=1'b0;
+        assign i2s_data=1'b0;
+    end endgenerate
 endmodule

@@ -96,7 +96,9 @@ module full_guitar_top #(
         .pluck_events(),
         .final_pcm_valid(final_pcm_valid), .final_pcm(final_pcm)
     ,
-        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
 
     spectrum_display_top #(
         .FFT_FRAME_GAP_SAMPLES(FFT_FRAME_GAP_SAMPLES),

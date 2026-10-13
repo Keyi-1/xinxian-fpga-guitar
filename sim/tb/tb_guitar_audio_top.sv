@@ -77,7 +77,9 @@ module tb_guitar_audio_top;
         .event_timestamp  (event_timestamp),
         .pluck_events(), .final_pcm_valid(), .final_pcm()
     ,
-        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
 
     // System clock is unrelated; all matrix/ADC/audio processing uses audio_clk.
     always #5 sys_clk_50m = ~sys_clk_50m;

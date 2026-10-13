@@ -23,7 +23,9 @@ module tb_piano_static_triad;
         .chorus_enable(1'b0),.sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
         .sample_tick(tick[1]),.voice_active(active[7:4]),.pcm_mix_valid(),.pcm_mix(),
         .voice_pcm(),.dac_bclk(),.dac_lrck(),.dac_din(),.display_phase_inc(),
-        .display_note_on(),.display_voice_sample_valid());
+        .display_note_on(),.display_voice_sample_valid(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
     integer f0,f1,frames=0,run_id=0,n;
     reg [127:0] fixed_phase;
     always @(posedge clk)begin

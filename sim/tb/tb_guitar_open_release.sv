@@ -19,7 +19,9 @@ module tb_guitar_open_release;
         .sustain_enable(sustain),.chorus_enable(chorus),.reverb_enable(room),.harmony_enable(harmony),
         .sample_tick(tick),.pcm_mix_valid(valid),.pcm_mix(),.voice_active(active),.voice_pcm(pcm),
         .dac_bclk(),.dac_lrck(),.dac_din(),.display_phase_inc(pitch),
-        .display_note_on(attack),.display_voice_sample_valid());
+        .display_note_on(attack),.display_voice_sample_valid(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
     // Preserve all 32 components and ROM values. Shorten only MAX_SAMPLES in
     // the bench, so expiration can be checked without simulating seconds.
     defparam dut.g_piano.u_core.voice[0].u_voice.MAX_SAMPLES=4096;

@@ -40,6 +40,7 @@
         <File path="../../rtl/audio_io/pcm24_chorus.v" type="file.verilog" enable="1" />
         <File path="../../rtl/audio_io/pcm24_reverb.v" type="file.verilog" enable="1" />
         <File path="../../rtl/audio_io/pt8211_tx.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/audio_io/i2s_tx.v" type="file.verilog" enable="1" />
         <File path="../../constraints/neo_guitar_radial.cst" type="file.cst" enable="1" />
         <File path="../../constraints/neo_guitar_radial.sdc" type="file.sdc" enable="1" />
         <File path="../../mem/note_phase_inc.mem" type="file.other" enable="1" />

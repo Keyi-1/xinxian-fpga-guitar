@@ -38,6 +38,7 @@ set rtl_files [list \
     [file join $repo_root rtl/audio_io/pcm24_chorus.v] \
     [file join $repo_root rtl/audio_io/pcm24_reverb.v] \
     [file join $repo_root rtl/audio_io/pt8211_tx.v] \
+    [file join $repo_root rtl/audio_io/i2s_tx.v] \
 ]
 add_file -type verilog {*}$rtl_files
 add_file -type cst [file join $repo_root constraints neo_guitar_audio_full.cst]

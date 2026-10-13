@@ -38,6 +38,7 @@ foreach source {
     rtl/audio_io/pcm24_chorus.v
     rtl/audio_io/pcm24_reverb.v
     rtl/audio_io/pt8211_tx.v
+    rtl/audio_io/i2s_tx.v
     rtl/top/neo_guitar_lissajous_top.v
     rtl/display/guitar_visual_telemetry.v
     rtl/display/guitar_visual_cdc.v

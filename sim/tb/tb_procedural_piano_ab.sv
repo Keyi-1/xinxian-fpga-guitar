@@ -26,7 +26,9 @@ module tb_procedural_piano_ab;
         .chorus_enable(chorus),.sustain_enable(sustain),.harmony_enable(1'b0),.reverb_enable(room),
         .sample_tick(tick[1]),.pcm_mix_valid(mix_valid[1]),.pcm_mix(),.voice_active(active[7:4]),
         .voice_pcm(voices[191:96]),.dac_bclk(),.dac_lrck(),.dac_din(),
-        .display_phase_inc(),.display_note_on(),.display_voice_sample_valid());
+        .display_phase_inc(),.display_note_on(),.display_voice_sample_valid(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
     integer frames=0,f0,f1,body_checks=0,alternate_checks=0,changed=0,four_seen=0;
     integer seed_checks=0;
     reg recording=0;
