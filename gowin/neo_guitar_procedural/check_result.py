@@ -1,6 +1,7 @@
 """Final experiment acceptance: pins, STA, resources, PCM audit and hash-bound gate."""
 from pathlib import Path
 import hashlib
+import argparse
 import json
 import re
 import subprocess
@@ -10,12 +11,25 @@ project=Path(__file__).resolve().parent
 repo=project.parent.parent
 name='neo_guitar_procedural'
 baseline='fb574a4'
-pnr=project/'impl/pnr'
+parser=argparse.ArgumentParser(description=__doc__)
+parser.add_argument('--implementation-root',type=Path,default=project/'impl',
+    help='Implementation directory; permits checking an archived successful build without overwriting a later failed IDE run')
+parser.add_argument('--build-log',type=Path,default=project/'build_console_shared_lp.log')
+args=parser.parse_args()
+implementation=args.implementation_root.resolve()
+pnr=implementation/'pnr'
 report=(pnr/f'{name}.rpt.txt').read_text(encoding='utf-8')
 timing=(pnr/f'{name}_tr_content.html').read_text(encoding='utf-8')
-build=(project/'build_console_shared_lp.log').read_text(encoding='utf-8')
+build=args.build_log.read_text(encoding='utf-8')
 assert 'GW5AT-LV60PG484AC1/I0' in report and 'Device Version>: B' in report
 assert 'Bitstream generation completed' in build and 'ERROR' not in build
+assert 'ERROR' not in report,'PnR report contains errors; this run is not a valid implementation'
+ide_path=project/f'impl/{name}_process_config.json'
+ide=json.loads(ide_path.read_text())
+assert (ide['Place_Option'],ide['Route_Option'],ide['Clock_Route_Order'],ide['Correct_Hold_Violation'])==('4','2',1,True)
+command=(pnr/'cmd.do').read_text()
+for option,value in [('place_option','4'),('route_option','2'),('clock_route_order','1'),('correct_hold','1')]:
+    assert re.search(rf'^-{option}\s+{value}\s*$',command,re.M),(option,value)
 for label in ('Logic Register as Latch','I/O Register as Latch'):
     assert re.search(rf'{label}\s*\|\s*0/',report),label
 cst=(repo/'constraints/neo_guitar_radial.cst').read_text()
@@ -48,7 +62,7 @@ for label in ('Logic','Register','BSRAM','DSP'):
     assert m,label
     used,total=map(float,m.groups());assert used<=total,label
     resources[label]=dict(used=used,available=total)
-hierarchy=ET.parse(project/f'impl/gwsynthesis/{name}_syn_rsc.xml').getroot()
+hierarchy=ET.parse(implementation/f'gwsynthesis/{name}_syn_rsc.xml').getroot()
 def count(node,key):return int(node.get(key,'0').split('(')[0])
 models=[x for x in hierarchy.iter() if x.get('name')=='procedural_hammer.u_hammer']
 assert len(models)==4
@@ -118,7 +132,7 @@ assert not re.search(r'FAIL:|MISMATCH|\*\* (Error|Fatal)',gate)
 warning=r'prim_sim\.v\((1860|1864|1868|1884|1888|1893|3130|3134|3138|3142|3313|3317)\): \(vopt-2697\)'
 for line in gate.splitlines():
     if line.startswith('# ** Warning:'):assert re.search(warning,line),line
-netlist=project/f'impl/gwsynthesis/{name}.vg'
+netlist=implementation/f'gwsynthesis/{name}.vg'
 evidence=json.loads((gate_dir/'verification.json').read_text(encoding='utf-8-sig'))
 assert evidence['result']=='PASS' and evidence['netlist_sha256']==hashlib.sha256(netlist.read_bytes()).hexdigest()
 for artifact in [pnr/f'{name}.fs',pnr/f'{name}.rpt.txt',pnr/f'{name}_tr_content.html']:
@@ -148,8 +162,11 @@ result=dict(branch='experiment/procedural-piano-hammer',baseline_commit=baseline
     unchanged_stage_test_evidence_note='Display/control/FX tests retained from the initial procedural implementation; their sources and all ROMs match fb574a4. Final hash-bound core/A-B and full gate checks cover the final hammer parameters.',
     synthesized_dac_frames_exact=int(dac[1]),synthesized_lcd_pixels_exact=int(lcd[2]),
     netlist_sha256=evidence['netlist_sha256'],unchanged_sources_sha256=hashes,
+    implementation_root=str(implementation),
+    ide_configuration=dict(place=4,route=2,clock_route_order=1,correct_hold=True,
+        sha256=hashlib.sha256(ide_path.read_bytes()).hexdigest()),
     implementation_reports_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in
-        [pnr/f'{name}.rpt.txt',pnr/f'{name}_tr_content.html',project/'build_console_shared_lp.log']},
+        [pnr/f'{name}.rpt.txt',pnr/f'{name}_tr_content.html',args.build_log]},
     changed_sources_sha256={str(p.relative_to(repo)):hashlib.sha256(p.read_bytes()).hexdigest() for p in changed},
     bitstream_bytes=fs.stat().st_size,bitstream_sha256=hashlib.sha256(fs.read_bytes()).hexdigest(),
     listening=listening,hardware_status='Experimental procedural attack awaits user listening and physical acceptance',

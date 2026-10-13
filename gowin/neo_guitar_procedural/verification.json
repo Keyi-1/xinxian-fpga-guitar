@@ -353,10 +353,18 @@
     "rtl/display/spectrum_display_top.v": "53683f8553ab5105611ee02bc08b8269f7773d301cfb1c0cf433cef16acbf865",
     "rtl/display/spectrum_fft1024.v": "e4e590aaec540a2718a2da02dfdcf18196957f0a37a5d0957ad4ed2f6966f39f"
   },
+  "implementation_root": "T:\\Documents\\AMD\\xinxian-fpga-guitar\\gowin\\neo_guitar_procedural\\temp\\place4\\impl",
+  "ide_configuration": {
+    "place": 4,
+    "route": 2,
+    "clock_route_order": 1,
+    "correct_hold": true,
+    "sha256": "5895ace17bcd006812f367fe135fb0baeae92a844b29a32331bb7c1f1e0da500"
+  },
   "implementation_reports_sha256": {
     "neo_guitar_procedural.rpt.txt": "e38d058145f94e0a4f60987941daced3a9837dfa734fa3aad3ecee097aa2d955",
     "neo_guitar_procedural_tr_content.html": "bfa0b4ef28fee4f31935427404a7bdedb80a4f0e33263d035cc23d1e74a11969",
-    "build_console_shared_lp.log": "1263c06fc1e47a7923ed4cfd206a7f607a1feb7a06d718dd471a0549a5e0593e"
+    "build_console.log": "1263c06fc1e47a7923ed4cfd206a7f607a1feb7a06d718dd471a0549a5e0593e"
   },
   "changed_sources_sha256": {
     "rtl\\synth\\piano_voice_core.v": "e583958eecbabefc548ae8a96ca083dfff87c34565e97f0049ffaa94905cdfe7",

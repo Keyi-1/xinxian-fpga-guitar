@@ -14,6 +14,11 @@ gowin/.cache/
 **/temp/
 **/.cache/
 
+# Keep this experiment's IDE settings; generated implementation files stay ignored.
+!/gowin/neo_guitar_procedural/impl/
+/gowin/neo_guitar_procedural/impl/*
+!/gowin/neo_guitar_procedural/impl/neo_guitar_procedural_process_config.json
+
 # ModelSim generated files
 sim/modelsim/work/
 sim/modelsim/transcript
