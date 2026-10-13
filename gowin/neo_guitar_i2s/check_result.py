@@ -141,7 +141,7 @@ def main():
             [rtl_dir/'verification.json',gate_dir/'verification.json',gate_dir/'run.log',
              PNR/f'{NAME}.rpt.txt',PNR/f'{NAME}_tr_content.html',PROJECT/'build_console.log',
              REPO/'constraints/neo_guitar_i2s.cst',REPO/'constraints/neo_guitar_i2s.sdc',ide_path]},
-        hardware_status='Awaiting physical acceptance of the added GPIO I2S interface; original wiring retained')
+        hardware_status='See README.md for user acceptance; this check verifies digital evidence only')
     (PROJECT/'verification.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({k:result[k] for k in ['result','clocks','violations','resources','standard_i2s','bitstream_sha256']},indent=2))
 

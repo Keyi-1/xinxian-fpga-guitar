@@ -249,5 +249,5 @@
     "constraints\\neo_guitar_i2s.sdc": "342b9c1ef184e42717fff8485d9baad9ecaa8e81ecc3979f46ead44253d4a3dd",
     "gowin\\neo_guitar_i2s\\impl\\neo_guitar_i2s_process_config.json": "76097c70ce02fe2f43c7c36179bec8e0d413b69261ef15d27b6974f6353c7e82"
   },
-  "hardware_status": "Awaiting physical acceptance of the added GPIO I2S interface; original wiring retained"
+  "hardware_status": "See README.md for user acceptance; this check verifies digital evidence only"
 }
