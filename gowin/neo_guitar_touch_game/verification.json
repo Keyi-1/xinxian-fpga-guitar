@@ -1,5 +1,5 @@
 {
-  "result": "RTL_PASS",
+  "result": "PASS",
   "baseline_commit": "655458f32ba4f7e06403fd6c5c4da0b6f0dad8a7",
   "benches": [
     "tb_i2c_fault_recovery",
@@ -273,5 +273,51 @@
     "rtl/top/xinxian_top.v": "50005cafe7aef542c120e8ef09210b5558bccd3053db465818497fd6771edd77"
   },
   "rtl_evidence_sha256": "fd89cf34b535f945feacbe12d34bc8c852100903658866bd7bdae530fbd178f9",
-  "hardware_status": "Touch/game not yet tested on hardware; Bank 2 voltage unmeasured"
+  "hardware_status": "Touch/game not yet tested on hardware; Bank 2 voltage unmeasured",
+  "clocks": {
+    "audio_clk_12m288": {
+      "required_mhz": 12.288,
+      "fmax_mhz": 14.61
+    },
+    "sys_clk_50m": {
+      "required_mhz": 50.0,
+      "fmax_mhz": 51.156
+    }
+  },
+  "violations": {
+    "setup": 0,
+    "hold": 0
+  },
+  "resources": {
+    "Logic": {
+      "used": 57717.0,
+      "available": 59904.0
+    },
+    "Register": {
+      "used": 23386.0,
+      "available": 60780.0
+    },
+    "CLS": {
+      "used": 29767.0,
+      "available": 29952.0
+    },
+    "BSRAM": {
+      "used": 95.0,
+      "available": 118.0
+    },
+    "DSP": {
+      "used": 115.5,
+      "available": 118.0
+    }
+  },
+  "bitstream_sha256": "8fb51b95c4353f2832a616556e0e232db4441f4624f756e6ec69f1a83c299008",
+  "netlist_sha256": "fc036bb08f9446636f55409aa5d87b9bd3f2c6baed867eaa419094ec5977ce81",
+  "gate_evidence_sha256": "c707441d27a3f99df3c1541b4d707dcd78975f5ee1cf33897c4c0e03fd74e8ec",
+  "implementation_evidence_sha256": {
+    "neo_guitar_touch_game.log": "53a82444e4c5dc2fdccb3de9db222ce8d39c5661191a1ef0e3d7873f291a379c",
+    "neo_guitar_touch_game.rpt.txt": "49899cf27d1a9181b6e7975a2b65d8cd1234c096d360eefbe83088d523b0e4e0",
+    "neo_guitar_touch_game_tr_content.html": "4617a945b45d13f594d34ebbb11fa6f6538a10b03616515d2637fe4639e75ff7",
+    "cmd.do": "dab4faad99ddbe75e040dd29bdc5677b988ff8fa77fad1b5bc40eaf8ba70534a"
+  },
+  "gate_simulation": "Home-menu LCD, touch reset GPIO and silent audio pins; game logic covered by RTL benches"
 }

@@ -83,11 +83,20 @@ def main():
     command = (pnr/'cmd.do').read_text()
     for option, value in [('place_option', '4'), ('route_option', '2'), ('clock_route_order', '1'), ('correct_hold', '1')]:
         assert re.search(rf'^-{option}\s+{value}\s*$', command, re.M), option
+    device = (pnr/'device.cfg').read_text()
+    for option in ['CPU', 'SSPI', 'I2C']:
+        assert f'set {option} regular_io = true' in device, option
+    ide = json.loads((PROJECT/f'impl/{NAME}_process_config.json').read_text())
+    assert ide['TopModule'] == 'neo_guitar_touch_game_top'
+    assert ide['OUTPUT_BASE_NAME'] == NAME
+    assert (ide['Place_Option'], ide['Route_Option'], ide['Clock_Route_Order']) == ('4', '2', 1)
+    assert ide['Correct_Hold_Violation'] is True
     resources = {}
     for label in ['Logic', 'Register', 'CLS', 'BSRAM', 'DSP']:
         m = re.search(rf'^\s+{label}\s+\|\s+([\d.]+)/([\d.]+)', report, re.M)
         assert m and float(m[1]) <= float(m[2]), label
         resources[label] = dict(used=float(m[1]), available=float(m[2]))
+    assert resources['DSP']['used'] == 115.5, 'touch/game must not add DSP or simplify the accepted tone engine'
     clocks = {}
     for clock, required in [('audio_clk_12m288', 12.288), ('sys_clk_50m', 50.0)]:
         m = re.search(rf'<td>{clock}</td>\s*<td>([\d.]+)\(MHz\)</td>\s*<td>([\d.]+)\(MHz\)</td>', timing)
