@@ -1,12 +1,12 @@
 `include "../config/guitar_config.vh"
 
-// Up to 32 independent modal DDS oscillators plus a short hammer residual.
-// The default eight-mode path preserves the hardware-accepted piano samples.
+// Up to 32 independent modal DDS oscillators plus a procedural hammer model.
+// The accepted modal body is retained; the former recorded residual is removed.
 // Envelope interpolation is between observations every 512 audio samples.
-// All playback state and synthesis run in FPGA logic; the original WAVs are
-// used offline only. Their wet envelopes are an initial timbre approximation.
+// Offline observations identify parameters, never a played audio waveform.
 module piano_voice_core #(
     parameter integer HAMMER_ENABLE = 1,
+    parameter [31:0] HAMMER_SEED = 32'h6d2b79f5,
     parameter integer MODES = 8,
     parameter integer CONTROL_ENABLE = 0,
     parameter integer ROCK_ENABLE = 0,
@@ -59,7 +59,6 @@ module piano_voice_core #(
     reg [31:0] phase_seed [0:23];
     reg [23:0] ratio_rom [0:23];
     reg [15:0] envelope_rom [0:6143];
-    reg signed [15:0] hammer_rom [0:6143];
     reg signed [15:0] sine_rom [0:1023];
     reg [25:0] ratio;
     reg [15:0] env_a, env_b, env_read, amplitude;
@@ -76,7 +75,7 @@ module piano_voice_core #(
     reg [31:0] next_phase;
     reg mode_enabled;
     reg signed [15:0] sine_value;
-    reg signed [32:0] mode_product;
+    reg signed [34:0] mode_product;
     reg signed [27:0] accumulator;
     reg signed [15:0] hammer_value;
     reg signed [37:0] velocity_product;
@@ -87,6 +86,32 @@ module piano_voice_core #(
     wire [1:0] selected_profile = (FORCE_PROFILE >= 0) ? FORCE_PROFILE[1:0] :
         (phase_inc < 32'd26276679) ? 2'd0 :
         (phase_inc < 32'd32164062) ? 2'd1 : 2'd2;
+
+    wire signed [17:0] hammer_operand_a;
+    wire signed [16:0] hammer_operand_b;
+    wire signed [15:0] procedural_hammer_value;
+    wire hammer_multiply=HAMMER_ENABLE!=0 &&
+        ((state==LOAD && mode_index<=3) || (state==ENV_B && mode_index<3));
+    wire signed [17:0] shared_operand_a=state==MULT ?
+        $signed({{2{sine_value[15]}},sine_value}) : hammer_operand_a;
+    wire signed [16:0] shared_operand_b=state==MULT ?
+        $signed({1'b0,amplitude}) : hammer_operand_b;
+    generate if(HAMMER_ENABLE!=0)begin : procedural_hammer
+        piano_hammer_model #(.SEED(HAMMER_SEED)) u_hammer(
+            .clk(clk),.rst_n(rst_n),.sample_ce(sample_ce && !busy),.note_on(note_on),
+            .strike_profile(selected_profile),.profile(profile),.band(mode_index[1:0]),
+            .age(age),.frame_age(frame_age),.frame_active(frame_active),
+            .first_multiply(state==LOAD),
+            .save_first(state==ENV_B && mode_index<3),
+            .update_filter(state==PHASE && mode_index<3),
+            .lowpass_ce(mode_index<3 && (state==LOAD || state==ENV_B || state==INC || state==PHASE)),
+            .lowpass_stage(state==LOAD ? 2'd3 : state==ENV_B ? 2'd2 : state==INC ? 2'd1 : 2'd0),
+            .capture_gain(state==ENV_B && mode_index==3),.product(mode_product),
+            .operand_a(hammer_operand_a),.operand_b(hammer_operand_b),.value(procedural_hammer_value));
+    end else begin : no_hammer
+        assign hammer_operand_a=0;assign hammer_operand_b=0;assign procedural_hammer_value=0;
+    end endgenerate
+
     wire [7:0] frame = frame_age[16:9];
     wire [7:0] next_frame = (frame == 255) ? 8'd255 : frame + 1'b1;
     wire harmony_mode = CONTROL_ENABLE!=0 && MODES==32 && harmony_latched && mode_index>=16;
@@ -150,7 +175,6 @@ module piano_voice_core #(
         $readmemh("../../mem/piano_ratio.mem",ratio_rom);
         $readmemh("../../mem/piano_phase.mem",phase_seed);
         $readmemh("../../mem/piano_envelope.mem",envelope_rom);
-        $readmemh("../../mem/piano_hammer.mem",hammer_rom);
         $readmemh("../../mem/harmonic_decay_rock.mem",bright_decay_rom);
         if(ROCK_ENABLE!=0)$readmemh("../../mem/rock_envelope.mem",rock_envelope_rom);
     end
@@ -199,6 +223,10 @@ module piano_voice_core #(
             for(i=0;i<MODES;i=i+1)begin mode_phase[i]<=0;bright_gain[i]<=0;end
         end else begin
             sample_valid<=0;
+            // One physical 18 x 17 DSP, time-shared with the hammer filters.
+            // The ordinary seven-clock modal schedule remains unchanged.
+            if(state==MULT || hammer_multiply)
+                mode_product<=shared_operand_a*shared_operand_b;
             // Two neighboring frames share one physical ROM read port rather
             // than duplicating the whole envelope ROM for interpolation.
             if(state==LOAD || state==ENV_B)env_read<=envelope_rom[env_read_address];
@@ -306,7 +334,6 @@ module piano_voice_core #(
                     state<=MULT;
                 end
                 MULT: begin
-                    mode_product<=$signed(sine_value)*$signed({1'b0,amplitude});
                     bright_product<=$signed(sine_value)*$signed({1'b0,bright_amplitude});
                     rock_product<=$signed(sine_value)*$signed({1'b0,rock_amplitude});
                     bright_decay_product<=bright_gain[mode_index]*bright_decay_rom[local_mode];
@@ -322,7 +349,7 @@ module piano_voice_core #(
                 end
                 HAMMER: begin
                     if(HAMMER_ENABLE!=0 && frame_active && frame_age<2048)
-                        hammer_value<=hammer_rom[{profile,frame_age[10:0]}];
+                        hammer_value<=procedural_hammer_value;
                     else hammer_value<=0;
                     state<=CONTROL_ENABLE!=0 ? TIMBRE : VELOCITY;
                 end

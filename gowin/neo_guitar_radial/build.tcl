@@ -20,6 +20,7 @@ foreach source {
     rtl/synth/sine_nco.v
     rtl/synth/harmonic_voice_core.v
     rtl/synth/piano_voice_core.v
+    rtl/synth/piano_hammer_model.v
     rtl/audio_io/four_voice_piano_audio_core.v
     rtl/audio_io/piano_stereo_chorus.v
     rtl/audio_io/piano_stereo_effects.v
@@ -37,6 +38,7 @@ foreach source {
     rtl/audio_io/pcm24_chorus.v
     rtl/audio_io/pcm24_reverb.v
     rtl/audio_io/pt8211_tx.v
+    rtl/audio_io/i2s_tx.v
     rtl/display/guitar_visual_telemetry.v
     rtl/display/guitar_visual_cdc.v
     rtl/display/guitar_scanline_ram.v

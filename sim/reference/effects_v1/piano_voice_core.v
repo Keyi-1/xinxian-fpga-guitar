@@ -114,7 +114,7 @@ module fxv1_piano_voice_core #(
         $readmemh("../../mem/piano_ratio.mem",ratio_rom);
         $readmemh("../../mem/piano_phase.mem",phase_seed);
         $readmemh("../../mem/piano_envelope.mem",envelope_rom);
-        $readmemh("../../mem/piano_hammer.mem",hammer_rom);
+        $readmemh("../reference/piano_legacy/piano_hammer.mem",hammer_rom);
         $readmemh("../../mem/harmonic_decay_rock.mem",bright_decay_rom);
     end
 

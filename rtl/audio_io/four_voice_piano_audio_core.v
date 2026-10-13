@@ -47,7 +47,9 @@ module four_voice_piano_audio_core #(
     end
     genvar g;
     generate for(g=0;g<4;g=g+1) begin : voice
-        piano_voice_core #(.HAMMER_ENABLE(HAMMER_ENABLE),.MODES(MODES),.CONTROL_ENABLE(CONTROL_ENABLE),.ROCK_ENABLE(ROCK_ENABLE)) u_voice (
+        piano_voice_core #(.HAMMER_ENABLE(HAMMER_ENABLE),
+            .HAMMER_SEED(32'h6d2b79f5 ^ (32'h9e3779b9*g)),
+            .MODES(MODES),.CONTROL_ENABLE(CONTROL_ENABLE),.ROCK_ENABLE(ROCK_ENABLE)) u_voice (
             .clk(clk_audio_ref),.rst_n(rst_n),.sample_ce(sample_tick),
             .note_on(pending_on[g]|note_on[g]),.note_off(pending_off[g]|note_off[g]),
             .velocity_level(velocity_level[g*2+:2]),.phase_inc(phase_inc[g*32+:32]),

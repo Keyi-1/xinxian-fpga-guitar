@@ -61,7 +61,9 @@ module tb_guitar_audio_latency;
         .pluck_events(),
         .final_pcm         ()
     ,
-        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
 
     guitar_audio_top #(
         .SAMPLE_DIV      (256),
@@ -97,7 +99,9 @@ module tb_guitar_audio_latency;
         .pluck_events(),
         .final_pcm         ()
     ,
-        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm());
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
 
     always #10 sys_clk_50m = ~sys_clk_50m;
     always #40.690104167 audio_clk_12m288 = ~audio_clk_12m288;

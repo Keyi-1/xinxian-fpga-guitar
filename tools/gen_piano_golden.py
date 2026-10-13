@@ -6,6 +6,7 @@ changes, four velocities, same-sample on/off, slides, damping and re-strikes.
 """
 from pathlib import Path
 import math
+from procedural_hammer import HammerModel
 
 ROOT=Path(__file__).resolve().parents[1]
 FS=48000
@@ -33,7 +34,7 @@ def stimulus(frame):
 def generate(hammer_on):
     lut=read('sine_lut.mem',True)
     ratios=read('piano_ratio.mem');envelopes=read('piano_envelope.mem')
-    seeds=read('piano_phase.mem');hammers=read('piano_hammer.mem',True)
+    seeds=read('piano_phase.mem');hammer=HammerModel()
     phase=[0]*8;age=0;active=False;releasing=False;release=0;gain=0;profile=0;continuity=0;last_pcm=0
     rows=[]
     for frame in range(32000):
@@ -65,8 +66,8 @@ def generate(hammer_on):
             a=envelopes[address];b=envelopes[min(address+1,(profile*8+mode)*256+255)]
             amplitude=a+((b-a)*fraction>>9) if frame_active and product<(1<<51) else 0
             total+=(lut[phase[mode]>>22]*amplitude)>>7
-        if hammer_on and frame_active and frame_age<2048:
-            total+=hammers[profile*2048+frame_age]<<8
+        transient=hammer.sample(bool(on),frame_active,frame_age,profile)
+        if hammer_on: total+=transient<<8
         output=(((total*gain)>>8)*(release>>8)>>16)+continuity
         output=min(max(output,-8388608),8388607)
         last_pcm=output

@@ -1,5 +1,7 @@
 # Gowin generated files
 build/
+# Local historical PCM, reconstructed from fb574a4 only for simulation A/B.
+sim/reference/piano_legacy/piano_hammer.mem
 gowin/impl/
 gowin/temp/
 gowin/.cache/
@@ -11,6 +13,14 @@ gowin/.cache/
 **/impl/
 **/temp/
 **/.cache/
+
+# Keep this experiment's IDE settings; generated implementation files stay ignored.
+!/gowin/neo_guitar_procedural/impl/
+/gowin/neo_guitar_procedural/impl/*
+!/gowin/neo_guitar_procedural/impl/neo_guitar_procedural_process_config.json
+!/gowin/neo_guitar_i2s/impl/
+/gowin/neo_guitar_i2s/impl/*
+!/gowin/neo_guitar_i2s/impl/neo_guitar_i2s_process_config.json
 
 # ModelSim generated files
 sim/modelsim/work/

@@ -8,6 +8,7 @@ module guitar_audio_top #(
     parameter integer MATRIX_DEBOUNCE_FRAMES = `DEBOUNCE_SCANS,
     parameter integer SAMPLE_DIV             = `AUDIO_SAMPLE_DIV,
     parameter integer PT8211_REF_DIV         = `PT8211_REF_DIV,
+    parameter integer I2S_ENABLE = 0,
     parameter integer SLIDE_SAMPLES           = `SLIDE_SAMPLES,
     parameter integer ADC_SPI_CLK_DIV         = `ADC_SPI_CLK_DIV,
     parameter integer ADC_DEAD_SAMPLES        = `RETRIGGER_DEAD_SAMPLES,
@@ -65,7 +66,8 @@ module guitar_audio_top #(
     output wire [3:0] display_note_on,
     output wire display_sample_tick,
     output wire display_voice_sample_valid,
-    output wire [95:0] display_voice_pcm
+    output wire [95:0] display_voice_pcm,
+    output wire i2s_bclk, i2s_ws, i2s_data
 );
 
     wire audio_rst_n;
@@ -100,7 +102,7 @@ module guitar_audio_top #(
         .raw_adc(raw_adc), .peak_adc(peak_adc), .event_timestamp(event_timestamp)
     );
     four_string_board_audio_chain #(
-        .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV),
+        .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV), .I2S_ENABLE(I2S_ENABLE),
         .SLIDE_SAMPLES(SLIDE_SAMPLES), .USE_HARMONIC(USE_HARMONIC),
         .USE_PIANO(USE_PIANO), .PIANO_HAMMER_ENABLE(PIANO_HAMMER_ENABLE),
         .PIANO_ROOM_ENABLE(PIANO_ROOM_ENABLE),
@@ -123,6 +125,7 @@ module guitar_audio_top #(
         .voice_active(audio_voice_active), .voice_pcm(display_voice_pcm),
         .display_phase_inc(display_phase_inc),.display_note_on(display_note_on),
         .display_voice_sample_valid(display_voice_sample_valid),
-        .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din)
+        .dac_bclk(dac_bclk), .dac_lrck(dac_lrck), .dac_din(dac_din),
+        .i2s_bclk(i2s_bclk), .i2s_ws(i2s_ws), .i2s_data(i2s_data)
     );
 endmodule

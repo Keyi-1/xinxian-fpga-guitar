@@ -40,6 +40,7 @@
         <File path="../../rtl/audio_io/pcm24_chorus.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/audio_io/pcm24_reverb.v" type="file.verilog" enable="1"/>
         <File path="../../rtl/audio_io/pt8211_tx.v" type="file.verilog" enable="1"/>
+        <File path="../../rtl/audio_io/i2s_tx.v" type="file.verilog" enable="1"/>
         <File path="../../constraints/neo_guitar_main.cst" type="file.cst" enable="1"/>
         <File path="../../constraints/neo_guitar_main.sdc" type="file.sdc" enable="1"/>
         <File path="../../mem/note_phase_inc.mem" type="file.other" enable="1"/>
@@ -51,8 +52,9 @@
         <File path="../../mem/piano_ratio.mem" type="file.other" enable="1"/>
         <File path="../../mem/piano_phase.mem" type="file.other" enable="1"/>
         <File path="../../mem/piano_envelope.mem" type="file.other" enable="1"/>
-        <File path="../../mem/piano_hammer.mem" type="file.other" enable="1"/>
         <File path="../../mem/piano_bright_gain.mem" type="file.other" enable="1"/>
         <File path="../../rtl/config/piano_bright_coeffs.vh" type="file.other" enable="1"/>
+        <File path="../../rtl/synth/piano_hammer_model.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/config/piano_hammer_coeffs.vh" type="file.other" enable="1" />
     </FileList>
 </Project>

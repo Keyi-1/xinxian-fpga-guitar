@@ -22,7 +22,9 @@ module tb_guitar_radial_fade_integration;
         .sustain_enable(1'b0),.chorus_enable(1'b0),.reverb_enable(1'b0),.harmony_enable(1'b0),
         .sample_tick(tick),.pcm_mix_valid(pcm_valid),.pcm_mix(pcm),.voice_active(active),.voice_pcm(voices),
         .dac_bclk(),.dac_lrck(),.dac_din(),.display_phase_inc(increment),
-        .display_note_on(attack),.display_voice_sample_valid(voice_valid));
+        .display_note_on(attack),.display_voice_sample_valid(voice_valid),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
     defparam audio.g_piano.u_core.voice[0].u_voice.MAX_SAMPLES=4096;
     defparam audio.g_piano.u_core.voice[1].u_voice.MAX_SAMPLES=4096;
     defparam audio.g_piano.u_core.voice[2].u_voice.MAX_SAMPLES=4096;
