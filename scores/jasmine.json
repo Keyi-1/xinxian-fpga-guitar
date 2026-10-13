@@ -1,0 +1,24 @@
+{
+  "title": "茉莉花",
+  "alias": "JASMINE",
+  "arrangement": "教学单旋律、一段、无伴奏",
+  "bpm": 96,
+  "tonic": "G3",
+  "sample_rate_hz": 48000,
+  "event_bytes": 16,
+  "event_count": 53,
+  "duration_ms": 27500,
+  "midi_min": 55,
+  "midi_max": 67,
+  "crc32": "8486bef4",
+  "lane_by_midi": {
+    "55": 3,
+    "57": 3,
+    "59": 2,
+    "62": 1,
+    "64": 1,
+    "67": 0
+  },
+  "slots_available": 5,
+  "populated_slots": 1
+}

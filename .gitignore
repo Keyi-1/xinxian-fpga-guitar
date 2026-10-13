@@ -21,6 +21,9 @@ gowin/.cache/
 !/gowin/neo_guitar_i2s/impl/
 /gowin/neo_guitar_i2s/impl/*
 !/gowin/neo_guitar_i2s/impl/neo_guitar_i2s_process_config.json
+!/gowin/neo_guitar_touch_game/impl/
+/gowin/neo_guitar_touch_game/impl/*
+!/gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json
 
 # ModelSim generated files
 sim/modelsim/work/

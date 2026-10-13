@@ -7,6 +7,7 @@ module four_string_board_audio_chain #(
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer REF_DIV = `PT8211_REF_DIV,
     parameter integer I2S_ENABLE = 0,
+    parameter integer EXTERNAL_CONTROL_ENABLE = 0,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer USE_HARMONIC = 0,
     parameter integer USE_PIANO = 0,
@@ -40,7 +41,9 @@ module four_string_board_audio_chain #(
     output wire [127:0] display_phase_inc,
     output wire [3:0] display_note_on,
     output wire display_voice_sample_valid,
-    output wire i2s_bclk, i2s_ws, i2s_data
+    output wire i2s_bclk, i2s_ws, i2s_data,
+    input wire [3:0] external_note_on,external_note_off,external_force_release,
+    input wire [127:0] external_phase_inc
 );
     wire [3:0] note_on, note_off, slide_busy;
     wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc;
@@ -55,6 +58,7 @@ module four_string_board_audio_chain #(
     wire timbre_busy, chorus_busy, reverb_busy;
     wire [7:0] piano_profile;
 
+    generate if(EXTERNAL_CONTROL_ENABLE==0)begin : performance_control
     guitar_play_control u_play_control (
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_tick(sample_tick),
         .stable_valid(stable_valid), .stable_fret_id(stable_fret_id),
@@ -62,6 +66,11 @@ module four_string_board_audio_chain #(
         .smoothed_phase_inc(smoothed_phase_inc),
         .note_on(note_on), .note_off(note_off), .target_phase_inc(target_phase_inc)
     );
+    end else begin : event_control
+        assign note_on=external_note_on;
+        assign note_off=external_note_off;
+        assign target_phase_inc=external_phase_inc;
+    end endgenerate
     genvar g;
     generate for (g = 0; g < 4; g = g + 1) begin : string_slide
         phase_slide_smoother #(.SLIDE_SAMPLES(SLIDE_SAMPLES),
@@ -78,10 +87,12 @@ module four_string_board_audio_chain #(
     generate if (USE_PIANO != 0) begin : g_piano
         four_voice_piano_audio_core #(.SAMPLE_DIV(SAMPLE_DIV),
             .HAMMER_ENABLE(PIANO_HAMMER_ENABLE),.MODES(PIANO_MODES),
-            .CONTROL_ENABLE(PIANO_CONTROL_ENABLE),.ROCK_ENABLE(PIANO_ROCK_ENABLE)) u_core (
+            .CONTROL_ENABLE(PIANO_CONTROL_ENABLE),.ROCK_ENABLE(PIANO_ROCK_ENABLE),
+            .FORCE_RELEASE_ENABLE(EXTERNAL_CONTROL_ENABLE)) u_core (
             .clk_audio_ref(clk_audio_ref),.rst_n(rst_n),.note_on(note_on),.note_off(note_off),
             .velocity_level(velocity_level),.phase_inc(phase_inc),.sample_tick(sample_tick),
             .timbre_select(timbre_select),.rock_select(rock_select),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),
+            .force_release(external_force_release),
             .sample_valid(voice_sample_valid),.voice_active(voice_active),.voice_pcm(voice_pcm),
             .voice_profile(piano_profile),.deadline_miss(deadline_miss),
             .timbre_blend(timbre_blend),.rock_blend(rock_blend),.timbre_busy(timbre_busy));
