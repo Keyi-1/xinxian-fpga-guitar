@@ -1,5 +1,6 @@
 """Independent sample-domain integer reference for the three-timbre DDS voice."""
 from gen_piano_golden import ROOT, read, pitch, MASK
+from procedural_hammer import HammerModel
 
 
 def stimulus(n):
@@ -20,7 +21,7 @@ def stimulus(n):
 
 def main():
     lut=read('sine_lut.mem',True);ratios=read('piano_ratio.mem');env=read('piano_envelope.mem')
-    seeds=read('piano_phase.mem');hammer=read('piano_hammer.mem',True)
+    seeds=read('piano_phase.mem');hammer=HammerModel()
     gains=read('piano_bright_gain.mem');decays=read('harmonic_decay_rock.mem')
     rock_gains=read('rock_gain.mem');rock_env=read('rock_envelope.mem');rock_seeds=read('rock_phase.mem');rock_ratios=read('rock_ratio.mem')
     phases=[0]*32;bright=[0]*32;age=0;active=False;releasing=False
@@ -74,7 +75,7 @@ def main():
             sine=lut[phases[mode]>>22]
             total+=(sine*amp)>>7;bright_total+=(sine*bright_amp)>>7;rock_total+=(sine*rock_amp)>>7
             if decay_step:bright[mode]=(bright[mode]*decays[local])>>15
-        if frame_active and frame_age<2048:total+=hammer[profile*2048+frame_age]<<8
+        total+=hammer.sample(bool(on),frame_active,frame_age,profile)<<8
         total=(total*(256-blend)+bright_total*blend)>>8
         total=(total*(256-rock)+rock_total*rock)>>8
         if harmony:total=(total>>1)+(total>>2)

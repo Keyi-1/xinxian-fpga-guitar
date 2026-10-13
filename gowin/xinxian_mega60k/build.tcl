@@ -18,6 +18,7 @@ set rtl_files [list \
     [file join $repo_root rtl/synth/sine_nco.v] \
     [file join $repo_root rtl/synth/harmonic_voice_core.v] \
     [file join $repo_root rtl/synth/piano_voice_core.v] \
+    [file join $repo_root rtl/synth/piano_hammer_model.v] \
     [file join $repo_root rtl/audio_io/four_string_board_audio_chain.v] \
     [file join $repo_root rtl/audio_io/four_voice_antibeat_allocator.v] \
     [file join $repo_root rtl/audio_io/stereo_audio_effects.v] \

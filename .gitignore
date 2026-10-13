@@ -1,5 +1,7 @@
 # Gowin generated files
 build/
+# Local historical PCM, reconstructed from fb574a4 only for simulation A/B.
+sim/reference/piano_legacy/piano_hammer.mem
 gowin/impl/
 gowin/temp/
 gowin/.cache/

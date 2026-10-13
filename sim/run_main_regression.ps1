@@ -6,6 +6,12 @@ param(
 $ErrorActionPreference = 'Stop'
 if (!$ModelSimBin) { $ModelSimBin = Split-Path (Get-Command vsim.exe -ErrorAction Stop).Source }
 $repoDir = Split-Path $PSScriptRoot
+$legacyPcm=Join-Path $PSScriptRoot 'reference\piano_legacy\piano_hammer.mem'
+if(!(Test-Path -LiteralPath $legacyPcm)){
+    $legacyText=& git -C $repoDir show 'fb574a4:mem/piano_hammer.mem'
+    if($LASTEXITCODE){throw 'Cannot recover simulation-only historical PCM'}
+    Set-Content -LiteralPath $legacyPcm -Value $legacyText -Encoding ASCII
+}
 $simDir = Join-Path $PSScriptRoot 'temp'
 $refDir = Join-Path $simDir 'verified_reference'
 New-Item -ItemType Directory -Path $refDir -Force | Out-Null
@@ -52,8 +58,9 @@ try {
     $sources = Get-ChildItem -LiteralPath (Join-Path $repoDir 'rtl') -Recurse -Filter '*.v' | ForEach-Object FullName
     $referenceSources = Get-ChildItem -LiteralPath $refDir -Filter '*.v' | ForEach-Object FullName
     $effectReferences = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'reference\effects_v1') -Filter '*.v' | ForEach-Object FullName
+    $pianoReferences = Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'reference\piano_legacy') -Filter '*.v' | ForEach-Object FullName
     $testSources = $tbFiles | ForEach-Object FullName
-    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$(Join-Path $repoDir 'rtl\config')" "+incdir+$refDir" @sources @referenceSources @effectReferences @testSources > compile.log 2>&1
+    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$(Join-Path $repoDir 'rtl\config')" "+incdir+$refDir" @sources @referenceSources @effectReferences @pianoReferences @testSources > compile.log 2>&1
     if ($LASTEXITCODE) { throw 'vlog failed; inspect sim/temp/compile.log' }
     $compileLog = Get-Content -Raw compile.log
     if ($compileLog -match '\*\* (Error|Fatal|Warning):') { throw 'compile diagnostics; inspect sim/temp/compile.log' }

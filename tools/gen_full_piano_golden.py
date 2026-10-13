@@ -1,5 +1,6 @@
 """32-mode numerical oracle using unbounded integers and sample-domain state."""
 from gen_piano_golden import ROOT,read,pitch,MASK
+from procedural_hammer import HammerModel
 
 def stimulus(n):
     inc=pitch((261.625565,329.627557,391.995436)[min(n//4000,2)])
@@ -10,7 +11,7 @@ def stimulus(n):
 
 def main():
     lut=read('sine_lut.mem',True);ratios=read('piano_ratio.mem');env=read('piano_envelope.mem')
-    seeds=read('piano_phase.mem');hammer=read('piano_hammer.mem',True)
+    seeds=read('piano_phase.mem');hammer=HammerModel()
     gains=read('piano_bright_gain.mem');decays=read('harmonic_decay_rock.mem')
     phases=[0]*32;bright=[0]*32;age=0;active=False;releasing=False
     release=0;gain=0;profile=0;last=0;continuity=0;harmony=False;shift=10
@@ -55,7 +56,7 @@ def main():
             sine=lut[phases[mode]>>22]
             total+=(sine*amp)>>7;bright_total+=(sine*bright_amp)>>7
             if decay_step:bright[mode]=(bright[mode]*decays[local])>>15
-        if frame_active and frame_age<2048:total+=hammer[profile*2048+frame_age]<<8
+        total+=hammer.sample(bool(on),frame_active,frame_age,profile)<<8
         total=(total*(256-blend)+bright_total*blend)>>8
         if harmony:total=(total>>1)+(total>>2)
         output=(((total*gain)>>8)*(release>>8)>>16)+continuity

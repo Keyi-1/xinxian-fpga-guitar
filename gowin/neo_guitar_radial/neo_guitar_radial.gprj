@@ -51,7 +51,6 @@
         <File path="../../mem/piano_ratio.mem" type="file.other" enable="1" />
         <File path="../../mem/piano_phase.mem" type="file.other" enable="1" />
         <File path="../../mem/piano_envelope.mem" type="file.other" enable="1" />
-        <File path="../../mem/piano_hammer.mem" type="file.other" enable="1" />
         <File path="../../mem/piano_bright_gain.mem" type="file.other" enable="1" />
         <File path="../../rtl/config/piano_bright_coeffs.vh" type="file.other" enable="1" />
         <File path="../../rtl/display/guitar_visual_telemetry.v" type="file.verilog" enable="1" />
@@ -78,5 +77,7 @@
         <File path="../../mem/hann1024_q15.mem" type="file.other" enable="1" />
         <File path="../../mem/fft1024_cos_q15.mem" type="file.other" enable="1" />
         <File path="../../mem/fft1024_sin_q15.mem" type="file.other" enable="1" />
+        <File path="../../rtl/synth/piano_hammer_model.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/config/piano_hammer_coeffs.vh" type="file.other" enable="1" />
     </FileList>
 </Project>
