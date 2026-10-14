@@ -129,11 +129,11 @@ IO_PORT "i2s_ws" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4 BANK_VCCIO=3.3;
 IO_LOC "i2s_data" T21;
 IO_PORT "i2s_data" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4 BANK_VCCIO=3.3;
 
-// Touch prototype: isolate panel INT from J6-4/T16 until VCCIO1_2 is measured.
+// Native J6 touch connector; user confirmed the IO voltage is compatible.
 IO_LOC "ctp_rst_n" T15;
 IO_PORT "ctp_rst_n" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
-IO_LOC "ctp_int" U21;
-IO_PORT "ctp_int" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
+IO_LOC "ctp_int" T16;
+IO_PORT "ctp_int" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4 BANK_VCCIO=3.3;
 IO_LOC "ctp_sda" U16;
 IO_PORT "ctp_sda" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
 IO_LOC "ctp_scl" W16;

@@ -62,12 +62,15 @@ def main():
     assert len(pins) == len(set(pins.values())) == 59
     assert all(pins[key] == value for key, value in old_pins.items())
     assert {p: pins[p] for p in ['ctp_rst_n', 'ctp_int', 'ctp_sda', 'ctp_scl']} == dict(
-        ctp_rst_n='T15', ctp_int='U21', ctp_sda='U16', ctp_scl='W16')
+        ctp_rst_n='T15', ctp_int='T16', ctp_sda='U16', ctp_scl='W16')
     result = dict(result='RTL_PASS', baseline_commit=BASELINE, benches=BENCHES,
                   audio_equivalence_samples=8192, forced_exit_samples=int(match[1]),
+                  touch_connection=dict(connector='J6', native_six_pin=True,
+                      fpga_pins={p: pins[p] for p in ['ctp_rst_n', 'ctp_int', 'ctp_sda', 'ctp_scl']},
+                      voltage_confirmation='User confirmed J6-compatible IO voltage'),
                   source_sha256=evidence['source_sha256'], preserved_assets_sha256=preserved,
                   rtl_evidence_sha256=digest(directory/'verification.json'),
-                  hardware_status='Touch/game not yet tested on hardware; Bank 2 voltage unmeasured')
+                  hardware_status='Touch/game not yet tested on hardware; user confirmed J6-compatible IO voltage; native J6 INT=T16')
     if args.rtl_only:
         (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
         print('RTL_PASS: seven benches; bitstream/routing/timing not approved by --rtl-only')

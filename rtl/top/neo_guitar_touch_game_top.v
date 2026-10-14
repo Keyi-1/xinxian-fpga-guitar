@@ -1,6 +1,6 @@
 `include "../config/guitar_config.vh"
-// Prototype keeps the accepted audio, effects and radial renderers. J6 carries
-// RST/SDA/SCL; INT uses the verified 3.3 V J9-10 until Bank 2 is measured.
+// Prototype keeps the accepted audio, effects and radial renderers. Touch
+// RST/INT/SDA/SCL use the native six-pin J6 connector; see the project CST.
 module neo_guitar_touch_game_top #(
     parameter integer KEY_DEBOUNCE_CYCLES=245760,
     parameter integer KEY_LONG_PRESS_CYCLES=12288000,

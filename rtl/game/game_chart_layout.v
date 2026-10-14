@@ -13,8 +13,10 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
     wire [1:0] lane=event_word[75:74];
     reg [255:0] held;
     wire signed [32:0] delta=$signed({1'b0,8'd0,event_word[23:0]})-$signed({held[159],held[159:128]});
-    reg [11:0] front_x[0:31],back_x[0:31];
-    reg [8:0] front_tail[0:31],back_tail[0:31];
+    // The pass starts just after frame_start and finishes before active video.
+    // Update one coordinate bank in blank; a second 672-bit bank is redundant.
+    reg [11:0] front_x[0:31];
+    reg [8:0] front_tail[0:31];
     reg [3:0] counts[0:3];
     reg [31:0] back_valid;
     reg [4:0] slot,bit_count;
@@ -34,7 +36,7 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
         if(!rst_n)begin
             state<=IDLE;address<=0;held<=0;back_valid<=0;valid_blocks<=0;display_snapshot<=0;
             overflow<=0;deadline_miss<=0;slot<=0;bit_count<=0;dividend<=0;quotient<=0;duration<=0;remainder<=0;negative<=0;
-            for(i=0;i<32;i=i+1)begin front_x[i]<=0;front_tail[i]<=0;back_x[i]<=0;back_tail[i]<=0;end
+            for(i=0;i<32;i=i+1)begin front_x[i]<=0;front_tail[i]<=0;end
             for(i=0;i<4;i=i+1)counts[i]<=0;
         end else begin
             if(frame_start && state!=IDLE && state!=WAIT)deadline_miss<=1;
@@ -59,10 +61,10 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
                     remainder<=subtract ? trial-250 : trial;
                     if(bit_count==0)begin
                         if(state==DIVIDE_X)begin
-                            back_x[slot]<=negative ? 12'd96-next_quotient[11:0] : 12'd96+next_quotient[11:0];
+                            front_x[slot]<=negative ? 12'd96-next_quotient[11:0] : 12'd96+next_quotient[11:0];
                             dividend<=duration;quotient<=0;remainder<=0;bit_count<=23;state<=DIVIDE_TAIL;
                         end else begin
-                            back_tail[slot]<=next_quotient>320 ? 9'd320 : next_quotient[8:0];
+                            front_tail[slot]<=next_quotient>320 ? 9'd320 : next_quotient[8:0];
                             back_valid[slot]<=1;state<=NEXT;
                         end
                     end else bit_count<=bit_count-1'b1;
@@ -74,7 +76,6 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
                 // avoiding an extra frame of motion latency at the hit line.
                 WAIT:begin
                     valid_blocks<=back_valid;display_snapshot<=held;state<=IDLE;
-                    for(i=0;i<32;i=i+1)begin front_x[i]<=back_x[i];front_tail[i]<=back_tail[i];end
                 end
             endcase
         end

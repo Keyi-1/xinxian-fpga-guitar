@@ -28,14 +28,15 @@ def main():
     (project/'impl'/f'{NAME}_process_config.json').write_text(json.dumps(cfg,indent=2)+'\n',encoding='utf-8')
     (project/'configure_ide.ps1').write_text((old/'configure_ide.ps1').read_text(encoding='utf-8').replace('neo_guitar_i2s',NAME),encoding='utf-8')
     cst=(ROOT/'constraints/neo_guitar_i2s.cst').read_text(encoding='utf-8')
-    cst += '\n// Touch prototype: isolate panel INT from J6-4/T16 until VCCIO1_2 is measured.\n'
-    for port,pin in [('ctp_rst_n','T15'),('ctp_int','U21'),('ctp_sda','U16'),('ctp_scl','W16')]:
-        cst+=f'IO_LOC "{port}" {pin};\nIO_PORT "{port}" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;\n'
+    cst += '\n// Native J6 touch connector; user confirmed the IO voltage is compatible.\n'
+    for port,pin in [('ctp_rst_n','T15'),('ctp_int','T16'),('ctp_sda','U16'),('ctp_scl','W16')]:
+        voltage=' BANK_VCCIO=3.3' if port=='ctp_int' else ''
+        cst+=f'IO_LOC "{port}" {pin};\nIO_PORT "{port}" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4{voltage};\n'
     pins=re.findall(r'IO_LOC\s+"[^"]+"\s+(\w+)',cst);assert len(pins)==len(set(pins))==59
     (ROOT/'constraints'/f'{NAME}.cst').write_text(cst,encoding='utf-8')
     sdc=(ROOT/'constraints/neo_guitar_i2s.sdc').read_text(encoding='utf-8')
     sdc+='\n# Touch bus inputs are synchronized before state decisions.\nset_false_path -from [get_ports {ctp_scl ctp_sda ctp_int}]\n'
     (ROOT/'constraints'/f'{NAME}.sdc').write_text(sdc,encoding='utf-8')
-    print(f'Created {project}: 59 unique pins; INT uses J9-10/U21, not unmeasured Bank 2')
+    print(f'Created {project}: 59 unique pins; touch uses native J6, INT=J6-4/T16')
 
 if __name__=='__main__':main()

@@ -13,10 +13,14 @@ module game_note_controller #(
   output reg [127:0] target_phase,output reg [7:0] note_velocity,
   output wire [31:0] song_time,output reg countdown,finished,
   output reg [19:0] score,output reg [7:0] combo,max_combo,hits,misses,wrongs,
-  output reg [11:0] judgement,output reg [127:0] consumed,
+  output reg [11:0] judgement,output wire [127:0] consumed,
   output reg deadline_miss);
     localparam IDLE=0,READ=1,EVALUATE=2,COMMIT=3;
     reg [1:0] state;
+    // Only real events need state bits. Zero-extend the published snapshot;
+    // this also removes unused upper mask registers across the CDC/display.
+    reg [EVENT_COUNT-1:0] consumed_bits;
+    assign consumed={{(128-EVENT_COUNT){1'b0}},consumed_bits};
     // Runtime score times are 24 bits; only the published signed snapshot is
     // widened to 32 bits. Do not synthesize unused upper counter/mux bits.
     reg [23:0] elapsed;
@@ -53,7 +57,7 @@ module game_note_controller #(
     always @(posedge clk)begin
         if(!rst_n)begin
             state<=IDLE;elapsed<=0;countdown_left<=0;countdown<=0;finished<=0;
-            score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;consumed<=0;
+            score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;consumed_bits<=0;
             pending<=0;scan_plucks<=0;launch<=0;pending_velocity<=0;scan_velocity<=0;
             pluck_times<=0;scan_times<=0;note_velocity<=0;found<=0;next_found<=0;address<=0;deadline_miss<=0;
             target_phase<={32'h00c879a3,32'h010b9a2b,32'h0151285d,32'h01c20d2f};miss_add<=0;
@@ -62,7 +66,7 @@ module game_note_controller #(
         end else if(start_song)begin
             state<=IDLE;elapsed<=0;countdown_left<=COUNTDOWN_SAMPLES;countdown<=COUNTDOWN_SAMPLES!=0;
             finished<=0;score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;
-            consumed<=0;pending<=0;launch<=0;deadline_miss<=0;
+            consumed_bits<=0;pending<=0;launch<=0;deadline_miss<=0;
             for(i=0;i<4;i=i+1)end_time[i]<=0;
         end else if(!enable)begin state<=IDLE;pending<=0;launch<=0;end
         else begin
@@ -93,7 +97,7 @@ module game_note_controller #(
             case(state)
                 READ:state<=EVALUATE;
                 EVALUATE:begin
-                    if(!consumed[address])begin
+                    if(!consumed_bits[address])begin
                         if(demo && on_time<=elapsed)begin
                             found[lane]<=1;best_index[lane]<=address;best_phase[lane]<=phase;best_duration[lane]<=duration;
                         end else if(!demo && eligible && absolute_error<best_error[lane])begin
@@ -101,7 +105,7 @@ module game_note_controller #(
                             best_phase[lane]<=phase;best_duration[lane]<=duration;
                         end
                         if(!demo && elapsed>on_time+WINDOW_SAMPLES && !eligible)begin
-                            consumed[address]<=1;miss_add<=miss_add+1'b1;judgement[lane*3+:3]<=4;
+                            consumed_bits[address]<=1;miss_add<=miss_add+1'b1;judgement[lane*3+:3]<=4;
                         end
                         if(!next_found[lane] && on_time>=elapsed && on_time<=elapsed+48000)begin
                             next_found[lane]<=1;next_phase[lane]<=phase;next_duration[lane]<=duration;
@@ -114,7 +118,7 @@ module game_note_controller #(
                     score_add=0;hit_add=0;wrong_add=0;combo_next=miss_add!=0 ? 8'd0 : combo;max_next=max_combo;launch_next=0;
                     for(i=0;i<4;i=i+1)begin
                         if(found[i])begin
-                            consumed[best_index[i]]<=1;target_phase[i*32+:32]<=best_phase[i];
+                            consumed_bits[best_index[i]]<=1;target_phase[i*32+:32]<=best_phase[i];
                             end_time[i]<=elapsed+best_duration[i];launch_next[i]=1;
                             note_velocity[i*2+:2]<=demo ? 2'd2 : scan_velocity[i*2+:2];
                             if(!demo)begin
