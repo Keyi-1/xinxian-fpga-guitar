@@ -1,6 +1,7 @@
 param([string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64',
       [string[]]$Benches=@('tb_i2c_fault_recovery','tb_gt911_touch','tb_touch_gesture_ui','tb_game_note_controller',
-                          'tb_game_cdc','tb_game_chart_renderer','tb_game_audio_preservation'))
+                          'tb_game_cdc','tb_game_chart_renderer','tb_game_audio_preservation','tb_game_miss_audio_cue',
+                          'tb_game_competition_controls'))
 $ErrorActionPreference='Stop'
 $repoDir=Split-Path $PSScriptRoot
 $simDir=Join-Path $repoDir 'sim\temp\touch_game'

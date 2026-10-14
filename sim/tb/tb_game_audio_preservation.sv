@@ -5,7 +5,7 @@ module tb_game_audio_preservation;
     reg [1:0] command_mode=1;
     reg [15:0] frets=0;reg [3:0] pluck=0;reg [7:0] velocity=8'he4;
     reg timbre=0,rock=0,chorus=0,sustain=0,harmony=0,room=0;
-    wire tick,tick_accepted,tick_default,ack,switching;
+    wire tick,tick_accepted,tick_default,ack,switching,miss_event;
     wire [1:0] mode;
     wire [3:0] active,on,off,forced;
     wire [127:0] phase,target;
@@ -15,7 +15,7 @@ module tb_game_audio_preservation;
         .command_mode(command_mode),.command_ack(ack),.mode(mode),.switching(switching),
         .stable_valid(stable_valid),.fret_id(frets),.pluck_valid(pluck),.velocity(velocity),
         .voice_active(active),.audible_phase(phase),.note_on(on),.note_off(off),.force_release(forced),
-        .target_phase(target),.note_velocity(routed_velocity),.game_snapshot(snapshot));
+        .target_phase(target),.note_velocity(routed_velocity),.game_snapshot(snapshot),.miss_event(miss_event));
     `define CHAIN_PARAMS .USE_PIANO(1),.PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1),.I2S_ENABLE(1)
     `define COMMON_PORTS .clk_audio_ref(clk),.rst_n(rst_n),.stable_valid(stable_valid),.stable_fret_id(frets),.pluck_valid(pluck), \
         .timbre_select(timbre),.rock_select(rock),.chorus_enable(chorus),.sustain_enable(sustain), \
@@ -25,10 +25,12 @@ module tb_game_audio_preservation;
         `COMMON_PORTS,.velocity_level(velocity),.sample_tick(tick_accepted),.voice_active(),.display_phase_inc());
     four_string_board_audio_chain #(`CHAIN_PARAMS) default_chain(
         `COMMON_PORTS,.velocity_level(velocity),.sample_tick(tick_default),.voice_active(),.display_phase_inc(),
-        .external_note_on(4'd0),.external_note_off(4'd0),.external_force_release(4'd0),.external_phase_inc(128'd0));
-    four_string_board_audio_chain #(`CHAIN_PARAMS,.EXTERNAL_CONTROL_ENABLE(1)) routed(
+        .external_note_on(4'd0),.external_note_off(4'd0),.external_force_release(4'd0),.external_phase_inc(128'd0),
+        .game_cue_enable(1'b0),.game_miss_event(1'b0));
+    four_string_board_audio_chain #(`CHAIN_PARAMS,.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(1)) routed(
         `COMMON_PORTS,.velocity_level(routed_velocity),.sample_tick(tick),.voice_active(active),.display_phase_inc(phase),
-        .external_note_on(on),.external_note_off(off),.external_force_release(forced),.external_phase_inc(target));
+        .external_note_on(on),.external_note_off(off),.external_force_release(forced),.external_phase_inc(target),
+        .game_cue_enable(mode==2 && !switching),.game_miss_event(miss_event));
     integer samples=0,compared_cycles=0,exit_sample;
     always @(negedge clk)if(rst_n)begin
         if(tick)samples=samples+1;

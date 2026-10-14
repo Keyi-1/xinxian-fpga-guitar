@@ -12,7 +12,7 @@ NAME = 'neo_guitar_touch_game'
 BASELINE = '655458f32ba4f7e06403fd6c5c4da0b6f0dad8a7'
 BENCHES = ['tb_i2c_fault_recovery', 'tb_gt911_touch', 'tb_touch_gesture_ui',
            'tb_game_note_controller', 'tb_game_cdc', 'tb_game_chart_renderer',
-           'tb_game_audio_preservation']
+           'tb_game_audio_preservation', 'tb_game_miss_audio_cue', 'tb_game_competition_controls']
 
 
 def digest(path):
@@ -26,7 +26,7 @@ def main():
     directory = REPO/'sim/temp/touch_game'
     evidence = json.loads((directory/'verification.json').read_text(encoding='utf-8-sig'))
     assert evidence['result'] == 'PASS' and evidence['baseline_commit'] == BASELINE
-    assert evidence['benches'] == BENCHES, 'run the complete seven-bench suite'
+    assert evidence['benches'] == BENCHES, 'run the complete touch/game bench suite'
     for path, expected in evidence['source_sha256'].items():
         assert digest(REPO/path) == expected, ('source/ROM changed after simulation', path)
     for bench in BENCHES:
@@ -70,10 +70,10 @@ def main():
                       voltage_confirmation='User confirmed J6-compatible IO voltage'),
                   source_sha256=evidence['source_sha256'], preserved_assets_sha256=preserved,
                   rtl_evidence_sha256=digest(directory/'verification.json'),
-                  hardware_status='Touch/game not yet tested on hardware; user confirmed J6-compatible IO voltage; native J6 INT=T16')
+                  hardware_status='Original menus and preview tested by user; missing game guidance reproduced and fixed in gate simulation; this bugfix awaits hardware acceptance; native J6 INT=T16')
     if args.rtl_only:
         (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
-        print('RTL_PASS: seven benches; bitstream/routing/timing not approved by --rtl-only')
+        print(f'RTL_PASS: {len(BENCHES)} benches; bitstream/routing/timing not approved by --rtl-only')
         return
 
     pnr = PROJECT/'impl/pnr'
@@ -130,13 +130,17 @@ def main():
     assert digest(gate_dir/'run.log') == gate_evidence['log_sha256']
     gate_log = (gate_dir/'run.log').read_text()
     assert 'PASS: synthesized menu LCD' in gate_log and 'FAIL:' not in gate_log
+    assert digest(gate_dir/'chart_run.log') == gate_evidence['chart_log_sha256']
+    assert digest(gate_dir/'tb_game_chart_gate.sv') == gate_evidence['chart_bench_sha256']
+    chart_log = (gate_dir/'chart_run.log').read_text()
+    assert 'PASS: synthesized chart' in chart_log and not re.search(r'FAIL:|\*\* (Error|Fatal)', chart_log)
     result.update(result='PASS', clocks=clocks, violations=violations, resources=resources,
                   bitstream_sha256=digest(fs),
                   netlist_sha256=netlist_hash,
                   gate_evidence_sha256=digest(gate_dir/'verification.json'),
                   implementation_evidence_sha256={p.name: digest(p) for p in [pnr/f'{NAME}.log',
                       pnr/f'{NAME}.rpt.txt', pnr/f'{NAME}_tr_content.html', pnr/'cmd.do']},
-                  gate_simulation='Home-menu LCD, touch reset GPIO and silent audio pins; game logic covered by RTL benches')
+                  gate_simulation='Home-menu LCD/touch/silent audio plus full-score consecutive synthesized moving chart; musical/control behavior covered by RTL benches')
     (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps({k: result[k] for k in ['result', 'clocks', 'violations', 'resources', 'bitstream_sha256']}, indent=2))
 

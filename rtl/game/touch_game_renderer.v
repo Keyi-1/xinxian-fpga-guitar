@@ -1,6 +1,7 @@
 // Four pixel stages fit the existing six-clock DCLK cadence. Eight interval
 // tests are parallel within the selected lane; no framebuffer or pixel divide.
-module touch_game_renderer(input wire clk,rst_n,frame_start,input wire [2:0] page,
+module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
+    (input wire clk,rst_n,frame_start,input wire [2:0] page,
     input wire touch_ready,transition,input wire [8:0] x,y,
     input wire [383:0] centres,input wire [287:0] tails,input wire [31:0] valid_blocks,
     input wire [255:0] game_snapshot,output reg [17:0] rgb,output reg [2:0] display_page);
@@ -105,7 +106,8 @@ module touch_game_renderer(input wire clk,rst_n,frame_start,input wire [2:0] pag
         endcase
         local_y=y-(lane==0 ? 0 : lane==1 ? 68 : lane==2 ? 136 : 204);
         head_hits=0;tail_hits=0;centre=0;tail_end=0;slot=0;
-        if((x[4:0]+y[4:0]+animation[4:0])<2)background={6'd5,6'd9,6'd16};
+        // Keep the backdrop steady. The former modulo-32 sparkles looked
+        // like a flashing dot matrix on the physical panel.
         case(display_page)
             0:begin
                 label(0,176,24,4,2,0);
@@ -142,7 +144,7 @@ module touch_game_renderer(input wire clk,rst_n,frame_start,input wire [2:0] pag
                 end
                 if(y>=198 && y<=252)begin
                     if(x>=40 && x<230)background={6'd6,6'd33,6'd47};
-                    else if(x>=250 && x<=440)background={6'd35,6'd17,6'd44};
+                    else if(x>=250 && x<=440)background=ALLOW_AUTOPLAY_PREVIEW ? {6'd35,6'd17,6'd44} : {6'd8,6'd9,6'd11};
                 end
                 label(7,102,208,2,2,0);label(8,310,208,2,2,0);
             end

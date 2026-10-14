@@ -8,6 +8,7 @@ module four_string_board_audio_chain #(
     parameter integer REF_DIV = `PT8211_REF_DIV,
     parameter integer I2S_ENABLE = 0,
     parameter integer EXTERNAL_CONTROL_ENABLE = 0,
+    parameter integer GAME_CUE_ENABLE = 0,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer USE_HARMONIC = 0,
     parameter integer USE_PIANO = 0,
@@ -43,7 +44,8 @@ module four_string_board_audio_chain #(
     output wire display_voice_sample_valid,
     output wire i2s_bclk, i2s_ws, i2s_data,
     input wire [3:0] external_note_on,external_note_off,external_force_release,
-    input wire [127:0] external_phase_inc
+    input wire [127:0] external_phase_inc,
+    input wire game_cue_enable,game_miss_event
 );
     wire [3:0] note_on, note_off, slide_busy;
     wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc;
@@ -251,6 +253,7 @@ module four_string_board_audio_chain #(
                 rock_drive_level = velocity_level[v*2 +: 2];
     end
     wire stereo_valid;
+    wire signed [23:0] pcm_left_music, pcm_right_music;
     wire signed [23:0] pcm_left_final, pcm_right_final;
     generate if(USE_PIANO!=0 && PIANO_CONTROL_ENABLE!=0)begin : piano_effects
         piano_stereo_effects #(.ROOM_ENABLE(PIANO_ROOM_ENABLE)) u_effects (
@@ -258,7 +261,7 @@ module four_string_board_audio_chain #(
             .left_in(pcm_left_scaled),.right_in(pcm_right_scaled),
             .drive_level(rock_drive_level),.timbre_blend(timbre_blend),
             .chorus_enable(chorus_enable),.room_enable(reverb_enable),
-            .sample_valid(stereo_valid),.left_out(pcm_left_final),.right_out(pcm_right_final),
+            .sample_valid(stereo_valid),.left_out(pcm_left_music),.right_out(pcm_right_music),
             .chorus_blend(chorus_blend),.reverb_blend(reverb_blend),
             .chorus_busy(chorus_busy),.reverb_busy(reverb_busy));
     end else if(USE_PIANO!=0) begin : piano_room
@@ -266,7 +269,7 @@ module four_string_board_audio_chain #(
             .clk(clk_audio_ref),.rst_n(rst_n),.sample_valid_in(voice_sample_valid),
             .left_in(pcm_left_scaled),.right_in(pcm_right_scaled),
             .room_enable(1'b0),.effect_blend(),.effect_busy(),
-            .sample_valid(stereo_valid),.left_out(pcm_left_final),.right_out(pcm_right_final));
+            .sample_valid(stereo_valid),.left_out(pcm_left_music),.right_out(pcm_right_music));
         assign chorus_blend=0;assign chorus_busy=0;assign reverb_blend=0;assign reverb_busy=0;
     end else begin : legacy_effects
     stereo_audio_effects #(.ENABLE(USE_HARMONIC)) u_effects (
@@ -274,10 +277,19 @@ module four_string_board_audio_chain #(
         .pcm_left(pcm_left_scaled), .pcm_right(pcm_right_scaled),
         .drive_level(rock_drive_level), .timbre_blend(timbre_blend),
         .chorus_enable(chorus_enable), .reverb_enable(reverb_enable),
-        .sample_valid(stereo_valid), .left_out(pcm_left_final), .right_out(pcm_right_final),
+        .sample_valid(stereo_valid), .left_out(pcm_left_music), .right_out(pcm_right_music),
         .chorus_blend(chorus_blend), .chorus_busy(chorus_busy),
         .reverb_blend(reverb_blend), .reverb_busy(reverb_busy)
     );
+    end endgenerate
+    generate if(GAME_CUE_ENABLE!=0)begin : game_feedback
+        game_miss_audio_cue u_cue(.clk(clk_audio_ref),.rst_n(rst_n),.sample_valid(stereo_valid),
+            .enabled(game_cue_enable),.trigger(game_miss_event),
+            .left_in(pcm_left_music),.right_in(pcm_right_music),
+            .left_out(pcm_left_final),.right_out(pcm_right_final));
+    end else begin : no_game_feedback
+        assign pcm_left_final=pcm_left_music;
+        assign pcm_right_final=pcm_right_music;
     end endgenerate
     wire signed [24:0] spectrum_sum =
         $signed({pcm_left_final[23],pcm_left_final}) +

@@ -14,7 +14,7 @@ module game_note_controller #(
   output wire [31:0] song_time,output reg countdown,finished,
   output reg [19:0] score,output reg [7:0] combo,max_combo,hits,misses,wrongs,
   output reg [11:0] judgement,output wire [127:0] consumed,
-  output reg deadline_miss);
+  output reg deadline_miss,output reg miss_event);
     localparam IDLE=0,READ=1,EVALUATE=2,COMMIT=3;
     reg [1:0] state;
     // Only real events need state bits. Zero-extend the published snapshot;
@@ -58,7 +58,7 @@ module game_note_controller #(
         if(!rst_n)begin
             state<=IDLE;elapsed<=0;countdown_left<=0;countdown<=0;finished<=0;
             score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;consumed_bits<=0;
-            pending<=0;scan_plucks<=0;launch<=0;pending_velocity<=0;scan_velocity<=0;
+            pending<=0;scan_plucks<=0;launch<=0;pending_velocity<=0;scan_velocity<=0;miss_event<=0;
             pluck_times<=0;scan_times<=0;note_velocity<=0;found<=0;next_found<=0;address<=0;deadline_miss<=0;
             target_phase<={32'h00c879a3,32'h010b9a2b,32'h0151285d,32'h01c20d2f};miss_add<=0;
             for(i=0;i<4;i=i+1)begin end_time[i]<=0;best_error[i]<=0;best_index[i]<=0;
@@ -66,10 +66,11 @@ module game_note_controller #(
         end else if(start_song)begin
             state<=IDLE;elapsed<=0;countdown_left<=COUNTDOWN_SAMPLES;countdown<=COUNTDOWN_SAMPLES!=0;
             finished<=0;score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;
-            consumed_bits<=0;pending<=0;launch<=0;deadline_miss<=0;
+            consumed_bits<=0;pending<=0;launch<=0;deadline_miss<=0;miss_event<=0;
             for(i=0;i<4;i=i+1)end_time[i]<=0;
-        end else if(!enable)begin state<=IDLE;pending<=0;launch<=0;end
+        end else if(!enable)begin state<=IDLE;pending<=0;launch<=0;miss_event<=0;end
         else begin
+            miss_event<=0;
             // A four-lane batch is retained; no last-string mailbox overwrite.
             for(i=0;i<4;i=i+1)if(pluck_valid[i] && !countdown && !finished)begin
                 pending[i]<=1;pending_velocity[i*2+:2]<=velocity[i*2+:2];pluck_times[i*24+:24]<=elapsed;
@@ -115,6 +116,7 @@ module game_note_controller #(
                     else begin address<=address+1'b1;state<=READ;end
                 end
                 COMMIT:begin
+                    miss_event<=miss_add!=0 && !demo;
                     score_add=0;hit_add=0;wrong_add=0;combo_next=miss_add!=0 ? 8'd0 : combo;max_next=max_combo;launch_next=0;
                     for(i=0;i<4;i=i+1)begin
                         if(found[i])begin

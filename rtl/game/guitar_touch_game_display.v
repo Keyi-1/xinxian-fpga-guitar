@@ -1,4 +1,5 @@
-module guitar_touch_game_display(input wire audio_clk,audio_rst_n,clk,rst_n,
+module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
+    (input wire audio_clk,audio_rst_n,clk,rst_n,
     input wire [399:0] audio_snapshot,input wire [255:0] audio_game_snapshot,
     input wire audio_pcm_valid,input wire signed [23:0] audio_pcm,
     input wire [2:0] page,input wire touch_ready,transition,
@@ -51,7 +52,8 @@ module guitar_touch_game_display(input wire audio_clk,audio_rst_n,clk,rst_n,
     game_chart_layout u_chart(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.snapshot_update(chart_update),
         .snapshot(ui_game_snapshot),.centres(centres),.tails(tails),.valid_blocks(valid_blocks),
         .display_snapshot(chart_snapshot),.overflow(chart_overflow),.deadline_miss(chart_deadline));
-    touch_game_renderer u_ui(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.page(page),
+    touch_game_renderer #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW)) u_ui(
+        .clk(clk),.rst_n(rst_n),.frame_start(frame_start),.page(page),
         .touch_ready(touch_ready),.transition(transition),.x(x),.y(y),.centres(centres),.tails(tails),
         .valid_blocks(valid_blocks),.game_snapshot(chart_snapshot),.rgb(ui_rgb),.display_page(display_page));
     assign lcd_backlight=rst_n && initialized;

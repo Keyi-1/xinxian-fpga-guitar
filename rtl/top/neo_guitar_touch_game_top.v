@@ -11,7 +11,9 @@ module neo_guitar_touch_game_top #(
     parameter integer PLUCK_DEAD_SAMPLES=`RETRIGGER_DEAD_SAMPLES,
     parameter integer PLUCK_SETTLE_SAMPLES=`PLUCK_SETTLE_SAMPLES,
     parameter integer FIXED_VELOCITY_ENABLE=`BOARD_FIXED_VELOCITY_ENABLE,
-    parameter integer TOUCH_SWAP_AXES=-1,TOUCH_MIRROR_X=0,TOUCH_MIRROR_Y=0
+    parameter integer TOUCH_SWAP_AXES=-1,TOUCH_MIRROR_X=0,TOUCH_MIRROR_Y=0,
+    // Training defaults; set both to zero for a player-triggered-only build.
+    parameter integer ALLOW_AUTOPLAY_PREVIEW=1,ENABLE_MISS_CUE=1
 )(input wire audio_clk_12m288,sys_clk_50m,
   input wire USER_BUTTON1_n,USER_BUTTON2_n,USER_BUTTON3_n,
   inout wire ROW0,ROW1,ROW2,ROW3,
@@ -64,7 +66,8 @@ module neo_guitar_touch_game_top #(
     wire [1:0] command_mode,dst_command_mode;
     wire [2:0] page;
     wire [255:0] ui_game_snapshot,audio_game_snapshot;
-    touch_game_ui u_ui(.clk(sys_clk_50m),.rst_n(lcd_rst_n),.tick_ms(tick_ms),.touch_ready(touch_ready),
+    touch_game_ui #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW)) u_ui(
+        .clk(sys_clk_50m),.rst_n(lcd_rst_n),.tick_ms(tick_ms),.touch_ready(touch_ready),
         .click(click),.double_click(double_click),.click_x(click_x),.click_y(click_y),.game_snapshot(ui_game_snapshot),
         .command_busy(command_busy),.command_done(command_done),.command_send(command_send),.command_mode(command_mode),
         .page(page),.flush_gesture(gesture_flush),.transition(transition));
@@ -78,7 +81,8 @@ module neo_guitar_touch_game_top #(
     guitar_touch_game_audio #(.MATRIX_CLK_DIV(MATRIX_CLK_DIV),.MATRIX_SETTLE_CYCLES(MATRIX_SETTLE_CYCLES),
         .MATRIX_DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES),.ADC_SPI_CLK_DIV(ADC_SPI_CLK_DIV),
         .PLUCK_DEAD_SAMPLES(PLUCK_DEAD_SAMPLES),.PLUCK_SETTLE_SAMPLES(PLUCK_SETTLE_SAMPLES),
-        .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE)) u_audio(
+        .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE),.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),
+        .ENABLE_MISS_CUE(ENABLE_MISS_CUE)) u_audio(
         .clk(audio_clk_12m288),.rst_n(audio_rst_n),.command_valid(dst_command_valid),.command_mode(dst_command_mode),
         .command_ack(dst_command_ack),.fret_col_in_n({COL7,COL6,COL5,COL4,COL3,COL2,COL1,COL0}),
         .fret_row_oe(row_oe),.fret_row_drive_n(row_drive_n),.adc_cs_n(adc_cs_n),.adc_sclk(adc_sclk),
@@ -86,7 +90,8 @@ module neo_guitar_touch_game_top #(
         .chorus_enable(chorus_enable),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),.reverb_enable(reverb_enable),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),.i2s_bclk(i2s_bclk),.i2s_ws(i2s_ws),.i2s_data(i2s_data),
         .visual_snapshot(visual_snapshot),.game_snapshot(audio_game_snapshot),.final_pcm_valid(final_pcm_valid),.final_pcm(final_pcm));
-    guitar_touch_game_display u_display(.audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),.clk(sys_clk_50m),.rst_n(lcd_rst_n),
+    guitar_touch_game_display #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW)) u_display(
+        .audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),.clk(sys_clk_50m),.rst_n(lcd_rst_n),
         .audio_snapshot(visual_snapshot),.audio_game_snapshot(audio_game_snapshot),.audio_pcm_valid(final_pcm_valid),.audio_pcm(final_pcm),
         .page(page),.touch_ready(touch_ready),.transition(transition),.ui_game_snapshot(ui_game_snapshot),
         .lcd_pclk(lcd_pclk),.lcd_hsync(lcd_hsync),.lcd_vsync(lcd_vsync),.lcd_de(lcd_de),.lcd_backlight(lcd_backlight),

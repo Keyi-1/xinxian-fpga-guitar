@@ -1,7 +1,8 @@
 // Pages: home, performance, songs, ready, countdown, game, result.
 // Empty song slots have no action. Touch failure falls back to performance.
 module touch_game_ui #(
-    parameter integer FALLBACK_MS=2000
+    parameter integer FALLBACK_MS=2000,
+    parameter integer ALLOW_AUTOPLAY_PREVIEW=1
 )(input wire clk,rst_n,tick_ms,touch_ready,click,double_click,
   input wire [8:0] click_x,click_y,input wire [255:0] game_snapshot,
   input wire command_busy,command_done,
@@ -37,7 +38,7 @@ module touch_game_ui #(
                       else if(click_y<40 && click_x<80)begin page<=0;flush_gesture<=1;end
                     3:if(click_y>=198 && click_y<=252)begin
                         if(click_x>=40 && click_x<230)request_mode(2,4);
-                        else if(click_x>=250 && click_x<=440)request_mode(3,4);
+                        else if(ALLOW_AUTOPLAY_PREVIEW && click_x>=250 && click_x<=440)request_mode(3,4);
                     end else if(click_y<40 && click_x<80)begin page<=2;flush_gesture<=1;end
                     6:if(click_y>=208 && click_y<=260)begin
                         if(click_x>=24 && click_x<160)begin page<=3;flush_gesture<=1;end

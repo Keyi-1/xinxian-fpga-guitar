@@ -12,13 +12,14 @@ module tb_game_note_controller;
     wire [31:0] time_now;
     wire [19:0] score;
     wire [11:0] judgement;
-    wire countdown,finished,deadline;
+    wire countdown,finished,deadline,miss_event;
     game_note_controller #(.EVENT_COUNT(8),.DURATION_SAMPLES(400),.COUNTDOWN_SAMPLES(0),
         .PERFECT_SAMPLES(3),.GOOD_SAMPLES(9),.WINDOW_SAMPLES(15)) dut(
         .clk(clk),.rst_n(rst_n),.sample_tick(tick),.enable(enable),.start_song(start_song),.demo(demo),
         .pluck_valid(pluck),.velocity(velocity),.note_on(on),.note_off(off),.target_phase(phase),.note_velocity(note_velocity),
         .song_time(time_now),.countdown(countdown),.finished(finished),.score(score),.combo(combo),.max_combo(max_combo),
-        .hits(hits),.misses(misses),.wrongs(wrongs),.judgement(judgement),.consumed(consumed),.deadline_miss(deadline));
+        .hits(hits),.misses(misses),.wrongs(wrongs),.judgement(judgement),.consumed(consumed),.deadline_miss(deadline),
+        .miss_event(miss_event));
     task event_at(input integer index,t,d,l,p);
         dut.u_rom.memory[index]=(80'(l)<<74)|(80'(p)<<48)|(80'(d)<<24)|80'(t);
     endtask
@@ -31,7 +32,11 @@ module tb_game_note_controller;
     task check(input bit pass,input string detail);
         if(!pass)$fatal(1,"FAIL: %s t=%0d score=%0d hits=%0d miss=%0d wrong=%0d",detail,time_now,score,hits,misses,wrongs);
     endtask
-    integer launches=0,chords=0,last_launch[0:3],lane_index;
+    integer launches=0,chords=0,last_launch[0:3],lane_index,cues=0;
+    always @(posedge clk)if(rst_n && miss_event)begin
+        if(demo)$fatal(1,"FAIL: preview generated a Miss cue");
+        cues=cues+1;
+    end
     always @(posedge clk)if(rst_n && tick)begin
         if(on!=0)launches=launches+$countones(on);
         if(on==15)chords=chords+1;
@@ -61,7 +66,9 @@ module tb_game_note_controller;
         check(score==470 && hits==8 && combo==0 && consumed[7:0]==255,"four-tone Bad boundary, independent consumption");
         check(phase=={32'd4002,32'd3002,32'd2002,32'd1002},"score supplies DDS, not fret/open pitch");
         wait(finished);check(misses==0 && max_combo==3,"hit events do not Miss; wrong strike breaks combo");
+        check(cues==0,"hits and Wrong never trigger Miss feedback");
         start();wait(finished);check(score==0 && hits==0 && misses==8,"silent player misses every event exactly once");
+        check(cues==5,"Miss feedback occurs once per batch, not continuously after a miss");
         @(negedge clk);demo=1;launches=0;chords=0;start();wait(finished);
         check(launches==8 && chords==1 && consumed[7:0]==255,"explicit preview plays full score once, including chord");
         check(score==0 && hits==0 && wrongs==0,"preview is not a scored/autoplay game");

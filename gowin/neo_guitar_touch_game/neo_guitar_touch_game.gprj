@@ -83,6 +83,7 @@
         <File path="../../rtl/game/game_chart_layout.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_font_rom.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_message_rom.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_miss_audio_cue.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_note_controller.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_score_rom.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_snapshot_cdc.v" type="file.verilog" enable="1" />

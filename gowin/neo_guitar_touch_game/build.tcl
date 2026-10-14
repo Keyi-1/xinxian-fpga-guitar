@@ -53,6 +53,7 @@ foreach source {
     rtl/game/game_chart_layout.v
     rtl/game/game_font_rom.v
     rtl/game/game_message_rom.v
+    rtl/game/game_miss_audio_cue.v
     rtl/game/game_note_controller.v
     rtl/game/game_score_rom.v
     rtl/game/game_snapshot_cdc.v

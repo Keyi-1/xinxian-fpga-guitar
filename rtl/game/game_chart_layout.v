@@ -17,7 +17,10 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
     // Update one coordinate bank in blank; a second 672-bit bank is redundant.
     reg [11:0] front_x[0:31];
     reg [8:0] front_tail[0:31];
-    reg [3:0] counts[0:3];
+    // Four explicit counters: Gowin's inferred multi-write array did not
+    // clear every lane on a new pass in the synthesized netlist.
+    reg [3:0] count0,count1,count2,count3;
+    wire [3:0] lane_count=lane==0 ? count0 : lane==1 ? count1 : lane==2 ? count2 : count3;
     reg [31:0] back_valid;
     reg [4:0] slot,bit_count;
     reg [23:0] dividend,quotient,duration;
@@ -37,20 +40,26 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
             state<=IDLE;address<=0;held<=0;back_valid<=0;valid_blocks<=0;display_snapshot<=0;
             overflow<=0;deadline_miss<=0;slot<=0;bit_count<=0;dividend<=0;quotient<=0;duration<=0;remainder<=0;negative<=0;
             for(i=0;i<32;i=i+1)begin front_x[i]<=0;front_tail[i]<=0;end
-            for(i=0;i<4;i=i+1)counts[i]<=0;
+            count0<=0;count1<=0;count2<=0;count3<=0;
         end else begin
             if(frame_start && state!=IDLE && state!=WAIT)deadline_miss<=1;
             case(state)
                 IDLE:if(snapshot_update)begin
                     held<=snapshot;back_valid<=0;address<=0;state<=READ;
-                    for(i=0;i<4;i=i+1)counts[i]<=0;
+                    count0<=0;count1<=0;count2<=0;count3<=0;
                 end
                 READ:state<=EVALUATE;
                 EVALUATE:begin
                     if(!held[address] && delta<=101000 && delta>=-7200)begin
-                        if(counts[lane]>=8)begin overflow<=1;state<=NEXT;end
+                        if(lane_count>=8)begin overflow<=1;state<=NEXT;end
                         else begin
-                            slot<={lane,3'd0}+counts[lane];counts[lane]<=counts[lane]+1'b1;
+                            slot<={lane,3'd0}+lane_count;
+                            case(lane)
+                                0:count0<=count0+1'b1;
+                                1:count1<=count1+1'b1;
+                                2:count2<=count2+1'b1;
+                                3:count3<=count3+1'b1;
+                            endcase
                             dividend<=(delta[32] ? -delta : delta)+125;negative<=delta[32];
                             duration<=event_word[47:24];quotient<=0;remainder<=0;bit_count<=23;state<=DIVIDE_X;
                         end
