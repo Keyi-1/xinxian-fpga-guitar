@@ -11,7 +11,8 @@ SHA256 `e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86`。
 九项 RTL、五项分弦 Python、512 组柱状态／1,108,992 像素、15 帧真实 FFT 集成／1,958,400 像素、
 21 帧整机网表／2,741,760 像素及 364 次连续布局通过；音频 8192 样本与冻结基线一致，延音退出仍为 1452 样本。
 [实现、完整资源对比与下板步骤](../../docs/DISPLAY_GAME_P1_RESOURCE_OPT.md)，
-[本轮验证记录](verification.json)。新版本尚待下板反馈；本轮只作本地提交，未 push／merge／烧录。
+[本轮验证记录](verification.json)。用户现反馈“现在的版本好像没什么问题”，并授权先本地提交保存；现场位流哈希未另行采集。
+仅作本地保存，未 push／merge／烧录，反馈范围见 [hardware_acceptance.json](hardware_acceptance.json)。
 构建采用独立快照，两个受保护用户文件、原 IDE 网表／位流和原全宽舞台归档均保留。
 
 以下全宽舞台数据是已验收的历史基线，和本轮独立 P1 产物分别留存。
