@@ -1,6 +1,6 @@
 `include "../config/game_score_config.vh"
 // One serial score scan per sample; <= 2*128+overhead clocks is rejected by
-// configuration. Current score has 53 events and finishes well within 256.
+// configuration. Current score has 67 events and finishes well within 256.
 // Pluck times are captured in the audio domain; rendering never judges notes.
 module game_note_controller #(
     parameter integer EVENT_COUNT=`GAME_EVENT_COUNT,
@@ -14,6 +14,7 @@ module game_note_controller #(
   output wire [31:0] song_time,output reg countdown,finished,
   output reg [19:0] score,output reg [7:0] combo,max_combo,hits,misses,wrongs,
   output reg [11:0] judgement,output wire [127:0] consumed,
+  output reg [7:0] judgement_epoch,
   output reg deadline_miss,output reg miss_event);
     localparam IDLE=0,READ=1,EVALUATE=2,COMMIT=3;
     reg [1:0] state;
@@ -58,14 +59,14 @@ module game_note_controller #(
         if(!rst_n)begin
             state<=IDLE;elapsed<=0;countdown_left<=0;countdown<=0;finished<=0;
             score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;consumed_bits<=0;
-            pending<=0;scan_plucks<=0;launch<=0;pending_velocity<=0;scan_velocity<=0;miss_event<=0;
+            pending<=0;scan_plucks<=0;launch<=0;pending_velocity<=0;scan_velocity<=0;miss_event<=0;judgement_epoch<=0;
             pluck_times<=0;scan_times<=0;note_velocity<=0;found<=0;next_found<=0;address<=0;deadline_miss<=0;
             target_phase<={32'h00c879a3,32'h010b9a2b,32'h0151285d,32'h01c20d2f};miss_add<=0;
             for(i=0;i<4;i=i+1)begin end_time[i]<=0;best_error[i]<=0;best_index[i]<=0;
                 best_phase[i]<=0;best_duration[i]<=0;next_phase[i]<=0;next_duration[i]<=0;end
         end else if(start_song)begin
             state<=IDLE;elapsed<=0;countdown_left<=COUNTDOWN_SAMPLES;countdown<=COUNTDOWN_SAMPLES!=0;
-            finished<=0;score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;
+            finished<=0;score<=0;combo<=0;max_combo<=0;hits<=0;misses<=0;wrongs<=0;judgement<=0;judgement_epoch<=0;
             consumed_bits<=0;pending<=0;launch<=0;deadline_miss<=0;miss_event<=0;
             for(i=0;i<4;i=i+1)end_time[i]<=0;
         end else if(!enable)begin state<=IDLE;pending<=0;launch<=0;miss_event<=0;end
@@ -107,6 +108,7 @@ module game_note_controller #(
                         end
                         if(!demo && elapsed>on_time+WINDOW_SAMPLES && !eligible)begin
                             consumed_bits[address]<=1;miss_add<=miss_add+1'b1;judgement[lane*3+:3]<=4;
+                            judgement_epoch[lane*2+:2]<=judgement_epoch[lane*2+:2]+1'b1;
                         end
                         if(!next_found[lane] && on_time>=elapsed && on_time<=elapsed+48000)begin
                             next_found[lane]<=1;next_phase[lane]<=phase;next_duration[lane]<=duration;
@@ -124,6 +126,7 @@ module game_note_controller #(
                             end_time[i]<=elapsed+best_duration[i];launch_next[i]=1;
                             note_velocity[i*2+:2]<=demo ? 2'd2 : scan_velocity[i*2+:2];
                             if(!demo)begin
+                                judgement_epoch[i*2+:2]<=judgement_epoch[i*2+:2]+1'b1;
                                 hit_add=hit_add+1'b1;
                                 if(best_error[i]<=PERFECT_SAMPLES)begin score_add=score_add+100;combo_next=combo_next+1'b1;judgement[i*3+:3]<=1;end
                                 else if(best_error[i]<=GOOD_SAMPLES)begin score_add=score_add+70;combo_next=combo_next+1'b1;judgement[i*3+:3]<=2;end
@@ -131,6 +134,7 @@ module game_note_controller #(
                                 if(combo_next>max_next)max_next=combo_next;
                             end
                         end else if(scan_plucks[i] && !demo)begin
+                            judgement_epoch[i*2+:2]<=judgement_epoch[i*2+:2]+1'b1;
                             wrong_add=wrong_add+1'b1;combo_next=0;judgement[i*3+:3]<=5;launch_next[i]=1;
                             note_velocity[i*2+:2]<=scan_velocity[i*2+:2];end_time[i]<=elapsed+(next_found[i] ? next_duration[i] : 32'd14400);
                             target_phase[i*32+:32]<=next_found[i] ? next_phase[i] :

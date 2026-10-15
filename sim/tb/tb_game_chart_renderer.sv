@@ -16,6 +16,53 @@ module tb_game_chart_renderer;
         .valid_blocks(blocks),.game_snapshot(displayed),.rgb(rgb),.display_page(displayed_page));
     integer clocks,counts[0:3],i,l,slot,delta,expected,now,fd,px,py;
     reg [79:0] event_word;
+    reg [383:0] test_centres=0;
+    reg [287:0] test_tails=0;
+    reg [31:0] test_blocks=0;
+    reg [255:0] test_snapshot=0;
+    reg [17:0] pixel0,pixel1,pixel2,pixel3;
+    task sample_pixel(input integer tx,ty,output [17:0] value);
+        @(negedge clk);x=tx;y=ty;repeat(5)@(negedge clk);value=rgb;
+    endtask
+    task frame_pulse;
+        @(negedge clk);frame_start=1;@(negedge clk);frame_start=0;repeat(4)@(negedge clk);
+    endtask
+    task stage_features;
+        integer lane_index,frame_index;
+        begin
+            force renderer.centres=test_centres;force renderer.tails=test_tails;
+            force renderer.valid_blocks=test_blocks;force renderer.game_snapshot=test_snapshot;
+            page=5;frame_pulse();
+            for(lane_index=0;lane_index<4;lane_index=lane_index+1)begin
+                test_centres[lane_index*96+:12]=200;
+                test_tails[lane_index*72+:9]=240;test_blocks[lane_index*8]=1;
+            end
+            sample_pixel(200,85,pixel0);sample_pixel(200,133,pixel1);
+            sample_pixel(200,181,pixel2);sample_pixel(200,229,pixel3);
+            if(pixel0!=={6'd16,6'd38,6'd63} || pixel1!=={6'd7,6'd54,6'd43} ||
+               pixel2!=={6'd63,6'd43,6'd17} || pixel3!=={6'd63,6'd26,6'd32})
+                $fatal(1,"FAIL: four full-width lane positions/palettes");
+            sample_pixel(220,85,pixel0);sample_pixel(250,85,pixel1);
+            sample_pixel(280,85,pixel2);sample_pixel(310,85,pixel3);
+            if(!(pixel0[17:12]>pixel1[17:12] && pixel1[17:12]>pixel2[17:12] && pixel2[17:12]>pixel3[17:12]))
+                $fatal(1,"FAIL: duration tail must dim away from its head");
+            test_snapshot[222:220]=1;test_snapshot[239:238]=1;repeat(5)@(negedge clk);
+            if(renderer.feedback_age[3:0]==0)$fatal(1,"FAIL: fresh Perfect is invisible");
+            for(frame_index=0;frame_index<16;frame_index=frame_index+1)frame_pulse();
+            if(renderer.feedback_age[3:0]!=0)$fatal(1,"FAIL: stale judgement never clears");
+            test_snapshot[239:238]=2;repeat(5)@(negedge clk);
+            if(renderer.feedback_age[3:0]==0)$fatal(1,"FAIL: repeated identical Perfect does not retrigger");
+            test_snapshot[159:128]=`GAME_DURATION_SAMPLES;repeat(500)@(negedge clk);
+            sample_pixel(479,49,pixel0);
+            if(pixel0!=={6'd45,6'd60,6'd63})$fatal(1,"FAIL: full song progress");
+            test_snapshot[159:128]=-48000;repeat(5)@(negedge clk);sample_pixel(479,49,pixel0);
+            if(pixel0!=={6'd9,6'd13,6'd19})$fatal(1,"FAIL: restart does not clear progress");
+            page=0;frame_pulse();sample_pixel(200,85,pixel0);
+            if(pixel0!=={6'd3,6'd5,6'd10})$fatal(1,"FAIL: note shapes leaked outside gameplay");
+            release renderer.centres;release renderer.tails;
+            release renderer.valid_blocks;release renderer.game_snapshot;
+        end
+    endtask
     task publish(input integer t);
         @(negedge clk);snapshot[159:128]=t;frame_start=1;
         @(negedge clk);frame_start=0;snapshot_update=1;
@@ -51,10 +98,11 @@ module tb_game_chart_renderer;
         // Walk the whole real score, including countdown and signed offsets.
         for(now=-96000;now<=`GAME_DURATION_SAMPLES;now=now+4800)publish(now);
         publish(0);publish(125);publish(-125);
+        stage_features();
         picture(0,"touch_home.ppm");picture(2,"touch_songs.ppm");picture(3,"touch_ready.ppm");
         snapshot[179:160]=1270;snapshot[187:180]=12;snapshot[195:188]=18;snapshot[203:196]=23;
-        snapshot[222:220]=1;picture(5,"touch_game.ppm");picture(6,"touch_result.ppm");
-        $display("PASS: full-score chart positions/blank deadline/capacity and five RTL pixel previews");$finish;
+        snapshot[222:220]=1;snapshot[239:238]=1;picture(5,"touch_game.ppm");picture(6,"touch_result.ppm");
+        $display("PASS: full-score chart positions/blank deadline/capacity; full-width stage, tail gradient, feedback expiry/retrigger, progress and five RTL pixel previews");$finish;
     end
     initial begin #100000000;$fatal(1,"FAIL: chart/render watchdog");end
 endmodule

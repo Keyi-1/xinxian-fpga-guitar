@@ -1,6 +1,6 @@
 {
   "size": 16,
-  "characters": "模式选择演奏游戏曲目茉莉花待导入准备开始试听高音低结束重玩主页触控未连接双击返回切换中教学单旋律拨弦跟随滑块自由节挑战ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -/.",
+  "characters": "模式选择演奏游戏曲目茉莉花待导入准备开始试听高音低结束重玩主页触控未连接双击返回切换中教学单旋律拨弦跟随滑块自由节挑战得分退出到线右侧来ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -/.+",
   "messages": [
     "模式选择",
     "演奏模式",
@@ -33,6 +33,22 @@
     "PERFECT",
     "GOOD",
     "BAD",
-    "WRONG"
-  ]
+    "WRONG",
+    "得分",
+    "连击",
+    "单旋律",
+    "96 BPM",
+    "双击退出",
+    "到线拨弦",
+    "右侧来音",
+    "PERFECT +100",
+    "GOOD +70",
+    "BAD +25"
+  ],
+  "stage_title": {
+    "text": "茉莉花",
+    "size": 24,
+    "tile_base": 109,
+    "tile_count": 12
+  }
 }

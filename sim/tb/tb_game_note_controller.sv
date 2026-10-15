@@ -12,6 +12,7 @@ module tb_game_note_controller;
     wire [31:0] time_now;
     wire [19:0] score;
     wire [11:0] judgement;
+    wire [7:0] judgement_epoch;
     wire countdown,finished,deadline,miss_event;
     game_note_controller #(.EVENT_COUNT(8),.DURATION_SAMPLES(400),.COUNTDOWN_SAMPLES(0),
         .PERFECT_SAMPLES(3),.GOOD_SAMPLES(9),.WINDOW_SAMPLES(15)) dut(
@@ -19,7 +20,7 @@ module tb_game_note_controller;
         .pluck_valid(pluck),.velocity(velocity),.note_on(on),.note_off(off),.target_phase(phase),.note_velocity(note_velocity),
         .song_time(time_now),.countdown(countdown),.finished(finished),.score(score),.combo(combo),.max_combo(max_combo),
         .hits(hits),.misses(misses),.wrongs(wrongs),.judgement(judgement),.consumed(consumed),.deadline_miss(deadline),
-        .miss_event(miss_event));
+        .miss_event(miss_event),.judgement_epoch(judgement_epoch));
     task event_at(input integer index,t,d,l,p);
         dut.u_rom.memory[index]=(80'(l)<<74)|(80'(p)<<48)|(80'(d)<<24)|80'(t);
     endtask
@@ -56,6 +57,7 @@ module tb_game_note_controller;
         repeat(5)@(negedge clk);rst_n=1;start();
         strike(20,2);wait(time_now==22);
         check(wrongs==1 && consumed==0 && phase[63:32]==2001,"early wrong feedback must not consume or shift score");
+        check(judgement_epoch[3:2]==1,"wrong event advances its display tag");
         strike(49,3);wait(time_now==51);
         check(score==200 && hits==2 && consumed[1:0]==3,"two simultaneous lanes, inclusive perfect boundary");
         check(note_velocity[3:0]==velocity[3:0],"actual velocity is latched per lane");
@@ -72,6 +74,14 @@ module tb_game_note_controller;
         @(negedge clk);demo=1;launches=0;chords=0;start();wait(finished);
         check(launches==8 && chords==1 && consumed[7:0]==255,"explicit preview plays full score once, including chord");
         check(score==0 && hits==0 && wrongs==0,"preview is not a scored/autoplay game");
+        check(judgement_epoch==0,"preview must not synthesize scored hit feedback");
+        @(negedge clk);demo=0;
+        event_at(0,50,20,0,1001);event_at(1,100,20,0,1002);
+        for(lane_index=2;lane_index<8;lane_index=lane_index+1)event_at(lane_index,1000+lane_index,20,0,1001);
+        start();strike(50,1);wait(time_now==52);
+        check(judgement[2:0]==1 && judgement_epoch[1:0]==1,"first Perfect display tag");
+        strike(100,1);wait(time_now==102);
+        check(judgement[2:0]==1 && judgement_epoch[1:0]==2,"repeated Perfect has a fresh tag without changing its code");
         $display("PASS: game nearest-event windows, velocity, wrong non-consumption, four-note chord, release, Miss and restart/preview");$finish;
     end
     initial begin #10000000;$fatal(1,"FAIL: game watchdog");end

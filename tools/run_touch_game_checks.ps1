@@ -1,13 +1,21 @@
 param([string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64',
       [string[]]$Benches=@('tb_i2c_fault_recovery','tb_gt911_touch','tb_touch_gesture_ui','tb_game_note_controller',
                           'tb_game_cdc','tb_game_chart_renderer','tb_game_audio_preservation','tb_game_miss_audio_cue',
-                          'tb_game_competition_controls'))
+                          'tb_game_competition_controls'),
+      [string]$PythonExe='E:\anaconda3\python.exe')
 $ErrorActionPreference='Stop'
 $repoDir=Split-Path $PSScriptRoot
 $simDir=Join-Path $repoDir 'sim\temp\touch_game'
 $sourceDir=Join-Path $simDir 'sources'
 New-Item -ItemType Directory -Path $sourceDir -Force | Out-Null
 $hashes=@{}
+& $PythonExe (Join-Path $PSScriptRoot 'test_game_fingering.py') > (Join-Path $simDir 'fingering.log') 2>&1
+if($LASTEXITCODE){throw 'Offline fingering/unchanged score regression failed'}
+Write-Output 'Offline fingering: physical feasibility, alternate strings, exhaustive oracle and unchanged melody PASS'
+foreach($name in @('game_fingering.py','generate_jasmine_score.py','generate_game_ui_font.py','test_game_fingering.py')){
+    $file=Join-Path $PSScriptRoot $name
+    $hashes["tools\$name"]=(Get-FileHash -LiteralPath $file).Hash.ToLower()
+}
 foreach($file in (Get-ChildItem -LiteralPath (Join-Path $repoDir 'mem') -File)){
     $hashes[$file.FullName.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $file.FullName).Hash.ToLower()
 }
@@ -34,7 +42,7 @@ Push-Location $simDir
 try{
     if(!(Test-Path -LiteralPath work)){& (Join-Path $ModelSimBin 'vlib.exe') work | Out-Null}
     $sources=Get-ChildItem -LiteralPath $sourceDir -Filter '*.v'|ForEach-Object FullName
-    $tests=$Benches|ForEach-Object {Join-Path $repoDir "sim\tb\$_.sv"}
+    $tests=@($Benches|ForEach-Object {Join-Path $repoDir "sim\tb\$_.sv"})
     foreach($test in $tests){$hashes[$test.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $test).Hash.ToLower()}
     & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir" @sources @tests > compile.log 2>&1
     if($LASTEXITCODE -or (Get-Content -Raw compile.log) -match '\*\* (Error|Fatal|Warning):'){throw 'Touch/game compile diagnostics'}

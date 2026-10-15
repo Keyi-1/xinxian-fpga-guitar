@@ -70,7 +70,8 @@ def main():
                       voltage_confirmation='User confirmed J6-compatible IO voltage'),
                   source_sha256=evidence['source_sha256'], preserved_assets_sha256=preserved,
                   rtl_evidence_sha256=digest(directory/'verification.json'),
-                  hardware_status='See hardware_acceptance.json for separately recorded user feedback and its scope; native J6 INT=T16')
+                  ui_style='full_width_stage',matrix_mode=False,polyline_effect=False,
+                  hardware_status='Full-width stage awaits hardware acceptance; hardware_acceptance.json records the earlier a13fd79 version; native J6 INT=T16')
     if args.rtl_only:
         (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
         print(f'RTL_PASS: {len(BENCHES)} benches; bitstream/routing/timing not approved by --rtl-only')
@@ -130,6 +131,8 @@ def main():
     assert digest(gate_dir/'run.log') == gate_evidence['log_sha256']
     gate_log = (gate_dir/'run.log').read_text()
     assert 'PASS: synthesized menu LCD' in gate_log and 'FAIL:' not in gate_log
+    assert 'full-width stage' in gate_log and '783360 pixels' in gate_log
+    assert digest(gate_dir/'stage_force.vh') == gate_evidence['stage_forces_sha256']
     assert digest(gate_dir/'chart_run.log') == gate_evidence['chart_log_sha256']
     assert digest(gate_dir/'tb_game_chart_gate.sv') == gate_evidence['chart_bench_sha256']
     chart_log = (gate_dir/'chart_run.log').read_text()
@@ -140,7 +143,7 @@ def main():
                   gate_evidence_sha256=digest(gate_dir/'verification.json'),
                   implementation_evidence_sha256={p.name: digest(p) for p in [pnr/f'{NAME}.log',
                       pnr/f'{NAME}.rpt.txt', pnr/f'{NAME}_tr_content.html', pnr/'cmd.do']},
-                  gate_simulation='Home-menu LCD/touch/silent audio plus full-score consecutive synthesized moving chart; musical/control behavior covered by RTL benches')
+                  gate_simulation='Six full-top home/countdown/full-width game/result frames, touch/silent audio plus full-score consecutive moving chart; musical/control behavior covered by RTL benches')
     (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps({k: result[k] for k in ['result', 'clocks', 'violations', 'resources', 'bitstream_sha256']}, indent=2))
 

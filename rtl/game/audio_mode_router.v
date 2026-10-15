@@ -22,6 +22,7 @@ module audio_mode_router #(
     wire [19:0] score;
     wire [7:0] combo,max_combo,hits,misses,wrongs;
     wire [11:0] judgement;
+    wire [7:0] judgement_epoch;
     wire [127:0] consumed;
     guitar_play_control u_performance(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
         .stable_valid(stable_valid),.stable_fret_id(fret_id),
@@ -33,7 +34,7 @@ module audio_mode_router #(
         .note_on(game_on),.note_off(game_off),.target_phase(game_phase),.note_velocity(game_velocity),
         .song_time(song_time),.countdown(countdown),.finished(finished),.score(score),
         .combo(combo),.max_combo(max_combo),.hits(hits),.misses(misses),.wrongs(wrongs),
-        .judgement(judgement),.consumed(consumed),.deadline_miss(deadline_miss),.miss_event(miss_event));
+        .judgement(judgement),.judgement_epoch(judgement_epoch),.consumed(consumed),.deadline_miss(deadline_miss),.miss_event(miss_event));
     assign note_on=switching || mode==0 ? 4'd0 : mode==1 ? play_on : game_on;
     assign force_release={4{switching && !stop_sent && sample_tick}};
     assign note_off=switching || mode==0 || mode==1 ? 4'd0 : game_off;
@@ -42,7 +43,8 @@ module audio_mode_router #(
     // Fixed, documented layout; coherently transferred at display frame start.
     always @(posedge clk)begin
         if(!rst_n)game_snapshot<=0;
-        else if(sample_tick)game_snapshot<={18'd0,deadline_miss,switching,finished,countdown,mode,
+        // Reserved bits 245:238 mark fresh results, including repeat Perfects.
+        else if(sample_tick)game_snapshot<={10'd0,judgement_epoch,deadline_miss,switching,finished,countdown,mode,
                           judgement,wrongs,misses,hits,max_combo,combo,score,song_time,consumed};
     end
     always @(posedge clk)begin

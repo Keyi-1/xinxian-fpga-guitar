@@ -29,6 +29,7 @@ $netlist=Join-Path $PSScriptRoot 'impl\gwsynthesis\neo_guitar_touch_game.vg'
 Copy-Item -LiteralPath $netlist -Destination (Join-Path $gateDir 'compiled.vg')
 $chartGenerator=Join-Path $repoDir 'tools\generate_game_chart_gate_bench.py'
 $chartBench=Join-Path $gateDir 'tb_game_chart_gate.sv'
+$stageForces=Join-Path $gateDir 'stage_force.vh'
 & $PythonExe $chartGenerator $netlist $chartBench
 if($LASTEXITCODE){throw 'Cannot map synthesized chart ports'}
 $hashes['tools\generate_game_chart_gate_bench.py']=(Get-FileHash -LiteralPath $chartGenerator).Hash.ToLower()
@@ -38,7 +39,7 @@ Push-Location $gateDir
 try{
     if(!(Test-Path -LiteralPath work)){& (Join-Path $ModelSimBin 'vlib.exe') work | Out-Null}
     $sources=Get-ChildItem -LiteralPath $sourceDir -Filter '*.v' | ForEach-Object FullName
-    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir" `
+    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir+$gateDir" `
         (Join-Path $GowinHome 'simlib\gw5a\prim_sim.v') (Join-Path $gateDir 'compiled.vg') @sources $bench $chartBench > compile.log 2>&1
     if($LASTEXITCODE){throw 'Gate compilation failed'}
     & (Join-Path $ModelSimBin 'vsim.exe') -c -onfinish stop work.tb_touch_game_gate -l run.log `
@@ -63,10 +64,11 @@ try{
     if($LASTEXITCODE -or $chartWarnings.Count -or $chartLog -match 'FAIL:|\*\* (Error|Fatal)' -or $chartLog -notmatch 'PASS:'){
         throw "Synthesized moving chart check failed; inspect $gateDir"
     }
-    [ordered]@{result='PASS';scope='Synthesized home menu/touch/silent audio plus full-score successive moving chart';
+    [ordered]@{result='PASS';scope='Six full-top frames: home/countdown/full-width moving stage/repeated feedback/result; touch and silent audio; full-score successive chart';
         source_sha256=$hashes;netlist_sha256=(Get-FileHash -LiteralPath 'compiled.vg').Hash.ToLower();
         log_sha256=(Get-FileHash -LiteralPath 'run.log').Hash.ToLower();
         chart_log_sha256=(Get-FileHash -LiteralPath 'chart_run.log').Hash.ToLower();
-        chart_bench_sha256=(Get-FileHash -LiteralPath $chartBench).Hash.ToLower()} |
+        chart_bench_sha256=(Get-FileHash -LiteralPath $chartBench).Hash.ToLower();
+        stage_forces_sha256=(Get-FileHash -LiteralPath $stageForces).Hash.ToLower()} |
         ConvertTo-Json -Depth 5 | Set-Content verification.json -Encoding UTF8
 }finally{Pop-Location}
