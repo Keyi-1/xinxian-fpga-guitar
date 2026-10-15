@@ -1,0 +1,165 @@
+{
+  "artifact_scope": "independent bands experiment; no production RTL change or new board release",
+  "production_master": "8230217e56952ee2793b97d98ef90e2740fff54b",
+  "production_image_unchanged": true,
+  "integration_status": "not_integrated",
+  "variants": {
+    "direct_log": {
+      "baseline": {
+        "synthesis": {
+          "register": 968,
+          "lut": 1638,
+          "alu": 76,
+          "bsram": 0,
+          "estimated_fmax_mhz": 70.732,
+          "estimate_clock_constraint_mhz": 100.0,
+          "netlist_sha256": "7fab9ec6d5df2d2f9486cae8769113e11b32ae45e450112e0d865ca0fb5f7727"
+        }
+      },
+      "direct_log": {
+        "synthesis": {
+          "register": 968,
+          "lut": 1638,
+          "alu": 75,
+          "bsram": 0,
+          "estimated_fmax_mhz": 72.878,
+          "estimate_clock_constraint_mhz": 100.0,
+          "netlist_sha256": "76dbd0c1b1608b4a2a7834d615670606f29be7cc801dc75ad475b923fec44b8f"
+        }
+      }
+    },
+    "balanced_log": {
+      "baseline": {
+        "synthesis": {
+          "register": 968,
+          "lut": 1638,
+          "alu": 76,
+          "bsram": 0,
+          "estimated_fmax_mhz": 70.732,
+          "estimate_clock_constraint_mhz": 100.0,
+          "netlist_sha256": "ef4d50a8fe1d34810a3774d60c8dcc89d52f080575d711dcd35fcbe9df55d145"
+        },
+        "implementation": {
+          "resources": {
+            "Logic": 1718.0,
+            "Register": 968.0,
+            "CLS": 1435.0,
+            "BSRAM": 0,
+            "DSP": 0
+          },
+          "clock_constraint_mhz": 50.0,
+          "fmax_mhz": 59.407,
+          "violations": {
+            "setup": 0,
+            "hold": 0,
+            "latch": 0,
+            "unrouted": 0
+          },
+          "clock_scope": "standalone clk register paths; automatic IO placement, no board CST or IO timing certification"
+        }
+      },
+      "balanced_log": {
+        "synthesis": {
+          "register": 968,
+          "lut": 1612,
+          "alu": 77,
+          "bsram": 0,
+          "estimated_fmax_mhz": 69.131,
+          "estimate_clock_constraint_mhz": 100.0,
+          "netlist_sha256": "a9b86c15d5598e28269f06a7435303b5584f71ccefdae3faefe43a0bfac23e1d"
+        },
+        "implementation": {
+          "resources": {
+            "Logic": 1693.0,
+            "Register": 968.0,
+            "CLS": 1403.0,
+            "BSRAM": 0,
+            "DSP": 0
+          },
+          "clock_constraint_mhz": 50.0,
+          "fmax_mhz": 53.343,
+          "violations": {
+            "setup": 0,
+            "hold": 0,
+            "latch": 0,
+            "unrouted": 0
+          },
+          "clock_scope": "standalone clk register paths; automatic IO placement, no board CST or IO timing certification"
+        }
+      }
+    }
+  },
+  "observations": {
+    "first_concat_candidate": "All binary inputs passed; X/Z propagation differed. Final addition restored; final candidates pass all probes.",
+    "standalone_warm_reset": "Both original and direct-log standalone netlists differ from original RTL on first publication after a later reset, cycle 187145. Cause not yet established. Both candidate netlists match paired baseline netlists for the full sequence.",
+    "harness_retry": "First paired-netlist compile failed due PowerShell scalar/array expansion; corrected without changing stimulus or assertions.",
+    "preserved_runs": [
+      "rtl_direct_log",
+      "gate_direct_log",
+      "gate_direct_log_debug",
+      "gate_baseline_diagnostic",
+      "gate_direct_log_paired"
+    ]
+  },
+  "limitations": [
+    "No full-system synthesis, P&R, pixel/audio regression or hardware test for these candidates.",
+    "Standalone automatic IO placement results cannot predict production CLS or Fmax.",
+    "Warm-reset RTL/netlist discrepancy remains a component experiment observation, not a newly certified reset contract."
+  ],
+  "tests": {
+    "rtl_direct_log_v2": {
+      "status": "PASS",
+      "scope": "exhaustive log and RTL component state/output equivalence",
+      "log_sha256": "0a0a2a48a5c8951ffcfd8ec1a92de7e7e61022942cf5d3b55293a899abd09f48",
+      "compile_log_sha256": "a35c75bd451f9e9b02ad2ed2c5192e93e60820ab62c155e7ea4ab19bbf8c2773"
+    },
+    "rtl_balanced_log": {
+      "status": "PASS",
+      "scope": "exhaustive log and RTL component state/output equivalence",
+      "log_sha256": "c538a84b5dca4ea32686e16944c3ce82d20518b7c0dba4e013db3d0bd0900208",
+      "compile_log_sha256": "06aa8eac707476af8618fc5a79072f792553429d1c636383710f0c226ff928de"
+    },
+    "gate_direct_log_paired_v2": {
+      "status": "PASS",
+      "scope": "candidate synthesized component vs frozen synthesized component, exact-cycle outputs including warm resets",
+      "log_sha256": "77b4676efb8ea90887c65191cb6c77b2b090e8299d702548a2ad12c4d419bb6a",
+      "compile_log_sha256": "a96f9b93a0e84c0dc1bcd125044c4b06ae42d84eae4b82ce40e411748de0b044"
+    },
+    "gate_balanced_log_paired": {
+      "status": "PASS",
+      "scope": "candidate synthesized component vs frozen synthesized component, exact-cycle outputs including warm resets",
+      "log_sha256": "dc5b24564328d4bfac5f51639ffaf4cce3ef531a8b36fb51ee294045fc6ea913",
+      "compile_log_sha256": "f76b577f7858a04fcab7241bddc117c527f27a94ae4d370198a0f55839f0c484"
+    }
+  },
+  "archive": {
+    "path": "build/radial_bands_experiment/archive_20261015",
+    "verification_sha256": "4524c802909aec739681ec767abe7d4ff9bed11390252d1313ae37d67eee0305",
+    "source_snapshot_sha256": "73f568b2d1e2262617718fa947c39dc7e92398063bc15f37974bd734fec3f481",
+    "evidence_file_count": 147
+  },
+  "source_sha256": {
+    "experiments/radial_bands/guitar_radial_bands_balanced_log.v": "afc910a720f10010d96c68d3bfe50e91f78cf54be7e096d914e95ddc22460445",
+    "experiments/radial_bands/guitar_radial_bands_direct_log.v": "1c0844254ee7597cbc401342ec59c938830589041b849189d91cfbc77c3ccd7e",
+    "sim/reference/radial_bands/guitar_radial_bands_frozen.v": "f29b3451df2e89672c24b6ad648e733fd3043485bfc512a794815e1b5185479e",
+    "rtl/display/guitar_radial_bands.v": "584729e9ce787607ef46e3fad02e7499db084c39b9bb8e37211252ebf7d612f9",
+    "sim/tb/tb_radial_bands_equivalence.sv": "10599ec83b2a035a1263c06c6b395e42a65df04ddec5bff12b0c9bfb2e17b507",
+    "docs/RADIAL_BANDS_RESOURCE_EXPERIMENT.md": "82c6ebd7f9d945c2bbeab0b003d09b232a2ee0a44c6873e2591daa4d283895ee",
+    "tools/prepare_radial_bands_experiment.py": "0e81f58c5b1aa30a3253fac4270b8230c4a48dbb9d205f5b0389364dd8a5cf9f",
+    "tools/run_radial_bands_experiment_checks.ps1": "2dab3fd2b8f9624bdae63cbc8ae3cffddaa1bd9561fde48571ca117dd2cd347c",
+    "tools/start_radial_bands_experiment.ps1": "1cc40034f3ec61abd61c9c38eeed6106c10358c1a36884a3a4b83ba1ff6315ce",
+    "tools/archive_radial_bands_experiment.py": "2afe487c460b01d24574c227ce830b579378340be70683af6330b376226ff040"
+  },
+  "excluded_user_ide_artifacts": {
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs": {
+      "sha256": "06b80fddcad019cb43a403084030c88b19f3cae1b5624b5ce48969a8aee0935f",
+      "last_write_local": "2026-10-15T20:44:57.976898",
+      "scope": "Observed existing IDE output, predates 21:55 master fast-forward; not used as experiment or P1 release evidence"
+    },
+    "gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.vg": {
+      "sha256": "ac75f9dbdeef7d81c8db4b0cc3fd9c478c00cda8625bd7c6c744dfb80dd96166",
+      "last_write_local": "2026-10-15T20:01:40.436233",
+      "scope": "Observed existing IDE output, predates 21:55 master fast-forward; not used as experiment or P1 release evidence"
+    }
+  }
+}
