@@ -1,5 +1,11 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
+**P2 首批核心试写：** 已新增 `game_p2_*` 源文件并加入本 `.gprj` 列表，便于在 IDE 查看。
+核心 RTL／数据验证记录为 [p2_core_verification.json](p2_core_verification.json)，
+范围和歌曲练习版说明见 [P2 原型说明](../../docs/P2_STATIC_ENGINE_PROTOTYPE.md)。
+**新核心尚未接入触控、显示或实际音色切换，当前顶层仍为 P1 功能；没有新增 P2 可下板位流。**
+用户已确认使用 P1.fs 做过下板检查；本轮不为未实例化模块启动无效的整机重建。
+
 **当前 master 已发布 P1（2026-10-15）：** 已验证的实现和记录已推送至 `origin/master`，
 将 64 根频谱柱高／峰值改为消隐期 64 拍串行复用，保持原三音色、音效、画面及游戏操作。
 完整 P&R：Logic **50159**，Register **22405**，CLS **27943/29952（93.29%）**，BSRAM **95**，DSP **115.5**；

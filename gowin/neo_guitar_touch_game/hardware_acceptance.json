@@ -36,7 +36,7 @@
     "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs",
     "reference_sha256": "e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86",
     "digital_status": "P&R/STA and required RTL/full-top synthesized-display/full-score regressions pass; all three P1 margin targets met",
-    "hardware_status": "User reports the current P1 version seems to have no issues and authorizes local saving. Installed bitstream hash was not independently captured; no additional quantitative acoustic or long-duration measurements supplied.",
+    "hardware_status": "User explicitly reports having performed on-board confirmation using P1.fs. Exact installed-file hash was not independently captured; no new quantitative acoustic or long-duration measurements supplied.",
     "installed_bitstream_sha256": null,
     "publication_authorized": false,
     "agent_programmed_hardware": false,
@@ -44,6 +44,14 @@
     "feedback_date": "2026-10-15",
     "feedback_code_commit": "c36689c",
     "user_statement": "现在的版本好像没什么问题，可以先提交保存。还有可以优化的空间吗？",
-    "local_save_authorized": true
+    "local_save_authorized": true,
+    "on_board_confirmation": {
+      "date": "2026-10-15",
+      "user_statement": "我已使用P1.fs做过下板确认。",
+      "reported_image": "P1.fs (user wording)",
+      "reference_release": "build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs",
+      "installed_bitstream_sha256": null,
+      "scope": "Explicit user confirmation, not an agent hardware programming action or independent measurement."
+    }
   }
 }

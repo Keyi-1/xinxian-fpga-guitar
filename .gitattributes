@@ -1,0 +1,6 @@
+# P2 generated data must round-trip through Windows Git byte-for-byte.
+mem/game_p2_static.mem text eol=lf
+rtl/config/game_p2_*.vh text eol=lf
+scores/p2/*.csv text eol=lf
+scores/p2/*.json text eol=lf
+scores/p2/*.bin binary

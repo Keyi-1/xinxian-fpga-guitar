@@ -1,0 +1,27 @@
+// Generated exact DDS increments, accepted 48 kHz tuning.
+case(midi)
+    7'd50:midi_phase=26'd13138339;
+    7'd51:midi_phase=26'd13919586;
+    7'd52:midi_phase=26'd14747287;
+    7'd53:midi_phase=26'd15624207;
+    7'd54:midi_phase=26'd16553270;
+    7'd55:midi_phase=26'd17537579;
+    7'd56:midi_phase=26'd18580418;
+    7'd57:midi_phase=26'd19685267;
+    7'd58:midi_phase=26'd20855814;
+    7'd59:midi_phase=26'd22095965;
+    7'd60:midi_phase=26'd23409859;
+    7'd61:midi_phase=26'd24801882;
+    7'd62:midi_phase=26'd26276679;
+    7'd63:midi_phase=26'd27839171;
+    7'd64:midi_phase=26'd29494575;
+    7'd65:midi_phase=26'd31248413;
+    7'd66:midi_phase=26'd33106541;
+    7'd67:midi_phase=26'd35075158;
+    7'd68:midi_phase=26'd37160835;
+    7'd69:midi_phase=26'd39370534;
+    7'd70:midi_phase=26'd41711627;
+    7'd71:midi_phase=26'd44191930;
+    7'd72:midi_phase=26'd46819719;
+    default:midi_phase=26'd0;
+endcase
