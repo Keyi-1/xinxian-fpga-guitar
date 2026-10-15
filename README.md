@@ -39,10 +39,16 @@
 已归档参考位流为 `build/releases/touch_game/neo_guitar_touch_game_j6_gamefix.fs`，现场烧录文件哈希未单独记录；
 验收记录见 [hardware_acceptance.json](gowin/neo_guitar_touch_game/hardware_acceptance.json)。
 在此分支使用游戏工程自己的验证脚本，master 的正式双输出入口及历史记录保持原样。
-当前实验已通过九项 RTL 回归、主页综合网表像素/引脚对照、整首曲谱 364 帧综合后移动布局对照及完整布局布线，setup/hold 为 0/0；
+已验收的 `a13fd79` 修复基线通过九项 RTL 回归、主页综合网表像素/引脚对照、整首曲谱 364 帧综合后移动布局对照及完整布局布线，setup/hold 为 0/0；
 演奏音频 8192 样本与已验收 master 完全一致。CLS 占 29744/29952（99.31%），
 系统／音频 Fmax 为 52.511／12.596 MHz；后续扩展需先优化逻辑占用及时序。
 用户已选择最初的“全宽舞台”方案，本分支已将其接入板上工程：顶部计分、四条完整轨道、渐变尾迹及短暂判定反馈，继续无需按品；同时加入曲谱生成阶段的避冲突／相邻换弦分配。4×9 矩阵及后来预览的折线动效未加入。详见 [全宽舞台实现说明](docs/FULL_WIDTH_GAME_STAGE.md)。上方 `a13fd79` 资源和实物记录属于修复基线，本次新界面需单独下板验收。
+
+全宽舞台已通过完整数字验证，当前归档为 [neo_guitar_touch_game_full_width.fs](T:/Documents/AMD/xinxian-fpga-guitar/build/releases/touch_game/neo_guitar_touch_game_full_width.fs)，
+SHA256 `9c161ac673cd1c081831075f4f84d4ff2067f6a20797119b9a65d9623b770883`。
+六帧综合网表显示、364 次连续布局、九项 RTL 回归及音频 8192 样本对照通过，未布通／setup／hold 均为 0。
+CLS 29842/29952（99.63%），BSRAM 95/118、DSP 115.5/118；系统／音频 Fmax 54.636／13.441 MHz。
+目前仍需后续面积优化；本次状态为数字验证通过、实物待验收，原实物验收版归档继续保留。
 
 ### 0.1 已完成
 

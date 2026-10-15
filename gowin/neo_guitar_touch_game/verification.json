@@ -1,5 +1,5 @@
 {
-  "result": "RTL_PASS",
+  "result": "PASS",
   "baseline_commit": "655458f32ba4f7e06403fd6c5c4da0b6f0dad8a7",
   "benches": [
     "tb_i2c_fault_recovery",
@@ -296,5 +296,51 @@
   "ui_style": "full_width_stage",
   "matrix_mode": false,
   "polyline_effect": false,
-  "hardware_status": "Full-width stage awaits hardware acceptance; hardware_acceptance.json records the earlier a13fd79 version; native J6 INT=T16"
+  "hardware_status": "Full-width stage awaits hardware acceptance; hardware_acceptance.json records the earlier a13fd79 version; native J6 INT=T16",
+  "clocks": {
+    "audio_clk_12m288": {
+      "required_mhz": 12.288,
+      "fmax_mhz": 13.441
+    },
+    "sys_clk_50m": {
+      "required_mhz": 50.0,
+      "fmax_mhz": 54.636
+    }
+  },
+  "violations": {
+    "setup": 0,
+    "hold": 0
+  },
+  "resources": {
+    "Logic": {
+      "used": 58178.0,
+      "available": 59904.0
+    },
+    "Register": {
+      "used": 22239.0,
+      "available": 60780.0
+    },
+    "CLS": {
+      "used": 29842.0,
+      "available": 29952.0
+    },
+    "BSRAM": {
+      "used": 95.0,
+      "available": 118.0
+    },
+    "DSP": {
+      "used": 115.5,
+      "available": 118.0
+    }
+  },
+  "bitstream_sha256": "9c161ac673cd1c081831075f4f84d4ff2067f6a20797119b9a65d9623b770883",
+  "netlist_sha256": "9fcb5a5a45c9a1c205213c7456f21f910ab9869431aaa1e808597b7837b05bcc",
+  "gate_evidence_sha256": "a96acadae28c63eb222ab0e3757c0605a59c424a9ba339abc8168e2faf1bade1",
+  "implementation_evidence_sha256": {
+    "neo_guitar_touch_game.log": "19196c8b89041ff85453a2292daff4cb4d5a9cea5d03a86621fd1d19645f7206",
+    "neo_guitar_touch_game.rpt.txt": "e929b2a60a34de692123dcecd3c8d3238951ee2aff403bcd5ae3d55e3d0ebd50",
+    "neo_guitar_touch_game_tr_content.html": "d7088ab2f548cc1bdd838df10bcd80a80581d729b8ab8bfbd1ea00b244d9a67b",
+    "cmd.do": "dab4faad99ddbe75e040dd29bdc5677b988ff8fa77fad1b5bc40eaf8ba70534a"
+  },
+  "gate_simulation": "Six full-top home/countdown/full-width game/result frames, touch/silent audio plus full-score consecutive moving chart; musical/control behavior covered by RTL benches"
 }
