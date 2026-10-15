@@ -1,18 +1,20 @@
 # 芯弦 FPGA 电子吉他
 
-> 四弦实时电子乐器：双 PCB 输入、FPGA 音色合成、双音频输出与演奏可视化
+> 四弦实时电子乐器：双 PCB 输入、FPGA 音色合成、双音频输出、触控与四轨引导演奏
 
-**当前版本（2026-10-13）：程序已通过用户下板验收。** 正式入口为
-[neo_guitar_i2s.gprj](gowin/neo_guitar_i2s/neo_guitar_i2s.gprj)，Top=`neo_guitar_i2s_top`。
-同一份最终立体声 PCM 同时送往板载 PT8211 和 J9 标准 I²S，保留三音色、四声部、全部音效、松品续音、四条拨弦渐变、环形真实频谱及中央莉萨如渐暗。
+**当前版本（2026-10-15）：用户认可全宽舞台效果并授权发布到 master。** 正式入口为
+[neo_guitar_touch_game.gprj](gowin/neo_guitar_touch_game/neo_guitar_touch_game.gprj)，Top=`neo_guitar_touch_game_top`。
+新增 GT911 触控菜单、《茉莉花》四轨游戏和全宽舞台；演奏模式保留原三音色、四声部、全部音效、松品续音、四条拨弦渐变、环形真实频谱及中央莉萨如渐暗。
+同一份最终立体声 PCM 继续同时送往板载 PT8211 和 J9 标准 I²S。原 `neo_guitar_i2s` 工程保留作已验收的双输出基线。
 
 钢琴击弦现由 FPGA 实时噪声激励、低通滤波和三个阻尼谐振器生成；生产链已移除录音残差 PCM ROM，保留钢琴模态主体。旧录音回放实现仅用于独立仿真 A/B。模型及赛题条款对照见 [程序生成击弦说明](docs/PROCEDURAL_PIANO_HAMMER.md)。
 
 | 当前入口与接口 | 配置 |
 | --- | --- |
 | FPGA / 底板 | Tang Mega 60K，GW5AT-LV60PG484AC1/I0，Device B / NEO Dock 31005 |
-| 工程操作与构建 | [双音频输出工程 README](gowin/neo_guitar_i2s/README.md) |
+| 工程操作与构建 | [触控／全宽舞台工程 README](gowin/neo_guitar_touch_game/README.md) |
 | LCD | J5，480×272 RGB666，DCLK 8.333 MHz；J17 的 1–2 针保持牢固连接，无需 HDMI |
+| 电容触控 | GT911 独立六针直插 J6；RST=T15、INT=T16、SDA=U16、SCL=W16，3.3 V |
 | 板载音频 | 原 PT8211 / 3.5 mm 输出，48 kHz、16 bit |
 | 标准 I²S | J9-11 BCLK / P19，J9-12 WS / R19，J9-9 DATA / T21；J9-3 或 4 共地 |
 | I²S 格式 | 48 kHz、每声道 32 位时隙、16 位有效数据；BCLK 3.072 MHz，WS 切换后延迟一位发送 MSB |
@@ -21,34 +23,33 @@
 
 芯弦 FPGA 电子吉他是一套以 Sipeed Tang Mega 60K FPGA 为硬件核心的四弦实时电子乐器。系统通过琴颈按弦矩阵和桥位压电传感器采集演奏动作，由 FPGA 内部可综合 HDL 逻辑完成音高选择、力度分级、声部管理、谐波／模态加法合成、包络、数字音效、频谱分析和音频输出。演奏期间，音频生成主链路不依赖软核 CPU、外部 MCU 或上位机程序。
 
-当前音色为钢琴、明亮弦音和哇音。品位矩阵只选择音高，压电拨弦才触发起音；松品滑回空弦并继续自然衰减，不由按品时长决定声音时长。三个 USER_BUTTON 用于音色／音效控制，没有外部复位键。
+当前音色为钢琴、明亮弦音和哇音。演奏模式下，品位矩阵只选择音高，压电拨弦才触发起音；松品滑回空弦并继续自然衰减，不由按品时长决定声音时长。三个 USER_BUTTON 用于音色／音效控制，没有外部复位键。
 
-屏幕左侧为 208×272 的蓝／绿／橙／红四弦渐变区；右侧为 272×272 显示区，内含 150×150 莉萨如图形和 64 根环形谱柱。曲线快速亮起、缓慢变暗，自然结束后保留约 150 ms 尾迹。
+演奏模式的屏幕左侧为 208×272 的蓝／绿／橙／红四弦渐变区；右侧为 272×272 显示区，内含 150×150 莉萨如图形和 64 根环形谱柱。曲线快速亮起、缓慢变暗，自然结束后保留约 150 ms 尾迹。
 
-四级力度实物标定尚未完成，当前默认固定力度编码 2（第 3 档）。GT911 触控、模式选择与四轨游戏已在 `experiment/touch-rhythm-game` 分支实现，2026-10-15 用户确认当前修复版无已知问题、可提交；入口见下节。该分支尚未合入 master。旧音频、居中图形、环形显示和独立击弦工程保留作阶段参考。
+游戏模式无需按品：看色块中心到达 x=96 判定线，拨对应弦后，由谱面选择音高并实时合成声音；保留计分、连击、Miss 提示和双击退出。曲谱生成器避免同弦重叠冲突，临近音优先换弦。4×9 矩阵与后续折线动效未加入。
+
+四级力度实物标定尚未完成，当前默认固定力度编码 2（第 3 档）。触控与游戏由 `experiment/touch-rhythm-game` 开发，随本次发布纳入 master；旧音频、居中图形、环形显示和独立击弦工程保留作阶段参考。
 
 项目最终目标日期为 **2026-11-01**，计划以 Apache License 2.0 公开源码。
 
 ## 0. 当前实际进度与待验收项目
 
-触控与四轨游戏现另开实验分支 `experiment/touch-rhythm-game`：新增模式菜单、GT911 触控、
-《茉莉花》教学单旋律和四轨拨弦判定，演奏模式复用原音源、音效与环形显示。
-工程入口及完整接线见 [`neo_guitar_touch_game`](gowin/neo_guitar_touch_game/README.md)。
-用户已确认 J6 电压符合要求，触控现改为原生 J6 六针直连，INT 使用 J6-4/T16。
-**2026-10-15 用户确认当前修复版已实物通过，可提交。** 对应代码为 `a13fd79`，
-已归档参考位流为 `build/releases/touch_game/neo_guitar_touch_game_j6_gamefix.fs`，现场烧录文件哈希未单独记录；
-验收记录见 [hardware_acceptance.json](gowin/neo_guitar_touch_game/hardware_acceptance.json)。
-在此分支使用游戏工程自己的验证脚本，master 的正式双输出入口及历史记录保持原样。
-已验收的 `a13fd79` 修复基线通过九项 RTL 回归、主页综合网表像素/引脚对照、整首曲谱 364 帧综合后移动布局对照及完整布局布线，setup/hold 为 0/0；
-演奏音频 8192 样本与已验收 master 完全一致。CLS 占 29744/29952（99.31%），
-系统／音频 Fmax 为 52.511／12.596 MHz；后续扩展需先优化逻辑占用及时序。
-用户已选择最初的“全宽舞台”方案，本分支已将其接入板上工程：顶部计分、四条完整轨道、渐变尾迹及短暂判定反馈，继续无需按品；同时加入曲谱生成阶段的避冲突／相邻换弦分配。4×9 矩阵及后来预览的折线动效未加入。详见 [全宽舞台实现说明](docs/FULL_WIDTH_GAME_STAGE.md)。上方 `a13fd79` 资源和实物记录属于修复基线，本次新界面需单独下板验收。
+当前主工程包含触控模式菜单、《茉莉花》单旋律及全宽四轨舞台。顶部计分，蓝／绿／橙／红四轨保留渐变尾迹和实际判定反馈；演奏模式复用原音源、音效与环形显示。
+工程入口及完整接线见 [`neo_guitar_touch_game`](gowin/neo_guitar_touch_game/README.md)，用户已确认原生 J6 六针直连的电压兼容，INT 使用 J6-4/T16。
+
+2026-10-15 用户先确认 `a13fd79` 修复版无已知问题，随后反馈全宽舞台“现在效果还可以”，授权 push 并合入 master。
+该反馈记录在 [hardware_acceptance.json](gowin/neo_guitar_touch_game/hardware_acceptance.json)；现场烧录文件的哈希没有另行采集，未新增定量声学或长期稳定性测量。
+全宽舞台源码为 `246b146`＋`98ba437`，发布审计为 `4bf7e0c`，详细实现见 [全宽舞台说明](docs/FULL_WIDTH_GAME_STAGE.md)。
+
+![全宽舞台实际 RTL 像素预览，计分为仿真数据](docs/images/full_width_game_stage.png)
 
 全宽舞台已通过完整数字验证，当前归档为 [neo_guitar_touch_game_full_width.fs](T:/Documents/AMD/xinxian-fpga-guitar/build/releases/touch_game/neo_guitar_touch_game_full_width.fs)，
 SHA256 `9c161ac673cd1c081831075f4f84d4ff2067f6a20797119b9a65d9623b770883`。
 六帧综合网表显示、364 次连续布局、九项 RTL 回归及音频 8192 样本对照通过，未布通／setup／hold 均为 0。
 CLS 29842/29952（99.63%），BSRAM 95/118、DSP 115.5/118；系统／音频 Fmax 54.636／13.441 MHz。
-目前仍需后续面积优化；本次状态为数字验证通过、实物待验收，原实物验收版归档继续保留。
+目前仍需后续面积优化；本次数字验证已通过、用户已认可当前效果并批准发布，旧实物验收版归档继续保留。
+默认是训练配置，试听与短促 Miss 提示开启；严格比赛配置和展示边界见 [合规说明](docs/TOUCH_GAME_COMPLIANCE_NOTES.md)。
 
 ### 0.1 已完成
 
@@ -59,12 +60,12 @@ CLS 29842/29952（99.63%），BSRAM 95/118、DSP 115.5/118；系统／音频 Fma
 - **每声部最多 32／每帧最多 128 个分量已实现：** 四声部并行、声部内分时计算；128 个非零分量的预算测试通过，音源调度为 233／256 个 12.288 MHz 时钟。自动和声使用每声部 16 主音 + 16 五度分量，保持原预算。
 - **双音频输出已实现：** 固定窄弦位声像、合唱与公共轻混响后，最终 PCM24→PCM16 同时送给 PT8211 和标准 I²S。两个发送器共享音源和音效计算；新增 I²S 不增加 DSP 或 BSRAM。普通音符之间功放保持开启。
 - **显示与演奏已整合：** 实际品位、拨弦和滑音驱动四弦渐变与莉萨如；1024 点 FFT 分析最终音效后的 PCM，生成 64 根环形谱柱。松品续音、曲线渐暗和当前双输出程序均已有用户实物验收反馈。
-- **当前数字验证通过：** I²S 独立协议测试检查 309 对样本；完整链路的 8192 对 I²S 样本与 PT8211 解码一致，原音频运算在 2,097,153 个参考时钟上逐周期一致。覆盖左右声道、帧边界、补零、复位、音色和全部音效。
-- **当前固定引脚实现与网表验证通过：** 7632 个 PT8211 帧与 RTL 一致，7631 对完整 I²S 样本与 PT8211 一致；7,949,456 个系统时钟及 1,115,060 个 LCD 有效像素与 RTL 一致。setup/hold 违例均为 0，无未布通网络。
+- **双输出基线数字验证通过：** I²S 独立协议测试检查 309 对样本；完整链路的 8192 对 I²S 样本与 PT8211 解码一致，原音频运算在 2,097,153 个参考时钟上逐周期一致。覆盖左右声道、帧边界、补零、复位、音色和全部音效。
+- **双输出基线固定引脚与网表验证通过：** 7632 个 PT8211 帧与 RTL 一致，7631 对完整 I²S 样本与 PT8211 一致；7,949,456 个系统时钟及 1,115,060 个 LCD 有效像素与 RTL 一致。当前触控游戏另有前述六帧显示及音频保真回归。
 
-当前源码的数字验证构建资源及时序（Gowin V1.9.12.03，GW5AT-LV60PG484AC1/I0，Device B；对应工程 `verification.json` 中的发布副本）：
+历史双输出基线的数字验证构建资源及时序（Gowin V1.9.12.03，GW5AT-LV60PG484AC1/I0，Device B；当前触控游戏资源见上一节）：
 
-| 项目 | 当前 `neo_guitar_i2s` |
+| 项目 | 历史双输出基线 `neo_guitar_i2s` |
 | --- | --- |
 | Logic / 59904 | 47470 |
 | Register / 60780 | 18733 |
@@ -75,27 +76,27 @@ CLS 29842/29952（99.63%），BSRAM 95/118、DSP 115.5/118；系统／音频 Fma
 | 系统／显示 Fmax（目标 50 MHz） | 59.995 MHz |
 | Setup / Hold 违例 | 0 / 0 |
 
-移除预录击弦 ROM 后，BSRAM 从旧环形版本的 118 降为 86，释放 32 块。
+双输出基线移除预录击弦 ROM 后，BSRAM 从旧环形版本的 118 降为 86，释放 32 块；当前触控游戏为 95/118。
 DSP 仍为 115.5/118；扩展功能前需评估复用和调度，现有实现尚未达到第 11.3 节的全部资源余量目标。
 
 在仓库根目录构建和核对当前版本（相关工具需在 PATH，或传入本机路径）：
 
 ```powershell
 # 如使用 IDE：先关闭工程、应用配置，再重新打开 .gprj
-./gowin/neo_guitar_i2s/configure_ide.ps1
-# 当前固定引脚双输出工程（Tcl 与 IDE 使用相同布局布线设置）
-gw_sh.exe gowin/neo_guitar_i2s/build.tcl
-# 协议及完整音频链回归；可用 -ModelSimBin 指定安装路径
-./tools/run_i2s_checks.ps1
-# 构建后对照综合网表的音频引脚和 LCD 像素
-./gowin/neo_guitar_i2s/run_gate_check.ps1 -ModelSimBin 'S:\BaiduNetdiskDownload\modelsim\win64'
+./gowin/neo_guitar_touch_game/configure_ide.ps1
+# 当前触控／游戏／双输出工程（Tcl 与 IDE 使用相同布局布线设置）
+gw_sh.exe gowin/neo_guitar_touch_game/build.tcl
+# 触控、游戏、布局、音频保真及严格配置回归
+./tools/run_touch_game_checks.ps1 -ModelSimBin 'S:\BaiduNetdiskDownload\modelsim\win64'
+# 构建后对照六帧综合网表显示、触控／静音音频引脚及全曲连续布局
+./gowin/neo_guitar_touch_game/run_gate_check.ps1 -ModelSimBin 'S:\BaiduNetdiskDownload\modelsim\win64'
 # 核对源码、引脚、时序、资源、仿真证据及位流哈希
-python gowin/neo_guitar_i2s/check_result.py
+python gowin/neo_guitar_touch_game/check_result.py
 ```
 
-构建输出为 `gowin/neo_guitar_i2s/impl/pnr/neo_guitar_i2s.fs`；本机保存的数字验证发布副本为
-`build/releases/dual_i2s/neo_guitar_i2s.fs`，SHA256：
-`9849f4669ad555e16cced7d00b33a29ada22439c0a6f0fb78cb387b3c1358b84`。
+构建输出为 `gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs`；本机发布副本为
+`build/releases/touch_game/neo_guitar_touch_game_full_width.fs`，SHA256 为前述 `9c161ac6…b770883`。
+旧双输出工程的构建与 `9849f466…1358b84` 归档详见 [双输出基线说明](gowin/neo_guitar_i2s/README.md)。
 IDE 使用 Place=4、Route=2、Clock Route Order=1，开启 hold 修复及 CPU/SSPI/I2C 引脚 GPIO 复用；
 工程保存了对应配置，避免旧 IDE 设置导致 `PR0004` 未布通。
 
@@ -103,14 +104,15 @@ IDE 使用 Place=4、Route=2、Clock Route Order=1，开启 hold 修复及 CPU/S
 `build/`、`impl/`、`sim/temp/` 中的位流、WAV 和完整报告为本地生成产物，不随 Git 提交；
 工程的配置 JSON 和精简 `verification.json` 随源码保存。新克隆需按上述步骤生成位流和验证证据。
 IDE 重新编译后，`impl` 中的网表和位流可能改变；需对新网表重新运行验证，校验器会拒绝混用旧仿真证据。
-本机后续 IDE 构建已更新 `impl`，上述发布副本及其原验证记录继续独立保留。
+本机 IDE 已在归档后重新生成不同的 `impl` 网表和位流；上述资源、时序和原门级记录对应归档发布，不认证这份重建产物。本次发布复核了归档位流、源码和原仿真日志的哈希，没有改动 HDL 或参数表。
 历史 `gowin/build_full.tcl` 仍为自动引脚逻辑构建，不用于实物下载。
 
 详细证据见：
 
-- [当前双音频输出工程与验收记录](gowin/neo_guitar_i2s/README.md)
+- [当前触控／游戏工程与验收记录](gowin/neo_guitar_touch_game/README.md)
+- [双音频输出基线与验收记录](gowin/neo_guitar_i2s/README.md)
 - [标准 I²S 接线、时序与验证](docs/STANDARD_I2S_VALIDATION.md)
-- [当前资源、时序与哈希记录](gowin/neo_guitar_i2s/verification.json)
+- [当前资源、时序与哈希记录](gowin/neo_guitar_touch_game/verification.json)
 - [实时滤波／模态击弦与赛题条款对照](docs/PROCEDURAL_PIANO_HAMMER.md)
 - [环形显示、曲线渐暗与松品续音](gowin/neo_guitar_radial/README.md)
 - [历史三键音频 FULL 上板说明](gowin/neo_guitar_audio_full/README.md)
@@ -146,19 +148,19 @@ IDE 重新编译后，`impl` 中的网表和位流可能改变；需对新网表
 | 品位板 ROW1～ROW3 | 已在四弦矩阵音频测试中覆盖 | 已随完整 4×8 扫描完成实物发声验证；早期 ROW0 单行记录仍作为独立诊断证据保留 |
 | 完整 4×8 矩阵扫描 | **双板全链路实物通过** | 已与 MCP3208 拨弦和优化音频同接验证 |
 | MCP3208 采集板 | **单板及双板集成实物通过** | 基线偏置/拨弦功能已验证；四级力度标定仍待完成 |
-| 双 PCB 输入与三音色／音效 | **实物通过** | 当前入口为 `neo_guitar_i2s`；继续补充长时间演奏、串扰和音频定量测试 |
+| 双 PCB 输入与三音色／音效 | **实物通过** | 当前 `neo_guitar_touch_game` 演奏模式复用原链路；继续补充长时间演奏、串扰和音频定量测试 |
 | 松品续音 | **实物通过** | 松品滑向空弦，保持原自然衰减；只有拨弦重新触发包络 |
 | 环形频谱／莉萨如／渐暗 | **用户已验收当前程序** | 480×272；左四弦渐变，右 150×150 曲线及 64 根谱柱 |
 | 程序生成钢琴击弦 | **固定三音干声试听及当前程序实物通过** | 生产链无预录击弦 PCM；旧版仅用于仿真参考 |
 | PT8211＋标准 I²S 双输出程序 | **2026-10-13 用户下板验收通过** | 协议及完整网表对照通过；外接 DAC 型号和专项实测结果尚未单独记录 |
 | LCD 接线与供电 | **显示已通过** | J5、J17 1–2、8.333 MHz、RGB666；背光额定电流匹配仍待单独确认 |
-| GT911／模式选择／四轨游戏 | **2026-10-15 用户实物验收通过** | 实验分支 `experiment/touch-rhythm-game`，修复代码 `a13fd79`；尚未合入 master |
+| GT911／模式选择／四轨游戏 | **2026-10-15 用户认可并批准发布** | 修复版 `a13fd79` 已验收；全宽舞台 `246b146`＋`98ba437` 获效果认可，本次纳入 master |
 | 四档力度 | **待实物标定** | 当前固定力度 2；见下一版设计方案 |
 
 - 底板为 NEO Dock 31005，核心板仍标为 30353/30354 之一。当前 J13 矩阵接线已实物通过并包含 Bank 1；沿用其既有 LVCMOS33、电源与接线，本次没有修改供电或扩展其它 Bank 1 接口。早期连接矩阵中的通用禁用规则和 PMOD 候选分配由此实测方案取代。
 - 50 MHz、PT8211、功放、三枚用户按键和 `USR_CLK_IN` 已由 31005 原理图、两版核心板共同部分及官方 60K CST 交叉核对。
 - NEO Dock MS5351M 的 CLK2 已设置为 12.288 MHz；示波器及 MINIMAL 实物音频链均已确认 FPGA 可稳定使用该时钟，完整断电后会独立自动恢复，不需要电脑、MCU、BL616 运行时配置或软核 CPU。
-- 当前 CST/SDC 为 `constraints/neo_guitar_i2s.cst` / `constraints/neo_guitar_i2s.sdc`：沿用 J13 矩阵、J8 ADC、J5 LCD、板载音频、三枚用户键和 LED，增加 J9 三根 I²S 输出，共 55 个固定且互不冲突的球位。新增三根为 Bank 7 的 LVCMOS33，不能与 SDRAM1/DVP 等复用外设同时驱动。
+- 当前 CST/SDC 为 `constraints/neo_guitar_touch_game.cst` / `constraints/neo_guitar_touch_game.sdc`：沿用 J13 矩阵、J8 ADC、J5 LCD、板载音频、三枚用户键、LED 和 J9 I²S，增加 J6 四根触控 GPIO，共 59 个固定且互不冲突的球位。I²S 三根为 Bank 7 的 LVCMOS33，不能与 SDRAM1/DVP 等复用外设同时驱动。
 - LCD 已到货。31005 的 J5 40-pin 连接器采用 RGB888 针脚排列，FPGA 连接 R2-R7、G2-G7、B2-B7 共 18 bit，每色低两位在底板接地；线路与 CH569 HSPI 共用。独立演示固定引脚见 `constraints/neo_lcd_lissajous.cst`，使用 J17 1–2 跳帽关闭 CH569。
 - 当前 `USER_BUTTON1=AA13` 用于音色切换；USER_BUTTON2=AB13、USER_BUTTON3=Y12 用于音效。旧工程中的 AA13/KEY0 复位定义不适用于当前音频 FULL。`SW7/RECONFIG=N12` 是 FPGA 专用重配置按钮，SRAM 下载后按下会清除当前配置，需重新 Program/Configure；内部上电初始化不占用用户键。
 - ROW0 LED 初测曾使用 PMOD1 的全部八根 GPIO 作为 COL0～COL7、PMOD0 的八根 GPIO 作为调试 LED。随后进行的 ROW0 音频闭环测试已移除 LED，只保留 PMOD1 八列输入，ROW0 直接接地、ROW1～ROW3 悬空，并通过 PT8211 输出判断所选音高。两种临时接法都与最终 12 线矩阵分配互斥，只能用于逐组诊断。
@@ -167,12 +169,12 @@ IDE 重新编译后，`impl` 中的网表和位流可能改变；需对新网表
 
 ### 0.3 当前实物工作顺序
 
-1. 以 `master` 的 `neo_guitar_i2s` 已验收程序作为当前整机基线，保持 J17 1–2 跳帽牢固，保留独立测试和历史位流用于排错。
+1. 以当前 `neo_guitar_touch_game` 全宽舞台发布作为整机基线，保持 J17 1–2 跳帽牢固，保留独立测试和历史位流用于排错。
 2. 对四根弦分别进行压电阈值、串扰和四级力度标定；确认后再关闭 `BOARD_FIXED_VELOCITY_ENABLE`，回归并重新上板。
 3. 继续检查空弦／按品、快速重拨、三／四音和弦以及音色、合唱、延音、混响和和声组合，补充长时间演奏记录。
 4. 用逻辑分析仪记录 J9 标准 I²S 和 PT8211 帧，补充外接 DAC 联调及物理拨弦到模拟输出延迟。早期 [输入延迟记录](docs/evidence/full_input_latency_acceptance.txt)不作为当前三音色整机延迟实测值。
 5. 先安排当前 FULL 的 RAM／DSP 余量，再扩展音色或显示功能；没有实测证据前不记录精确噪声、THD、SNR 等定量指标。
-6. 触控／引导演奏修复版已在实验分支通过用户验收；后续按 [模块路线](docs/FOLLOWUP_MODULE_IMPLEMENTATION_ROADMAP.md)推进，继续保留当前完整音色、音效和显示基线。游戏界面美化先审核效果示例。
+6. 全宽舞台已获效果认可并批准发布；后续按 [模块路线](docs/FOLLOWUP_MODULE_IMPLEMENTATION_ROADMAP.md)推进，先优化显示／游戏资源，再添加长曲、曲库和导入，继续保留当前完整音色、音效和显示基线。
 
 以下 0.4～0.10 为各阶段的历史验收记录；其中当时的工程入口、复位键、音色和待办状态不代表当前 master 配置。
 
@@ -290,7 +292,7 @@ IDE 重新编译后，`impl` 中的网表和位流可能改变；需对新网表
 
 #### 1.2.2 FPGA 原生节奏指导演奏模式
 
-可增加类似节奏音游的简化四轨指导功能，但目标是预置谱面和硬件实时判定，不是完整手机游戏 GUI。建议功能包括：
+当前已实现《茉莉花》单旋律、四轨判定和触控全宽舞台，见 [当前工程](gowin/neo_guitar_touch_game/README.md)。以下保留原设计范围，长曲、多曲目及动态导入仍待后续阶段：
 
 - 四条轨道，对应四根弦；
 - 由 `.mem`/ROM/片上 B-SRAM 保存的预编译音符时间表；
@@ -404,18 +406,18 @@ event_timestamp
 
 实际显示器为 **4.3 寸、480×272、并行 RGB、带独立 GT911 电容触摸接口**。NEO Dock 31005 的 J5 包含 R0-R7、G0-G7、B0-B7，FPGA 连接 R2-R7、G2-G7、B2-B7 共 18 根颜色数据；六根颜色低位在底板接地。LCD 数据/控制线路与 CH569 HSPI 共用，测试时使用 J17 的 1–2 跳帽关闭 CH569。该接口是并行 TTL/DPI RGB。
 
-当前整机沿用已验证的 50 MHz 六分频、8.333 MHz DCLK、531×292 总时序、480×272 有效区及下降沿更新，约 53.745 Hz。内部每通道 8 bit，板级包装输出 `lcd_r/g/b[7:2]`。左侧为四弦渐变，右侧为 150×150 莉萨如和 64 根环形频谱柱，已随当前程序通过用户实物验收。仍需单独完成的核对为：
+当前整机沿用已验证的 50 MHz 六分频、8.333 MHz DCLK、531×292 总时序、480×272 有效区及下降沿更新，约 53.745 Hz，板级输出为 RGB666。演奏模式左侧为四弦渐变，右侧为 150×150 莉萨如和 64 根环形频谱柱；游戏模式切换为全宽四轨。仍需单独完成的核对为：
 
 - 到货模组准确型号及商品 ST7625/IPS 信息与 PDF 的差异；
 - 面板端实际信号完整性及 setup/hold 裕量；
 - 背光额定电流与底板恒流设置的匹配；
-- GT911 触摸的独立调试与后续交互接入。
+- GT911 多场景、长时间操作和故障恢复的追加实测；原生 J6 触控与菜单已经接入。
 
-当前固定引脚音频／FFT／LCD／I²S 入口为 `neo_guitar_i2s_top`；独立 [莉萨如演示](gowin/neo_lcd_lissajous/README.md)保留作显示排错。RGB 屏无需 HDMI，当前显示不依赖 GT911 初始化；历史 FULL 自动引脚位流不用于实物。
+当前固定引脚音频／FFT／LCD／I²S／触控入口为 `neo_guitar_touch_game_top`；独立 [莉萨如演示](gowin/neo_lcd_lissajous/README.md)保留作显示排错。RGB 屏无需 HDMI，当前显示不依赖 GT911 初始化；历史 FULL 自动引脚位流不用于实物。
 
 此前候选的 540×960 MCU888/RGB888 屏不作为固定基线，除非卖家补齐上述资料，并确认其 RGB 模式、扫描方向、时序、电平和 FPC 与实际 NEO Dock／转接板兼容。
 
-480×272×24-bit 完整帧缓存约 3.13 Mbit，超过片上 BSRAM。当前频谱采用坐标绘图，莉萨如只存储缩小后的轨迹亮度；当前完整整机共使用 86/118 个 BSRAM。独立全屏莉萨如演示的双缓冲方案仅用于历史显示测试。
+480×272×24-bit 完整帧缓存约 3.13 Mbit，超过片上 BSRAM。当前频谱采用坐标绘图，莉萨如使用轨迹／扫描行缓存；当前触控游戏整机共使用 95/118 个 BSRAM，旧双输出基线为 86/118。独立全屏莉萨如演示的双缓冲方案仅用于历史显示测试。
 
 ### 3.6 时钟与供电
 
@@ -596,7 +598,8 @@ xinxian-fpga-guitar/
 │  ├─ FULL_EFFECTS_V2.md
 │  └─ evidence/
 ├─ gowin/
-│  ├─ neo_guitar_i2s/             # 当前已验收：双音频输出＋环形显示
+│  ├─ neo_guitar_touch_game/      # 当前入口：触控＋全宽四轨游戏＋完整演奏模式
+│  ├─ neo_guitar_i2s/             # 已验收的双音频输出／环形显示基线
 │  ├─ neo_guitar_procedural/      # 实时击弦模型独立工程
 │  ├─ neo_guitar_radial/          # 环形显示与渐暗阶段工程
 │  ├─ neo_guitar_lissajous/       # 早期居中莉萨如
@@ -611,10 +614,13 @@ xinxian-fpga-guitar/
 │  ├─ neo_guitar_audio_full.sdc
 │  ├─ neo_guitar_i2s.cst
 │  ├─ neo_guitar_i2s.sdc
+│  ├─ neo_guitar_touch_game.cst
+│  ├─ neo_guitar_touch_game.sdc
 │  └─ full_timing.sdc
 ├─ rtl/
 │  ├─ top/
 │  ├─ input/
+│  ├─ game/
 │  ├─ control/
 │  ├─ synth/
 │  ├─ effects/
@@ -655,7 +661,8 @@ xinxian-fpga-guitar/
 | 档位 | 用途 | 主要功能 |
 | --- | --- | --- |
 | `MINIMAL` | 首次上板与音频闭环 | 单声部、少量谐波、无 FFT、无复杂音效、PT8211 输出 |
-| `neo_guitar_i2s` | 当前已验收整机入口 | 四声部、最多 128 分量、实时击弦、全部三音色／音效、PT8211＋标准 I²S、1024 点 FFT、四弦渐变和环形显示 |
+| `neo_guitar_touch_game` | 当前整机入口，用户认可并批准发布 | GT911、模式菜单、《茉莉花》全宽四轨游戏；演奏模式保留完整三音色／音效、双音频输出、FFT 及原图形 |
+| `neo_guitar_i2s` | 已验收的双输出基线 | 四声部、最多 128 分量、实时击弦、全部三音色／音效、PT8211＋标准 I²S、1024 点 FFT、四弦渐变和环形显示 |
 | 音频 `FULL` | 历史音频阶段工程 | 三音色、合唱／延音／轻混响／五度和声；固定引脚，无 LCD，新增 I²S 默认关闭 |
 | FFT/LCD `FULL` | 历史完整逻辑构建 | 相同音频核心加 FFT 和 RGB 时序；自动引脚，仅逻辑构建 |
 | `neo_lcd_lissajous` | 480×272 动态显示与屏幕验收 | 固定 J5 引脚，8.333 MHz，彩虹莉萨如/拖尾/暂停；独立显示，无音频 |
@@ -803,6 +810,6 @@ BSRAM 为 86／118，DSP 为 115.5／118，仍未达到全部资源使用率与�
 
 需求基线日期：2026-09-04
 
-当前进度更新：2026-10-15，`neo_guitar_i2s` 为 master 的整机入口；触控游戏实验分支修复版已通过用户实物验收
+当前进度更新：2026-10-15，`neo_guitar_touch_game` 为本次发布的 master 整机入口，包含触控与全宽四轨游戏
 
-状态：双输出程序及实验分支触控游戏修复版已通过用户下板验收；四档力度实物标定及整机定量测试仍待完成
+状态：双输出及触控修复基线已验收，全宽舞台获用户效果认可并批准发布；四档力度实物标定及整机定量测试仍待完成

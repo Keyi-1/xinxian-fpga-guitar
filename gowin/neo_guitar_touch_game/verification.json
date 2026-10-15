@@ -296,7 +296,7 @@
   "ui_style": "full_width_stage",
   "matrix_mode": false,
   "polyline_effect": false,
-  "hardware_status": "Full-width stage awaits hardware acceptance; hardware_acceptance.json records the earlier a13fd79 version; native J6 INT=T16",
+  "hardware_status": "See hardware_acceptance.json for user feedback and installed-image verification limits; native J6 INT=T16",
   "clocks": {
     "audio_clk_12m288": {
       "required_mhz": 12.288,
@@ -342,5 +342,11 @@
     "neo_guitar_touch_game_tr_content.html": "d7088ab2f548cc1bdd838df10bcd80a80581d729b8ab8bfbd1ea00b244d9a67b",
     "cmd.do": "dab4faad99ddbe75e040dd29bdc5677b988ff8fa77fad1b5bc40eaf8ba70534a"
   },
-  "gate_simulation": "Six full-top home/countdown/full-width game/result frames, touch/silent audio plus full-score consecutive moving chart; musical/control behavior covered by RTL benches"
+  "gate_simulation": "Six full-top home/countdown/full-width game/result frames, touch/silent audio plus full-score consecutive moving chart; musical/control behavior covered by RTL benches",
+  "artifact_scope": {
+    "kind": "archived_release",
+    "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_full_width.fs",
+    "reference_verification": "build/releases/touch_game/full_width_verification.json",
+    "note": "Local IDE regenerated impl after the recorded release; its current netlist and bitstream differ. This record certifies the archived release, not those regenerated artifacts."
+  }
 }

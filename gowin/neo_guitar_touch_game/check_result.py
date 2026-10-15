@@ -71,7 +71,7 @@ def main():
                   source_sha256=evidence['source_sha256'], preserved_assets_sha256=preserved,
                   rtl_evidence_sha256=digest(directory/'verification.json'),
                   ui_style='full_width_stage',matrix_mode=False,polyline_effect=False,
-                  hardware_status='Full-width stage awaits hardware acceptance; hardware_acceptance.json records the earlier a13fd79 version; native J6 INT=T16')
+                  hardware_status='See hardware_acceptance.json for user feedback and installed-image verification limits; native J6 INT=T16')
     if args.rtl_only:
         (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
         print(f'RTL_PASS: {len(BENCHES)} benches; bitstream/routing/timing not approved by --rtl-only')

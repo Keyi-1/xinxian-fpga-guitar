@@ -1,12 +1,32 @@
 {
   "date": "2026-10-15",
   "source": "User feedback in the project conversation",
-  "user_statement": "现在这个版本没有什么bug了，可以先提交。",
-  "code_commit": "a13fd79",
-  "reference_release_bitstream": "build/releases/touch_game/neo_guitar_touch_game_j6_gamefix.fs",
-  "reference_release_sha256": "db1e7578e676d4cdbd0de375c46f016e744386f7fd1cfc45d340205f99ce849a",
+  "user_statement": "现在效果还可以，可以push到github上并merge到master中",
+  "code_commit": "4bf7e0c",
+  "implementation_commits": [
+    "246b146",
+    "98ba437"
+  ],
+  "reference_release_bitstream": "build/releases/touch_game/neo_guitar_touch_game_full_width.fs",
+  "reference_release_sha256": "9c161ac673cd1c081831075f4f84d4ff2067f6a20797119b9a65d9623b770883",
   "installed_bitstream_sha256": null,
   "configuration": "Training: ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1; native J6 INT=T16",
-  "scope": "User acceptance of the current source version; the installed bitstream hash was not captured. No additional quantitative audio, long-duration stability, or strict-competition hardware measurements recorded",
-  "artifact_audit": "The archived release still matches its recorded hash. Local IDE synthesis and PNR outputs have since changed; the old gate evidence does not certify those regenerated artifacts. No rebuild or new release was performed for this UI concept task."
+  "publication_authorized": true,
+  "scope": "User approves the current full-width-stage effect and explicitly authorizes GitHub push and merge to master. This records user feedback, not an independent hardware measurement or a capture of the installed bitstream hash. No additional quantitative audio, long-duration stability, or strict-competition hardware measurements recorded",
+  "artifact_audit": "The archived full-width release matches its recorded SHA256. Existing digital verification binds production RTL, ROMs, netlist, logs and routed implementation; the separate serial-spectrum area probe is not applied to this release; local IDE outputs were subsequently regenerated and differ from this archive. The archived logs do not certify the regenerated netlist or bitstream",
+  "previous_acceptances": [
+    {
+      "date": "2026-10-15",
+      "source": "User feedback in the project conversation",
+      "user_statement": "现在这个版本没有什么bug了，可以先提交。",
+      "code_commit": "a13fd79",
+      "reference_release_bitstream": "build/releases/touch_game/neo_guitar_touch_game_j6_gamefix.fs",
+      "reference_release_sha256": "db1e7578e676d4cdbd0de375c46f016e744386f7fd1cfc45d340205f99ce849a",
+      "installed_bitstream_sha256": null,
+      "configuration": "Training: ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1; native J6 INT=T16",
+      "scope": "User acceptance of the current source version; the installed bitstream hash was not captured. No additional quantitative audio, long-duration stability, or strict-competition hardware measurements recorded",
+      "artifact_audit": "The archived release still matches its recorded hash. Local IDE synthesis and PNR outputs have since changed; the old gate evidence does not certify those regenerated artifacts. No rebuild or new release was performed for this UI concept task."
+    }
+  ],
+  "local_ide_bitstream_sha256": "d0a12ed908c9503b7e838b6a80f0b1d1e93fab5c7abc010b6493b4a32915c8aa"
 }
