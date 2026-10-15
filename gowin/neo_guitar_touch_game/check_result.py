@@ -70,7 +70,7 @@ def main():
                       voltage_confirmation='User confirmed J6-compatible IO voltage'),
                   source_sha256=evidence['source_sha256'], preserved_assets_sha256=preserved,
                   rtl_evidence_sha256=digest(directory/'verification.json'),
-                  hardware_status='Original menus and preview tested by user; missing game guidance reproduced and fixed in gate simulation; this bugfix awaits hardware acceptance; native J6 INT=T16')
+                  hardware_status='See hardware_acceptance.json for separately recorded user feedback and its scope; native J6 INT=T16')
     if args.rtl_only:
         (PROJECT/'verification.json').write_text(json.dumps(result, indent=2)+'\n')
         print(f'RTL_PASS: {len(BENCHES)} benches; bitstream/routing/timing not approved by --rtl-only')

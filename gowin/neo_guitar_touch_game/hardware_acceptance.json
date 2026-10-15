@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-15",
+  "source": "User feedback in the project conversation",
+  "user_statement": "现在这个版本没有什么bug了，可以先提交。",
+  "code_commit": "a13fd79",
+  "reference_release_bitstream": "build/releases/touch_game/neo_guitar_touch_game_j6_gamefix.fs",
+  "reference_release_sha256": "db1e7578e676d4cdbd0de375c46f016e744386f7fd1cfc45d340205f99ce849a",
+  "installed_bitstream_sha256": null,
+  "configuration": "Training: ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1; native J6 INT=T16",
+  "scope": "User acceptance of the current source version; the installed bitstream hash was not captured. No additional quantitative audio, long-duration stability, or strict-competition hardware measurements recorded",
+  "artifact_audit": "The archived release still matches its recorded hash. Local IDE synthesis and PNR outputs have since changed; the old gate evidence does not certify those regenerated artifacts. No rebuild or new release was performed for this UI concept task."
+}

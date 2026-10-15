@@ -289,7 +289,7 @@
     "rtl/top/xinxian_top.v": "50005cafe7aef542c120e8ef09210b5558bccd3053db465818497fd6771edd77"
   },
   "rtl_evidence_sha256": "14005b4dc12f2008ce8bf33d1cdbe19cae2eb154b9cbc58710a5e270529ff5a9",
-  "hardware_status": "Original menus and preview tested by user; missing game guidance reproduced and fixed in gate simulation; this bugfix awaits hardware acceptance; native J6 INT=T16",
+  "hardware_status": "2026-10-15: user accepted the current source version; installed bitstream hash not captured. See hardware_acceptance.json. This digital record describes the archived release, not subsequently regenerated local IDE outputs; native J6 INT=T16",
   "clocks": {
     "audio_clk_12m288": {
       "required_mhz": 12.288,
