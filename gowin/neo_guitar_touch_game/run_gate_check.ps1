@@ -1,9 +1,13 @@
 param([string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64',
       [string]$GowinHome='S:\BaiduNetdiskDownload\GOWIN\Gowin_V1.9.12.03_x64\IDE',
-      [string]$PythonExe='E:\anaconda3\python.exe')
+      [string]$PythonExe='E:\anaconda3\python.exe',
+      [string]$ImplementationDir=$PSScriptRoot,
+      [string]$GateDir='',
+      [switch]$P1)
 $ErrorActionPreference='Stop'
 $repoDir=Split-Path (Split-Path $PSScriptRoot)
-$gateDir=Join-Path $repoDir 'sim\temp\touch_game_gate'
+if(!$GateDir){$GateDir=Join-Path $repoDir 'sim\temp\touch_game_gate'}
+$gateDir=[IO.Path]::GetFullPath($GateDir)
 $sourceDir=Join-Path $gateDir 'sources'
 New-Item -ItemType Directory -Path $sourceDir -Force | Out-Null
 $rtlFiles=Get-ChildItem -LiteralPath (Join-Path $repoDir 'rtl') -Recurse -Filter '*.v'
@@ -13,7 +17,13 @@ $moduleNames=foreach($file in $rtlFiles){
 $pattern='\b('+ (($moduleNames|ForEach-Object {[regex]::Escape($_)}) -join '|') +')\b'
 $hashes=@{}
 foreach($file in $rtlFiles){
-    $body=[regex]::Replace((Get-Content -Raw -LiteralPath $file.FullName),$pattern,{param($m)'rtlref_'+$m.Value})
+    $source=Get-Content -Raw -LiteralPath $file.FullName
+    if($P1 -and $file.Name -eq 'guitar_radial_palette.v'){
+        $frozen=Join-Path $repoDir 'sim\reference\display_game_p1\guitar_radial_palette_frozen.v'
+        $source=(Get-Content -Raw -LiteralPath $frozen).Replace('module guitar_radial_palette_frozen(', 'module guitar_radial_palette(')
+        $hashes['sim\reference\display_game_p1\guitar_radial_palette_frozen.v']=(Get-FileHash $frozen).Hash.ToLower()
+    }
+    $body=[regex]::Replace($source,$pattern,{param($m)'rtlref_'+$m.Value})
     $body=$body.Replace('`include "../config/','`include "').Replace('"../../mem/','"../../../mem/')
     Set-Content -LiteralPath (Join-Path $sourceDir $file.Name) -Value $body -Encoding UTF8
     $hashes[$file.FullName.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $file.FullName).Hash.ToLower()
@@ -25,12 +35,13 @@ foreach($file in (Get-ChildItem -LiteralPath (Join-Path $repoDir 'rtl\config') -
 foreach($file in (Get-ChildItem -LiteralPath (Join-Path $repoDir 'mem') -File)){
     $hashes[$file.FullName.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $file.FullName).Hash.ToLower()
 }
-$netlist=Join-Path $PSScriptRoot 'impl\gwsynthesis\neo_guitar_touch_game.vg'
+$netlist=Join-Path $ImplementationDir 'impl\gwsynthesis\neo_guitar_touch_game.vg'
 Copy-Item -LiteralPath $netlist -Destination (Join-Path $gateDir 'compiled.vg')
 $chartGenerator=Join-Path $repoDir 'tools\generate_game_chart_gate_bench.py'
 $chartBench=Join-Path $gateDir 'tb_game_chart_gate.sv'
 $stageForces=Join-Path $gateDir 'stage_force.vh'
-& $PythonExe $chartGenerator $netlist $chartBench
+$p1Args=@();if($P1){$p1Args=@('--p1')}
+& $PythonExe $chartGenerator $netlist $chartBench @p1Args
 if($LASTEXITCODE){throw 'Cannot map synthesized chart ports'}
 $hashes['tools\generate_game_chart_gate_bench.py']=(Get-FileHash -LiteralPath $chartGenerator).Hash.ToLower()
 $bench=Join-Path $repoDir 'sim\tb\tb_touch_game_gate.sv'
@@ -39,7 +50,8 @@ Push-Location $gateDir
 try{
     if(!(Test-Path -LiteralPath work)){& (Join-Path $ModelSimBin 'vlib.exe') work | Out-Null}
     $sources=Get-ChildItem -LiteralPath $sourceDir -Filter '*.v' | ForEach-Object FullName
-    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir+$gateDir" `
+    $defines=@();if($P1){$defines=@('+define+P1_CHECKS')}
+    & (Join-Path $ModelSimBin 'vlog.exe') -sv @defines "+incdir+$sourceDir+$gateDir" `
         (Join-Path $GowinHome 'simlib\gw5a\prim_sim.v') (Join-Path $gateDir 'compiled.vg') @sources $bench $chartBench > compile.log 2>&1
     if($LASTEXITCODE){throw 'Gate compilation failed'}
     & (Join-Path $ModelSimBin 'vsim.exe') -c -onfinish stop work.tb_touch_game_gate -l run.log `
@@ -64,7 +76,7 @@ try{
     if($LASTEXITCODE -or $chartWarnings.Count -or $chartLog -match 'FAIL:|\*\* (Error|Fatal)' -or $chartLog -notmatch 'PASS:'){
         throw "Synthesized moving chart check failed; inspect $gateDir"
     }
-    [ordered]@{result='PASS';scope='Six full-top frames: home/countdown/full-width moving stage/repeated feedback/result; touch and silent audio; full-score successive chart';
+    [ordered]@{result='PASS';p1_frozen_palette=[bool]$P1;scope='Full-top scan/GPIO/silent audio plus full-score successive chart; P1 adds dynamic spectrum/fade/page transitions against frozen palette';
         source_sha256=$hashes;netlist_sha256=(Get-FileHash -LiteralPath 'compiled.vg').Hash.ToLower();
         log_sha256=(Get-FileHash -LiteralPath 'run.log').Hash.ToLower();
         chart_log_sha256=(Get-FileHash -LiteralPath 'chart_run.log').Hash.ToLower();

@@ -18,41 +18,55 @@ module guitar_radial_palette(input wire clk,rst_n,frame_start,visual_update,
     reg [5:0] hue_count;
     reg [1:0] peak_divider;
     integer i;
+    // One shared smoothing/peak datapath: 64 clocks after visual_update.
+    // Integration commits visual_update near the start of vertical blank;
+    // all heights/peaks settle before any active pixel (checked in simulation).
+    // No pixel, mask, coordinate or scanner pipeline latency is changed.
+    // targets may change during the pass; retain the exact start-time word.
+    reg [159:0] bar_targets;
+    reg [5:0] bar_index;
+    reg [4:0] previous_pair;
+    reg bar_busy,decay_peaks;
+    wire [4:0] bar_raw=bar_targets[4:0];
+    wire [4:0] bar_next=bar_index>=62 ? bar_raw : bar_targets[9:5];
+    wire [5:0] pair_sum={1'b0,bar_raw}+{1'b0,bar_next}+6'd1;
+    wire [4:0] pair_value=pair_sum[5:1];
+    wire [4:0] old_height=heights[bar_index],old_peak=peaks[bar_index];
     reg [5:0] raw_target,previous_target,next_target;
     reg [7:0] smoothed;
     reg [4:0] next_height;
-    function [4:0] interpolated;
-        input [5:0] bar;
-        reg [5:0] sum;
-        begin
-            if(!bar[0] || bar==63)interpolated=targets[bar[5:1]*5+:5];
-            else begin sum={1'b0,targets[bar[5:1]*5+:5]}+{1'b0,targets[(bar[5:1]+5'd1)*5+:5]}+1'b1;
-                interpolated=sum[5:1];end
-        end
-    endfunction
+    always @*begin
+        raw_target={1'b0,bar_index[0] ? pair_value : bar_raw};
+        previous_target={1'b0,bar_index[0] ? bar_raw : previous_pair};
+        next_target={1'b0,bar_index[0] ? bar_next : pair_value};
+        smoothed=({2'd0,raw_target}<<1)+{2'd0,previous_target}+{2'd0,next_target}+8'd2;
+        next_height=smoothed[6:2];
+        if(next_height>old_height)begin
+            smoothed={3'd0,old_height}+({3'd0,next_height}<<1)+{3'd0,next_height}+8'd3;
+            next_height=smoothed[6:2];
+        end else if(next_height<old_height)next_height=old_height-1'b1;
+    end
     always @(posedge clk)begin
         if(!rst_n)begin
             old_strikes<=0;hue_count<=0;peak_divider<=0;
+            bar_targets<=0;bar_index<=0;previous_pair<=0;bar_busy<=0;decay_peaks<=0;
             for(i=0;i<4;i=i+1)envelope[i]<=0;
             for(i=0;i<64;i=i+1)begin heights[i]<=0;peaks[i]<=0;end
-        end else if(visual_update)begin
-            old_strikes<=strikes;hue_count<=hue_count+1'b1;peak_divider<=peak_divider+1'b1;
-            for(i=0;i<4;i=i+1)
-                if(strikes[i*8+:8]!=old_strikes[i*8+:8])envelope[i]<=31;
-                else if(envelope[i]!=0)envelope[i]<=envelope[i]-1'b1;
-            for(i=0;i<64;i=i+1)begin
-                raw_target={1'b0,interpolated(i[5:0])};
-                previous_target={1'b0,interpolated(i==0 ? 6'd0 : i[5:0]-1'b1)};
-                next_target={1'b0,interpolated(i==63 ? 6'd63 : i[5:0]+1'b1)};
-                smoothed=({2'd0,raw_target}<<1)+{2'd0,previous_target}+{2'd0,next_target}+8'd2;
-                next_height=smoothed[6:2];
-                if(next_height>heights[i])begin
-                    smoothed={3'd0,heights[i]}+({3'd0,next_height}<<1)+{3'd0,next_height}+8'd3;
-                    next_height=smoothed[6:2];
-                end else if(next_height<heights[i])next_height=heights[i]-1'b1;
-                heights[i]<=next_height;
-                if(next_height>=peaks[i])peaks[i]<=next_height;
-                else if(peak_divider==3 && peaks[i]!=0)peaks[i]<=peaks[i]-1'b1;
+        end else begin
+            if(visual_update)begin
+                old_strikes<=strikes;hue_count<=hue_count+1'b1;peak_divider<=peak_divider+1'b1;
+                for(i=0;i<4;i=i+1)
+                    if(strikes[i*8+:8]!=old_strikes[i*8+:8])envelope[i]<=31;
+                    else if(envelope[i]!=0)envelope[i]<=envelope[i]-1'b1;
+                bar_targets<=targets;bar_index<=0;previous_pair<=targets[4:0];
+                bar_busy<=1;decay_peaks<=peak_divider==3;
+            end else if(bar_busy)begin
+                heights[bar_index]<=next_height;
+                if(next_height>=old_peak)peaks[bar_index]<=next_height;
+                else if(decay_peaks && old_peak!=0)peaks[bar_index]<=old_peak-1'b1;
+                if(bar_index[0])begin bar_targets<={5'd0,bar_targets[159:5]};previous_pair<=pair_value;end
+                if(bar_index==63)bar_busy<=0;
+                else bar_index<=bar_index+1'b1;
             end
         end
     end

@@ -30,6 +30,14 @@ module tb_touch_game_gate;
         .lcd_r(rr),.lcd_g(rg),.lcd_b(rb),.ctp_scl(rscl),.ctp_sda(rsda),.ctp_int(rint),.ctp_rst_n(rrst));
     reg [2:0] test_page=0;
     reg [255:0] test_snapshot=0;
+`ifdef P1_CHECKS
+    reg [399:0] test_visual=0;
+    reg [159:0] test_targets=0;
+    integer mutation=0;
+    localparam FRAME_COUNT=21;
+`else
+    localparam FRAME_COUNT=6;
+`endif
     wire test_update=reference.u_display.frame_start;
     integer frames=0,clocks=0,pixels=0;
     initial begin
@@ -63,8 +71,37 @@ module tb_touch_game_gate;
                         test_snapshot[241:240]=1;test_snapshot[2:0]=7;
                     end
                     6:begin test_page=6;end
+`ifdef P1_CHECKS
+                    7:begin
+                        test_page=1;
+                        test_visual[335:332]=15;test_visual[367:352]=16'hffff;
+                        test_visual[399:368]=32'h01010101;
+                        for(integer j=0;j<4;j=j+1)begin
+                            test_visual[128+j*32+:32]=32'd19685267+j*32'd4123000;
+                            test_visual[288+j*11+:11]=220+j*55;
+                        end
+                        for(integer j=0;j<32;j=j+1)test_targets[j*5+:5]=j;
+                    end
+                    8:begin test_targets={160{1'b1}};end
+                    9:begin test_targets=0;test_visual[367:352]=16'h1234;end
+                    10:begin test_visual[335:332]=0;test_visual[367:352]=0;end
+                    18:begin
+                        if(reference.u_display.curve_active!=0)$fatal(1,"FAIL: gate frozen curve fade missing");
+                        test_visual[335:332]=1;test_visual[367:352]=15;test_visual[375:368]=2;
+                    end
+                    19:test_page=0;
+                    20:test_page=5;
+                    21:test_page=1;
+`endif
                 endcase
             end
+`ifdef P1_CHECKS
+            if(reference.u_display.visual_update)mutation=7;
+            else if(mutation!=0)begin
+                mutation=mutation-1;
+                if(mutation==0)test_targets=~test_targets;
+            end
+`endif
         end
     end
     always @(posedge audio_clk)begin
@@ -72,10 +109,13 @@ module tb_touch_game_gate;
     end
     always @(posedge gp)if(gd)begin
         pixels=pixels+1;
-        if(pixels==480*272*6)begin
+        if(pixels==480*272*FRAME_COUNT)begin
+`ifdef P1_CHECKS
+            $display("PASS: synthesized P1 frozen display %0d clocks / %0d pixels; 21 full-top frames, dynamic spectrum/target mutation/peak decay/eight-frame curve fade/page switches; six-clock scan RGB and touch/silent audio match",clocks,pixels);
+`endif
             $display("PASS: synthesized menu LCD and full-width stage %0d clocks / %0d pixels; home/countdown/moving notes/header/repeated judgement/result, touch reset and silent PT8211/I2S match full RTL",clocks,pixels);
             $finish;
         end
     end
-    initial begin #200000000;$fatal(1,"FAIL: gate stage watchdog");end
+    initial begin #500000000;$fatal(1,"FAIL: gate stage watchdog");end
 endmodule

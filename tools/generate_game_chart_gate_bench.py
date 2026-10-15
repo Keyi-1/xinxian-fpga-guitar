@@ -138,6 +138,39 @@ endmodule
             raise ValueError(f'Unsupported CDC output: {name} [{width}]')
     required = set(range(67)) | set(range(128, 152)) | {159} | set(range(160, 212)) | set(range(220, 232)) | set(range(238, 246))
     assert update_found and required <= snapshot_bits, 'inspect missing optimized CDC fields'
+    if '--p1' in sys.argv:
+        # Drive only legal display inputs, retaining the synthesized palette,
+        # curve RAM, renderer, game mux and physical scanner in the full top.
+        for module, instance, prefix, value, bits in [
+                ('guitar_visual_cdc', 'u_cdc', 'snapshot', 'test_visual', 400),
+                ('guitar_radial_bands', 'u_bands', 'targets', 'test_targets', 160)]:
+            start = source.index(f'module {module} (')
+            body = source[start:source.index('endmodule', start)]
+            outputs = re.findall(r'^output\s+(?:\[([^]]+)\]\s+)?(\w+);', body, re.M)
+            found = set()
+            for width, name in outputs:
+                if name == prefix:
+                    assert width, (module, name)
+                    hi, lo = map(int, width.split(':'))
+                    found.update(range(lo, hi+1))
+                    expression = f'{value}[{hi}:{lo}]'
+                elif name.startswith(prefix+'_'):
+                    bit = int(name.rsplit('_', 1)[1])
+                    assert not width and 0 <= bit < bits
+                    found.add(bit)
+                    expression = f'{value}[{bit}]'
+                else:
+                    continue
+                force_lines.append(f'force gate.u_display.{instance}.{name} = {expression};')
+            expected = set(range(bits)) if bits == 160 else (
+                set(range(272, 400)) |
+                {i*32+j for i in range(4) for j in range(16, 32)} |
+                {128+i*32+j for i in range(4) for j in range(26)})
+            # Low phase bits are not rendered; synthesized pitch increments
+            # have six constant-zero high bits. Bench pitches stay below 2^26.
+            assert found == expected, (module, 'inspect changed optimized fields', expected ^ found)
+        force_lines += ['force reference.u_display.u_cdc.dst_snapshot = test_visual;',
+                        'force reference.u_display.u_bands.targets = test_targets;']
     force_path = destination.parent/'stage_force.vh'
     force_path.write_text('\n'.join(force_lines)+'\n', encoding='ascii')
     print(f'Generated {force_path.name}: display-only injection; physical scan and full top retained')
