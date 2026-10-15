@@ -2,7 +2,7 @@
   "artifact_scope": "independent bands experiment; no production RTL change or new board release",
   "production_master": "8230217e56952ee2793b97d98ef90e2740fff54b",
   "production_image_unchanged": true,
-  "integration_status": "not_integrated",
+  "integration_status": "rejected_by_user",
   "variants": {
     "direct_log": {
       "baseline": {
@@ -161,5 +161,13 @@
       "last_write_local": "2026-10-15T20:01:40.436233",
       "scope": "Observed existing IDE output, predates 21:55 master fast-forward; not used as experiment or P1 release evidence"
     }
-  }
+  },
+  "adoption_decision": {
+    "date": "2026-10-15",
+    "user_statement": "那就还是不采纳这个频带模块的优化路径了吧，感觉节省得很少。",
+    "decision": "Do not adopt; stop this frequency-band optimization route, including further RAM, selector and pipeline experiments.",
+    "production_master_unchanged": "8230217e56952ee2793b97d98ef90e2740fff54b",
+    "historical_evidence": "Preserve the immutable experiment archive; this decision is not a new validation result."
+  },
+  "source_sha256_scope": "Historical hashes copied from the immutable experiment archive; precede the subsequent adoption decision and document update."
 }

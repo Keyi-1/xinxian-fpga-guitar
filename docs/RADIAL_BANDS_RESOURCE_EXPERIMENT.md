@@ -11,7 +11,9 @@
 **两种对数量化改写均保持组件行为，但本次收益不足以集成。**
 直接尾数选择只节省 1 个综合 ALU；平衡树候选略省面积，独立实装时序反而下降。
 实验源码留在 `experiments/radial_bands/`，未替换生产 `rtl/display/guitar_radial_bands.v`。
-后续优先评估工作数组存储／动态选择，再评估保持发布时间的流水线。
+用户随后明确决定不采纳这条频带模块优化路线，理由是收益太小。
+本路线就此停止，不继续展开工作数组 RAM 化、动态选择或流水线实验；
+实验分支和数据保留备查，不合入生产。
 
 当前可下板版本仍是 P1：CLS 27943/29952（93.29%）、系统 Fmax 58.765 MHz、
 音频 Fmax 14.442 MHz，运行时钟为 50 MHz／12.288 MHz。
@@ -147,16 +149,19 @@ E:/anaconda3/python.exe tools/prepare_radial_bands_experiment.py build/radial_ba
 ./tools/start_radial_bands_experiment.ps1 -RunDir build/radial_bands_experiment/new_run -Variant balanced_log -Stage route
 ```
 
-## 后续候选及验证边界
+## 停止决定及验证边界
 
 本轮新完成组件验证、配对网表验证和上述模块 P&R。生产 RTL／ROM／约束和已发布 P1 证据均未变化，
 因此没有重复运行已经完成的音频、触控／游戏、整机有效像素对照或整机 P&R。
 这两种改写均不计作整机资源或 Fmax 收益，当前生产版本的实装结果保持不变。
 
-下一项更有希望的实验是 `32×19 bit` 工作数组的存储与动态选择结构。
-若用 RAM，必须确认真实 BSRAM 映射、连续同频带 bin 的读改写前递、归约期间读写清零冲突、
-末 bin／frame_done 提交和复位；若新增流水线，必须保持目标发布边界，不能跨过视觉帧快照。
-采用前仍需真实 FFT／显示动态对照、完整整机综合网表验证和 P&R／STA，最后才能产生新可下板版本。
+2026-10-15，用户决定：“那就还是不采纳这个频带模块的优化路径了吧，感觉节省得很少。”
+据此结束本路线，不集成两个候选，也不继续先前建议的 `32×19 bit` 工作数组 RAM／选择器／流水线实验。
+`master` 保持已验证的 P1 版本 `8230217`；不以本实验替换现有位流。
+本次只保存停止决定，不修改 RTL、不重跑测试或构建、不推进后续功能。
+
+已归档的 `verification.json`、源码 ZIP 和原日志保持原样，仍反映实验完成时的状态。
+停止决定记录在本文及 `experiments/radial_bands/results_20261015.json`，与历史验证证据分开保存。
 
 两个受保护用户文件的工作内容和暂存 blob 均保持原样，未纳入本次提交。
 当前 P1 的下板复测步骤继续见 `docs/DISPLAY_GAME_P1_RESOURCE_OPT.md`；本实验无新增接线或烧录步骤。
