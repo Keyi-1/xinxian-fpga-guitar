@@ -13,7 +13,8 @@ module piano_voice_core #(
     parameter [20:0] HARMONY_RATIO_Q20 = 21'd1571089,
     parameter integer MAX_SAMPLES = 131072,
     parameter integer RELEASE_SHIFT = 10,
-    parameter integer FORCE_PROFILE = -1
+    parameter integer FORCE_PROFILE = -1,
+    parameter integer FORCE_RELEASE_ENABLE = 0
 ) (
     input wire clk, rst_n, sample_ce, note_on, note_off,
     input wire [1:0] velocity_level,
@@ -21,6 +22,7 @@ module piano_voice_core #(
     input wire [8:0] timbre_blend,
     input wire [8:0] rock_blend,
     input wire sustain_enable, harmony_enable,
+    input wire force_release,
     output reg sample_valid,
     output reg signed [23:0] pcm_out,
     output reg active,
@@ -36,6 +38,7 @@ module piano_voice_core #(
     reg [16:0] age;
     reg [16:0] frame_age;
     reg releasing;
+    reg forced_releasing;
     reg [23:0] release_level;
     reg [8:0] velocity_gain;
     reg [8:0] frame_timbre;
@@ -206,7 +209,7 @@ module piano_voice_core #(
         if(!rst_n) begin
             state<=IDLE; mode_index<=0; age<=0; frame_age<=0;
             active<=0; busy<=0; deadline_miss<=0; sample_valid<=0; pcm_out<=0;
-            profile<=0; releasing<=0; release_level<=0; velocity_gain<=0;
+            profile<=0; releasing<=0; forced_releasing<=0; release_level<=0; velocity_gain<=0;
             increment_latched<=0; frame_active<=0; ratio<=0; env_a<=0; env_b<=0;env_read<=0;
             frame_timbre<=0; damping_shift<=RELEASE_SHIFT; harmony_latched<=0;
             frame_rock<=0;rock_env_read<=0;rock_amplitude_product<=0;rock_product<=0;
@@ -255,7 +258,7 @@ module piano_voice_core #(
                         (sustain_enable ? bright_decay_phase==0 : bright_decay_phase[1:0]==0);
                     // Same-sample pluck wins over damping, as in play control.
                     if(note_on) begin
-                        active<=1; releasing<=0; release_level<=24'hffffff;
+                        active<=1; releasing<=0; forced_releasing<=0; release_level<=24'hffffff;
                         velocity_gain<=gain_for_velocity(velocity_level);
                         damping_shift<=RELEASE_SHIFT;
                         sustain_age_phase<=0;bright_decay_phase<=0;frame_bright_decay<=1;
@@ -277,8 +280,10 @@ module piano_voice_core #(
                         if(continuity > -64 && continuity < 64) continuity<=0;
                         else continuity<=continuity-continuity_delta;
                         if(active) begin
-                            damping_shift<=RELEASE_SHIFT;
-                            if(note_off)begin
+                            damping_shift<=FORCE_RELEASE_ENABLE!=0 && forced_releasing ? 5'd7 : RELEASE_SHIFT;
+                            if(FORCE_RELEASE_ENABLE!=0 && force_release)begin
+                                releasing<=1;forced_releasing<=1;damping_shift<=7;
+                            end else if(note_off)begin
                                 releasing<=1;
                                 damping_shift<=RELEASE_SHIFT;
                             end
@@ -290,7 +295,7 @@ module piano_voice_core #(
                                 // Sustain holds the damper after release. Its
                                 // natural modal envelope still decays; turning
                                 // the effect off restores ordinary damping.
-                                if(releasing && !(CONTROL_ENABLE!=0 && sustain_enable))
+                                if(releasing && (FORCE_RELEASE_ENABLE!=0 && forced_releasing || !(CONTROL_ENABLE!=0 && sustain_enable)))
                                     release_level<=release_level-release_delta;
                             end
                         end
