@@ -13,9 +13,15 @@ module tb_game_cdc;
         .dst_clk(dst_clk),.dst_rst_n(rst_n),.dst_request(request),.dst_snapshot(snapshot),.dst_update(update));
     always @(posedge src_clk)sequence_number<=sequence_number+1'b1;
     integer i,j,updates=0;
-    always @(negedge dst_clk)if(update)begin
-        if(snapshot!={8{snapshot[31:0]}})$fatal(1,"FAIL: torn telemetry word");
-        updates=updates+1;
+    reg [255:0] previous_snapshot=0;
+    always @(negedge dst_clk)begin
+        if(rst_n && !update && snapshot!==previous_snapshot)
+            $fatal(1,"FAIL: destination snapshot changed without its frame update");
+        if(update)begin
+            if(snapshot!={8{snapshot[31:0]}})$fatal(1,"FAIL: torn telemetry word");
+            updates=updates+1;
+        end
+        previous_snapshot=snapshot;
     end
     initial begin
         repeat(5)@(negedge src_clk);rst_n=1;
@@ -31,7 +37,7 @@ module tb_game_cdc;
         end
         repeat(5)@(negedge dst_clk);
         if(updates!=100)$fatal(1,"FAIL: lost/duplicated snapshots");
-        $display("PASS: 100 asynchronous held commands and coherent 256-bit snapshots, delayed ACK");$finish;
+        $display("PASS: 100 asynchronous held commands and coherent frame-held 256-bit snapshots, delayed ACK");$finish;
     end
     initial begin #1000000;$fatal(1,"FAIL: CDC watchdog");end
 endmodule

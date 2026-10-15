@@ -9,16 +9,13 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
     `include "../config/game_ui_messages.vh"
     `include "../config/game_score_config.vh"
     reg [7:0] animation;
-    reg [19:0] score_shift,score_previous;
+    reg [19:0] score_shift;
     reg [19:0] bcd_work,score_bcd;
-    reg [4:0] bcd_bits;
-    reg bcd_busy;
-    // A single 8-bit double-dabble converter services the four small counters.
-    // Counter formatting needs neither division nor reciprocal multiplication.
-    reg [1:0] number_select;
-    reg [3:0] number_step;
-    reg [7:0] number_shift;
-    reg [11:0] number_work,number_adjusted;
+    // One double-dabble engine formats score and all four counters. A complete
+    // round takes 105 system clocks, well inside the existing vertical blank.
+    // Inputs are the CDC's frame-held snapshot; active-video digits stay stable.
+    reg [2:0] number_select;
+    reg [4:0] number_step;
     reg [47:0] number_bcd;
     reg [19:0] bcd_adjusted;
     integer d;
@@ -57,30 +54,33 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
     always @*begin
         bcd_adjusted=bcd_work;
         for(d=0;d<5;d=d+1)if(bcd_work[d*4+:4]>=5)bcd_adjusted[d*4+:4]=bcd_work[d*4+:4]+3;
-        number_adjusted=number_work;
-        for(d=0;d<3;d=d+1)if(number_work[d*4+:4]>=5)number_adjusted[d*4+:4]=number_work[d*4+:4]+3;
     end
     always @(posedge clk)begin
-        if(!rst_n)begin animation<=0;display_page<=0;score_previous<=0;score_shift<=0;
-            bcd_work<=0;score_bcd<=0;bcd_bits<=0;bcd_busy<=0;
-            number_select<=0;number_step<=0;number_shift<=0;number_work<=0;number_bcd<=0;end
+        if(!rst_n)begin animation<=0;display_page<=0;score_shift<=0;
+            bcd_work<=0;score_bcd<=0;
+            number_select<=0;number_step<=0;number_bcd<=0;end
         else begin
             if(frame_start)begin animation<=animation+1'b1;display_page<=page;end
-            if(!bcd_busy && score_previous!=game_snapshot[179:160])begin
-                score_previous<=game_snapshot[179:160];score_shift<=game_snapshot[179:160];
-                bcd_work<=0;bcd_bits<=0;bcd_busy<=1;
-            end else if(bcd_busy)begin
-                bcd_work<={bcd_adjusted[18:0],score_shift[19]};score_shift<={score_shift[18:0],1'b0};
-                if(bcd_bits==19)begin score_bcd<={bcd_adjusted[18:0],score_shift[19]};bcd_busy<=0;end
-                else bcd_bits<=bcd_bits+1'b1;
-            end
             if(number_step==0)begin
-                number_shift<=game_snapshot[180+number_select*8+:8];number_work<=0;number_step<=1;
+                case(number_select)
+                    0:score_shift<=game_snapshot[179:160];
+                    1:score_shift<={12'd0,game_snapshot[187:180]};
+                    2:score_shift<={12'd0,game_snapshot[195:188]};
+                    3:score_shift<={12'd0,game_snapshot[203:196]};
+                    default:score_shift<={12'd0,game_snapshot[211:204]};
+                endcase
+                bcd_work<=0;number_step<=1;
             end else begin
-                number_shift<={number_shift[6:0],1'b0};number_work<={number_adjusted[10:0],number_shift[7]};
-                if(number_step==8)begin
-                    number_bcd[number_select*12+:12]<={number_adjusted[10:0],number_shift[7]};
-                    number_select<=number_select+1'b1;number_step<=0;
+                score_shift<={score_shift[18:0],1'b0};bcd_work<={bcd_adjusted[18:0],score_shift[19]};
+                if(number_step==20)begin
+                    case(number_select)
+                        0:score_bcd<={bcd_adjusted[18:0],score_shift[19]};
+                        1:number_bcd[11:0]<={bcd_adjusted[10:0],score_shift[19]};
+                        2:number_bcd[23:12]<={bcd_adjusted[10:0],score_shift[19]};
+                        3:number_bcd[35:24]<={bcd_adjusted[10:0],score_shift[19]};
+                        4:number_bcd[47:36]<={bcd_adjusted[10:0],score_shift[19]};
+                    endcase
+                    number_select<=number_select==4 ? 3'd0 : number_select+1'b1;number_step<=0;
                 end else number_step<=number_step+1'b1;
             end
         end

@@ -33,6 +33,16 @@ module tb_game_chart_renderer;
             force renderer.centres=test_centres;force renderer.tails=test_tails;
             force renderer.valid_blocks=test_blocks;force renderer.game_snapshot=test_snapshot;
             page=5;frame_pulse();
+            // The shared formatter must preserve all five displayed values,
+            // including three-digit counter boundaries and five-digit overflow.
+            test_snapshot[179:160]=99999;test_snapshot[211:180]={8'd9,8'd123,8'd199,8'd255};
+            repeat(210)@(negedge clk);
+            if(renderer.score_bcd!==20'h99999 || renderer.number_bcd!==48'h009123199255)
+                $fatal(1,"FAIL: shared score/counter formatter");
+            test_snapshot[179:160]=1048575;test_snapshot[211:180]=0;repeat(210)@(negedge clk);
+            if(renderer.score_bcd!==20'h48575 || renderer.number_bcd!==0)
+                $fatal(1,"FAIL: five-digit score overflow or stale counters");
+            test_snapshot=0;repeat(210)@(negedge clk);
             for(lane_index=0;lane_index<4;lane_index=lane_index+1)begin
                 test_centres[lane_index*96+:12]=200;
                 test_tails[lane_index*72+:9]=240;test_blocks[lane_index*8]=1;

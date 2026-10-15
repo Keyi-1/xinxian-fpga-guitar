@@ -49,6 +49,8 @@ module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
     guitar_radial_palette u_palette(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.visual_update(visual_update),
         .x(x),.y(y),.mask(mask),.hz(hz),.fret(fret),.level(level),.voice_active(display_active),
         .flash(display_flash),.strikes(strikes),.targets(targets),.rgb(radial_rgb),.curve_active(curve_active));
+    // The CDC destination holds one coherent word for the entire frame. Layout
+    // and UI share this bank; only the next blank's request may replace it.
     game_chart_layout u_chart(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.snapshot_update(chart_update),
         .snapshot(ui_game_snapshot),.centres(centres),.tails(tails),.valid_blocks(valid_blocks),
         .display_snapshot(chart_snapshot),.overflow(chart_overflow),.deadline_miss(chart_deadline));

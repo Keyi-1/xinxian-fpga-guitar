@@ -4,14 +4,20 @@
 module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
     input wire [255:0] snapshot,
     output wire [383:0] centres,output wire [287:0] tails,
-    output reg [31:0] valid_blocks,output reg [255:0] display_snapshot,
+    output reg [31:0] valid_blocks,output wire [255:0] display_snapshot,
     output reg overflow,deadline_miss);
     localparam IDLE=0,READ=1,EVALUATE=2,DIVIDE_X=3,DIVIDE_TAIL=4,NEXT=5,WAIT=6;
     reg [2:0] state;
     reg [6:0] address;
     wire [79:0] event_word;
     wire [1:0] lane=event_word[75:74];
-    reg [255:0] held;
+    // game_snapshot_cdc already holds this word until the next frame request.
+    // Reuse that coherent destination bank during layout and active video;
+    // copying it twice here wastes registers and routing at nearly full CLS.
+    // Contract: snapshot changes only with snapshot_update in vertical blank,
+    // and remains stable until the next frame's layout pass.
+    wire [255:0] held=snapshot;
+    assign display_snapshot=snapshot;
     wire signed [32:0] delta=$signed({1'b0,8'd0,event_word[23:0]})-$signed({held[159],held[159:128]});
     // The pass starts just after frame_start and finishes before active video.
     // Update one coordinate bank in blank; a second 672-bit bank is redundant.
@@ -37,7 +43,7 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
     integer i;
     always @(posedge clk)begin
         if(!rst_n)begin
-            state<=IDLE;address<=0;held<=0;back_valid<=0;valid_blocks<=0;display_snapshot<=0;
+            state<=IDLE;address<=0;back_valid<=0;valid_blocks<=0;
             overflow<=0;deadline_miss<=0;slot<=0;bit_count<=0;dividend<=0;quotient<=0;duration<=0;remainder<=0;negative<=0;
             for(i=0;i<32;i=i+1)begin front_x[i]<=0;front_tail[i]<=0;end
             count0<=0;count1<=0;count2<=0;count3<=0;
@@ -45,7 +51,7 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
             if(frame_start && state!=IDLE && state!=WAIT)deadline_miss<=1;
             case(state)
                 IDLE:if(snapshot_update)begin
-                    held<=snapshot;back_valid<=0;address<=0;state<=READ;
+                    back_valid<=0;address<=0;state<=READ;
                     count0<=0;count1<=0;count2<=0;count3<=0;
                 end
                 READ:state<=EVALUATE;
@@ -84,7 +90,7 @@ module game_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
                 // finishes inside vertical blank. Publish in the SAME blank,
                 // avoiding an extra frame of motion latency at the hit line.
                 WAIT:begin
-                    valid_blocks<=back_valid;display_snapshot<=held;state<=IDLE;
+                    valid_blocks<=back_valid;state<=IDLE;
                 end
             endcase
         end

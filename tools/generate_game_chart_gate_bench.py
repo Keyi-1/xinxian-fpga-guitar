@@ -106,24 +106,38 @@ endmodule
 '''
     destination.write_text(bench, encoding='utf-8')
     print(f'Generated {destination.name}: {len(ports)} verified optimized ports')
-    # Drive display-only test snapshots into the real synthesized chart.
+    # Drive display-only test snapshots at the CDC destination bank. Layout
+    # and UI share that bank, so forcing chart-only inputs would miss score
+    # and judgement fields that synthesis now routes directly to the UI.
     # X/Y decode remains driven by the actual LCD scan logic; no optimized
     # renderer internals or combinational predecode terms are guessed.
     force_lines = ['force gate.u_display.page_Z = test_page;',
                    'force reference.u_display.page = test_page;',
-                   'force reference.u_display.u_chart.snapshot = test_snapshot;',
-                   'force reference.u_display.u_chart.snapshot_update = test_update;']
+                   'force reference.u_display.u_game_cdc.dst_snapshot = test_snapshot;',
+                   'force reference.u_display.u_game_cdc.dst_update = test_update;']
     display_start = source.index('module guitar_touch_game_display (')
     display_body = source[display_start:source.index('endmodule', display_start)]
     assert re.search(r'^input \[2:0\] page_Z;', display_body, re.M), 'inspect optimized display page port'
-    for direction, width, name in ports:
-        if direction != 'input':
+    cdc_start = source.index('module game_snapshot_cdc (')
+    cdc_body = source[cdc_start:source.index('endmodule', cdc_start)]
+    cdc_ports = re.findall(r'^(input|output)\s+(?:\[([^]]+)\]\s+)?(\w+);', cdc_body, re.M)
+    snapshot_bits = set()
+    update_found = False
+    for direction, width, name in cdc_ports:
+        if direction != 'output':
             continue
         if name.startswith('ui_game_snapshot_'):
             bit = int(name.rsplit('_', 1)[1])
-            force_lines.append(f'force gate.u_display.u_chart.{name} = test_snapshot[{bit}];')
+            assert 0 <= bit < 256 and not width, (name, width)
+            snapshot_bits.add(bit)
+            force_lines.append(f'force gate.u_display.u_game_cdc.{name} = test_snapshot[{bit}];')
         elif name == 'chart_update':
-            force_lines.append('force gate.u_display.u_chart.chart_update = test_update;')
+            update_found = True
+            force_lines.append('force gate.u_display.u_game_cdc.chart_update = test_update;')
+        else:
+            raise ValueError(f'Unsupported CDC output: {name} [{width}]')
+    required = set(range(67)) | set(range(128, 152)) | {159} | set(range(160, 212)) | set(range(220, 232)) | set(range(238, 246))
+    assert update_found and required <= snapshot_bits, 'inspect missing optimized CDC fields'
     force_path = destination.parent/'stage_force.vh'
     force_path.write_text('\n'.join(force_lines)+'\n', encoding='ascii')
     print(f'Generated {force_path.name}: display-only injection; physical scan and full top retained')
