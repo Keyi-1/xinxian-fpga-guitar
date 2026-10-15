@@ -181,24 +181,36 @@ def main():
                   netlist_sha256=netlist_hash,
                   gate_evidence_sha256=digest(gate_dir/'verification.json'),
                   implementation_evidence_sha256={p.name: digest(p) for p in [pnr/f'{NAME}.log',
-                      pnr/f'{NAME}.rpt.txt', pnr/f'{NAME}_tr_content.html', pnr/'cmd.do']},
+                      pnr/f'{NAME}.rpt.txt', pnr/f'{NAME}_tr_content.html', pnr/'cmd.do', pnr/'device.cfg']},
                   gate_simulation='Six full-top home/countdown/full-width game/result frames, touch/silent audio plus full-score consecutive moving chart; musical/control behavior covered by RTL benches')
     if args.p1:
         run_dir = implementation.parents[2]
         manifest = json.loads((run_dir/'manifest.json').read_text(encoding='utf-8-sig'))
         for path, expected in manifest['source_sha256'].items():
             assert digest(REPO/path) == expected == digest(run_dir/'workspace'/path), path
+        routed_design = re.search(r'^-d\s+(.+)$', command, re.M)
+        assert routed_design and Path(routed_design[1].strip()).resolve() == (implementation/f'impl/gwsynthesis/{NAME}.vg').resolve()
+        if 'synthesized_netlist_sha256' in manifest:
+            assert manifest['synthesized_netlist_sha256'] == netlist_hash
         for name, expected in manifest['build_scripts_sha256'].items():
             assert digest(implementation/name) == expected, name
         for path, expected in manifest['protected_user_files_sha256'].items():
             assert digest(REPO/path) == expected, ('protected user file changed', path)
-        synthesis = implementation/f'impl/gwsynthesis/{NAME}.log'
+        synthesis = run_dir/'synthesis.log'
+        assert 'GowinSynthesis finish' in synthesis.read_text()
         assert not re.search(r'inferr?ed.*latch|latch.*inferr?ed', synthesis.read_text(), re.I)
+        assert not re.search(r'^\s*(?:DLCE|DLPE)\s+\w+\s*\(',
+                             (implementation/f'impl/gwsynthesis/{NAME}.vg').read_text(), re.M)
         assert not re.search(r'\bPR0004\b|\b[1-9]\d*\s+(?:unrouted|unroute|unconnected)\b', log, re.I)
         result.update(p1_evidence_sha256=digest(REPO/'sim/temp/display_game_p1/verification.json'),
                       p1_equivalence=p1_evidence,
                       build_manifest_sha256=digest(run_dir/'manifest.json'),
                       synthesis_log_sha256=digest(synthesis),
+                      verification_tools_sha256={path:digest(REPO/path) for path in [
+                          'tools/run_touch_game_checks.ps1', 'tools/run_display_game_p1_checks.ps1',
+                          'tools/prepare_display_game_p1_build.py', 'tools/start_display_game_p1_build.ps1',
+                          'tools/generate_game_chart_gate_bench.py', 'tools/archive_display_game_p1.py',
+                          'gowin/neo_guitar_touch_game/run_gate_check.ps1', 'gowin/neo_guitar_touch_game/check_result.py']},
                       gate_simulation='21 full-top frames against frozen palette: original six game frames plus dynamic spectrum, mid-pass targets, peak decay, curve fade and page switches; silent audio/GPIO; 364 consecutive synthesized chart updates',
                       violations=dict(violations, unrouted=0, latch=0, display_deadline=0),
                       artifact_scope=dict(kind='isolated_p1_build', implementation=str(implementation)),

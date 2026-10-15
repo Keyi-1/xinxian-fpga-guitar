@@ -16,6 +16,15 @@ foreach($entry in $manifest.source_sha256.PSObject.Properties){
 }
 if($manifest.processes | Where-Object {$_.stage -eq $Stage}){throw "Stage already attempted; preserve its logs and choose a new run if retrying"}
 $projectDir=$manifest.project
+if($Stage -eq 'route'){
+    $synLog=Get-Content -LiteralPath (Join-Path $RunDir 'synthesis.log') -Raw
+    if($synLog -notmatch 'GowinSynthesis finish' -or $synLog -match 'ERROR'){throw 'A successful synthesis is required before P&R'}
+    $vg=Join-Path $projectDir 'impl/gwsynthesis/neo_guitar_touch_game.vg'
+    $vgHash=(Get-FileHash -LiteralPath $vg).Hash.ToLower()
+    if($manifest.PSObject.Properties.Name -contains 'synthesized_netlist_sha256'){
+        if($manifest.synthesized_netlist_sha256 -ne $vgHash){throw 'Netlist changed after synthesis'}
+    }else{$manifest|Add-Member synthesized_netlist_sha256 $vgHash}
+}
 $script=if($Stage -eq 'route'){'route.tcl'}else{'synth.tcl'}
 $proc=Start-Process -FilePath $GowinExe -ArgumentList $script -WorkingDirectory $projectDir -WindowStyle Hidden `
     -RedirectStandardOutput (Join-Path $RunDir "$Stage.log") `

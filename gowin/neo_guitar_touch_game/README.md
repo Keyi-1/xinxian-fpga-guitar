@@ -1,19 +1,35 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-当前发布源自分支 `experiment/touch-rhythm-game`，基于已验收的双输出基线 `655458f`。主工程使用
+**P1 本地下板候选（2026-10-15）：** 分支 `experiment/display-game-resource-opt`，
+将 64 根频谱柱高／峰值改为消隐期 64 拍串行复用，保持原三音色、音效、画面及游戏操作。
+完整 P&R：Logic **50159**，Register **22405**，CLS **27943/29952（93.29%）**，BSRAM **95**，DSP **115.5**；
+系统／音频 Fmax **58.765／14.442 MHz**，运行时钟仍为 50／12.288 MHz。
+未布通、latch、setup／hold 和已检查运算 deadline 均为 0，三项余量目标均达到。
+
+本轮位流：[neo_guitar_touch_game_p1_display_opt.fs](../../build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs)，
+SHA256 `e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86`。
+九项 RTL、五项分弦 Python、512 组柱状态／1,108,992 像素、15 帧真实 FFT 集成／1,958,400 像素、
+21 帧整机网表／2,741,760 像素及 364 次连续布局通过；音频 8192 样本与冻结基线一致，延音退出仍为 1452 样本。
+[实现、完整资源对比与下板步骤](../../docs/DISPLAY_GAME_P1_RESOURCE_OPT.md)，
+[本轮验证记录](verification.json)。新版本尚待下板反馈；本轮只作本地提交，未 push／merge／烧录。
+构建采用独立快照，两个受保护用户文件、原 IDE 网表／位流和原全宽舞台归档均保留。
+
+以下全宽舞台数据是已验收的历史基线，和本轮独立 P1 产物分别留存。
+
+已验收的全宽舞台发布源自分支 `experiment/touch-rhythm-game`，基于已验收的双输出基线 `655458f`。主工程使用
 `neo_guitar_touch_game.gprj` / `neo_guitar_touch_game_top`，器件为 Mega 60K
 `GW5AT-LV60PG484AC1/I0`，Device B。此工程作为本次 master 发布入口，原双音频输出工程保留作历史基线。
 
 **用户反馈与发布：** 2026-10-15 用户先确认 `a13fd79` 对应修复版无已知问题，随后认可当前全宽舞台效果并授权推送、合入 master。现场烧录文件的哈希未单独记录；详见 [hardware_acceptance.json](hardware_acceptance.json)。
 
-**当前全宽舞台：** 计分移到顶部，四轨中心 y=85／133／181／229，保留 x=96 判定线、渐变尾迹及实际判定反馈。仍是无需按品的游戏；4×9 矩阵和后来添加的折线动效未加入。曲谱同时更新为避同弦冲突、相邻音优先换弦的离线分配。本次用户反馈单独记录，详见 [实现和验证说明](../../docs/FULL_WIDTH_GAME_STAGE.md)。
+**已验收全宽舞台基线：** 计分移到顶部，四轨中心 y=85／133／181／229，保留 x=96 判定线、渐变尾迹及实际判定反馈。仍是无需按品的游戏；4×9 矩阵和后来添加的折线动效未加入。曲谱同时更新为避同弦冲突、相邻音优先换弦的离线分配。本次用户反馈单独记录，详见 [实现和验证说明](../../docs/FULL_WIDTH_GAME_STAGE.md)。
 
-当前可烧录文件：[neo_guitar_touch_game_full_width.fs](T:/Documents/AMD/xinxian-fpga-guitar/build/releases/touch_game/neo_guitar_touch_game_full_width.fs)，
+全宽舞台基线位流：[neo_guitar_touch_game_full_width.fs](T:/Documents/AMD/xinxian-fpga-guitar/build/releases/touch_game/neo_guitar_touch_game_full_width.fs)，
 SHA256 `9c161ac673cd1c081831075f4f84d4ff2067f6a20797119b9a65d9623b770883`。
 九项 RTL 回归、六帧综合网表显示（783,360 像素）、364 次连续布局及完整 P&R／STA 通过；未布通、setup、hold 均为 0。
 Logic 58178，Register 22239，CLS 29842/29952（99.63%），BSRAM 95，DSP 115.5；系统／音频 Fmax 54.636／13.441 MHz。
 源代码为 `246b146`＋`98ba437`；原演奏音频 8192 样本仍与 master 一致，所有三音色及音效保留。
-当前面积余量仍很小，后续扩展前需继续 P1 优化。全宽舞台已获用户效果认可；没有新增定量音频或长期稳定性测量。下面旧资源和位流按版本留存。
+该基线面积余量很小，本轮 P1 优化结果见文首。全宽舞台已获用户效果认可；没有新增定量音频或长期稳定性测量。下面旧资源和位流按版本留存。
 
 以上验证记录对应归档发布。发布复核时，IDE 后来重建的 `impl` 网表／位流已与归档不同，原门级日志不能认证新产物；本次复核保留归档，核对当前源码及原日志哈希，不改动 HDL。后续发布新构建应重新运行本工程门级验证和 `check_result.py`。
 
@@ -136,17 +152,22 @@ SHA256：`db1e7578e676d4cdbd0de375c46f016e744386f7fd1cfc45d340205f99ce849a`。
 ## 构建、验证与实物验收
 
 ```powershell
-# 在仓库根目录；相关程序需在 PATH 或指定路径
-./gowin/neo_guitar_touch_game/configure_ide.ps1 # 先关闭 IDE 工程，执行后再打开
-gw_sh.exe gowin/neo_guitar_touch_game/build.tcl
-./tools/run_touch_game_checks.ps1 -ModelSimBin 'S:\BaiduNetdiskDownload\modelsim\win64'
-./gowin/neo_guitar_touch_game/run_gate_check.ps1 -ModelSimBin 'S:\BaiduNetdiskDownload\modelsim\win64'
-python gowin/neo_guitar_touch_game/check_result.py
-python tools/render_touch_game_previews.py # 可选：Pillow，将仿真像素转为 PNG
+# P1 使用新的独立目录，先综合，确认收益后再布局布线；日志和 PID 写入 manifest。
+./tools/run_display_game_p1_checks.ps1
+./tools/run_touch_game_checks.ps1
+E:/anaconda3/python.exe tools/prepare_display_game_p1_build.py build/display_game_p1/new_run
+./tools/start_display_game_p1_build.ps1 -RunDir build/display_game_p1/new_run -Stage synthesis
+# 等上述进程结束并检查新综合报告后：
+./tools/start_display_game_p1_build.ps1 -RunDir build/display_game_p1/new_run -Stage route
+$project = 'build/display_game_p1/new_run/workspace/gowin/neo_guitar_touch_game'
+./gowin/neo_guitar_touch_game/run_gate_check.ps1 -P1 -ImplementationDir $project -GateDir sim/temp/display_game_p1_gate
+E:/anaconda3/python.exe gowin/neo_guitar_touch_game/check_result.py --p1 --implementation-dir $project --gate-dir sim/temp/display_game_p1_gate --output build/display_game_p1/new_run/verification.json
 ```
 
 IDE 固定 Place=4、Route=2、Clock Route Order=1、hold 修复及 CPU/SSPI/I2C GPIO 复用。
-输出为 `impl/pnr/neo_guitar_touch_game.fs`。不能用综合成功代替布线/时序合格；
+本轮独立构建输出位于 `build/display_game_p1/<run>/workspace/gowin/neo_guitar_touch_game/impl/pnr/`；
+下板对象以文首独立归档和 SHA256 为准。主工程仍保留原 IDE 入口。
+不能用综合成功代替布线/时序合格；
 当前验证结果及资源数据见本目录 `verification.json`，以实际生成状态为准。
 RTL 检查包括 I²C 故障恢复、GT911 设备模型、坐标/手势/页面、拨弦判定、
 异步命令和快照、全曲滑块位置，以及完整音频链与 master `655458f` 的数字对照。

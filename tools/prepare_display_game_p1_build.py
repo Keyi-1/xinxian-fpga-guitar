@@ -41,7 +41,17 @@ def main():
     # Hold correction is a P&R default, verified from generated cmd.do.
     script = script.replace('run all', 'run syn')
     (project/'synth.tcl').write_text(script)
-    (project/'route.tcl').write_text(script.replace('run syn', 'run pnr'))
+    # A fresh process with RTL files may automatically re-run synthesis even
+    # for `run pnr`. Import the completed VG directly to route that exact file.
+    route = '''set project_dir [file dirname [file normalize [info script]]]
+cd $project_dir
+set repo_root [file normalize [file join $project_dir ../..]]
+add_file [file join $project_dir impl gwsynthesis neo_guitar_touch_game.vg]
+add_file -type cst [file join $repo_root constraints neo_guitar_touch_game.cst]
+add_file -type sdc [file join $repo_root constraints neo_guitar_touch_game.sdc]
+'''
+    route += script[script.index('set_device '):].replace('run syn', 'run pnr')
+    (project/'route.tcl').write_text(route)
     impl = project/'impl'
     impl.mkdir()
     # Read committed settings, never copy or change the user's local settings.
@@ -53,7 +63,7 @@ def main():
                     branch=subprocess.check_output(['git', 'branch', '--show-current'], cwd=ROOT).decode().strip(),
                     source_sha256=hashes,
                     build_scripts_sha256={p.name:digest(p) for p in [project/'synth.tcl', project/'route.tcl']},
-                    protected_user_files_sha256={p:digest(ROOT/p) for p in protected},
+                    protected_user_files_sha256={p:digest(ROOT/p) for p in protected if (ROOT/p).exists()},
                     project=str(project), status='prepared', processes=[])
     (dest/'manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     print(project)

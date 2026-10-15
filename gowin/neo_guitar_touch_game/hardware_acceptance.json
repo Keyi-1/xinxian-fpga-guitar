@@ -28,5 +28,18 @@
       "artifact_audit": "The archived release still matches its recorded hash. Local IDE synthesis and PNR outputs have since changed; the old gate evidence does not certify those regenerated artifacts. No rebuild or new release was performed for this UI concept task."
     }
   ],
-  "local_ide_bitstream_sha256": "d0a12ed908c9503b7e838b6a80f0b1d1e93fab5c7abc010b6493b4a32915c8aa"
+  "local_ide_bitstream_sha256": "d0a12ed908c9503b7e838b6a80f0b1d1e93fab5c7abc010b6493b4a32915c8aa",
+  "pending_p1_candidate": {
+    "date": "2026-10-15",
+    "implementation_commit": "e169d93",
+    "branch": "experiment/display-game-resource-opt",
+    "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs",
+    "reference_sha256": "e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86",
+    "digital_status": "P&R/STA and required RTL/full-top synthesized-display/full-score regressions pass; all three P1 margin targets met",
+    "hardware_status": "Pending user programming and feedback; no new acoustic or long-duration measurements",
+    "installed_bitstream_sha256": null,
+    "publication_authorized": false,
+    "agent_programmed_hardware": false,
+    "scope": "This is a separate P1 candidate. Previous full-width acceptance and publication authorization apply only to that previous release. This turn authorizes local commits, not push, merge or board programming."
+  }
 }
