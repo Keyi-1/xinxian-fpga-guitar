@@ -1,5 +1,6 @@
 `timescale 1ns/1ps
 module tb_game_p2_static_bank;
+    GSR GSR(.GSRI(1'b1));
     reg clk=0,display_clk=0;
     always #5 clk=~clk;always #7 display_clk=~display_clk;
     reg rst_n=0,tick=0,start=0,allow_test=0,display_read=0;

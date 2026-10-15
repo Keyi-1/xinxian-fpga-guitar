@@ -1,10 +1,11 @@
 // Hold command data until its destination explicitly acknowledges execution.
-module mode_command_cdc(input wire src_clk,src_rst_n,src_send,
-    input wire [1:0] src_mode,output reg src_busy,src_done,
+module mode_command_cdc #(parameter integer WIDTH=2)(input wire src_clk,src_rst_n,src_send,
+    input wire [WIDTH-1:0] src_mode,output reg src_busy,src_done,
     input wire dst_clk,dst_rst_n,output reg dst_valid,
-    output reg [1:0] dst_mode,input wire dst_ack);
+    output reg [WIDTH-1:0] dst_mode,input wire dst_ack);
     reg request,ack;
-    reg [1:0] held,request_sync,ack_sync;
+    reg [WIDTH-1:0] held;
+    reg [1:0] request_sync,ack_sync;
     reg settling;
     always @(posedge src_clk)begin
         if(!src_rst_n)begin request<=0;held<=0;ack_sync<=0;src_busy<=0;src_done<=0;end

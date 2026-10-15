@@ -1,6 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$RunDir,
       [string[]]$Benches=@('tb_game_p2_window','tb_game_p2_legacy_equivalence','tb_game_p2_static_bank','tb_game_p2_judgement'),
       [string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64',
+      [string]$GowinHome='S:\BaiduNetdiskDownload\GOWIN\Gowin_V1.9.12.03_x64\IDE',
       [string]$PythonExe='E:\anaconda3\python.exe')
 $ErrorActionPreference='Stop'
 $repoDir=Split-Path $PSScriptRoot
@@ -41,12 +42,14 @@ Push-Location $RunDir
 try{
     & $PythonExe (Join-Path $repoDir 'tools/generate_p2_static_scores.py') --check > generated.log 2>&1
     if($LASTEXITCODE){throw 'P2 generated score drift'}
+    & $PythonExe (Join-Path $repoDir 'tools/generate_game_p2_bsram.py') --check > bsram_init.log 2>&1
+    if($LASTEXITCODE){throw 'P2 primitive initializer drift'}
     & $PythonExe (Join-Path $repoDir 'tools/test_game_score_v2.py') > python.log 2>&1
     if($LASTEXITCODE){throw 'P2 score compiler checks failed'}
     & (Join-Path $ModelSimBin 'vlib.exe') work > vlib.log 2>&1
     if($LASTEXITCODE){throw 'Cannot create simulator library'}
     $sources=@(Get-ChildItem $sourceDir -Filter '*.v' | ForEach-Object FullName)
-    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir" @sources @tests > compile.log 2>&1
+    & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir" (Join-Path $GowinHome 'simlib/gw5a/prim_sim.v') @sources @tests > compile.log 2>&1
     if($LASTEXITCODE -or (Get-Content -Raw compile.log) -match '\*\* (Error|Fatal|Warning):'){throw 'P2 compile diagnostics'}
     $logs=@{}
     foreach($bench in $Benches){

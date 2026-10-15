@@ -11,7 +11,7 @@ module tb_game_chart_renderer;
     game_chart_layout chart(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.snapshot_update(snapshot_update),
         .snapshot(snapshot),.centres(centres),.tails(tails),.valid_blocks(blocks),.display_snapshot(displayed),
         .overflow(overflow),.deadline_miss(deadline));
-    touch_game_renderer renderer(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.page(page),
+    touch_game_renderer renderer(.selected_slot(3'd0),.display_fault(1'b0),.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.page(page),
         .touch_ready(1'b1),.transition(1'b0),.x(x),.y(y),.centres(centres),.tails(tails),
         .valid_blocks(blocks),.game_snapshot(displayed),.rgb(rgb),.display_page(displayed_page));
     integer clocks,counts[0:3],i,l,slot,delta,expected,now,fd,px,py;

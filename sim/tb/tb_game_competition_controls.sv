@@ -8,7 +8,7 @@ module tb_game_competition_controls;
     always @(posedge clk)divider<=divider+1'b1;
     wire send,ack,switching;wire [1:0] ui_mode,mode;wire [2:0] page;
     wire [3:0] note_on;wire [255:0] snapshot;
-    touch_game_ui #(.ALLOW_AUTOPLAY_PREVIEW(0)) ui(.clk(clk),.rst_n(rst_n),.tick_ms(1'b0),
+    touch_game_ui #(.ALLOW_AUTOPLAY_PREVIEW(0)) ui(.selected_slot(),.display_fault(1'b0),.clk(clk),.rst_n(rst_n),.tick_ms(1'b0),
         .touch_ready(1'b1),.click(click),.double_click(1'b0),.click_x(x),.click_y(y),.game_snapshot(256'd0),
         .command_busy(1'b0),.command_done(done),.command_send(send),.command_mode(ui_mode),.page(page),
         .flush_gesture(),.transition());

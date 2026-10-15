@@ -1,5 +1,4 @@
-// First P2 integration boundary. UI/router must explicitly connect this module;
-// the accepted P1 top is not silently switched to a prototype engine.
+// Immutable score bank shared by the production P2 audio and display paths.
 // Timbre is metadata only here; use it after the router's release/ack handshake.
 module game_p2_static_engine #(parameter integer COUNTDOWN_SAMPLES=96000)
   (input wire clk,rst_n,sample_tick,enable,start_song,demo,

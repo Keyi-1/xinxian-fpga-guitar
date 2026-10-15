@@ -1,5 +1,6 @@
 `timescale 1ns/1ps
 module tb_game_p2_judgement;
+    GSR GSR(.GSRI(1'b1));
     reg clk=0;always #5 clk=~clk;
     reg rst_n=0,start=0,demo=0,enable=1;
     reg [6:0] divider=0;

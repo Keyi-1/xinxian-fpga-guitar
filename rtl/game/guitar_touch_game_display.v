@@ -1,7 +1,9 @@
-module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
+module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0)
     (input wire audio_clk,audio_rst_n,clk,rst_n,
     input wire [399:0] audio_snapshot,input wire [255:0] audio_game_snapshot,
     input wire audio_pcm_valid,input wire signed [23:0] audio_pcm,
+    input wire [2:0] selected_slot,input wire [95:0] score_data,
+    output wire score_read,output wire [10:0] score_address,output wire display_fault,
     input wire [2:0] page,input wire touch_ready,transition,
     output wire [255:0] ui_game_snapshot,
     output wire lcd_pclk,lcd_hsync,lcd_vsync,lcd_de,lcd_backlight,
@@ -51,12 +53,20 @@ module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
         .flash(display_flash),.strikes(strikes),.targets(targets),.rgb(radial_rgb),.curve_active(curve_active));
     // The CDC destination holds one coherent word for the entire frame. Layout
     // and UI share this bank; only the next blank's request may replace it.
+    generate if(USE_P2)begin:p2
+    game_p2_chart_layout u_chart(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.snapshot_update(chart_update),
+        .snapshot(ui_game_snapshot),.score_read(score_read),.score_address(score_address),.score_data(score_data),.centres(centres),.tails(tails),.valid_blocks(valid_blocks),
+        .display_snapshot(chart_snapshot),.overflow(chart_overflow),.deadline_miss(chart_deadline));
+    end else begin:p1
     game_chart_layout u_chart(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),.snapshot_update(chart_update),
         .snapshot(ui_game_snapshot),.centres(centres),.tails(tails),.valid_blocks(valid_blocks),
         .display_snapshot(chart_snapshot),.overflow(chart_overflow),.deadline_miss(chart_deadline));
-    touch_game_renderer #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW)) u_ui(
+    assign score_read=0;assign score_address=0;
+    end endgenerate
+    assign display_fault=USE_P2 && (chart_overflow || chart_deadline);
+    touch_game_renderer #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2)) u_ui(
         .clk(clk),.rst_n(rst_n),.frame_start(frame_start),.page(page),
-        .touch_ready(touch_ready),.transition(transition),.x(x),.y(y),.centres(centres),.tails(tails),
+        .selected_slot(selected_slot),.display_fault(display_fault),.touch_ready(touch_ready),.transition(transition),.x(x),.y(y),.centres(centres),.tails(tails),
         .valid_blocks(valid_blocks),.game_snapshot(chart_snapshot),.rgb(ui_rgb),.display_page(display_page));
     assign lcd_backlight=rst_n && initialized;
 endmodule

@@ -3,6 +3,7 @@
 // identically in both memories for simulation; Python separately proves the
 // shipped static data preserves every original sample timestamp and DDS value.
 module tb_game_p2_legacy_equivalence;
+    GSR GSR(.GSRI(1'b1));
     reg clk=0;always #5 clk=~clk;
     reg rst_n=0,start=0,demo=1;
     reg [7:0] divider=0;

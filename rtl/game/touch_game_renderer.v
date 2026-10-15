@@ -1,59 +1,78 @@
 // Full-width four-lane stage. Four pixel stages fit the six-clock DCLK cadence:
 // relative note coordinates, shape selection, palette/font, output.
 // No framebuffer, per-pixel divide, blur or added audio processing.
-module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
+module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0)
     (input wire clk,rst_n,frame_start,input wire [2:0] page,
+    input wire [2:0] selected_slot,input wire display_fault,
     input wire touch_ready,transition,input wire [8:0] x,y,
     input wire [383:0] centres,input wire [287:0] tails,input wire [31:0] valid_blocks,
     input wire [255:0] game_snapshot,output reg [17:0] rgb,output reg [2:0] display_page);
     `include "../config/game_ui_messages.vh"
     `include "../config/game_score_config.vh"
+    localparam integer PROGRESS_STEP=(`GAME_DURATION_SAMPLES+479)/480;
+    localparam SCORE_DIGITS=USE_P2 ? 6 : 5, COUNTER_DIGITS=USE_P2 ? 5 : 3;
+    localparam BCD_WIDTH=SCORE_DIGITS*4, COUNTER_WIDTH=COUNTER_DIGITS*4;
+    wire [31:0] time_value=USE_P2 ? game_snapshot[95:64] : game_snapshot[159:128];
+    wire [31:0] score_value=USE_P2 ? game_snapshot[127:96] : {12'd0,game_snapshot[179:160]};
+    wire [15:0] combo_value=USE_P2 ? game_snapshot[143:128] : {8'd0,game_snapshot[187:180]};
+    wire [15:0] max_value=USE_P2 ? game_snapshot[159:144] : {8'd0,game_snapshot[195:188]};
+    wire [15:0] hits_value=USE_P2 ? game_snapshot[175:160] : {8'd0,game_snapshot[203:196]};
+    wire [15:0] miss_value=USE_P2 ? game_snapshot[191:176] : {8'd0,game_snapshot[211:204]};
+    wire [11:0] judgement_value=USE_P2 ? game_snapshot[219:208] : game_snapshot[231:220];
+    wire [7:0] epoch_value=USE_P2 ? game_snapshot[227:220] : game_snapshot[245:238];
+    wire [2:0] active_slot=USE_P2 ? game_snapshot[237:235] : 3'd0;
+    wire [2:0] title_slot=(display_page==3) ? selected_slot : active_slot;
+    wire error_value=USE_P2 && (game_snapshot[233] || display_fault);
+    // Constants mirror the immutable catalog durations: ceil(samples/480).
+    // Verified against every catalog entry by the integrated display bench.
+    wire [31:0] progress_step=USE_P2 ? (active_slot==1 ? 32'd25600 : active_slot==2 ? 32'd19200 :
+        active_slot==3 ? 32'd12800 : active_slot==4 ? 32'd60000 : 32'd3375) : PROGRESS_STEP;
+    reg [8:0] progress_identity;
     reg [7:0] animation;
     reg [19:0] score_shift;
-    reg [19:0] bcd_work,score_bcd;
+    reg [BCD_WIDTH-1:0] bcd_work,score_bcd;
     // One double-dabble engine formats score and all four counters. A complete
     // round takes 105 system clocks, well inside the existing vertical blank.
     // Inputs are the CDC's frame-held snapshot; active-video digits stay stable.
     reg [2:0] number_select;
     reg [4:0] number_step;
-    reg [47:0] number_bcd;
-    reg [19:0] bcd_adjusted;
+    reg [4*COUNTER_WIDTH-1:0] number_bcd;
+    reg [BCD_WIDTH-1:0] bcd_adjusted;
     integer d;
     // Geometry and result effects are independent of the audio judgement.
     reg [7:0] feedback_previous;
     reg [15:0] feedback_age;
     reg [1:0] feedback_lane;
     reg [8:0] progress_pixels;
-    reg [23:0] progress_threshold;
-    localparam integer PROGRESS_STEP=(`GAME_DURATION_SAMPLES+479)/480;
+    reg [31:0] progress_threshold;
     integer f;
     wire stage_page=display_page==4 || display_page==5;
     always @(posedge clk)begin
         if(!rst_n)begin
             feedback_previous<=0;feedback_age<=0;feedback_lane<=0;
-            progress_pixels<=0;progress_threshold<=PROGRESS_STEP;
-        end else if(!stage_page || game_snapshot[159])begin
-            feedback_previous<=game_snapshot[245:238];feedback_age<=0;
-            progress_pixels<=0;progress_threshold<=PROGRESS_STEP;
+            progress_pixels<=0;progress_threshold<=progress_step;progress_identity<={active_slot,game_snapshot[255:250]};
+        end else if(!stage_page || time_value[31] || (USE_P2 && progress_identity!={active_slot,game_snapshot[255:250]}))begin
+            feedback_previous<=epoch_value;feedback_age<=0;
+            progress_pixels<=0;progress_threshold<=progress_step;progress_identity<={active_slot,game_snapshot[255:250]};
         end else begin
             for(f=0;f<4;f=f+1)begin
-                if(game_snapshot[238+f*2+:2]!=feedback_previous[f*2+:2])begin
-                    feedback_previous[f*2+:2]<=game_snapshot[238+f*2+:2];
+                if(epoch_value[f*2+:2]!=feedback_previous[f*2+:2])begin
+                    feedback_previous[f*2+:2]<=epoch_value[f*2+:2];
                     feedback_age[f*4+:4]<=15;feedback_lane<=f;
                 end else if(frame_start && feedback_age[f*4+:4]!=0)
                     feedback_age[f*4+:4]<=feedback_age[f*4+:4]-1'b1;
             end
             // Snapshot time changes only in blank. Catch up in <=480 clocks,
             // using one constant increment instead of a pixel-rate divider.
-            if(progress_pixels<480 && game_snapshot[151:128]>=progress_threshold)begin
+            if(progress_pixels<480 && time_value>=progress_threshold)begin
                 progress_pixels<=progress_pixels+1'b1;
-                progress_threshold<=progress_threshold+PROGRESS_STEP;
+                progress_threshold<=progress_threshold+progress_step;
             end
         end
     end
     always @*begin
         bcd_adjusted=bcd_work;
-        for(d=0;d<5;d=d+1)if(bcd_work[d*4+:4]>=5)bcd_adjusted[d*4+:4]=bcd_work[d*4+:4]+3;
+        for(d=0;d<SCORE_DIGITS;d=d+1)if(bcd_work[d*4+:4]>=5)bcd_adjusted[d*4+:4]=bcd_work[d*4+:4]+3;
     end
     always @(posedge clk)begin
         if(!rst_n)begin animation<=0;display_page<=0;score_shift<=0;
@@ -63,22 +82,22 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
             if(frame_start)begin animation<=animation+1'b1;display_page<=page;end
             if(number_step==0)begin
                 case(number_select)
-                    0:score_shift<=game_snapshot[179:160];
-                    1:score_shift<={12'd0,game_snapshot[187:180]};
-                    2:score_shift<={12'd0,game_snapshot[195:188]};
-                    3:score_shift<={12'd0,game_snapshot[203:196]};
-                    default:score_shift<={12'd0,game_snapshot[211:204]};
+                    0:score_shift<=USE_P2 && score_value>999999 ? 20'd999999 : score_value[19:0];
+                    1:score_shift<={4'd0,combo_value};
+                    2:score_shift<={4'd0,max_value};
+                    3:score_shift<={4'd0,hits_value};
+                    default:score_shift<={4'd0,miss_value};
                 endcase
                 bcd_work<=0;number_step<=1;
             end else begin
-                score_shift<={score_shift[18:0],1'b0};bcd_work<={bcd_adjusted[18:0],score_shift[19]};
+                score_shift<={score_shift[18:0],1'b0};bcd_work<={bcd_adjusted[BCD_WIDTH-2:0],score_shift[19]};
                 if(number_step==20)begin
                     case(number_select)
-                        0:score_bcd<={bcd_adjusted[18:0],score_shift[19]};
-                        1:number_bcd[11:0]<={bcd_adjusted[10:0],score_shift[19]};
-                        2:number_bcd[23:12]<={bcd_adjusted[10:0],score_shift[19]};
-                        3:number_bcd[35:24]<={bcd_adjusted[10:0],score_shift[19]};
-                        4:number_bcd[47:36]<={bcd_adjusted[10:0],score_shift[19]};
+                        0:score_bcd<={bcd_adjusted[BCD_WIDTH-2:0],score_shift[19]};
+                        1:number_bcd[0*COUNTER_WIDTH+:COUNTER_WIDTH]<={bcd_adjusted[COUNTER_WIDTH-2:0],score_shift[19]};
+                        2:number_bcd[1*COUNTER_WIDTH+:COUNTER_WIDTH]<={bcd_adjusted[COUNTER_WIDTH-2:0],score_shift[19]};
+                        3:number_bcd[2*COUNTER_WIDTH+:COUNTER_WIDTH]<={bcd_adjusted[COUNTER_WIDTH-2:0],score_shift[19]};
+                        4:number_bcd[3*COUNTER_WIDTH+:COUNTER_WIDTH]<={bcd_adjusted[COUNTER_WIDTH-2:0],score_shift[19]};
                     endcase
                     number_select<=number_select==4 ? 3'd0 : number_select+1'b1;number_step<=0;
                 end else number_step<=number_step+1'b1;
@@ -102,8 +121,8 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
     reg [8:0] centre;
     reg [4:0] slot;
     reg [1:0] text_tint;
-    wire [2:0] latest_judgement=feedback_lane==0 ? game_snapshot[222:220] : feedback_lane==1 ? game_snapshot[225:223] :
-                                  feedback_lane==2 ? game_snapshot[228:226] : game_snapshot[231:229];
+    wire [2:0] latest_judgement=feedback_lane==0 ? judgement_value[0+:3] : feedback_lane==1 ? judgement_value[3+:3] :
+                                  feedback_lane==2 ? judgement_value[6+:3] : judgement_value[9+:3];
     wire recent_feedback=feedback_age[feedback_lane*4+:4]!=0;
     integer k;
     wire [4:0] breath=animation[5] ? ~animation[4:0] : animation[4:0];
@@ -116,30 +135,31 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
                 dx=x-origin_x;dy=y-origin_y;text_enable=1;
                 character_index=ascii!=0 ? (scale==2 ? dx>>4 : dx>>3) : (scale==2 ? dx>>5 : dx>>4);
                 message_address={message_id,character_index};numeric_glyph=0;
-                font_row=scale==2 ? dy[4:1] : dy[3:0];font_col=scale==2 ? dx[4:1] : (ascii!=0 ? {1'b0,dx[2:0]} : dx[3:0]);
+                font_row=scale==2 ? dy[4:1] : dy[3:0];font_col=scale==2 ? (ascii!=0 ? {1'b0,dx[3:1]} : dx[4:1]) : (ascii!=0 ? {1'b0,dx[2:0]} : dx[3:0]);
             end
         end
     endtask
     task score_digits;
         input integer ox,oy,scale;
         reg [8:0] dx,dy;
-        begin if(x>=ox && x<ox+40*scale && y>=oy && y<oy+16*scale)begin
+        begin if(x>=ox && x<ox+SCORE_DIGITS*8*scale && y>=oy && y<oy+16*scale)begin
             dx=x-ox;dy=y-oy;text_enable=1;numeric_glyph=1;
-            glyph=`GAME_DIGIT_BASE+score_bcd[(4-(scale==2 ? dx>>4 : dx>>3))*4+:4];
+            glyph=`GAME_DIGIT_BASE+score_bcd[(SCORE_DIGITS-1-(scale==2 ? dx>>4 : dx>>3))*4+:4];
             font_row=scale==2 ? dy[4:1] : dy[3:0];
             font_col=scale==2 ? {1'b0,dx[3:1]} : {1'b0,dx[2:0]};end end
     endtask
     task pair_digits;
-        input integer ox,oy;input [11:0] value;
+        input integer ox,oy;input [COUNTER_WIDTH-1:0] value;
         reg [8:0] dx;reg [3:0] digit;
-        begin if(x>=ox && x<ox+24 && y>=oy && y<oy+16)begin
+        begin if(x>=ox && x<ox+COUNTER_DIGITS*8 && y>=oy && y<oy+16)begin
             dx=x-ox;
-            case(dx>>3)0:digit=value[11:8];1:digit=value[7:4];default:digit=value[3:0];endcase
+            digit=value[(COUNTER_DIGITS-1-(dx>>3))*4+:4];
             text_enable=1;numeric_glyph=1;glyph=`GAME_DIGIT_BASE+digit;font_row=y-oy;font_col={1'b0,dx[2:0]};end end
     endtask
     task combo_digits;
         reg [8:0] dx,dy;reg [3:0] digit;
-        begin if(x>=352 && x<400 && y>=8 && y<40)begin
+        begin if(USE_P2 && combo_value>=1000)pair_digits(352,16,number_bcd[0+:COUNTER_WIDTH]);
+        else if(x>=352 && x<400 && y>=8 && y<40)begin
             dx=x-352;dy=y-8;
             case(dx>>4)0:digit=number_bcd[11:8];1:digit=number_bcd[7:4];default:digit=number_bcd[3:0];endcase
             if((dx>>4)==2 || ((dx>>4)==1 && number_bcd[11:4]!=0) || digit!=0)begin
@@ -147,6 +167,15 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
                 font_row=dy[4:1];font_col={1'b0,dx[3:1]};
             end
         end end
+    endtask
+    task song_title;
+        input [2:0] song;input integer ox,oy,scale;
+        begin case(song)
+            1:label(42,ox,oy,2,scale,0);
+            2:if(scale==1)label(55,ox,oy,17,1,1);else label(43,ox,oy,4,scale,1);
+            3:label(44,ox,oy,4,scale,0);
+            default:label(4,ox,oy,3,scale,0);
+        endcase end
     endtask
     task stage_title;
         reg [8:0] dx,dy;reg [1:0] character;
@@ -162,10 +191,10 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
         background={6'd3,6'd5,6'd10};text_enable=0;glyph=0;message_address=0;numeric_glyph=0;font_row=0;font_col=0;text_tint=0;
         lane=y<112 ? 0 : y<160 ? 1 : y<208 ? 2 : 3;
         case(lane)
-            0:begin lane_origin=64;lane_judgement=game_snapshot[222:220];lane_age=feedback_age[3:0];end
-            1:begin lane_origin=112;lane_judgement=game_snapshot[225:223];lane_age=feedback_age[7:4];end
-            2:begin lane_origin=160;lane_judgement=game_snapshot[228:226];lane_age=feedback_age[11:8];end
-            3:begin lane_origin=208;lane_judgement=game_snapshot[231:229];lane_age=feedback_age[15:12];end
+            0:begin lane_origin=64;lane_judgement=judgement_value[0+:3];lane_age=feedback_age[3:0];end
+            1:begin lane_origin=112;lane_judgement=judgement_value[3+:3];lane_age=feedback_age[7:4];end
+            2:begin lane_origin=160;lane_judgement=judgement_value[6+:3];lane_age=feedback_age[11:8];end
+            3:begin lane_origin=208;lane_judgement=judgement_value[9+:3];lane_age=feedback_age[15:12];end
         endcase
         local_y=y-lane_origin;
         relative_x=0;note_valid=0;tail_hits=0;centre=0;dx_work=0;slot=0;
@@ -190,14 +219,19 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
             2:begin
                 label(3,176,6,4,2,0);label(17,24,14,2,1,0);
                 if(x>=24 && x<=455 && y>=48)begin
-                    background=y<92 ? {6'd6,6'd23,6'd36} : {6'd6,6'd9,6'd16};
+                    background=y<(USE_P2 ? 224 : 92) ? {6'd6,6'd23,6'd36} : {6'd6,6'd9,6'd16};
                     if(y==48 || y==91 || y==135 || y==179 || y==223 || y==267)background={6'd12,6'd23,6'd35};
                 end
-                label(4,56,60,3,1,0);label(24,268,60,5,1,0);
-                label(5,56,104,3,1,0);label(5,56,148,3,1,0);label(5,56,192,3,1,0);label(5,56,236,3,1,0);
+                label(4,56,60,3,1,0);label(USE_P2 ? 48 : 24,268,60,USE_P2 ? 12 : 5,1,USE_P2);
+                if(USE_P2)begin
+                    song_title(1,56,104,1);label(46,268,104,13,1,1);
+                    song_title(2,56,148,1);label(47,268,148,10,1,1);
+                    song_title(3,56,192,1);label(46,268,192,13,1,1);
+                    label(45,56,236,9,1,1);
+                end else begin label(5,56,104,3,1,0);label(5,56,148,3,1,0);label(5,56,192,3,1,0);label(5,56,236,3,1,0);end
             end
             3:begin
-                label(6,176,20,4,2,0);label(17,24,14,2,1,0);label(4,216,70,3,1,0);
+                label(6,176,20,4,2,0);label(17,24,14,2,1,0);song_title(USE_P2 ? selected_slot : 3'd0,192,70,1);
                 label(25,184,170,6,1,0);
                 if(x>=64 && x<416 && y>=104 && y<144)begin
                     if(x<152)background={6'd12,6'd29,6'd60};
@@ -249,7 +283,11 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
                         background=lane_judgement==1 || lane_judgement==2 ? {6'd52,6'd61,6'd63} : {6'd63,6'd25,6'd31};
                 end
                 if(x>=91 && x<101 && ((y>=57 && y<60)||(y>=254 && y<257)))background={6'd45,6'd60,6'd63};
-                stage_title();label(34,16,32,3,1,0);label(35,88,32,6,1,1);
+                if(!USE_P2 || active_slot==0)begin stage_title();label(34,16,32,3,1,0);label(35,88,32,6,1,1);end
+                else begin
+                    if(active_slot==3)label(52,16,0,2,2,0);else song_title(active_slot,16,0,2);label(active_slot==1 ? 51 : active_slot==2 ? 50 : 49,16,32,10,1,1);
+                    label(54,104,16,6,1,1);
+                end
                 label(32,228,0,2,1,0);score_digits(228,16,2);combo_digits();label(33,416,14,2,1,0);
                 if(recent_feedback)case(latest_judgement)
                     1:label(39,109,256,12,1,1);2:label(40,109,256,8,1,1);3:label(41,109,256,7,1,1);
@@ -262,17 +300,18 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1)
                 if(display_page==4)begin
                     label(7,208,116,2,2,0);
                     if(x>=286 && x<294 && y>=126 && y<142)begin
-                        text_enable=1;numeric_glyph=1;glyph=`GAME_DIGIT_BASE+(game_snapshot[159] && $signed(game_snapshot[159:128])<-48000 ? 2 : 1);
+                        text_enable=1;numeric_glyph=1;glyph=`GAME_DIGIT_BASE+(time_value[31] && $signed(time_value)<-48000 ? 2 : 1);
                         font_row=y-126;font_col=x-286;
                     end
                 end
             end
             6:begin
-                label(11,176,18,4,2,0);label(4,216,67,3,1,0);
+                label(11,176,18,4,2,0);song_title(active_slot,192,67,1);
+                if(error_value)label(53,208,88,5,1,1);
                 label(19,100,105,5,1,1);score_digits(100,126,1);
-                label(21,268,105,3,1,1);pair_digits(268,126,number_bcd[23:12]);
-                label(22,100,161,3,1,1);pair_digits(140,161,number_bcd[35:24]);
-                label(23,268,161,4,1,1);pair_digits(308,161,number_bcd[47:36]);
+                label(21,268,105,3,1,1);pair_digits(268,126,number_bcd[1*COUNTER_WIDTH+:COUNTER_WIDTH]);
+                label(22,100,161,3,1,1);pair_digits(140,161,number_bcd[2*COUNTER_WIDTH+:COUNTER_WIDTH]);
+                label(23,268,161,4,1,1);pair_digits(308,161,number_bcd[3*COUNTER_WIDTH+:COUNTER_WIDTH]);
                 if(y>=208 && y<=260)begin
                     if(x>=24 && x<160)background={6'd6,6'd29,6'd38};
                     else if(x>=172 && x<308)background={6'd25,6'd14,6'd35};

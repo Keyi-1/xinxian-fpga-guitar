@@ -1,5 +1,6 @@
 `timescale 1ns/1ps
 module tb_game_p2_window;
+    GSR GSR(.GSRI(1'b1));
     reg clk=0;always #5 clk=~clk;
     reg rst_n=0,tick=0,enable=1,start_song=0,demo=1,catalog_valid=1;
     reg [10:0] base=0;

@@ -1,6 +1,6 @@
-// P2 prototype: at most 64 events plus one density guard, independent of song
+// P2 bounded engine: at most 64 events plus one density guard, independent of song
 // length. Immutable score reads have one-clock latency. No per-song bit mask.
-// Not connected to the production router/UI until integration acceptance.
+// Used by game_p2_mode_router; faults require sustain-independent release.
 module game_p2_window_controller #(
     parameter integer COUNTDOWN_SAMPLES=96000,
     parameter integer PERFECT_SAMPLES=1680,GOOD_SAMPLES=4320,WINDOW_SAMPLES=7200,

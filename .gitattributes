@@ -4,3 +4,5 @@ rtl/config/game_p2_*.vh text eol=lf
 scores/p2/*.csv text eol=lf
 scores/p2/*.json text eol=lf
 scores/p2/*.bin binary
+
+/rtl/config/game_p2_bsram_init.vh text eol=lf

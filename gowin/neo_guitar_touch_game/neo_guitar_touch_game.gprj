@@ -104,5 +104,8 @@
         <File path="../../rtl/input/touch_coordinate_mapper.v" type="file.verilog" enable="1" />
         <File path="../../rtl/input/touch_gesture.v" type="file.verilog" enable="1" />
         <File path="../../rtl/top/neo_guitar_touch_game_top.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p2_mode_router.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p2_chart_layout.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/config/game_p2_bsram_init.vh" type="file.other" enable="1" />
     </FileList>
 </Project>

@@ -3,9 +3,10 @@
 module guitar_effect_buttons #(
     parameter integer DEBOUNCE_CYCLES=245760,
     parameter integer LONG_PRESS_CYCLES=12288000,
-    parameter integer LONG_PRESS_ENABLE=1
+    parameter integer LONG_PRESS_ENABLE=1,EXTERNAL_TIMBRE_ENABLE=0
 )(
     input wire clk,rst_n,key_timbre_n,key_chorus_n,key_space_n,
+    input wire load_timbre,input wire [1:0] loaded_timbre,
     output wire timbre_select,rock_select,
     output reg [1:0] timbre_mode,
     output reg chorus_enable,
@@ -32,7 +33,8 @@ module guitar_effect_buttons #(
             debounce_count<=0;hold_count<=0;space_mode<=0;timbre_mode<=0;harmony_enable<=0;chorus_enable<=0;
         end else begin
             sync1<=key_chorus_n;sync2<=sync1;
-            if(timbre_press)timbre_mode<=timbre_mode==2 ? 2'd0 : timbre_mode+1'b1;
+            if(EXTERNAL_TIMBRE_ENABLE && load_timbre && loaded_timbre<=2)timbre_mode<=loaded_timbre;
+            else if(timbre_press)timbre_mode<=timbre_mode==2 ? 2'd0 : timbre_mode+1'b1;
             if(space_press)space_mode<=space_mode==2 ? 2'd0 : space_mode+1'b1;
             if(sync2==stable_n)debounce_count<=0;
             else if(DEBOUNCE_CYCLES<=1 || debounce_count>=DEBOUNCE_CYCLES-1)begin
