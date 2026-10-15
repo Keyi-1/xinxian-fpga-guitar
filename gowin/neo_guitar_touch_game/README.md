@@ -1,6 +1,6 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**P1 本地下板候选（2026-10-15）：** 分支 `experiment/display-game-resource-opt`，
+**当前 master 已发布 P1（2026-10-15）：** 已验证的实现和记录已推送至 `origin/master`，
 将 64 根频谱柱高／峰值改为消隐期 64 拍串行复用，保持原三音色、音效、画面及游戏操作。
 完整 P&R：Logic **50159**，Register **22405**，CLS **27943/29952（93.29%）**，BSRAM **95**，DSP **115.5**；
 系统／音频 Fmax **58.765／14.442 MHz**，运行时钟仍为 50／12.288 MHz。
@@ -11,9 +11,17 @@ SHA256 `e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86`。
 九项 RTL、五项分弦 Python、512 组柱状态／1,108,992 像素、15 帧真实 FFT 集成／1,958,400 像素、
 21 帧整机网表／2,741,760 像素及 364 次连续布局通过；音频 8192 样本与冻结基线一致，延音退出仍为 1452 样本。
 [实现、完整资源对比与下板步骤](../../docs/DISPLAY_GAME_P1_RESOURCE_OPT.md)，
-[本轮验证记录](verification.json)。用户现反馈“现在的版本好像没什么问题”，并授权先本地提交保存；现场位流哈希未另行采集。
-仅作本地保存，未 push／merge／烧录，反馈范围见 [hardware_acceptance.json](hardware_acceptance.json)。
-构建采用独立快照，两个受保护用户文件、原 IDE 网表／位流和原全宽舞台归档均保留。
+[本轮验证记录](verification.json)。用户反馈“现在的版本好像没什么问题”，之后授权本地合入 master 并推送 GitHub。
+现场位流哈希未另行采集，未由代理烧录硬件；历史实物反馈范围见 [hardware_acceptance.json](hardware_acceptance.json)。
+该次 P1 使用独立快照构建，原 IDE 网表／位流和原全宽舞台归档均保留。
+用户现要求以后改为直接使用本 `.gprj` 及其原 `impl` 目录构建，流程见下文。
+后续频带小实验收益不足，已停止并保留在 `experiment/radial-bands-resource-opt`，未合入本工程。
+
+**直接使用现成位流：** 上面的 P1 `.fs` 已是最终可烧录文件，无需先重新运行 `.gprj`。
+在 Gowin Programmer 中扫描原 `GW5AT-60B`，双击设备的 Operation，
+选择 `SRAM Mode`／`SRAM Program`，在 `File name` 中选取该 `.fs`，保存后执行 Program/Configure。
+这是上电期间的临时配置；掉电保存需使用板上适用的 Flash 流程，不在此处修改 Flash 设置。
+菜单步骤参考 [Gowin Programmer 官方指南](https://cdn.gowinsemi.com.cn/SUG502E.pdf)。
 
 以下全宽舞台数据是已验收的历史基线，和本轮独立 P1 产物分别留存。
 
@@ -151,6 +159,20 @@ SHA256：`db1e7578e676d4cdbd0de375c46f016e744386f7fd1cfc45d340205f99ce849a`。
 曲谱上限由生成脚本限制为 120 项以满足采样预算；更长曲目需后续窗口缓存设计，不能直接扩大参数。
 
 ## 构建、验证与实物验收
+
+**以后默认使用原 IDE 工程构建，不另建构建工程：**
+
+1. 打开本目录 `neo_guitar_touch_game.gprj`，确认顶层、Device B 和现有工程设置。
+2. 在 Gowin IDE 的 Process 中运行 Synthesize，再运行 Place & Route。
+3. 综合结果位于 `impl/gwsynthesis/`，布线、STA 报告和最终位流位于 `impl/pnr/`；
+   原工程的最终位流为 `impl/pnr/neo_guitar_touch_game.fs`。
+4. 对这一次实际生成的产物完成必需回归、综合网表和 STA 检查后，再复制到
+   `build/releases/touch_game/` 下独立命名归档，绑定本次源码及产物哈希。
+
+原有 P1 发布文件及其证据保留，不用旧日志认证后来 IDE 重建的产物。
+仅修改说明或已存在有效构建结果时，不为刷新 IDE 状态重跑综合布局布线。
+
+以下命令保留用于复现**历史独立 P1 构建**，不是后续默认操作流程：
 
 ```powershell
 # P1 使用新的独立目录，先综合，确认收益后再布局布线；日志和 PID 写入 manifest。
