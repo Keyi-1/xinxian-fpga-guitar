@@ -18,9 +18,10 @@ class ScoreV2Tests(unittest.TestCase):
         for before, line in zip(old[:67],words):
             e = decode(int(line,16))
             self.assertEqual(before, (e.lane<<74)|(phase(e.midi)<<48)|(e.duration<<24)|e.onset)
-        self.assertEqual(manifest['slots'][3]['alias'], 'QING_GE_INTRO')
+        self.assertEqual(manifest['slots'][3]['alias'], 'QING_GE_MELODY')
         self.assertTrue(manifest['slots'][3]['valid'])
-        self.assertEqual(manifest['slots'][3]['count'],128)
+        self.assertEqual(manifest['slots'][3]['count'],212)
+        self.assertEqual(manifest['slots'][3]['duration'],7296000)
         self.assertEqual(manifest['slots'][1]['timbre'],1)
         self.assertEqual(manifest['slots'][2]['timbre'],2)
 

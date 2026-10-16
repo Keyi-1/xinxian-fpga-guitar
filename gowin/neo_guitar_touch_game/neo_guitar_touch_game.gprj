@@ -90,6 +90,7 @@
         <File path="../../rtl/game/game_p2_window_controller.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_p2_static_engine.v" type="file.verilog" enable="1" />
         <File path="../../rtl/config/game_p2_catalog.vh" type="file.other" enable="1" />
+        <File path="../../rtl/config/game_p2_progress.vh" type="file.other" enable="1" />
         <File path="../../rtl/config/game_p2_phase.vh" type="file.other" enable="1" />
         <File path="../../mem/game_p2_static.mem" type="file.other" enable="1" />
         <File path="../../rtl/game/game_score_rom.v" type="file.verilog" enable="1" />

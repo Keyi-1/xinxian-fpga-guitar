@@ -11,7 +11,8 @@ MESSAGES=['模式选择','演奏模式','游戏模式','曲目选择','茉莉花
           '得分','连击','单旋律','96 BPM','双击退出','到线拨弦','右侧来音',
           'PERFECT +100','GOOD +70','BAD +25',
           '慢练','RIFF','情歌前奏','TEST ONLY','BRIGHT 60 BPM','WAH 60 BPM',
-          'PIANO 96 BPM','INTRO LOOP','RIFF LOOP','SLOW ARP','情歌','ERROR','60 BPM','SEVEN NATION ARMY']
+          'PIANO 96 BPM','INTRO LOOP','RIFF LOOP','SLOW ARP','情歌','ERROR','60 BPM','SEVEN NATION ARMY',
+          '情歌旋律','MELODY']
 
 def main():
     chinese=''.join(dict.fromkeys(''.join(s for s in MESSAGES if not s.isascii())))

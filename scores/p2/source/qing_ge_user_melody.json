@@ -1,0 +1,1264 @@
+{
+  "title": "情歌（用户提供 EOP 双行简谱，上声部）",
+  "source_arranger_printed": "Wuyangr",
+  "source_pages": [
+    {
+      "page": 1,
+      "path": "scores/p2/source/qing_ge_user_page_1.jpg",
+      "sha256": "226e331d910348aade818c8fc2956c408b7954612fc22e4e46d024c869d689fd",
+      "original_filename": "Camera_XHS_1792148778629spectrum_1040g0k031va2q1.jpg"
+    },
+    {
+      "page": 2,
+      "path": "scores/p2/source/qing_ge_user_page_2.jpg",
+      "sha256": "5b04061591d42680844cc6285dd0ba061e4da47e481df0ce4f25083b90a36412",
+      "original_filename": "Camera_XHS_1792148780931spectrum_1040g0k031va2q1.jpg"
+    }
+  ],
+  "scope": "All 38 printed measures of the supplied two-page arrangement; not a reconstruction of unprovided original-recording sections",
+  "time_signature": [
+    4,
+    4
+  ],
+  "printed_bpm": 72,
+  "practice_bpm": 60,
+  "source_tonic_midi": 67,
+  "transpose_semitones": -12,
+  "timbre": 1,
+  "pitch_profile": "game_extended",
+  "adaptation_authorization": "2026-10-16 user: preserve every interval; lower one octave and extend game range D3-G5, performance unchanged",
+  "symbols": {
+    "+": "one upper octave",
+    "-": "one lower octave",
+    "~": "grey tied continuation, merge without another pluck",
+    "0": "rest"
+  },
+  "rhythm_review": {
+    "status": "USER_ACCEPTED_TRIAL",
+    "bars": [
+      10,
+      18
+    ],
+    "issue": "Visible eighth/sixteenth values appear to sum to 7/2 quarter beats instead of 4",
+    "proposed_override": {
+      "token_index_zero_based": 4,
+      "symbol": "5",
+      "printed_read_duration": "1/2",
+      "proposed_duration": "1",
+      "reason": "Keep all pitches/ties and complete four beats; requires explicit user acceptance"
+    },
+    "user_authorization": "2026-10-16 explicit reply: two bar-10/18 degree-5 half beats become one beat for listening review"
+  },
+  "measures": [
+    {
+      "number": 1,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1"
+        },
+        {
+          "pitch": "5",
+          "beats": "1"
+        },
+        {
+          "pitch": "3",
+          "beats": "3/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "tokens": [
+        {
+          "pitch": "1",
+          "beats": "1"
+        },
+        {
+          "pitch": "6",
+          "beats": "1"
+        },
+        {
+          "pitch": "3",
+          "beats": "2"
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "tokens": [
+        {
+          "pitch": "1",
+          "beats": "2"
+        },
+        {
+          "pitch": "2",
+          "beats": "2"
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "tokens": [
+        {
+          "pitch": "1",
+          "beats": "2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "-5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1"
+        },
+        {
+          "pitch": "5",
+          "beats": "1"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "tokens": [
+        {
+          "pitch": "~3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "~3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/3"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "~2",
+          "beats": "1"
+        },
+        {
+          "pitch": "0",
+          "beats": "1"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/3"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "~2",
+          "beats": "1"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "-5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1"
+        },
+        {
+          "pitch": "5",
+          "beats": "1"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "tokens": [
+        {
+          "pitch": "~3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 16,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 18,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "~3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/3"
+        }
+      ]
+    },
+    {
+      "number": 19,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "~2",
+          "beats": "1"
+        },
+        {
+          "pitch": "0",
+          "beats": "1"
+        },
+        {
+          "pitch": "3",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "4",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/3"
+        }
+      ]
+    },
+    {
+      "number": 20,
+      "tokens": [
+        {
+          "pitch": "3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "~2",
+          "beats": "1"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "-5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 21,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~7",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 22,
+      "tokens": [
+        {
+          "pitch": "6",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~6",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "6",
+          "beats": "1/3"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/3"
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        }
+      ]
+    },
+    {
+      "number": 24,
+      "tokens": [
+        {
+          "pitch": "6",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "7",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        }
+      ]
+    },
+    {
+      "number": 25,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "+4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "+4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "tokens": [
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 28,
+      "tokens": [
+        {
+          "pitch": "6",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        }
+      ]
+    },
+    {
+      "number": 29,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "+4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "+4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "tokens": [
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/4"
+        },
+        {
+          "pitch": "~+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 32,
+      "tokens": [
+        {
+          "pitch": "+2",
+          "beats": "2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 33,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "2"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 34,
+      "tokens": [
+        {
+          "pitch": "+3",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "+4",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        }
+      ]
+    },
+    {
+      "number": 35,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 36,
+      "tokens": [
+        {
+          "pitch": "+3",
+          "beats": "1"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1"
+        },
+        {
+          "pitch": "0",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "++1",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+1",
+          "beats": "1/2"
+        }
+      ]
+    },
+    {
+      "number": 37,
+      "tokens": [
+        {
+          "pitch": "+5",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+4",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+3",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "+2",
+          "beats": "1/2"
+        },
+        {
+          "pitch": "6",
+          "beats": "1"
+        },
+        {
+          "pitch": "7",
+          "beats": "1"
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "tokens": [
+        {
+          "pitch": "+1",
+          "beats": "4"
+        }
+      ]
+    }
+  ]
+}

@@ -39,7 +39,8 @@ module game_p2_window_controller #(
     reg [24:0] best_duration[0:3],next_duration[0:3];
     reg [13:0] best_error[0:3];
     reg [5:0] best_slot[0:3];
-    reg [25:0] best_phase[0:3],next_phase[0:3];
+    // The fretless game accepts D3..G5. The performance fret ROM is unchanged.
+    reg [26:0] best_phase[0:3],next_phase[0:3];
     reg [6:0] miss_add;
     wire [31:0] onset=read_data[31:0],duration=read_data[63:32];
     wire [6:0] midi=read_data[70:64];
@@ -50,7 +51,7 @@ module game_p2_window_controller #(
     wire [32:0] absolute_error=error_time[32] ? -error_time : error_time;
     wire eligible=scan_plucks[lane] && absolute_error<=WINDOW_SAMPLES;
     wire expired=!demo && {1'b0,elapsed}>{1'b0,onset}+WINDOW_SAMPLES && !eligible;
-    wire invalid_word=midi<50 || midi>72 || duration==0 || read_data[79:75]!=0 ||
+    wire invalid_word=midi<50 || midi>79 || duration==0 || read_data[79:75]!=0 ||
         {1'b0,onset}+{1'b0,duration}>{1'b0,duration_limit} ||
         (scan_id!=scan_begin && onset<previous_onset);
     assign read_enable=state==READ && enable && !fault && !start_song;
@@ -63,7 +64,7 @@ module game_p2_window_controller #(
         assign note_off[g]=sample_tick && enable && !countdown && !note_on[g] &&
             end_time[g]!=0 && elapsed>=end_time[g];
     end endgenerate
-    function [25:0] midi_phase;
+    function [26:0] midi_phase;
         input [6:0] midi;
         begin
             `include "../config/game_p2_phase.vh"
@@ -182,7 +183,7 @@ module game_p2_window_controller #(
                     combo_next=miss_add!=0 ? 16'd0 : combo;max_next=max_combo;launch_next=0;
                     for(i=0;i<4;i=i+1)begin
                         if(found[i])begin
-                            target_phase[i*32+:32]<={6'd0,best_phase[i]};
+                            target_phase[i*32+:32]<={5'd0,best_phase[i]};
                             end_time[i]<=elapsed+best_duration[i];launch_next[i]=1;
                             note_velocity[i*2+:2]<=demo ? 2'd2 : scan_velocity[i*2+:2];
                             if(!demo)begin
@@ -196,7 +197,7 @@ module game_p2_window_controller #(
                             judgement_epoch[i*2+:2]<=judgement_epoch[i*2+:2]+1'b1;
                             wrong_add=wrong_add+1'b1;combo_next=0;judgement[i*3+:3]<=5;launch_next[i]=1;
                             note_velocity[i*2+:2]<=scan_velocity[i*2+:2];end_time[i]<=elapsed+(next_found[i] ? next_duration[i] : 32'd14400);
-                            target_phase[i*32+:32]<=next_found[i] ? {6'd0,next_phase[i]} :
+                            target_phase[i*32+:32]<=next_found[i] ? {5'd0,next_phase[i]} :
                                 i==0 ? 32'h01c20d2f : i==1 ? 32'h0151285d : i==2 ? 32'h010b9a2b : 32'h00c879a3;
                         end
                     end

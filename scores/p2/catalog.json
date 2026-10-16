@@ -3,7 +3,7 @@
   "sample_rate_hz": 48000,
   "event_bits": 96,
   "event_bytes": 16,
-  "total_events": 875,
+  "total_events": 959,
   "capacity": 2048,
   "slots": [
     {
@@ -54,19 +54,21 @@
     },
     {
       "slot": 3,
-      "alias": "QING_GE_INTRO",
-      "title": "情歌前奏和弦慢练（四小节循环）",
-      "duration": 6144000,
+      "alias": "QING_GE_MELODY",
+      "title": "情歌旋律（用户谱完整38小节）",
+      "duration": 7296000,
       "bpm": 60,
       "timbre": 1,
       "playable": true,
       "test_only": false,
-      "provenance": "Short four-bar intro harmony excerpt, C practice key; original quarter-note arpeggio pattern at 60 BPM, eight practice repetitions. No lyrics or melody, not the complete accompaniment or original recording.",
-      "reference": "https://kanpu8.com/chords/love-song-fish-leong/",
+      "pitch_profile": "game_extended",
+      "transpose_semitones": -12,
+      "provenance": "Complete 38-bar upper staff from two user-supplied images; 60 BPM, one octave down, no loop. Two explicitly accepted bar10/18 rhythm revisions await listening confirmation; not the full original-recording arrangement.",
+      "reference": "scores/p2/source/qing_ge_user_melody.json",
       "offset": 491,
-      "count": 128,
+      "count": 212,
       "valid": true,
-      "crc32": "46bcdb66"
+      "crc32": "49355fa2"
     },
     {
       "slot": 4,
@@ -78,12 +80,12 @@
       "playable": false,
       "test_only": true,
       "provenance": "Generated timing fixture, not a performance song",
-      "offset": 619,
+      "offset": 703,
       "count": 256,
       "valid": true,
       "crc32": "b14c6b12"
     }
   ],
-  "integration": "core prototype only; not connected to production UI/audio",
-  "bank_sha256": "c7fd79327a98bd8d619b71bd983412c5d85af341c89b0f467543b27e83488847"
+  "integration": "Production touch UI/audio; Qing Ge user-score melody trial",
+  "bank_sha256": "b95418a7c187b5cd5ce62cf0b08dadff94e1916d40bdf627470eeea4a143b11c"
 }

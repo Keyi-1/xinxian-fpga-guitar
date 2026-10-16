@@ -284,6 +284,16 @@ function [6:0] game_message_glyph;
             11'd1774:game_message_glyph=7'd90;
             11'd1775:game_message_glyph=7'd85;
             11'd1776:game_message_glyph=7'd97;
+            11'd1792:game_message_glyph=7'd70;
+            11'd1793:game_message_glyph=7'd71;
+            11'd1794:game_message_glyph=7'd46;
+            11'd1795:game_message_glyph=7'd47;
+            11'd1824:game_message_glyph=7'd85;
+            11'd1825:game_message_glyph=7'd77;
+            11'd1826:game_message_glyph=7'd84;
+            11'd1827:game_message_glyph=7'd87;
+            11'd1828:game_message_glyph=7'd76;
+            11'd1829:game_message_glyph=7'd97;
             default:game_message_glyph=7'd109;
         endcase
     end

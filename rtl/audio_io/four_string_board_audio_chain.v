@@ -10,6 +10,7 @@ module four_string_board_audio_chain #(
     parameter integer EXTERNAL_CONTROL_ENABLE = 0,
     parameter integer GAME_CUE_ENABLE = 0,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
+    parameter integer CONTROL_PHASE_VALUE_BITS = `NOTE_PHASE_VALUE_BITS,
     parameter integer USE_HARMONIC = 0,
     parameter integer USE_PIANO = 0,
     parameter integer PIANO_HAMMER_ENABLE = 1,
@@ -76,7 +77,7 @@ module four_string_board_audio_chain #(
     genvar g;
     generate for (g = 0; g < 4; g = g + 1) begin : string_slide
         phase_slide_smoother #(.SLIDE_SAMPLES(SLIDE_SAMPLES),
-            .PHASE_VALUE_BITS(`NOTE_PHASE_VALUE_BITS)) u_smoother (
+            .PHASE_VALUE_BITS(CONTROL_PHASE_VALUE_BITS)) u_smoother (
             .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick),
             .note_on(note_on[g]), .voice_active(voice_active[g]),
             .target_phase_inc(target_phase_inc[g*32 +: 32]),

@@ -62,7 +62,7 @@ def main():
             lines.append(f'force gate.u_display.{instance}.{name}={expression};')
         expected = set(range(size)) if size == 160 else (
             set(range(272,400)) | {i*32+j for i in range(4) for j in range(16,32)} |
-            {128+i*32+j for i in range(4) for j in range(26)})
+            {128+i*32+j for i in range(4) for j in range(27)})
         assert observed == expected, ('changed visual fields', observed^expected)
     lines += ['force reference.u_display.u_cdc.dst_snapshot=test_visual;',
               'force reference.u_display.u_bands.targets=test_targets;']

@@ -8,7 +8,7 @@ from fractions import Fraction
 import csv
 import struct
 import zlib
-from game_fingering import Note, assign, candidates
+from game_fingering import Note, assign, candidates, OPEN_MIDI
 
 SAMPLE_RATE = 48000
 MAX_EVENTS = 2048
@@ -37,9 +37,18 @@ class Event:
                            self.velocity, self.flags, self.group, 0)
 
 
-def phase(midi):
-    if not 50 <= midi <= 72:
-        raise ValueError('MIDI outside existing D3..C5 instrument')
+def pitch_candidates(midi, profile='physical'):
+    if profile=='physical':return candidates(midi)
+    if profile=='game_extended':
+        # Fretless game only: each voice accepts a complete DDS increment.
+        # Preserve the allocator's interval feasibility and nearby-note costs.
+        return [(lane,max(0,midi-base)) for lane,base in enumerate(OPEN_MIDI)] if 50<=midi<=79 else []
+    raise ValueError(f'unknown pitch profile: {profile}')
+
+
+def phase(midi, profile='physical'):
+    if not pitch_candidates(midi,profile):
+        raise ValueError(f'MIDI outside {profile} instrument range')
     return round(440 * 2 ** ((midi - 69) / 12) * 2 ** 32 / SAMPLE_RATE)
 
 
@@ -49,7 +58,7 @@ def decode(word):
                  word >> 75 & 31, word >> 80 & 65535)
 
 
-def from_binary(payload):
+def from_binary(payload, *, profile='physical'):
     if not payload or len(payload) % RECORD.size:
         raise ValueError('incomplete/empty v2 payload')
     events = []
@@ -57,11 +66,11 @@ def from_binary(payload):
         if reserved:
             raise ValueError('reserved field must be zero')
         events.append(Event(onset, duration, midi, lane, velocity, flags, group))
-    validate(events)
+    validate(events,profile=profile)
     return events
 
 
-def validate(events, duration=None):
+def validate(events, duration=None, *, profile='physical'):
     if not 1 <= len(events) <= MAX_EVENTS:
         raise ValueError('event capacity must be 1..2048')
     last_onset = -1
@@ -74,7 +83,7 @@ def validate(events, duration=None):
             raise ValueError(f'event {i}: end exceeds 10 minutes')
         if event.onset < last_onset:
             raise ValueError(f'event {i}: unsorted events')
-        if not 0 <= event.lane < 4 or not any(lane == event.lane for lane, _ in candidates(event.midi)):
+        if not 0 <= event.lane < 4 or not any(lane == event.lane for lane, _ in pitch_candidates(event.midi,profile)):
             raise ValueError(f'event {i}: unsupported lane/pitch')
         if not 0 <= event.velocity < 4 or event.flags or not 0 <= event.group <= 65535:
             raise ValueError(f'event {i}: invalid velocity/flags/group')
@@ -98,15 +107,16 @@ def validate(events, duration=None):
     return events
 
 
-def allocate(notes):
+def allocate(notes, *, profile='physical'):
     """Use the accepted allocator: no overlap, nearby notes prefer another string."""
-    positions = assign([Note(e.onset, e.duration, e.midi) for e in notes])
+    positions = assign([Note(e.onset, e.duration, e.midi) for e in notes],
+        candidate_fn=lambda midi:pitch_candidates(midi,profile))
     result = [replace(e, lane=lane) for e, (lane, _) in zip(notes, positions)]
-    validate(result)
+    validate(result,profile=profile)
     return result
 
 
-def read_csv(path, bpm=60):
+def read_csv(path, bpm=60, *, profile='physical'):
     """CSV uses exact beat fractions, or explicit 48 kHz sample timestamps."""
     events = []
     lanes = []
@@ -126,7 +136,7 @@ def read_csv(path, bpm=60):
                                 int(row.get('flags', '') or 0), int(row.get('group_id', '') or 0)))
     if any(lanes) and not all(lanes):
         raise ValueError('specify every lane or let allocator choose every lane')
-    return validate(events) if all(lanes) else allocate(events)
+    return validate(events,profile=profile) if all(lanes) else allocate(events,profile=profile)
 
 
 def payload_info(events):

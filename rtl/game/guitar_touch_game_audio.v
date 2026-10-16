@@ -61,6 +61,7 @@ module guitar_touch_game_audio #(
     assign display_data=0;assign timbre_load=0;assign timbre_code=0;
     end endgenerate
     four_string_board_audio_chain #(.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(ENABLE_MISS_CUE),.I2S_ENABLE(1),.USE_PIANO(1),
+        .CONTROL_PHASE_VALUE_BITS(USE_P2 ? 27 : `NOTE_PHASE_VALUE_BITS),
         .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1)) u_chain(
         .clk_audio_ref(clk),.rst_n(rst_n),.stable_valid(1'b0),.stable_fret_id(16'd0),.pluck_valid(4'd0),
         .velocity_level(note_velocity),.timbre_select(timbre_select),.rock_select(rock_select),

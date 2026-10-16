@@ -95,7 +95,7 @@ module tb_game_p2_top_gate;
         pixels=pixels+1;
         if(pixels==480*272*FRAME_COUNT)begin
 
-            $display("PASS: synthesized P2 full top %0d clocks / %0d pixels; ten frames, menu/selected intro/countdown/wah/long-song ring head/16-bit results, dynamic spectrum and page switches; actual six-clock LCD scan, GPIO and silent PT8211/I2S match",clocks,pixels);
+            $display("PASS: synthesized P2 full top %0d clocks / %0d pixels; ten frames, menu/selected melody/countdown/wah/long-song ring head/16-bit results, dynamic spectrum and page switches; actual six-clock LCD scan, GPIO and silent PT8211/I2S match",clocks,pixels);
             $finish;
         end
     end

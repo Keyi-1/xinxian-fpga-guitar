@@ -9,6 +9,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     input wire [255:0] game_snapshot,output reg [17:0] rgb,output reg [2:0] display_page);
     `include "../config/game_ui_messages.vh"
     `include "../config/game_score_config.vh"
+    `include "../config/game_p2_progress.vh"
     localparam integer PROGRESS_STEP=(`GAME_DURATION_SAMPLES+479)/480;
     localparam SCORE_DIGITS=USE_P2 ? 6 : 5, COUNTER_DIGITS=USE_P2 ? 5 : 3;
     localparam BCD_WIDTH=SCORE_DIGITS*4, COUNTER_WIDTH=COUNTER_DIGITS*4;
@@ -23,10 +24,8 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     wire [2:0] active_slot=USE_P2 ? game_snapshot[237:235] : 3'd0;
     wire [2:0] title_slot=(display_page==3) ? selected_slot : active_slot;
     wire error_value=USE_P2 && (game_snapshot[233] || display_fault);
-    // Constants mirror the immutable catalog durations: ceil(samples/480).
-    // Verified against every catalog entry by the integrated display bench.
-    wire [31:0] progress_step=USE_P2 ? (active_slot==1 ? 32'd25600 : active_slot==2 ? 32'd19200 :
-        active_slot==3 ? 32'd12800 : active_slot==4 ? 32'd60000 : 32'd3375) : PROGRESS_STEP;
+    // Generated from the immutable catalogue; no independently maintained times.
+    wire [31:0] progress_step=USE_P2 ? game_p2_progress_step(active_slot) : PROGRESS_STEP;
     reg [8:0] progress_identity;
     reg [7:0] animation;
     reg [19:0] score_shift;
@@ -173,7 +172,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
         begin case(song)
             1:label(42,ox,oy,2,scale,0);
             2:if(scale==1)label(55,ox,oy,17,1,1);else label(43,ox,oy,4,scale,1);
-            3:label(44,ox,oy,4,scale,0);
+            3:label(56,ox,oy,4,scale,0);
             default:label(4,ox,oy,3,scale,0);
         endcase end
     endtask
@@ -285,7 +284,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                 if(x>=91 && x<101 && ((y>=57 && y<60)||(y>=254 && y<257)))background={6'd45,6'd60,6'd63};
                 if(!USE_P2 || active_slot==0)begin stage_title();label(34,16,32,3,1,0);label(35,88,32,6,1,1);end
                 else begin
-                    if(active_slot==3)label(52,16,0,2,2,0);else song_title(active_slot,16,0,2);label(active_slot==1 ? 51 : active_slot==2 ? 50 : 49,16,32,10,1,1);
+                    if(active_slot==3)label(52,16,0,2,2,0);else song_title(active_slot,16,0,2);label(active_slot==1 ? 51 : active_slot==2 ? 50 : 57,16,32,10,1,1);
                     label(54,104,16,6,1,1);
                 end
                 label(32,228,0,2,1,0);score_digits(228,16,2);combo_digits();label(33,416,14,2,1,0);

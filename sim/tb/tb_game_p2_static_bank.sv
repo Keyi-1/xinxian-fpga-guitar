@@ -59,7 +59,7 @@ module tb_game_p2_static_bank;
             end
         join
         if(fault || reads!=2048)$fatal(1,"FAIL: concurrent immutable-bank access");
-        choose(3);if(fault || timbre!=1 || count!=128 || duration!=6144000)$fatal(1,"FAIL: Qing Ge short intro exercise metadata");
+        choose(3);if(fault || timbre!=1 || count!=212 || duration!=7296000)$fatal(1,"FAIL: Qing Ge 38-bar user melody metadata");
         choose(4);if(!fault || fault_code!=1)$fatal(1,"FAIL: test-only slot exposed to game");
         allow_test=1;choose(4);if(fault || duration!=28800000)$fatal(1,"FAIL: explicit ten-minute diagnostic selection");
         choose(7);if(!fault || fault_code!=1)$fatal(1,"FAIL: out-of-catalog slot");

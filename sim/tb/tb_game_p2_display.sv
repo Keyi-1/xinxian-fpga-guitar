@@ -47,9 +47,9 @@ module tb_game_p2_display;
     endtask
     initial begin
         $readmemh("../../../mem/game_p2_static.mem",words);
-        bases[0]=0;bases[1]=67;bases[2]=323;bases[3]=491;bases[4]=619;
-        counts[0]=67;counts[1]=256;counts[2]=168;counts[3]=128;counts[4]=256;
-        durations[0]=1620000;durations[1]=12288000;durations[2]=9216000;durations[3]=6144000;durations[4]=28800000;
+        bases[0]=0;bases[1]=67;bases[2]=323;bases[3]=491;bases[4]=703;
+        counts[0]=67;counts[1]=256;counts[2]=168;counts[3]=212;counts[4]=256;
+        durations[0]=1620000;durations[1]=12288000;durations[2]=9216000;durations[3]=7296000;durations[4]=28800000;
         repeat(8)@(negedge clk);rst=1;
         for(s=0;s<5;s=s+1)begin
             publish(s,-96000,0,0);publish(s,-48000,0,0);

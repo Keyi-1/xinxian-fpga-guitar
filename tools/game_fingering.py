@@ -25,7 +25,7 @@ def candidates(midi):
             if 0 <= midi-base <= 8]
 
 
-def assign(notes, sample_rate=48000, beam_width=128):
+def assign(notes, sample_rate=48000, beam_width=128, *, candidate_fn=candidates):
     if not notes:
         return []
     if beam_width < 1 or sample_rate < 1:
@@ -34,7 +34,7 @@ def assign(notes, sample_rate=48000, beam_width=128):
     for index, note in enumerate(notes):
         if note.onset < 0 or note.duration <= 0:
             raise FingeringError(f'event {index}: invalid onset/duration')
-        choices = candidates(note.midi)
+        choices = candidate_fn(note.midi)
         if not choices:
             raise FingeringError(f'event {index}: MIDI {note.midi} outside the 0..8-fret instrument')
         groups.setdefault(note.onset, []).append((index, note, choices))

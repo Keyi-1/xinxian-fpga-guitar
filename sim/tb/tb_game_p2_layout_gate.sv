@@ -33,7 +33,7 @@ module tb_game_p2_layout_gate;
     initial begin
         $readmemh("../../../mem/game_p2_static.mem",words);
         bases[0]=0;bases[1]=67;bases[2]=323;bases[3]=491;
-        counts[0]=67;counts[1]=256;counts[2]=168;counts[3]=128;
+        counts[0]=67;counts[1]=256;counts[2]=168;counts[3]=212;
         wait(reference.lcd_rst_n);repeat(10)@(negedge audio_clk);audio_run=0;
         for(s=0;s<4;s=s+1)begin
             publish(s,-96000,0,0);publish(s,-48000,0,0);
@@ -44,7 +44,7 @@ module tb_game_p2_layout_gate;
             end
             $display("Progress: synthesized complete song %0d layouts matched (%0d passes)",s,passes);
         end
-        $display("PASS: synthesized P2 actual shared-ROM wiring and %0d consecutive layouts, all 619 production events, ring heads, consumption and countdown boundaries match RTL",passes);
+        $display("PASS: synthesized P2 actual shared-ROM wiring and %0d consecutive layouts, all 703 production events, ring heads, consumption and countdown boundaries match RTL",passes);
         $finish;
     end
     initial begin #1000000000;$fatal(1,"FAIL: layout gate watchdog");end

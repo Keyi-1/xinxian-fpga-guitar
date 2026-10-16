@@ -2,8 +2,8 @@
 
 The arpeggio is an original exercise, not a transcription of Liang Jingru's song.
 Seven Nation Army is a short seven-note riff practice loop, not the full song.
-Qing Ge uses only a short intro harmony excerpt and a newly written slow pattern;
-it is explicitly a practice loop, not a transcription of the full song.
+Qing Ge uses the complete upper staff of the two user-supplied pages (38 bars),
+with explicitly accepted rhythm corrections; unprovided sections are not inferred.
 """
 from pathlib import Path
 from fractions import Fraction
@@ -12,6 +12,7 @@ import csv
 import hashlib
 import json
 from game_score_v2 import Event, MAX_EVENTS, allocate, phase, payload_info, validate
+from qing_ge_user_score import compile_score
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -38,11 +39,9 @@ def build():
     durations = [Fraction(1),Fraction(1,2),Fraction(1,2),Fraction(1,2),Fraction(1,2),Fraction(1,2),Fraction(1)]
     riff = allocate([Event(round((repeat*8+b)*48000), round(d*48000), n, 0)
                      for repeat in range(24) for b,d,n in zip(beats,durations,notes)])
-    # A short four-bar harmony excerpt only. No lyrics or melody transcription.
-    # https://kanpu8.com/chords/love-song-fish-leong/ (intro, first four bars)
-    # C G/B | Am Am7/G | F G | C. Newly written quarter-note arpeggios.
-    intro_notes = [60,64,59,62,57,60,55,60,53,57,55,59,60,64,67,64]
-    qing_intro = allocate([Event(i*48000,36000,intro_notes[i%16],0) for i in range(128)])
+    # Only the upper staff supplied by the user; the lower accompaniment is
+    # intentionally excluded from the already-selected melody gameplay.
+    qing_melody,qing_duration,qing_report=compile_score()
     # Ten minutes, last onset beyond the old 24-bit boundary. Not a named song.
     boundary = allocate([Event(i*112500, 36000, (55,59,62,64)[i%4], 0)
                          for i in range(256)])
@@ -54,10 +53,11 @@ def build():
         dict(slot=2, alias='SEVEN_NATION_RIFF', title='Seven Nation Army 短 riff 慢练', events=riff, duration=24*8*48000,
              bpm=60, timbre=2, playable=True, test_only=False, provenance='Short hook practice only, octave raised; newly arranged timing, not full original recording or score',
              reference='https://nationalguitaracademy.com/songs/how-to-play-seven-nation-army-on-guitar/'),
-        dict(slot=3, alias='QING_GE_INTRO', title='情歌前奏和弦慢练（四小节循环）', events=qing_intro, duration=128*48000,
+        dict(slot=3, alias='QING_GE_MELODY', title='情歌旋律（用户谱完整38小节）', events=qing_melody, duration=qing_duration,
              bpm=60, timbre=1, playable=True, test_only=False,
-             provenance='Short four-bar intro harmony excerpt, C practice key; original quarter-note arpeggio pattern at 60 BPM, eight practice repetitions. No lyrics or melody, not the complete accompaniment or original recording.',
-             reference='https://kanpu8.com/chords/love-song-fish-leong/'),
+             pitch_profile='game_extended',transpose_semitones=-12,
+             provenance='Complete 38-bar upper staff from two user-supplied images; 60 BPM, one octave down, no loop. Two explicitly accepted bar10/18 rhythm revisions await listening confirmation; not the full original-recording arrangement.',
+             reference='scores/p2/source/qing_ge_user_melody.json'),
         dict(slot=4, alias='TIME_10MIN', title='十分钟边界测试', events=boundary, duration=600*48000,
              bpm=60, timbre=1, playable=False, test_only=True, provenance='Generated timing fixture, not a performance song'),
     ]
@@ -65,7 +65,7 @@ def build():
     for entry in entries:
         events = entry.pop('events')
         if events:
-            validate(events, entry['duration'])
+            validate(events, entry['duration'],profile=entry.get('pitch_profile','physical'))
         entry.update(offset=len(words), count=len(events), valid=bool(events))
         payload, crc = payload_info(events)
         entry['crc32'] = crc
@@ -74,7 +74,7 @@ def build():
     assert len(words) <= MAX_EVENTS
     manifest = dict(format_version=2, sample_rate_hz=48000, event_bits=96,
                     event_bytes=16, total_events=len(words), capacity=MAX_EVENTS,
-                    slots=entries, integration='core prototype only; not connected to production UI/audio')
+                    slots=entries, integration='Production touch UI/audio; Qing Ge user-score melody trial')
     outputs = {'mem/game_p2_static.mem': ''.join(f'{w:024x}\n' for w in words+[0]*(MAX_EVENTS-len(words))).encode()}
     for alias, events, payload in rows:
         if events:
@@ -88,10 +88,16 @@ def build():
         catalog.append(f"    3'd{e['slot']}:begin valid=1'b{int(e['valid'])};playable=1'b{int(e['playable'])};test_only=1'b{int(e['test_only'])};base=11'd{e['offset']};event_count=12'd{e['count']};duration=32'd{e['duration']};timbre=2'd{e['timbre']};end")
     catalog += ['    default:begin end', 'endcase', '']
     outputs['rtl/config/game_p2_catalog.vh'] = '\n'.join(catalog).encode()
+    progress=['// Generated from the same catalogue; ceil(samples/480).',
+        'function [31:0] game_p2_progress_step;', '    input [2:0] slot;', '    begin case(slot)']
+    progress += [f"        3'd{e['slot']}:game_p2_progress_step=32'd{(e['duration']+479)//480};" for e in entries]
+    progress += ["        default:game_p2_progress_step=32'd3375;",'    endcase end','endfunction','']
+    outputs['rtl/config/game_p2_progress.vh']='\n'.join(progress).encode()
     table = ['// Generated exact DDS increments, accepted 48 kHz tuning.', 'case(midi)']
-    table += [f"    7'd{n}:midi_phase=26'd{phase(n)};" for n in range(50,73)]
-    table += ["    default:midi_phase=26'd0;",'endcase','']
+    table += [f"    7'd{n}:midi_phase=27'd{phase(n,profile='game_extended')};" for n in range(50,80)]
+    table += ["    default:midi_phase=27'd0;",'endcase','']
     outputs['rtl/config/game_p2_phase.vh'] = '\n'.join(table).encode()
+    outputs['scores/p2/qing_ge_transcription_audit.json']=(json.dumps(qing_report,ensure_ascii=False,indent=2)+'\n').encode('utf-8')
     return outputs, manifest
 
 
@@ -107,7 +113,7 @@ def main():
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
-    print(f"PASS: P2 static bank {manifest['total_events']}/{MAX_EVENTS} events; Jasmine exact, 60 BPM exercises/short intro loops, 10 min fixture")
+    print(f"PASS: P2 static bank {manifest['total_events']}/{MAX_EVENTS} events; Jasmine exact, Qing Ge 38 bars/152s, short riff, 10 min fixture")
 
 
 if __name__ == '__main__':
