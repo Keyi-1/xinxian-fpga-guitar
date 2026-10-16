@@ -19,16 +19,24 @@ module game_p2_window_controller #(
   output reg [11:0] window_head,output wire [6:0] window_count,
   output reg [63:0] consumed_snapshot,output reg [15:0] generation);
     localparam IDLE=0,READ=1,EVALUATE=2,COMMIT=3;
+    // The catalogue rejects songs longer than ten minutes. Accepted event
+    // onset/duration fit 25 bits; elapsed includes the final judgement window.
+    // Keep input validation at the full 32-bit record width before storing it.
+    localparam TIME_BITS=$clog2(28800000+WINDOW_SAMPLES+2);
+    localparam END_BITS=$clog2(57600000+WINDOW_SAMPLES+2);
     reg [1:0] state;
     reg [10:0] base;
     reg [11:0] count,scan_id,scan_begin,scan_end,retire_head;
-    reg [31:0] duration_limit,elapsed,countdown_left,previous_onset;
+    reg [24:0] duration_limit,previous_onset;
+    reg [TIME_BITS-1:0] elapsed;
+    reg [31:0] countdown_left;
     reg retire_open;
     reg [63:0] consumed_bits;
     reg [3:0] pending,scan_plucks,launch,found,next_found;
     reg [7:0] pending_velocity,scan_velocity;
-    reg [127:0] pluck_times,scan_times;
-    reg [31:0] end_time[0:3],best_duration[0:3],next_duration[0:3];
+    reg [4*TIME_BITS-1:0] pluck_times,scan_times;
+    reg [END_BITS-1:0] end_time[0:3];
+    reg [24:0] best_duration[0:3],next_duration[0:3];
     reg [13:0] best_error[0:3];
     reg [5:0] best_slot[0:3];
     reg [25:0] best_phase[0:3],next_phase[0:3];
@@ -37,7 +45,8 @@ module game_p2_window_controller #(
     wire [6:0] midi=read_data[70:64];
     wire [1:0] lane=read_data[72:71];
     wire probe=scan_id==scan_begin+12'd64;
-    wire signed [32:0] error_time=$signed({1'b0,scan_times[lane*32+:32]})-$signed({1'b0,onset});
+    wire [31:0] strike_time=scan_times[lane*TIME_BITS+:TIME_BITS];
+    wire signed [32:0] error_time=$signed({1'b0,strike_time})-$signed({1'b0,onset});
     wire [32:0] absolute_error=error_time[32] ? -error_time : error_time;
     wire eligible=scan_plucks[lane] && absolute_error<=WINDOW_SAMPLES;
     wire expired=!demo && {1'b0,elapsed}>{1'b0,onset}+WINDOW_SAMPLES && !eligible;
@@ -66,6 +75,13 @@ module game_p2_window_controller #(
         begin sum={1'b0,a}+b;add16=sum[16] ? 16'hffff : sum[15:0];end
     endfunction
     integer i;
+    wire [63:0] found_mask;
+    genvar slot;
+    generate for(slot=0;slot<64;slot=slot+1)begin: commit_mask
+        assign found_mask[slot]=(found[0] && best_slot[0]==slot) ||
+            (found[1] && best_slot[1]==slot) || (found[2] && best_slot[2]==slot) ||
+            (found[3] && best_slot[3]==slot);
+    end endgenerate
     reg [63:0] commit_bits;
     reg [9:0] score_add;
     reg [6:0] hit_add,wrong_add;
@@ -103,7 +119,7 @@ module game_p2_window_controller #(
         end else begin
             miss_event<=0;snapshot_valid<=0;
             for(i=0;i<4;i=i+1)if(pluck_valid[i] && !countdown && !finished)begin
-                pending[i]<=1;pending_velocity[i*2+:2]<=velocity[i*2+:2];pluck_times[i*32+:32]<=elapsed;
+                pending[i]<=1;pending_velocity[i*2+:2]<=velocity[i*2+:2];pluck_times[i*TIME_BITS+:TIME_BITS]<=elapsed;
             end
             if(sample_tick)begin
                 launch<=0;
@@ -118,7 +134,7 @@ module game_p2_window_controller #(
                     else begin
                         scan_plucks<=pending|pluck_valid;scan_velocity<=pending_velocity;scan_times<=pluck_times;
                         for(i=0;i<4;i=i+1)begin
-                            if(pluck_valid[i])begin scan_velocity[i*2+:2]<=velocity[i*2+:2];scan_times[i*32+:32]<=elapsed;end
+                            if(pluck_valid[i])begin scan_velocity[i*2+:2]<=velocity[i*2+:2];scan_times[i*TIME_BITS+:TIME_BITS]<=elapsed;end
                             best_error[i]<=14'h3fff;
                         end
                         pending<=0;found<=0;next_found<=0;miss_add<=0;
@@ -162,11 +178,11 @@ module game_p2_window_controller #(
                     end
                 end
                 COMMIT:begin
-                    commit_bits=consumed_bits;score_add=0;hit_add=0;wrong_add=0;
+                    commit_bits=consumed_bits | found_mask;score_add=0;hit_add=0;wrong_add=0;
                     combo_next=miss_add!=0 ? 16'd0 : combo;max_next=max_combo;launch_next=0;
                     for(i=0;i<4;i=i+1)begin
                         if(found[i])begin
-                            commit_bits[best_slot[i]]=1;target_phase[i*32+:32]<={6'd0,best_phase[i]};
+                            target_phase[i*32+:32]<={6'd0,best_phase[i]};
                             end_time[i]<=elapsed+best_duration[i];launch_next[i]=1;
                             note_velocity[i*2+:2]<=demo ? 2'd2 : scan_velocity[i*2+:2];
                             if(!demo)begin
