@@ -36,7 +36,7 @@
   从 "2" 改为 "1"；仍保留 Maxfan32、ClockOrder0 及所有其余字节和原暂存对象。
   该试验已失败（376 条未布通），证据在 `build/p2_integration/impl_a4_route32_clock0_algo1/`；
   已仅回退试验字段 Route_Option 到 "2"，当前为 Maxfan32、ClockOrder0、Route2。
-  A5 控制器内部位宽/掩码等价优化的综合评估在 `build/p2_integration/impl_a5_bound_time/`。
+  A5 控制器内部位宽/掩码等价优化的最终通过构建在 `build/p2_integration/impl_a5_bound_time/`。
   恢复先查已有进程、stdout 和 stderr；Tcl 异常也须标记结束，禁止重复构建。
 - 用户已拒绝继续频带模块的优化路线，原因是收益小且平衡树候选时序回退。
   不继续频带 RAM／选择器／流水线实验；历史实验和停止决定保留在远程分支
@@ -50,9 +50,9 @@
 ## P2 静态多曲目集成状态
 
 - 用户已明确报告使用 P1.fs 完成下板确认。当前 P2 源码已连接触控选曲、帧级显示与推荐音色握手；
-  生产顶层 `USE_P2=1`，旧默认兼容路径留作回归。P2 的最终网表、P&R/STA 正在验证，未认证新发布。
+  生产顶层 `USE_P2=1`，旧默认兼容路径留作回归。P2 最终网表、原工程 P&R/STA 及所需回归已通过，等待用户下板确认。
 - 主工程仍是原 `.gprj` 和原 `impl`。当前 A5 实现源码清单在 `build/p2_integration/impl_a5_bound_time/`，
-  恢复时先查其进程、日志与位流状态，禁止重复启动完整 P&R。
+  此构建综合已完成；最终 P&R 在 `build/p2_integration/impl_a5_bound_time/`。认证在 `p2_integration_verification.json`，发布副本为 `build/releases/touch_game/neo_guitar_touch_game_p2_static_songs.fs`。无新改动不重复启动完整 P&R。
 - P2 采用 64 事件有界窗口、32 位时间/得分、16 位计数和静态多曲目录。
   曲谱使用显式 DPB16 切片；更改曲谱后同时生成并校验 `game_p2_bsram_init.vh`。
   自动推断的宽 ROM 曾在网表中把第二条 MIDI 59 读为 29，该构建已经停止，不用于发布。
@@ -64,4 +64,4 @@
   菜单另保留茉莉花和原创慢练，第五行十分钟诊断曲禁用。
 - 推荐音色在旧声释放/确认后真正加载，手动音色按键继续可用；原声部、钢琴模态、音效、FFT 和时钟保持。
 - P2 独立验证使用 `p2_integration_verification.json`，P1 的 `verification.json` 和发布位流保留。
-  当前状态与入口见 `docs/P2_STATIC_SONG_INTEGRATION.md`。完成新位流认证后等待用户下板反馈。
+  当前状态与入口见 `docs/P2_STATIC_SONG_INTEGRATION.md`。新位流已认证，后续功能等待用户下板反馈。

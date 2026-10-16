@@ -1,9 +1,18 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**P2 静态多曲目集成（2026-10-16）：** 已连接前四行触控选曲、帧级布局和实际推荐音色加载。
-源码、整机 RTL 回归及显式 BSRAM 单元网表验证通过；最终整机网表与原工程 P&R/STA 仍在运行。
-当前还未认证 P2 位流，以 [集成状态和入口](../../docs/P2_STATIC_SONG_INTEGRATION.md) 为准。
-《情歌》为前奏和弦慢练，Seven Nation Army 为短 riff 循环；完整原曲伴奏尚未转录。
+**P2 静态多曲目集成（2026-10-16）：** 原工程综合、完整 P&R/STA 和所需回归已通过，等待本次下板确认。
+原工程位流：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。
+发布副本：[neo_guitar_touch_game_p2_static_songs.fs](../../build/releases/touch_game/neo_guitar_touch_game_p2_static_songs.fs)，
+SHA256 `8d78cf9005fadfa9aa863adf4e9c17fc494521c68b828ddce6269b8091d87292`。
+前四行触控选曲、帧级显示和实际三种推荐音色已连接，原音色按键与音效保留。
+完整实现：Logic **51513**、Register **23030**、
+CLS **28455/29952（95.002%）**、BSRAM **99**、DSP **115.5**；
+系统／音频 Fmax **55.880／15.042 MHz**。
+setup／hold、未布通、latch 和已测 deadline 均为 0。
+P2 符合实际 50 MHz／12.288 MHz 运行与合法资源门槛；CLS 95.002% 超过 95% 余量目标（还需至少减少 1 CLS）。不宣称所有余量目标仍达标。
+[本次验证记录](p2_integration_verification.json)；[集成、验证范围和下板步骤](../../docs/P2_STATIC_SONG_INTEGRATION.md)。
+《情歌》为 60 BPM 前奏和弦慢练循环，Seven Nation Army 为升八度短 riff 循环；完整原曲伴奏尚未转录。
+P1 历史归档保持原样，本次没有推送或代理烧录。
 
 **已验收的 P1 发布基线（2026-10-15）：** 已验证的实现和记录已推送至 `origin/master`，
 将 64 根频谱柱高／峰值改为消隐期 64 拍串行复用，保持原三音色、音效、画面及游戏操作。
@@ -22,7 +31,7 @@ SHA256 `e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86`。
 用户现要求以后改为直接使用本 `.gprj` 及其原 `impl` 目录构建，流程见下文。
 后续频带小实验收益不足，已停止并保留在 `experiment/radial-bands-resource-opt`，未合入本工程。
 
-**直接使用现成位流：** 上面的 P1 `.fs` 已是最终可烧录文件，无需先重新运行 `.gprj`。
+**直接使用现成位流：** 文首原工程 P2 `.fs` 和同哈希发布副本均可在 Programmer 直接加载，无需重新综合 `.gprj`。P1 归档继续保留。
 在 Gowin Programmer 中扫描原 `GW5AT-60B`，双击设备的 Operation，
 选择 `SRAM Mode`／`SRAM Program`，在 `File name` 中选取该 `.fs`，保存后执行 Program/Configure。
 这是上电期间的临时配置；掉电保存需使用板上适用的 Flash 流程，不在此处修改 Flash 设置。
@@ -203,7 +212,7 @@ P2 当前使用用户单独授权的 Route=1、Clock Route Order=0、Route Maxfa
 本轮独立构建输出位于 `build/display_game_p1/<run>/workspace/gowin/neo_guitar_touch_game/impl/pnr/`；
 下板对象以文首独立归档和 SHA256 为准。主工程仍保留原 IDE 入口。
 不能用综合成功代替布线/时序合格；
-当前验证结果及资源数据见本目录 `verification.json`，以实际生成状态为准。
+P2 当前认证结果与资源见 `p2_integration_verification.json`；`verification.json` 保存 P1 历史结果。
 RTL 检查包括 I²C 故障恢复、GT911 设备模型、坐标/手势/页面、拨弦判定、
 异步命令和快照、全曲滑块位置，以及完整音频链与 master `655458f` 的数字对照。
 五幅界面预览来自 RTL 像素输出，保存在本地 `build/touch_game/previews/`；没有用绘图程序代替 RTL。

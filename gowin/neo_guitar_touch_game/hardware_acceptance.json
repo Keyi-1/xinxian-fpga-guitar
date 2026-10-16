@@ -53,5 +53,18 @@
       "installed_bitstream_sha256": null,
       "scope": "Explicit user confirmation, not an agent hardware programming action or independent measurement."
     }
+  },
+  "p2_digital_release": {
+    "date": "2026-10-16",
+    "validated_source_commit": "e19dd8198ea74d4647a87b7f93f1053eca390ea4",
+    "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_p2_static_songs.fs",
+    "reference_sha256": "8d78cf9005fadfa9aa863adf4e9c17fc494521c68b828ddce6269b8091d87292",
+    "verification": "gowin/neo_guitar_touch_game/p2_integration_verification.json",
+    "digital_status": "PASS: original project synthesis, complete P&R/STA, RTL, audio and final-netlist layout/video/musical output checks",
+    "hardware_status": "P2 awaits user on-board confirmation; P1 feedback above does not certify P2",
+    "installed_bitstream_sha256": null,
+    "publication_authorized": false,
+    "agent_programmed_hardware": false,
+    "scope": "Four practice slots, not complete Qing Ge or Seven Nation Army arrangements. No new acoustic or long-duration hardware measurement."
   }
 }

@@ -29,6 +29,7 @@ def main():
     assert digest(a.build_dir/'source_manifest.json')==data['artifacts_sha256'][str((a.build_dir/'source_manifest.json').relative_to(ROOT)).replace('\\','/')]
     for path,value in data['source_sha256'].items():assert digest(ROOT/path)==value,path
     for path,value in data['artifacts_sha256'].items():assert digest(ROOT/path)==value,path
+    for path,value in data['verification_tools_sha256'].items():assert digest(ROOT/path)==value,path
     root=ROOT/'build/releases/touch_game'
     directory=root/a.name
     output=root/'neo_guitar_touch_game_p2_static_songs.fs'
@@ -52,9 +53,18 @@ def main():
     evidence_dirs={Path(p).parent for p in data['rtl_evidence_sha256']}
     proof=data.get('controller_cycle_equivalence')
     if proof:
-        for path in proof['source_sha256']:copy(ROOT/path,directory/'source'/path)
+        for path,value in proof['source_sha256'].items():
+            assert digest(ROOT/path)==value,path
+            copy(ROOT/path,directory/'source'/path)
         manifest=json.loads((a.build_dir/'source_manifest.json').read_text(encoding='utf-8'))
         evidence_dirs.add(Path(manifest['controller_optimization']['equivalence']).parent)
+        # Preserve the superseded A4 graph bridge as history, explicitly apart
+        # from the new A5 gate proof and physically implemented netlist.
+        for relative in ['sim/temp/p2_gate_final5/compiled.vg',
+                         'build/p2_integration/impl_a4_route32/compiled.vg',
+                         'build/p2_integration/impl_a4_route32/netlist_graph_equivalence.json',
+                         'build/p2_integration/impl_a4_route32/graph_checker_tests.log']:
+            copy(ROOT/relative,directory/'history'/relative)
     for subdir in evidence_dirs:
         run=ROOT/subdir
         for file in run.iterdir():
