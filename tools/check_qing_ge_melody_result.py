@@ -236,10 +236,12 @@ def main():
     p.add_argument('--build-dir', type=Path, required=True)
     p.add_argument('--gate-dir', type=Path, required=True)
     p.add_argument('--extra-gate-dir', type=Path, required=True)
+    p.add_argument('--seek-gate-dir', type=Path, required=True)
     p.add_argument('--source-rtl-only', action='store_true', help='No release certificate is written')
     p.add_argument('--output', type=Path, default=PROJECT/'p2_qing_ge_melody_verification.json')
     a = p.parse_args()
     b, g, x = (v.resolve() for v in [a.build_dir, a.gate_dir, a.extra_gate_dir])
+    seek_dir = a.seek_gate_dir.resolve()
     m = load(b/'source_manifest.json'); source_hashes(m)
     previous_cert = PROJECT/'p2_integration_verification.json'
     assert read(previous_cert) == old(relative(previous_cert)), 'Historical P2 certificate changed'
@@ -296,17 +298,22 @@ def main():
         return
     standard = gate_proof(g, ['tb_game_p2_engine_gate', 'tb_game_p2_layout_gate', 'tb_game_p2_top_gate'], digest(vg), proof_files)
     extra = gate_proof(x, ['tb_game_p2_actual_bank_gate', 'tb_game_p2_range_gate'], digest(vg), proof_files)
+    seek = gate_proof(seek_dir, ['tb_game_p2_melody_seek_gate'], digest(vg), proof_files)
     assert digest(Path(standard['vendor_primitive_path'])) == standard['vendor_primitive_sha256']
     require_terms(g/'tb_game_p2_layout_gate.log', ['2117'])
     require_terms(g/'tb_game_p2_top_gate.log', ['1305600'])
     require_terms(x/'tb_game_p2_actual_bank_gate.log', ['4096 exact asynchronous reads', 'all2048 records/96bits', 'G5 MIDI79'])
     require_terms(x/'tb_game_p2_range_gate.log', ['G5 bit26 held', 'bidirectional slides', 'sustained exit'])
+    require_terms(seek_dir/'tb_game_p2_melody_seek_gate.log', ['212 real-ROM attacks/precise DDS including G5 bit26', 'seek at proven elapsed DFF Q only'])
     from generate_game_p2_extra_gate import generate
     import tempfile
     with tempfile.TemporaryDirectory(dir=b) as temp:
         generate(vg, Path(temp))
         for name in ['bank_actual_map.vh', 'range_actual_force.vh', 'range_actual_observe.vh']:
             assert (Path(temp)/name).read_bytes() == (x/name).read_bytes()
+        from generate_game_p2_seek_gate import generate as generate_seek
+        generate_seek(vg, Path(temp))
+        assert (Path(temp)/'seek_actual_map.vh').read_bytes() == (seek_dir/'seek_actual_map.vh').read_bytes()
     pnr = PROJECT/'impl/pnr'; log = read(pnr/f'{NAME}.log'); report = read(pnr/f'{NAME}.rpt.txt')
     timing = read(pnr/f'{NAME}_tr_content.html')
     assert 'Bitstream generation completed' in log and 'ERROR' not in log
@@ -374,7 +381,7 @@ def main():
         rtl_layouts=2888, gate_layouts=2117, gate_effective_pixels=1305600,
         source_guard='Exact finite range/UI transforms against board-confirmed fragment release; all remaining runtime assets unchanged',
         legacy_equivalence_scope='Prior valid MIDI50..72 domain only; MIDI73..79 is intentional new behavior',
-        standard_gate=standard, extra_gate=extra,
+        standard_gate=standard, extra_gate=extra, seek_gate=seek,
         training_defaults=dict(ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1),
         hardware_status='Prior P1 and P2 fragments user-confirmed; this 38-bar melody and accepted bar10/18 rhythm revisions await listening/on-board confirmation',
         excluded_validation=['New hardware/analog measurements', 'Original-recording completeness', 'Accompaniment staff', 'Wall-clock full-song hardware endurance'],

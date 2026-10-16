@@ -36,7 +36,7 @@ def main():
             source = source.replace('\\', '/')
             assert source not in all_sources or all_sources[source] == value
             all_sources[source] = value
-    for key in ['standard_gate', 'extra_gate']:
+    for key in ['standard_gate', 'extra_gate', 'seek_gate']:
         for path, value in data[key]['source_sha256'].items():
             path = path.replace('\\', '/')
             assert path not in all_sources or all_sources[path] == value
