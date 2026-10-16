@@ -24,6 +24,9 @@
 - 保留以下两个用户文件的本地内容及暂存状态，不自动提交、撤销或覆盖：
   `gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json`、
   `docs/MPU6050_POSTURE_TIMBRE_DESIGN_PLAN.md`。使用现有工程设置构建，不为方便运行重写该 JSON。
+- 2026-10-16 用户对一次实际布线失败作出明确例外授权：仅将上述原工程 JSON 的 `Route_Maxfan`
+  从 23 改为 32；其余字节和已暂存对象不变，不自动提交该用户文件。
+  仅布线重试与配置前后哈希在 `build/p2_integration/impl_a4_route32/`，综合网表仍是已验证的 A4，禁止重复综合。
 - 用户已拒绝继续频带模块的优化路线，原因是收益小且平衡树候选时序回退。
   不继续频带 RAM／选择器／流水线实验；历史实验和停止决定保留在远程分支
   `experiment/radial-bands-resource-opt`。

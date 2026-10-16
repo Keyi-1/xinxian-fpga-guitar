@@ -10,6 +10,7 @@ import hashlib
 import json
 import re
 import subprocess
+from datetime import datetime
 
 ROOT = Path(__file__).resolve().parent.parent
 PROJECT = ROOT/'gowin/neo_guitar_touch_game'
@@ -43,6 +44,11 @@ def evidence(directory, benches, status='result'):
         assert digest(p) == data['log_sha256'][bench], p
         text = read(p)
         assert 'PASS:' in text and not re.search(r'FAIL:|\*\* (Error|Fatal|Warning):', text), p
+    compile_log=directory/'compile.log'
+    assert 'Errors: 0, Warnings: 0' in read(compile_log),compile_log
+    assert not re.search(r'\*\* (Error|Fatal|Warning):',read(compile_log)),compile_log
+    for name,field in [('compile.log','compile_log_sha256'),('python.log','python_log_sha256')]:
+        if field in data:assert digest(directory/name)==data[field],directory/name
     return data
 
 
@@ -50,12 +56,34 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--build-dir', type=Path, required=True)
     parser.add_argument('--gate-dir', type=Path, required=True)
+    parser.add_argument('--digital-only', action='store_true',
+                        help='Audit completed RTL/gate hashes; print PNR_PENDING and never write a release certificate')
     parser.add_argument('--output', type=Path, default=PROJECT/'p2_integration_verification.json')
     args = parser.parse_args()
     manifest_path = args.build_dir/'source_manifest.json'
     manifest = json.loads(read(manifest_path))
     for path, value in manifest['source_sha256'].items():
         assert digest(ROOT/path) == value, ('changed since synthesis started', path)
+    synthesis_origin=args.build_dir
+    option_change=manifest.get('authorized_option_change')
+    if 'synthesis_origin' in manifest:
+        # A route-only retry must preserve the exact previously verified VG.
+        # The only accepted source-manifest difference is the explicit user
+        # authorization below; never relabel a changed RTL as an old synthesis.
+        synthesis_origin=ROOT/manifest['synthesis_origin']
+        origin_path=synthesis_origin/'source_manifest.json'
+        assert digest(origin_path)==manifest['synthesis_origin_manifest_sha256']
+        origin=json.loads(read(origin_path))
+        assert origin['synthesized_netlist_sha256']==manifest['synthesized_netlist_sha256']
+        assert origin['validated_source_commit']==manifest['validated_source_commit']
+        assert option_change and option_change['key']=='Route_Maxfan'
+        assert option_change['before']==23 and option_change['after']==32
+        assert option_change['path']=='gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json'
+        assert option_change['user_authorization']=='2026-10-16 explicit reply: allow only Route_Maxfan and preserve all other user content'
+        for path,value in origin['source_sha256'].items():
+            expected=option_change['after_sha256'] if path==option_change['path'] else value
+            assert manifest['source_sha256'][path]==expected,path
+        assert set(origin['source_sha256'])==set(manifest['source_sha256'])
     preserved = {}
     paths = subprocess.check_output(['git', 'ls-tree', '-r', '--name-only', P1], cwd=ROOT).decode().splitlines()
     for path in paths:
@@ -79,13 +107,19 @@ def main():
     evidence(ROOT/'sim/temp/touch_game', legacy_benches)
     evidence(ROOT/'sim/temp/p2_final_connection', ['tb_game_p2_connection', 'tb_game_p2_display'])
     evidence(ROOT/'sim/temp/p2_final_audio', ['tb_game_p2_audio_preservation'])
+    evidence(ROOT/'sim/temp/p2_button_compat', ['tb_guitar_effect_buttons','tb_guitar_effect_buttons_defaults'])
     evidence(ROOT/'sim/temp/game_p2/explicit_dpb_final', ['tb_game_p2_window', 'tb_game_p2_legacy_equivalence',
              'tb_game_p2_static_bank', 'tb_game_p2_judgement'], 'status')
+    for path in ['sim/temp/touch_game/fingering.log','sim/temp/game_p2/explicit_dpb_final/python.log']:
+        text=read(ROOT/path)
+        assert 'Ran 5 tests' in text and re.search(r'^OK\s*$',text,re.M),path
     audio = read(ROOT/'sim/temp/p2_final_audio/tb_game_p2_audio_preservation.log')
     assert '2097153 cycles / 8192 samples identical to accepted master' in audio
     assert 'sustain exit 1452 samples' in audio
     display = read(ROOT/'sim/temp/p2_final_connection/tb_game_p2_display.log')
     assert '2636 complete P2 layouts' in display and 'max 445 clocks' in display
+    from check_game_p2_font import check as check_font
+    font_preservation=check_font()
     gate = json.loads(read(args.gate_dir/'verification.json'))
     assert gate['result'] == 'PASS'
     assert set(gate['log_sha256'])=={'tb_game_p2_engine_gate.log','tb_game_p2_layout_gate.log','tb_game_p2_top_gate.log'}
@@ -113,12 +147,18 @@ def main():
         assert digest(Path(gate['vendor_primitive_path']))==gate['vendor_primitive_sha256']
     vg = PROJECT/f'impl/gwsynthesis/{NAME}.vg'
     assert digest(vg) == gate['netlist_sha256'] == digest(args.gate_dir/'compiled.vg')
+    assert digest(vg)==manifest['synthesized_netlist_sha256'], 'netlist differs from the reviewed synthesis'
     syn = read(PROJECT/f'impl/gwsynthesis/{NAME}.log')
     assert 'GowinSynthesis finish' in syn
     assert not re.search(r'inferr?ed.*latch|latch.*inferr?ed', syn, re.I)
     netlist = read(vg)
     assert not re.search(r'^\s*(?:DLCE|DLPE)\s+\w+\s*\(', netlist, re.M)
     assert 'module game_p2_mode_router ' in netlist and 'module game_p2_window_controller ' in netlist
+    if args.digital_only:
+        print(json.dumps(dict(result='DIGITAL_PASS_PNR_PENDING',netlist_sha256=digest(vg),
+            rtl_and_gate_hashes_verified=True,gate_pixels=1305600,gate_layouts=1865,
+            release_certificate_written=False),indent=2))
+        return
     pnr = PROJECT/'impl/pnr'
     log = read(pnr/f'{NAME}.log')
     report = read(pnr/f'{NAME}.rpt.txt')
@@ -159,6 +199,8 @@ def main():
     assert design and Path(design[1].strip()).resolve() == vg.resolve()
     for option, value in [('place_option', '4'), ('route_option', '2'), ('clock_route_order', '1'), ('correct_hold', '1')]:
         assert re.search(rf'^-{option}\s+{value}\s*$', command, re.M), option
+    expected_fanout='32' if option_change else '23'
+    assert re.search(rf'^-route_maxfan\s+{expected_fanout}\s*$',command,re.M)
     pins=dict(re.findall(r'IO_LOC\s+"([^"]+)"\s+(\w+);',read(ROOT/f'constraints/{NAME}.cst')))
     assert len(pins)==len(set(pins.values()))==59
     rows={}
@@ -171,22 +213,57 @@ def main():
     protected_path=args.build_dir.parent/'protected_user_files.json'
     protected=json.loads(read(protected_path))
     for path,record in protected.items():
-        assert digest(ROOT/path)==record['sha256'], ('protected user content changed',path)
+        if option_change and path==option_change['path']:
+            before=args.build_dir/'process_config.before.json'
+            after=args.build_dir/'process_config.after.json'
+            assert digest(before)==record['sha256']==option_change['before_sha256']
+            assert digest(after)==digest(ROOT/path)==option_change['after_sha256']
+            raw=before.read_bytes()
+            assert raw.count(b'"Route_Maxfan": 23')==1
+            assert raw.replace(b'"Route_Maxfan": 23',b'"Route_Maxfan": 32')==after.read_bytes()
+        else:
+            assert digest(ROOT/path)==record['sha256'], ('protected user content changed',path)
         index=subprocess.check_output(['git','ls-files','-s','--',path],cwd=ROOT).decode().strip()
         assert index==record['index_line'], ('protected user index changed',path)
     fs = pnr/f'{NAME}.fs'
     assert fs.stat().st_size > 10000000
+    process=json.loads(read(args.build_dir/'build_process.json'))
+    route_started=datetime.fromisoformat(process['started']).timestamp()
+    syn_process=json.loads(read(synthesis_origin/'build_process.json'))
+    syn_started=datetime.fromisoformat(syn_process['started']).timestamp()
+    for path in [vg,PROJECT/f'impl/gwsynthesis/{NAME}.log',PROJECT/f'impl/gwsynthesis/{NAME}_syn_rsc.xml']:
+        assert path.stat().st_mtime>=syn_started,('old synthesis artifact cannot certify this build',path)
+    for path in [fs,pnr/f'{NAME}.log',pnr/f'{NAME}.rpt.txt',pnr/f'{NAME}_tr_content.html',pnr/'cmd.do']:
+        assert path.stat().st_mtime>=route_started,('old routing artifact cannot certify this build',path)
     artifacts = [vg, fs, pnr/f'{NAME}.log', pnr/f'{NAME}.rpt.txt', pnr/f'{NAME}_tr_content.html',
                  pnr/'cmd.do', pnr/'device.cfg', PROJECT/f'impl/gwsynthesis/{NAME}.log',
-                 PROJECT/f'impl/gwsynthesis/{NAME}_syn_rsc.xml', manifest_path,protected_path]
+                 PROJECT/f'impl/gwsynthesis/{NAME}_syn_rsc.xml', manifest_path,protected_path,
+                 args.build_dir/'build_process.json']
+    if option_change:
+        artifacts.extend([args.build_dir/'process_config.before.json',args.build_dir/'process_config.after.json',
+                          synthesis_origin/'source_manifest.json',synthesis_origin/'build_process.json',
+                          synthesis_origin/'failed.json',synthesis_origin/'failed_pnr.log',
+                          synthesis_origin/'failed_pnr.rpt.txt',synthesis_origin/'failed_pnr_cmd.do'])
     result = dict(result='PASS', artifact_scope=dict(kind='original_gprj_integrated_p2',
                   project=str(PROJECT/f'{NAME}.gprj'), implementation=str(PROJECT/'impl')),
                   source_sha256=manifest['source_sha256'], preserved_assets_sha256=preserved,
+                  validated_source_commit=manifest['validated_source_commit'],
+                  authorized_option_change=option_change,
+                  rtl_evidence_sha256={p:digest(ROOT/p) for p in [
+                      'sim/temp/touch_game/verification.json','sim/temp/p2_final_connection/verification.json',
+                      'sim/temp/p2_final_audio/verification.json','sim/temp/p2_button_compat/verification.json',
+                      'sim/temp/game_p2/explicit_dpb_final/verification.json','sim/temp/p2_bank_gate_r1/verification.json']},
+                  supplemental_evidence_sha256={p:digest(ROOT/p) for p in [
+                      'sim/temp/touch_game/fingering.log','sim/temp/game_p2/explicit_dpb_final/python.log',
+                      *[f'sim/temp/{name}/compile.log' for name in ['touch_game','p2_final_connection',
+                          'p2_final_audio','p2_button_compat','game_p2/explicit_dpb_final']]]},
+                  gate_evidence_sha256=digest(args.gate_dir/'verification.json'),
                   artifacts_sha256={str(p.relative_to(ROOT)).replace('\\', '/'): digest(p) for p in artifacts},
                   bitstream_sha256=digest(fs), netlist_sha256=digest(vg), resources=resources, clocks=clocks,
                   score_bank=dict(implementation='explicit 16-bit true dual-port DPB slices',blocks=int(score_banks[0].attrib['Bsram']),logical_records=2048,record_bits=96,unit_verification=bank_check),
                   violations=dict(setup=0, hold=0, latch=0, unrouted=0, score_deadline=0, layout_deadline=0),
                   audio_baseline='655458f32ba4f7e06403fd6c5c4da0b6f0dad8a7', audio_equivalent_samples=8192,
+                  font_preservation=font_preservation,
                   sustain_exit_samples=1452, display_layout_passes=2636, max_layout_clocks=445,
                   gate=gate, prior_p1_resources=dict(Logic=50159,Register=22405,CLS=27943,BSRAM=95,DSP=115.5),
                   prior_p1_fmax_mhz=dict(sys=58.765,audio=14.442),
@@ -197,7 +274,7 @@ def main():
     result['verification_tools_sha256'] = {p: digest(ROOT/p) for p in [
         'tools/check_game_p2_result.py', 'tools/run_game_p2_gate.ps1', 'tools/generate_game_p2_gate_bench.py',
         'tools/run_touch_game_checks.ps1', 'tools/run_game_p2_checks.ps1','tools/generate_game_p2_bsram.py',
-        'tools/archive_game_p2_integration.py','tools/continue_game_p2_gate.ps1']}
+        'tools/archive_game_p2_integration.py','tools/continue_game_p2_gate.ps1','tools/check_game_p2_font.py']}
     args.output.write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({k: result[k] for k in ['result', 'resources', 'clocks', 'bitstream_sha256', 'margin_targets_met']}, indent=2))
 

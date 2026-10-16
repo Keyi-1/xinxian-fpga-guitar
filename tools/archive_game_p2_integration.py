@@ -38,11 +38,13 @@ def main():
     copy(fs,output)
     copy(cert,directory/'verification.json')
     for path in data['source_sha256']:copy(ROOT/path,directory/'source'/path)
+    for file in (ROOT/'scores/p2').rglob('*'):
+        if file.is_file():copy(file,directory/'source'/file.relative_to(ROOT))
     for path in data['artifacts_sha256']:
         original=ROOT/path
         if original.suffix not in ['.fs','.vg']:copy(original,directory/'evidence'/path)
     copy(PROJECT/'impl/gwsynthesis/neo_guitar_touch_game.vg',directory/'netlist/neo_guitar_touch_game.vg')
-    for subdir in ['touch_game','p2_final_connection','p2_final_audio','game_p2/explicit_dpb_final']:
+    for subdir in ['touch_game','p2_final_connection','p2_final_audio','p2_button_compat','game_p2/explicit_dpb_final']:
         run=ROOT/'sim/temp'/subdir
         for file in run.iterdir():
             if file.is_file() and file.suffix in ['.log','.json','.ppm']:
@@ -59,8 +61,18 @@ def main():
     for relative in ['tools/run_game_p2_gate.ps1','tools/generate_game_p2_gate_bench.py',
                      'tools/check_game_p2_result.py','tools/archive_game_p2_integration.py',
                      'tools/run_touch_game_checks.ps1','tools/run_game_p2_checks.ps1','tools/generate_game_p2_bsram.py',
-                     'tools/continue_game_p2_gate.ps1']:
+                     'tools/continue_game_p2_gate.ps1','tools/check_game_p2_font.py',
+                     'tools/game_score_v2.py','tools/generate_p2_static_scores.py','tools/compile_p2_score.py',
+                     'tools/generate_game_ui_font.py','tools/game_fingering.py','tools/test_game_fingering.py',
+                     'tools/test_game_score_v2.py']:
         copy(ROOT/relative,directory/'tools'/Path(relative).name)
+    for relative in ['AGENTS.md','docs/P2_STATIC_SONG_INTEGRATION.md',
+                     'docs/P2_STATIC_ENGINE_PROTOTYPE.md',
+                     'gowin/neo_guitar_touch_game/README.md',
+                     'gowin/neo_guitar_touch_game/hardware_acceptance.json']:
+        copy(ROOT/relative,directory/'documentation'/relative)
+    for file in (ROOT/'build/p2_integration/previews').glob('p2_ready_*.png'):
+        copy(file,directory/'previews'/file.name)
     record=dict(source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT).decode().strip(),
         bitstream=str(output.relative_to(ROOT)).replace('\\','/'),bitstream_sha256=digest(output),
         verification_sha256=digest(cert),artifact_scope=data['artifact_scope'],
