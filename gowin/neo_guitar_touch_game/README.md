@@ -1,6 +1,6 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**P2 静态多曲目集成（2026-10-16）：** 原工程综合、完整 P&R/STA 和所需回归已通过，等待本次下板确认。
+**P2 静态多曲目集成（2026-10-16）：** 原工程综合、完整 P&R/STA 和所需回归已通过；用户已反馈片段练习循环通过。
 原工程位流：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。
 发布副本：[neo_guitar_touch_game_p2_static_songs.fs](../../build/releases/touch_game/neo_guitar_touch_game_p2_static_songs.fs)，
 SHA256 `8d78cf9005fadfa9aa863adf4e9c17fc494521c68b828ddce6269b8091d87292`。
@@ -13,6 +13,8 @@ P2 符合实际 50 MHz／12.288 MHz 运行与合法资源门槛；CLS 95.002% �
 [本次验证记录](p2_integration_verification.json)；[集成、验证范围和下板步骤](../../docs/P2_STATIC_SONG_INTEGRATION.md)。
 《情歌》为 60 BPM 前奏和弦慢练循环，Seven Nation Army 为升八度短 riff 循环；完整原曲伴奏尚未转录。
 P1 历史归档保持原样，本次没有推送或代理烧录。
+
+下一批已选《情歌》完整主旋律、第二音色、60 BPM。[整首 MIDI 导入工具与进展](../../docs/P2_FULL_MELODY_IMPORT.md)已准备并通过十项测试；完整 MIDI/简谱输入待提供，当前生产位流仍为片段版。
 
 **已验收的 P1 发布基线（2026-10-15）：** 已验证的实现和记录已推送至 `origin/master`，
 将 64 根频谱柱高／峰值改为消隐期 64 拍串行复用，保持原三音色、音效、画面及游戏操作。

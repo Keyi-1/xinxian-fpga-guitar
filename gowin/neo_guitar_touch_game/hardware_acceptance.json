@@ -61,10 +61,17 @@
     "reference_sha256": "8d78cf9005fadfa9aa863adf4e9c17fc494521c68b828ddce6269b8091d87292",
     "verification": "gowin/neo_guitar_touch_game/p2_integration_verification.json",
     "digital_status": "PASS: original project synthesis, complete P&R/STA, RTL, audio and final-netlist layout/video/musical output checks",
-    "hardware_status": "P2 awaits user on-board confirmation; P1 feedback above does not certify P2",
+    "hardware_status": "User reports fragment practice loops pass on 2026-10-16; installed image/hash and quantitative measurements not independently captured",
     "installed_bitstream_sha256": null,
     "publication_authorized": false,
     "agent_programmed_hardware": false,
-    "scope": "Four practice slots, not complete Qing Ge or Seven Nation Army arrangements. No new acoustic or long-duration hardware measurement."
+    "scope": "Four practice slots, not complete Qing Ge or Seven Nation Army arrangements. No new acoustic or long-duration hardware measurement.",
+    "user_feedback": {
+      "date": "2026-10-16",
+      "user_statement": "现在片段练习循环已经可以通过了。可以尝试改成完整的旋律吗？",
+      "reported_scope": "Fragment practice-loop version only; not an acceptance of a full-song melody build",
+      "installed_bitstream_sha256": null,
+      "agent_programmed_hardware": false
+    }
   }
 }
