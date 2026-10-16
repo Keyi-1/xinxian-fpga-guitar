@@ -172,7 +172,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
         begin case(song)
             1:label(42,ox,oy,2,scale,0);
             2:if(scale==1)label(55,ox,oy,17,1,1);else label(43,ox,oy,4,scale,1);
-            3:label(56,ox,oy,4,scale,0);
+            3:label(52,ox,oy,2,scale,0);
             default:label(4,ox,oy,3,scale,0);
         endcase end
     endtask
@@ -230,7 +230,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                 end else begin label(5,56,104,3,1,0);label(5,56,148,3,1,0);label(5,56,192,3,1,0);label(5,56,236,3,1,0);end
             end
             3:begin
-                label(6,176,20,4,2,0);label(17,24,14,2,1,0);song_title(USE_P2 ? selected_slot : 3'd0,192,70,1);
+                label(6,176,20,4,2,0);label(17,24,14,2,1,0);song_title(USE_P2 ? selected_slot : 3'd0,USE_P2 && selected_slot==3 ? 224 : 192,70,1);
                 label(25,184,170,6,1,0);
                 if(x>=64 && x<416 && y>=104 && y<144)begin
                     if(x<152)background={6'd12,6'd29,6'd60};
@@ -305,7 +305,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                 end
             end
             6:begin
-                label(11,176,18,4,2,0);song_title(active_slot,192,67,1);
+                label(11,176,18,4,2,0);song_title(active_slot,USE_P2 && active_slot==3 ? 224 : 192,67,1);
                 if(error_value)label(53,208,88,5,1,1);
                 label(19,100,105,5,1,1);score_digits(100,126,1);
                 label(21,268,105,3,1,1);pair_digits(268,126,number_bcd[1*COUNTER_WIDTH+:COUNTER_WIDTH]);

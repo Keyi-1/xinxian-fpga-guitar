@@ -1,0 +1,6 @@
+{
+  "baseline_commit": "dee95b1c136931b3a9023ba219195bbe05a8b07c",
+  "original_sha256": "54d55014ff7db348169adf32a3031536c07095e70ac355dc2a69c76aacbba507",
+  "reference_sha256": "62c69493ff1c50bcfdb656762929febb842e4671f48a465eb0a896de3396a402",
+  "only_transform": "module name touch_game_renderer -> touch_game_renderer_m1"
+}
