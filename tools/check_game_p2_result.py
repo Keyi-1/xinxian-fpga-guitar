@@ -74,7 +74,7 @@ def main():
         origin_path=synthesis_origin/'source_manifest.json'
         assert digest(origin_path)==manifest['synthesis_origin_manifest_sha256']
         origin=json.loads(read(origin_path))
-        assert origin['synthesized_netlist_sha256']==manifest['synthesized_netlist_sha256']
+        assert origin['synthesized_netlist_sha256']==manifest.get('gate_netlist_sha256',manifest['synthesized_netlist_sha256'])
         assert origin['validated_source_commit']==manifest['validated_source_commit']
         assert option_change and option_change['key']=='Route_Maxfan'
         assert option_change['before']==23 and option_change['after']==32
@@ -146,8 +146,23 @@ def main():
     if 'vendor_primitive_path' in gate:
         assert digest(Path(gate['vendor_primitive_path']))==gate['vendor_primitive_sha256']
     vg = PROJECT/f'impl/gwsynthesis/{NAME}.vg'
-    assert digest(vg) == gate['netlist_sha256'] == digest(args.gate_dir/'compiled.vg')
+    assert gate['netlist_sha256'] == digest(args.gate_dir/'compiled.vg')
     assert digest(vg)==manifest['synthesized_netlist_sha256'], 'netlist differs from the reviewed synthesis'
+    graph_proof=None
+    if digest(vg)!=gate['netlist_sha256']:
+        from compare_synth_graph import compare
+        proof_path=args.build_dir/'netlist_graph_equivalence.json'
+        assert digest(proof_path)==manifest['netlist_graph_equivalence_sha256']
+        graph_proof=json.loads(read(proof_path))
+        assert graph_proof['checker_sha256']==digest(ROOT/'tools/compare_synth_graph.py')
+        # Recompute exact connectivity/parameters from BOTH raw files. The old
+        # logs alone do not certify a regenerated VG with a different hash.
+        recomputed=compare(args.gate_dir/'compiled.vg',vg)
+        assert all(graph_proof[k]==value for k,value in recomputed.items())
+        assert graph_proof['before_sha256']==gate['netlist_sha256']==manifest['gate_netlist_sha256']
+        assert graph_proof['after_sha256']==digest(vg)
+        sensitivity=read(args.build_dir/'graph_checker_tests.log')
+        assert 'Ran 6 tests' in sensitivity and re.search(r'^OK\s*$',sensitivity,re.M)
     syn = read(PROJECT/f'impl/gwsynthesis/{NAME}.log')
     assert 'GowinSynthesis finish' in syn
     assert not re.search(r'inferr?ed.*latch|latch.*inferr?ed', syn, re.I)
@@ -244,11 +259,15 @@ def main():
                           synthesis_origin/'source_manifest.json',synthesis_origin/'build_process.json',
                           synthesis_origin/'failed.json',synthesis_origin/'failed_pnr.log',
                           synthesis_origin/'failed_pnr.rpt.txt',synthesis_origin/'failed_pnr_cmd.do'])
+    if graph_proof:
+        artifacts.extend([args.build_dir/'netlist_graph_equivalence.json',
+                          args.build_dir/'graph_checker_tests.log',args.build_dir/'netlist.diff.txt'])
     result = dict(result='PASS', artifact_scope=dict(kind='original_gprj_integrated_p2',
                   project=str(PROJECT/f'{NAME}.gprj'), implementation=str(PROJECT/'impl')),
                   source_sha256=manifest['source_sha256'], preserved_assets_sha256=preserved,
                   validated_source_commit=manifest['validated_source_commit'],
                   authorized_option_change=option_change,
+                  regenerated_netlist_graph_equivalence=graph_proof,
                   rtl_evidence_sha256={p:digest(ROOT/p) for p in [
                       'sim/temp/touch_game/verification.json','sim/temp/p2_final_connection/verification.json',
                       'sim/temp/p2_final_audio/verification.json','sim/temp/p2_button_compat/verification.json',
@@ -274,7 +293,8 @@ def main():
     result['verification_tools_sha256'] = {p: digest(ROOT/p) for p in [
         'tools/check_game_p2_result.py', 'tools/run_game_p2_gate.ps1', 'tools/generate_game_p2_gate_bench.py',
         'tools/run_touch_game_checks.ps1', 'tools/run_game_p2_checks.ps1','tools/generate_game_p2_bsram.py',
-        'tools/archive_game_p2_integration.py','tools/continue_game_p2_gate.ps1','tools/check_game_p2_font.py']}
+        'tools/archive_game_p2_integration.py','tools/continue_game_p2_gate.ps1','tools/check_game_p2_font.py',
+        'tools/compare_synth_graph.py','tools/test_compare_synth_graph.py']}
     args.output.write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({k: result[k] for k in ['result', 'resources', 'clocks', 'bitstream_sha256', 'margin_targets_met']}, indent=2))
 

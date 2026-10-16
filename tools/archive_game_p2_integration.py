@@ -44,6 +44,7 @@ def main():
         original=ROOT/path
         if original.suffix not in ['.fs','.vg']:copy(original,directory/'evidence'/path)
     copy(PROJECT/'impl/gwsynthesis/neo_guitar_touch_game.vg',directory/'netlist/neo_guitar_touch_game.vg')
+    copy(a.gate_dir/'compiled.vg',directory/'gate/compiled.vg')
     for subdir in ['touch_game','p2_final_connection','p2_final_audio','p2_button_compat','game_p2/explicit_dpb_final']:
         run=ROOT/'sim/temp'/subdir
         for file in run.iterdir():
@@ -64,7 +65,7 @@ def main():
                      'tools/continue_game_p2_gate.ps1','tools/check_game_p2_font.py',
                      'tools/game_score_v2.py','tools/generate_p2_static_scores.py','tools/compile_p2_score.py',
                      'tools/generate_game_ui_font.py','tools/game_fingering.py','tools/test_game_fingering.py',
-                     'tools/test_game_score_v2.py']:
+                     'tools/test_game_score_v2.py','tools/compare_synth_graph.py','tools/test_compare_synth_graph.py']:
         copy(ROOT/relative,directory/'tools'/Path(relative).name)
     for relative in ['AGENTS.md','docs/P2_STATIC_SONG_INTEGRATION.md',
                      'docs/P2_STATIC_ENGINE_PROTOTYPE.md',
