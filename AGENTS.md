@@ -29,6 +29,9 @@
   原工程重试与配置前后哈希在 `build/p2_integration/impl_a4_route32/`；Gowin 自动重综合改变了命名和拆分端口，
   已用 `tools/compare_synth_graph.py` 全量证明重建 VG 与已验证 A4 的原语、参数、全部引脚连接等价。
   两份原始 VG 和结构证明分别绑定；不要只用旧日志认证重建产物，不重复已完成的等价功能仿真。
+- Route_Maxfan=32 的重试仍有一条未布通网络。2026-10-16 用户再单独授权仅把 `Clock_Route_Order`
+  从 1 改为 0；其他配置与原暂存对象不变。当前运行记录在 `build/p2_integration/impl_a4_route32_clock0/`，
+  该次直接使用现有网表，仅重做 P&R。先查进程和结果，不重复启动。
 - 用户已拒绝继续频带模块的优化路线，原因是收益小且平衡树候选时序回退。
   不继续频带 RAM／选择器／流水线实验；历史实验和停止决定保留在远程分支
   `experiment/radial-bands-resource-opt`。

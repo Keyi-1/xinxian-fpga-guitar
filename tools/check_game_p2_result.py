@@ -66,6 +66,7 @@ def main():
         assert digest(ROOT/path) == value, ('changed since synthesis started', path)
     synthesis_origin=args.build_dir
     option_change=manifest.get('authorized_option_change')
+    clock_change=manifest.get('authorized_clock_order_change')
     if 'synthesis_origin' in manifest:
         # A route-only retry must preserve the exact previously verified VG.
         # The only accepted source-manifest difference is the explicit user
@@ -80,8 +81,16 @@ def main():
         assert option_change['before']==23 and option_change['after']==32
         assert option_change['path']=='gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json'
         assert option_change['user_authorization']=='2026-10-16 explicit reply: allow only Route_Maxfan and preserve all other user content'
+        if clock_change:
+            assert clock_change['path']==option_change['path']
+            assert clock_change['key']=='Clock_Route_Order' and clock_change['before']==1 and clock_change['after']==0
+            assert clock_change['before_sha256']==option_change['after_sha256']
+            assert clock_change['user_authorization']=='2026-10-16 explicit reply: allow only Clock_Route_Order to 0'
+            previous_path=ROOT/manifest['previous_route_attempt']/'source_manifest.json'
+            assert digest(previous_path)==manifest['previous_route_manifest_sha256']
         for path,value in origin['source_sha256'].items():
-            expected=option_change['after_sha256'] if path==option_change['path'] else value
+            config_hash=clock_change['after_sha256'] if clock_change else option_change['after_sha256']
+            expected=config_hash if path==option_change['path'] else value
             assert manifest['source_sha256'][path]==expected,path
         assert set(origin['source_sha256'])==set(manifest['source_sha256'])
     preserved = {}
@@ -212,7 +221,8 @@ def main():
     command = read(pnr/'cmd.do')
     design = re.search(r'^-d\s+(.+)$', command, re.M)
     assert design and Path(design[1].strip()).resolve() == vg.resolve()
-    for option, value in [('place_option', '4'), ('route_option', '2'), ('clock_route_order', '1'), ('correct_hold', '1')]:
+    for option, value in [('place_option', '4'), ('route_option', '2'),
+                          ('clock_route_order', '0' if clock_change else '1'), ('correct_hold', '1')]:
         assert re.search(rf'^-{option}\s+{value}\s*$', command, re.M), option
     expected_fanout='32' if option_change else '23'
     assert re.search(rf'^-route_maxfan\s+{expected_fanout}\s*$',command,re.M)
@@ -232,10 +242,19 @@ def main():
             before=args.build_dir/'process_config.before.json'
             after=args.build_dir/'process_config.after.json'
             assert digest(before)==record['sha256']==option_change['before_sha256']
-            assert digest(after)==digest(ROOT/path)==option_change['after_sha256']
             raw=before.read_bytes()
             assert raw.count(b'"Route_Maxfan": 23')==1
-            assert raw.replace(b'"Route_Maxfan": 23',b'"Route_Maxfan": 32')==after.read_bytes()
+            expected=raw.replace(b'"Route_Maxfan": 23',b'"Route_Maxfan": 32')
+            final_hash=option_change['after_sha256']
+            if clock_change:
+                previous=args.build_dir/'previous_config_route32.json'
+                assert previous.read_bytes()==expected
+                assert digest(previous)==clock_change['before_sha256']
+                assert expected.count(b'"Clock_Route_Order": 1')==1
+                expected=expected.replace(b'"Clock_Route_Order": 1',b'"Clock_Route_Order": 0')
+                final_hash=clock_change['after_sha256']
+            assert digest(after)==digest(ROOT/path)==final_hash
+            assert expected==after.read_bytes()
         else:
             assert digest(ROOT/path)==record['sha256'], ('protected user content changed',path)
         index=subprocess.check_output(['git','ls-files','-s','--',path],cwd=ROOT).decode().strip()
@@ -244,7 +263,8 @@ def main():
     assert fs.stat().st_size > 10000000
     process=json.loads(read(args.build_dir/'build_process.json'))
     route_started=datetime.fromisoformat(process['started']).timestamp()
-    syn_process=json.loads(read(synthesis_origin/'build_process.json'))
+    actual_syn=ROOT/manifest['actual_synthesis_run'] if 'actual_synthesis_run' in manifest else synthesis_origin
+    syn_process=json.loads(read(actual_syn/'build_process.json'))
     syn_started=datetime.fromisoformat(syn_process['started']).timestamp()
     for path in [vg,PROJECT/f'impl/gwsynthesis/{NAME}.log',PROJECT/f'impl/gwsynthesis/{NAME}_syn_rsc.xml']:
         assert path.stat().st_mtime>=syn_started,('old synthesis artifact cannot certify this build',path)
@@ -262,11 +282,18 @@ def main():
     if graph_proof:
         artifacts.extend([args.build_dir/'netlist_graph_equivalence.json',
                           args.build_dir/'graph_checker_tests.log',args.build_dir/'netlist.diff.txt'])
+    if clock_change:
+        previous=ROOT/manifest['previous_route_attempt']
+        artifacts.extend([args.build_dir/'previous_config_route32.json',previous/'source_manifest.json',
+                          previous/'build_process.json',previous/'failed.json',previous/'failed_pnr.log',
+                          previous/'failed_pnr.rpt.txt',previous/'failed_pnr_cmd.do'])
     result = dict(result='PASS', artifact_scope=dict(kind='original_gprj_integrated_p2',
                   project=str(PROJECT/f'{NAME}.gprj'), implementation=str(PROJECT/'impl')),
                   source_sha256=manifest['source_sha256'], preserved_assets_sha256=preserved,
                   validated_source_commit=manifest['validated_source_commit'],
                   authorized_option_change=option_change,
+                  authorized_clock_order_change=clock_change,
+                  actual_synthesis_run=str(actual_syn.relative_to(ROOT)).replace('\\','/'),
                   regenerated_netlist_graph_equivalence=graph_proof,
                   rtl_evidence_sha256={p:digest(ROOT/p) for p in [
                       'sim/temp/touch_game/verification.json','sim/temp/p2_final_connection/verification.json',
