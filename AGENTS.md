@@ -32,6 +32,9 @@
 - Route_Maxfan=32 的重试仍有一条未布通网络。2026-10-16 用户再单独授权仅把 `Clock_Route_Order`
   从 1 改为 0；其他配置与原暂存对象不变。当前运行记录在 `build/p2_integration/impl_a4_route32_clock0/`，
   该次直接使用现有网表，仅重做 P&R。先查进程和结果，不重复启动。
+- Clock_Route_Order=0 的重试仍有一条未布通网络。2026-10-16 用户第三次单独授权仅把 `Route_Option`
+  从 "2" 改为 "1"；仍保留 Maxfan32、ClockOrder0 及所有其余字节和原暂存对象。
+  当前 P&R 在 `build/p2_integration/impl_a4_route32_clock0_algo1/`，先查进程／结束标记和报告，不重复启动。
 - 用户已拒绝继续频带模块的优化路线，原因是收益小且平衡树候选时序回退。
   不继续频带 RAM／选择器／流水线实验；历史实验和停止决定保留在远程分支
   `experiment/radial-bands-resource-opt`。

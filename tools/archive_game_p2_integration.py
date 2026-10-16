@@ -36,6 +36,7 @@ def main():
     fs=PROJECT/'impl/pnr/neo_guitar_touch_game.fs'
     assert digest(fs)==data['bitstream_sha256']
     copy(fs,output)
+    assert digest(output)==data['bitstream_sha256'], 'archived bitstream differs from the certified original-project output'
     copy(cert,directory/'verification.json')
     for path in data['source_sha256']:copy(ROOT/path,directory/'source'/path)
     for file in (ROOT/'scores/p2').rglob('*'):

@@ -67,6 +67,7 @@ def main():
     synthesis_origin=args.build_dir
     option_change=manifest.get('authorized_option_change')
     clock_change=manifest.get('authorized_clock_order_change')
+    route_change=manifest.get('authorized_route_option_change')
     if 'synthesis_origin' in manifest:
         # A route-only retry must preserve the exact previously verified VG.
         # The only accepted source-manifest difference is the explicit user
@@ -88,8 +89,16 @@ def main():
             assert clock_change['user_authorization']=='2026-10-16 explicit reply: allow only Clock_Route_Order to 0'
             previous_path=ROOT/manifest['previous_route_attempt']/'source_manifest.json'
             assert digest(previous_path)==manifest['previous_route_manifest_sha256']
+        if route_change:
+            assert clock_change and route_change['path']==option_change['path']
+            assert route_change['key']=='Route_Option' and route_change['before']=='2' and route_change['after']=='1'
+            assert route_change['before_sha256']==clock_change['after_sha256']
+            assert route_change['user_authorization']=='2026-10-16 explicit reply: allow only Route_Option to 1'
+            previous_path=ROOT/manifest['algorithm_previous_attempt']/'source_manifest.json'
+            assert digest(previous_path)==manifest['algorithm_previous_manifest_sha256']
         for path,value in origin['source_sha256'].items():
             config_hash=clock_change['after_sha256'] if clock_change else option_change['after_sha256']
+            if route_change:config_hash=route_change['after_sha256']
             expected=config_hash if path==option_change['path'] else value
             assert manifest['source_sha256'][path]==expected,path
         assert set(origin['source_sha256'])==set(manifest['source_sha256'])
@@ -221,7 +230,7 @@ def main():
     command = read(pnr/'cmd.do')
     design = re.search(r'^-d\s+(.+)$', command, re.M)
     assert design and Path(design[1].strip()).resolve() == vg.resolve()
-    for option, value in [('place_option', '4'), ('route_option', '2'),
+    for option, value in [('place_option', '4'), ('route_option', '1' if route_change else '2'),
                           ('clock_route_order', '0' if clock_change else '1'), ('correct_hold', '1')]:
         assert re.search(rf'^-{option}\s+{value}\s*$', command, re.M), option
     expected_fanout='32' if option_change else '23'
@@ -253,6 +262,12 @@ def main():
                 assert expected.count(b'"Clock_Route_Order": 1')==1
                 expected=expected.replace(b'"Clock_Route_Order": 1',b'"Clock_Route_Order": 0')
                 final_hash=clock_change['after_sha256']
+            if route_change:
+                previous=args.build_dir/'previous_config_clock0.json'
+                assert previous.read_bytes()==expected and digest(previous)==route_change['before_sha256']
+                assert expected.count(b'"Route_Option": "2"')==1
+                expected=expected.replace(b'"Route_Option": "2"',b'"Route_Option": "1"')
+                final_hash=route_change['after_sha256']
             assert digest(after)==digest(ROOT/path)==final_hash
             assert expected==after.read_bytes()
         else:
@@ -287,12 +302,18 @@ def main():
         artifacts.extend([args.build_dir/'previous_config_route32.json',previous/'source_manifest.json',
                           previous/'build_process.json',previous/'failed.json',previous/'failed_pnr.log',
                           previous/'failed_pnr.rpt.txt',previous/'failed_pnr_cmd.do'])
+    if route_change:
+        previous=ROOT/manifest['algorithm_previous_attempt']
+        artifacts.extend([args.build_dir/'previous_config_clock0.json',previous/'source_manifest.json',
+                          previous/'build_process.json',previous/'failed.json',previous/'failed_pnr.log',
+                          previous/'failed_pnr.rpt.txt',previous/'failed_pnr_cmd.do'])
     result = dict(result='PASS', artifact_scope=dict(kind='original_gprj_integrated_p2',
                   project=str(PROJECT/f'{NAME}.gprj'), implementation=str(PROJECT/'impl')),
                   source_sha256=manifest['source_sha256'], preserved_assets_sha256=preserved,
                   validated_source_commit=manifest['validated_source_commit'],
                   authorized_option_change=option_change,
                   authorized_clock_order_change=clock_change,
+                  authorized_route_option_change=route_change,
                   actual_synthesis_run=str(actual_syn.relative_to(ROOT)).replace('\\','/'),
                   regenerated_netlist_graph_equivalence=graph_proof,
                   rtl_evidence_sha256={p:digest(ROOT/p) for p in [

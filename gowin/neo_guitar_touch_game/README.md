@@ -198,7 +198,8 @@ $project = 'build/display_game_p1/new_run/workspace/gowin/neo_guitar_touch_game'
 E:/anaconda3/python.exe gowin/neo_guitar_touch_game/check_result.py --p1 --implementation-dir $project --gate-dir sim/temp/display_game_p1_gate --output build/display_game_p1/new_run/verification.json
 ```
 
-IDE 固定 Place=4、Route=2、Clock Route Order=1、hold 修复及 CPU/SSPI/I2C GPIO 复用。
+历史 P1 固定 Place=4、Route=2、Clock Route Order=1、hold 修复及 CPU/SSPI/I2C GPIO 复用。
+P2 当前使用用户单独授权的 Route=1、Clock Route Order=0、Route Maxfan=32，Place=4、hold 修复和 GPIO 复用保持。
 本轮独立构建输出位于 `build/display_game_p1/<run>/workspace/gowin/neo_guitar_touch_game/impl/pnr/`；
 下板对象以文首独立归档和 SHA256 为准。主工程仍保留原 IDE 入口。
 不能用综合成功代替布线/时序合格；
