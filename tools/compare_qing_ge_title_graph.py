@@ -20,7 +20,7 @@ def compare(before, after):
         signatures.append(Graph(modules,'neo_guitar_touch_game_top').signature())
     assert signatures[0]==signatures[1],('Primitive/pin graph outside changed renderer differs',signatures)
     return dict(result='PASS',before_sha256=sha(before),after_sha256=sha(after),
-        excluded_module='touch_game_renderer',excluded_module_ports=boundary,
+        excluded_module='touch_game_renderer',excluded_module_ports={name:[kind,bits] for name,(kind,bits) in boundary.items()},
         scope='Exact entire production graph, with only renderer body opaque; renderer pins, all remaining primitives/parameters/connections retained',
         checker_sha256=sha(__file__),graph_checker_sha256=sha(Path(__file__).with_name('compare_synth_graph.py')),
         **signatures[0])

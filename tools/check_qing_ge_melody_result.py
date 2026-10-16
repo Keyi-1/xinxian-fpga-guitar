@@ -28,6 +28,7 @@ LEGACY = ['tb_i2c_fault_recovery', 'tb_gt911_touch', 'tb_touch_gesture_ui',
           'tb_game_competition_controls', 'tb_guitar_effect_buttons',
           'tb_guitar_effect_buttons_defaults']
 VENDOR_WARNING = re.compile(r'prim_sim\.v\((1860|1864|1868|1884|1888|1893|3130|3134|3138|3142|3313|3317)\): \(vopt-2697\)')
+HISTORICAL_SOURCE_REPLACEMENTS = {}
 
 
 def digest(path):
@@ -140,8 +141,12 @@ def source_guards():
             expected = replace_once(expected, before,
                 '    // Generated from the immutable catalogue; no independently maintained times.\n'
                 '    wire [31:0] progress_step=USE_P2 ? game_p2_progress_step(active_slot) : PROGRESS_STEP;')
-            expected = replace_once(expected, '3:label(44,ox,oy,4,scale,0);', '3:label(56,ox,oy,4,scale,0);')
+            expected = replace_once(expected, '3:label(44,ox,oy,4,scale,0);', '3:label(52,ox,oy,2,scale,0);')
             expected = replace_once(expected, 'active_slot==2 ? 50 : 49,', 'active_slot==2 ? 50 : 57,')
+            expected = replace_once(expected, "selected_slot : 3'd0,192,70,1)",
+                "selected_slot : 3'd0,USE_P2 && selected_slot==3 ? 224 : 192,70,1)")
+            expected = replace_once(expected, 'song_title(active_slot,192,67,1)',
+                'song_title(active_slot,USE_P2 && active_slot==3 ? 224 : 192,67,1)')
         assert read(ROOT/path) == expected, ('unapproved runtime/source change', path)
         if path not in exceptions:
             preserved[path] = digest(ROOT/path)
@@ -155,9 +160,11 @@ def source_guards():
     return preserved, report, check_font()
 
 
-def source_hashes(data):
+def source_hashes(data, historical=False):
     for path, value in data['source_sha256'].items():
-        assert digest(ROOT/path) == value, ('source changed since proof', path)
+        current = digest(ROOT/path)
+        if current != value:
+            assert historical and HISTORICAL_SOURCE_REPLACEMENTS.get((path.replace('\\', '/'), value)) == current, ('source changed since proof', path)
 
 
 def clean_log(path, vendor=False, success=True):
@@ -174,7 +181,7 @@ def clean_log(path, vendor=False, success=True):
 def rtl_proof(directory, benches, evidence_files):
     p = directory/'verification.json'; data = load(p)
     assert data.get('result', data.get('status')) == 'PASS' and data['benches'] == benches
-    source_hashes(data); evidence_files.add(p)
+    source_hashes(data, historical=True); evidence_files.add(p)
     normalized = {v.replace('\\', '/') for v in data['source_sha256']}
     for bench in benches:
         assert f'sim/tb/{bench}.sv' in normalized, ('missing bench binding', bench)
@@ -203,10 +210,10 @@ def python_log(path, count):
     assert not re.search(r'^FAILED|^ERROR:|^FAIL:', text, re.M), path
 
 
-def gate_proof(directory, names, netlist_hash, evidence_files):
+def gate_proof(directory, names, netlist_hash, evidence_files, historical=False, status='PASS'):
     p = directory/'verification.json'; data = load(p)
-    assert data['result'] == 'PASS' and set(data['log_sha256']) == {f'{x}.log' for x in names}
-    source_hashes(data)
+    assert data['result'] == status and set(data['log_sha256']) == {f'{x}.log' for x in names}
+    source_hashes(data, historical=historical)
     assert data['netlist_sha256'] == digest(directory/'compiled.vg') == netlist_hash
     evidence_files.add(p)
     for name, value in data['log_sha256'].items():
@@ -215,6 +222,8 @@ def gate_proof(directory, names, netlist_hash, evidence_files):
         clean_log(log, vendor=True); evidence_files.add(log)
     for name, value in data['generated_sha256'].items():
         assert digest(directory/name) == value; evidence_files.add(directory/name)
+    for name,value in data.get('recovery_receipts_sha256',{}).items():
+        assert digest(directory/name)==value;evidence_files.add(directory/name)
     for path in directory.glob('*compile.log'):
         clean_log(path, success=False)
         assert 'Errors: 0, Warnings: 0' in read(path)
@@ -222,7 +231,7 @@ def gate_proof(directory, names, netlist_hash, evidence_files):
     if 'engine_origin_evidence_sha256' in data:
         origin = directory/'engine_origin.json'
         assert digest(origin) == data['engine_origin_evidence_sha256']
-        o = load(origin); source_hashes(o)
+        o = load(origin); source_hashes(o, historical=historical)
         assert o['netlist_sha256'] == netlist_hash
         evidence_files.add(origin)
     for name, field in [('compile.log', 'compile_log_sha256'), ('mapping.log', 'mapping_log_sha256')]:
@@ -231,12 +240,44 @@ def gate_proof(directory, names, netlist_hash, evidence_files):
     return data
 
 
+def title_revision_proof(directory, evidence_files):
+    """The single explicitly requested UI correction; no other stale source."""
+    path='rtl/game/touch_game_renderer.v'
+    commit='dee95b1c136931b3a9023ba219195bbe05a8b07c'
+    original=subprocess.check_output(['git','show',f'{commit}:{path}'],cwd=ROOT)
+    provenance=load(ROOT/'sim/reference/qing_ge/touch_game_renderer_m1.json')
+    assert provenance['baseline_commit']==commit
+    assert provenance['original_sha256']==hashlib.sha256(original).hexdigest()
+    reference=ROOT/'sim/reference/qing_ge/touch_game_renderer_m1.v'
+    assert reference.read_bytes()==original.replace(b'module touch_game_renderer #',b'module touch_game_renderer_m1 #')
+    assert digest(reference)==provenance['reference_sha256']
+    expected=original.decode('utf-8')
+    for before,after in [
+        ('3:label(56,ox,oy,4,scale,0);','3:label(52,ox,oy,2,scale,0);'),
+        ("selected_slot : 3'd0,192,70,1)","selected_slot : 3'd0,USE_P2 && selected_slot==3 ? 224 : 192,70,1)"),
+        ('song_title(active_slot,192,67,1)','song_title(active_slot,USE_P2 && active_slot==3 ? 224 : 192,67,1)')]:
+        expected=replace_once(expected,before,after)
+    assert read(ROOT/path)==expected,'Only the reviewed title glyph/centering changes are allowed'
+    proof=load(directory/'verification.json');assert proof['result']=='PASS'
+    assert proof['benches']==['tb_qing_ge_title_alignment']
+    source_hashes(proof)  # This NEW pixel proof must match current sources exactly.
+    assert digest(directory/'compile.log')==proof['compile_log_sha256']
+    assert digest(directory/'title.log')==proof['log_sha256']
+    clean_log(directory/'compile.log',success=False);clean_log(directory/'title.log')
+    require_terms(directory/'title.log',['ready/results x224..255 centered on 480','20 screens/2611200 pixels','all pixels outside requested title boxes and legacy mode equal frozen M1'])
+    for name in ['verification.json','compile.log','title.log']:
+        evidence_files.add(directory/name)
+    HISTORICAL_SOURCE_REPLACEMENTS[(path,provenance['original_sha256'])]=digest(ROOT/path)
+    return proof
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--build-dir', type=Path, required=True)
     p.add_argument('--gate-dir', type=Path, required=True)
     p.add_argument('--extra-gate-dir', type=Path, required=True)
     p.add_argument('--seek-gate-dir', type=Path, required=True)
+    p.add_argument('--ui-origin-build-dir', type=Path, required=True)
     p.add_argument('--source-rtl-only', action='store_true', help='No release certificate is written')
     p.add_argument('--output', type=Path, default=PROJECT/'p2_qing_ge_melody_verification.json')
     a = p.parse_args()
@@ -250,6 +291,17 @@ def main():
     assert digest(ROOT/'build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs') == 'e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86'
     preserved, transcription, font = source_guards()
     proof_files = set()
+    python_log(b/'title_graph_guard_tests.log',5)
+    proof_files.add(b/'title_graph_guard_tests.log')
+    title_proof=title_revision_proof(ROOT/m['title_evidence'],proof_files)
+    ui_origin=a.ui_origin_build_dir.resolve()
+    assert relative(ui_origin)==m['ui_origin_build']
+    assert digest(ui_origin/'source_manifest.json')==m['ui_origin_manifest_sha256']
+    origin_manifest=load(ui_origin/'source_manifest.json')
+    assert set(origin_manifest['source_sha256'])==set(m['source_sha256'])
+    differences={k for k,v in origin_manifest['source_sha256'].items() if m['source_sha256'][k]!=v}
+    assert differences=={'rtl/game/touch_game_renderer.v'}
+    source_hashes(origin_manifest,historical=True)
     core = ROOT/m['core_evidence']; integration = ROOT/m['rtl_evidence']
     rtl_proof(core, CORE, proof_files)
     audio = rtl_proof(integration, INTEGRATION, proof_files)
@@ -265,7 +317,7 @@ def main():
     # This frozen proof covers ONLY the previous valid MIDI50..72 domain.
     domain = ROOT/m['legacy_domain_evidence']; d = load(domain/'verification.json')
     assert d['result'] == 'PASS' and d['reference_commit'] == 'a6009a3596d812402c06e7a2fadf8c6b881faae5'
-    source_hashes(d)
+    source_hashes(d,historical=True)
     for name, field in [('compile.log', 'compile_log_sha256'), ('equivalence.log', 'log_sha256')]:
         assert digest(domain/name) == d[field]; clean_log(domain/name, success=name != 'compile.log')
         proof_files.add(domain/name)
@@ -296,6 +348,9 @@ def main():
     if a.source_rtl_only:
         print('SOURCE_RTL_PASS_IMPLEMENTATION_PENDING: no release certificate written')
         return
+    # A renderer-only source edit changed synthesized boundary/predecode nets.
+    # No historical VG proof may certify this implementation: all six gate
+    # benches below must bind the actual NEW complete production netlist.
     standard = gate_proof(g, ['tb_game_p2_engine_gate', 'tb_game_p2_layout_gate', 'tb_game_p2_top_gate'], digest(vg), proof_files)
     extra = gate_proof(x, ['tb_game_p2_actual_bank_gate', 'tb_game_p2_range_gate'], digest(vg), proof_files)
     seek = gate_proof(seek_dir, ['tb_game_p2_melody_seek_gate'], digest(vg), proof_files)
@@ -314,6 +369,16 @@ def main():
         from generate_game_p2_seek_gate import generate as generate_seek
         generate_seek(vg, Path(temp))
         assert (Path(temp)/'seek_actual_map.vh').read_bytes() == (seek_dir/'seek_actual_map.vh').read_bytes()
+        if 'recovery_receipts_sha256' in standard:
+            import shutil
+            canonical=Path(temp)/'canonical';canonical.mkdir()
+            original=g/'tb_game_p2_layout_gate_original.sv'
+            assert read(original)==read(ROOT/'sim/tb/tb_game_p2_layout_gate.sv')
+            shutil.copy2(original,canonical/'tb_game_p2_layout_gate.sv')
+            from generate_game_p2_layout_recovery import generate as regenerate_layout
+            regenerate_layout(vg,canonical,Path(temp))
+            for name in ['layout_recovery_map.json','tb_game_p2_layout_gate.sv']:
+                assert (Path(temp)/name).read_bytes()==(g/name).read_bytes()
     pnr = PROJECT/'impl/pnr'; log = read(pnr/f'{NAME}.log'); report = read(pnr/f'{NAME}.rpt.txt')
     timing = read(pnr/f'{NAME}_tr_content.html')
     assert 'Bitstream generation completed' in log and 'ERROR' not in log
@@ -358,14 +423,16 @@ def main():
         b/'source_manifest.json', b/'build_process.json', b/'synthesis_review.json', protected,
         b/'process_config.json', b/'build.stdout.log', b/'build.stderr.log',
         *[pnr/f'{NAME}{suffix}' for suffix in ['.log', '.rpt.txt', '_tr_content.html']],
-        pnr/'cmd.do', pnr/'device.cfg', previous_cert}
+        pnr/'cmd.do', pnr/'device.cfg', previous_cert,
+        ui_origin/'source_manifest.json',b/'graph_reuse_rejected.json'}
     for path in [vg, fs, syn, pnr/f'{NAME}.log', pnr/f'{NAME}.rpt.txt', pnr/f'{NAME}_tr_content.html', pnr/'cmd.do']:
         assert path.stat().st_mtime >= started, ('old build result', path)
     margins = resources['CLS']['used']/resources['CLS']['available'] <= .95 and clocks['sys_clk_50m']['fmax_mhz'] >= 55 and clocks['audio_clk_12m288']['fmax_mhz'] >= 13.5
-    tools = [Path(__file__), ROOT/'tools/archive_qing_ge_melody.py']
+    tools = [Path(__file__), ROOT/'tools/archive_qing_ge_melody.py',ROOT/'tools/compare_synth_graph.py',ROOT/'tools/compare_qing_ge_title_graph.py',ROOT/'tools/test_qing_ge_title_graph.py']
     certificate = dict(result='PASS', artifact_scope=dict(kind='original_gprj_qing_ge_user_melody',
         project=relative(PROJECT/f'{NAME}.gprj'), implementation=relative(PROJECT/'impl')),
         validated_source_commit=m['validated_source_commit'], previous_release_commit=BASE,
+        actual_synthesis_run=relative(b),
         source_sha256=m['source_sha256'], preserved_assets_sha256=preserved,
         verification_tools_sha256={relative(v): digest(v) for v in tools},
         artifacts_sha256={relative(v): digest(v) for v in sorted(artifacts)},
@@ -382,6 +449,12 @@ def main():
         source_guard='Exact finite range/UI transforms against board-confirmed fragment release; all remaining runtime assets unchanged',
         legacy_equivalence_scope='Prior valid MIDI50..72 domain only; MIDI73..79 is intentional new behavior',
         standard_gate=standard, extra_gate=extra, seek_gate=seek,
+        title_pixel_proof=title_proof,
+        ui_revision=dict(user_request='Remove Chinese melody suffix; center Qing Ge title',
+            only_changed_runtime_source='rtl/game/touch_game_renderer.v',
+            reference_commit='dee95b1c136931b3a9023ba219195bbe05a8b07c',
+            current_netlist_sha256=digest(vg),netlist_proof_reuse=False,
+            proof_scope='Only prior source-level regressions reused after exact three-edit renderer guard and independent frozen pixel proof. All six gate benches rerun and bound to actual current complete VG; no old VG equivalence claimed'),
         training_defaults=dict(ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1),
         hardware_status='Prior P1 and P2 fragments user-confirmed; this 38-bar melody and accepted bar10/18 rhythm revisions await listening/on-board confirmation',
         excluded_validation=['New hardware/analog measurements', 'Original-recording completeness', 'Accompaniment staff', 'Wall-clock full-song hardware endurance'],

@@ -51,7 +51,8 @@ def main():
         for direction, width, name in ports(module):
             if direction != 'output':
                 continue
-            if name == prefix:
+            if name in {prefix,prefix+'_Z'}:
+                assert width, ('inspect complete architectural bus',name)
                 hi, lo = map(int, width.split(':'));observed.update(range(lo, hi+1))
                 expression = f'{value}[{hi}:{lo}]'
             elif name.startswith(prefix+'_'):
@@ -78,7 +79,10 @@ def main():
     assert observed == {i*12+j for i in range(32) for j in range(9)}, 'inspect eliminated coordinate bits'
     for bit in set(range(384))-observed:
         connections.append(f"assign g_centres[{bit}]=1'b0;")
-    connections += [f'assign g_blocks={chart_path}.valid_blocks;',f'assign g_tails={chart_path}.tails;',
+    mask_ports=[(width,name) for direction,width,name in ports('game_p2_chart_layout')
+                if direction=='output' and name in {'valid_blocks','valid_blocks_Z'}]
+    assert len(mask_ports)==1 and mask_ports[0][0]=='31:0',('inspect architectural chart mask',mask_ports)
+    connections += [f'assign g_blocks={chart_path}.{mask_ports[0][1]};',f'assign g_tails={chart_path}.tails;',
                     f'assign g_overflow={chart_path}.chart_overflow;', f'assign g_deadline={chart_path}.chart_deadline;']
     (directory/'chart_outputs.vh').write_text('\n'.join(connections)+'\n')
     assert re.search(r'^wire \[31:0\] countdown_left;', body('game_p2_window_controller'), re.M)

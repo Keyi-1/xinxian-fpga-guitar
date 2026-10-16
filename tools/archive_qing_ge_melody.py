@@ -25,6 +25,17 @@ def main():
     data = json.loads(cert.read_text(encoding='utf-8'))
     assert data['result'] == 'PASS' and data['artifact_scope']['kind'] == 'original_gprj_qing_ge_user_melody'
     all_sources = dict(data['source_sha256'])
+    previous_sources = {}
+
+    def merge_source(path, value):
+        path = path.replace('\\', '/')
+        if path in all_sources and all_sources[path] != value:
+            assert path == data['ui_revision']['only_changed_runtime_source']
+            original = subprocess.check_output(['git','show',f"{data['ui_revision']['reference_commit']}:{path}"],cwd=ROOT)
+            assert hashlib.sha256(original).hexdigest() == value
+            previous_sources[path] = original
+        else:
+            all_sources[path] = value
     for field in ['artifacts_sha256', 'evidence_sha256', 'verification_tools_sha256', 'preserved_assets_sha256']:
         for path, value in data[field].items():
             assert digest(ROOT/path) == value, ('changed certified artifact', path)
@@ -33,14 +44,10 @@ def main():
             continue
         proof = json.loads((ROOT/path).read_text(encoding='utf-8-sig'))
         for source, value in proof.get('source_sha256', {}).items():
-            source = source.replace('\\', '/')
-            assert source not in all_sources or all_sources[source] == value
-            all_sources[source] = value
-    for key in ['standard_gate', 'extra_gate', 'seek_gate']:
+            merge_source(source, value)
+    for key in ['standard_gate', 'extra_gate', 'seek_gate', 'title_pixel_proof']:
         for path, value in data[key]['source_sha256'].items():
-            path = path.replace('\\', '/')
-            assert path not in all_sources or all_sources[path] == value
-            all_sources[path] = value
+            merge_source(path, value)
     all_sources.update(data['verification_tools_sha256'])
     for path, value in all_sources.items():
         assert digest(ROOT/path) == value, ('changed verified source', path)
@@ -64,14 +71,17 @@ def main():
     copy(vg, directory/'netlist/neo_guitar_touch_game.vg')
     for path in all_sources:
         copy(ROOT/path, directory/'source'/path)
+    for path, content in previous_sources.items():
+        target = directory/'source_before_title'/path
+        target.parent.mkdir(parents=True, exist_ok=True);target.write_bytes(content)
     for path in set(data['artifacts_sha256']) | set(data['evidence_sha256']):
         if Path(path).suffix not in ['.fs', '.vg']:
             copy(ROOT/path, directory/'evidence'/path)
-    for base in ['scores/p2', 'build/qing_ge_melody/impl_m1']:
+    for base in ['scores/p2', 'build/qing_ge_melody/impl_m1', data['actual_synthesis_run']]:
         for path in (ROOT/base).rglob('*'):
-            if path.is_file() and path.suffix in ['.json', '.jpg', '.csv', '.bin', '.log', '.tcl', '.ps1']:
+            if path.is_file() and path.suffix in ['.json', '.jpg', '.png', '.csv', '.bin', '.log', '.tcl', '.ps1']:
                 copy(path, directory/'supplemental'/path.relative_to(ROOT))
-    started = datetime.fromisoformat(json.loads((ROOT/'build/qing_ge_melody/impl_m1/build_process.json').read_text(encoding='utf-8-sig'))['started']).timestamp()
+    started = datetime.fromisoformat(json.loads((ROOT/data['actual_synthesis_run']/'build_process.json').read_text(encoding='utf-8-sig'))['started']).timestamp()
     for path in (PROJECT/'impl/pnr').glob('*'):
         if path.is_file() and path.stat().st_mtime >= started and path.suffix in ['.html', '.txt', '.css', '.do', '.cfg']:
             copy(path, directory/'reports'/path.name)
@@ -90,6 +100,7 @@ def main():
         artifact_scope=data['artifact_scope'], bitstream=str(output.relative_to(ROOT)).replace('\\', '/'),
         bitstream_sha256=digest(output), verification_sha256=digest(cert),
         source_sha256=all_sources,
+        pre_title_source_sha256={path:hashlib.sha256(content).hexdigest() for path,content in previous_sources.items()},
         files_sha256={p.relative_to(directory).as_posix(): digest(p) for p in directory.rglob('*') if p.is_file()})
     (directory/'archive.json').write_text(json.dumps(record, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({k: record[k] for k in ['source_commit', 'bitstream', 'bitstream_sha256', 'verification_sha256']}, indent=2))
