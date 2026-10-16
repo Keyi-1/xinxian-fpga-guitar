@@ -20,10 +20,13 @@ def main():
     p.add_argument('--gate-dir',type=Path,required=True)
     p.add_argument('--name',default='p2_static_songs_20261016')
     a=p.parse_args()
+    a.build_dir=a.build_dir.resolve();a.gate_dir=a.gate_dir.resolve()
     cert=PROJECT/'p2_integration_verification.json'
     data=json.loads(cert.read_text(encoding='utf-8'))
     assert data['result']=='PASS'
     assert data['artifact_scope']['kind']=='original_gprj_integrated_p2'
+    assert digest(a.gate_dir/'verification.json')==data['gate_evidence_sha256']
+    assert digest(a.build_dir/'source_manifest.json')==data['artifacts_sha256'][str((a.build_dir/'source_manifest.json').relative_to(ROOT)).replace('\\','/')]
     for path,value in data['source_sha256'].items():assert digest(ROOT/path)==value,path
     for path,value in data['artifacts_sha256'].items():assert digest(ROOT/path)==value,path
     root=ROOT/'build/releases/touch_game'
@@ -46,11 +49,17 @@ def main():
         if original.suffix not in ['.fs','.vg']:copy(original,directory/'evidence'/path)
     copy(PROJECT/'impl/gwsynthesis/neo_guitar_touch_game.vg',directory/'netlist/neo_guitar_touch_game.vg')
     copy(a.gate_dir/'compiled.vg',directory/'gate/compiled.vg')
-    for subdir in ['touch_game','p2_final_connection','p2_final_audio','p2_button_compat','game_p2/explicit_dpb_final']:
-        run=ROOT/'sim/temp'/subdir
+    evidence_dirs={Path(p).parent for p in data['rtl_evidence_sha256']}
+    proof=data.get('controller_cycle_equivalence')
+    if proof:
+        for path in proof['source_sha256']:copy(ROOT/path,directory/'source'/path)
+        manifest=json.loads((a.build_dir/'source_manifest.json').read_text(encoding='utf-8'))
+        evidence_dirs.add(Path(manifest['controller_optimization']['equivalence']).parent)
+    for subdir in evidence_dirs:
+        run=ROOT/subdir
         for file in run.iterdir():
             if file.is_file() and file.suffix in ['.log','.json','.ppm']:
-                copy(file,directory/'rtl'/subdir/file.name)
+                copy(file,directory/'rtl'/subdir.relative_to('sim/temp')/file.name)
     for file in (ROOT/'sim/temp/p2_bank_gate_r1').iterdir():
         if file.is_file() and file.suffix in ['.json','.log','.vg','.v']:
             copy(file,directory/'bank_gate'/file.name)
@@ -68,6 +77,9 @@ def main():
                      'tools/generate_game_ui_font.py','tools/game_fingering.py','tools/test_game_fingering.py',
                      'tools/test_game_score_v2.py','tools/compare_synth_graph.py','tools/test_compare_synth_graph.py']:
         copy(ROOT/relative,directory/'tools'/Path(relative).name)
+    if proof:
+        for name in ['run_game_p2_window_equivalence.ps1','test_p2_controller_guard.py']:
+            copy(ROOT/'tools'/name,directory/'tools'/name)
     for relative in ['AGENTS.md','docs/P2_STATIC_SONG_INTEGRATION.md',
                      'docs/P2_STATIC_ENGINE_PROTOTYPE.md',
                      'gowin/neo_guitar_touch_game/README.md',

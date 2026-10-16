@@ -93,7 +93,7 @@ module tb_game_p2_window_equivalence;
         end
         // Exhaustive found-lane masks, randomized equal/different ring slots,
         // saturating counters/score and lane-order-dependent combo reset.
-        count=1;restart();
+        count=1;restart();jump(28799999);
         for(i=0;i<512;i=i+1)begin
             @(negedge clk);
             dut.state=3;ref_a4.state=3;

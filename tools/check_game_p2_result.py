@@ -23,6 +23,7 @@ ALLOWED = {
     'rtl/top/neo_guitar_touch_game_top.v', 'rtl/config/game_ui_messages.vh',
     'mem/game_font_16.mem', 'mem/game_message_index.mem',
 }
+EQUIVALENT_SOURCE_REPLACEMENTS = {}
 
 
 def digest(p):
@@ -33,12 +34,59 @@ def read(p):
     return Path(p).read_text(encoding='utf-8-sig')
 
 
+def verified_source(path, expected):
+    actual=digest(ROOT/path)
+    if actual!=expected:
+        key=(path.replace('\\','/'),expected)
+        assert EQUIVALENT_SOURCE_REPLACEMENTS.get(key)==actual, ('changed since RTL verification',path)
+
+
+def controller_equivalence(manifest):
+    """One explicit, independently tested A4 controller representation change.
+
+    This exception cannot approve any other module, any different reference,
+    or an untested current controller. New full-top gate tests are still needed.
+    """
+    change=manifest.get('controller_optimization')
+    if not change:return None
+    path='rtl/game/game_p2_window_controller.v'
+    assert change['only_changed_source']==path
+    baseline='a6009a3596d812402c06e7a2fadf8c6b881faae5'
+    assert change['baseline_commit']==baseline
+    provenance=json.loads(read(ROOT/'sim/reference/game_p2/game_p2_window_controller_a4.json'))
+    old=subprocess.check_output(['git','show',f'{baseline}:{path}'],cwd=ROOT)
+    assert hashlib.sha256(old).hexdigest()==provenance['original_sha256']
+    reference=ROOT/'sim/reference/game_p2/game_p2_window_controller_a4.v'
+    assert reference.read_bytes()==old.replace(b'module game_p2_window_controller #(',b'module game_p2_window_controller_a4 #(')
+    assert digest(reference)==provenance['reference_sha256']
+    proof_path=ROOT/change['equivalence']
+    assert digest(proof_path)==change['equivalence_sha256']
+    proof=json.loads(read(proof_path))
+    assert proof['result']=='PASS' and proof['reference_commit']==baseline
+    required={path,'sim/reference/game_p2/game_p2_window_controller_a4.v',
+        'sim/reference/game_p2/game_p2_window_controller_a4.json','rtl/config/game_p2_phase.vh',
+        'sim/tb/tb_game_p2_window_equivalence.sv','tools/run_game_p2_window_equivalence.ps1'}
+    assert set(proof['source_sha256'])==required
+    for p,value in proof['source_sha256'].items():assert digest(ROOT/p)==value,p
+    folder=proof_path.parent
+    assert digest(folder/'compile.log')==proof['compile_log_sha256']
+    assert digest(folder/'equivalence.log')==proof['log_sha256']
+    compile_log=read(folder/'compile.log');log=read(folder/'equivalence.log')
+    assert 'Errors: 0, Warnings: 0' in compile_log
+    assert not re.search(r'FAIL:|\*\* (Error|Fatal|Warning):',compile_log+log)
+    for term in ['PASS: A4 cycle-exact controller equivalence','821642 clocks','2753 snapshots',
+                 '2048 events/32 wraps','512 commits','invalid high bits','max busy 131']:
+        assert term in log,term
+    EQUIVALENT_SOURCE_REPLACEMENTS[(path,provenance['original_sha256'])]=digest(ROOT/path)
+    return proof
+
+
 def evidence(directory, benches, status='result'):
     data = json.loads(read(directory/'verification.json'))
     assert data[status] == 'PASS', directory
     assert data['benches'] == benches, directory
     for path, value in data['source_sha256'].items():
-        assert digest(ROOT/path) == value, ('changed since RTL verification', path)
+        verified_source(path,value)
     for bench in benches:
         p = directory/f'{bench}.log'
         assert digest(p) == data['log_sha256'][bench], p
@@ -60,24 +108,38 @@ def main():
                         help='Audit completed RTL/gate hashes; print PNR_PENDING and never write a release certificate')
     parser.add_argument('--output', type=Path, default=PROJECT/'p2_integration_verification.json')
     args = parser.parse_args()
+    args.build_dir=args.build_dir.resolve()
+    args.gate_dir=args.gate_dir.resolve()
     manifest_path = args.build_dir/'source_manifest.json'
     manifest = json.loads(read(manifest_path))
+    controller_proof=controller_equivalence(manifest)
     for path, value in manifest['source_sha256'].items():
         assert digest(ROOT/path) == value, ('changed since synthesis started', path)
     synthesis_origin=args.build_dir
     option_change=manifest.get('authorized_option_change')
     clock_change=manifest.get('authorized_clock_order_change')
     route_change=manifest.get('authorized_route_option_change')
-    if 'synthesis_origin' in manifest:
+    if 'synthesis_origin' in manifest or controller_proof:
         # A route-only retry must preserve the exact previously verified VG.
         # The only accepted source-manifest difference is the explicit user
         # authorization below; never relabel a changed RTL as an old synthesis.
-        synthesis_origin=ROOT/manifest['synthesis_origin']
-        origin_path=synthesis_origin/'source_manifest.json'
-        assert digest(origin_path)==manifest['synthesis_origin_manifest_sha256']
+        optimization=manifest.get('controller_optimization')
+        if optimization:
+            assert 'synthesis_origin' not in manifest
+            origin_path=ROOT/optimization['baseline_manifest']
+            synthesis_origin=origin_path.parent
+            assert digest(origin_path)==optimization['baseline_manifest_sha256']
+        else:
+            synthesis_origin=ROOT/manifest['synthesis_origin']
+            origin_path=synthesis_origin/'source_manifest.json'
+            assert digest(origin_path)==manifest['synthesis_origin_manifest_sha256']
         origin=json.loads(read(origin_path))
-        assert origin['synthesized_netlist_sha256']==manifest.get('gate_netlist_sha256',manifest['synthesized_netlist_sha256'])
-        assert origin['validated_source_commit']==manifest['validated_source_commit']
+        if not optimization:
+            assert origin['synthesized_netlist_sha256']==manifest.get('gate_netlist_sha256',manifest['synthesized_netlist_sha256'])
+            assert origin['validated_source_commit']==manifest['validated_source_commit']
+        else:
+            assert origin['validated_source_commit']==optimization['baseline_commit']
+            assert manifest['actual_synthesis_run']==str(args.build_dir.relative_to(ROOT)).replace('\\','/')
         assert option_change and option_change['key']=='Route_Maxfan'
         assert option_change['before']==23 and option_change['after']==32
         assert option_change['path']=='gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json'
@@ -100,6 +162,9 @@ def main():
             config_hash=clock_change['after_sha256'] if clock_change else option_change['after_sha256']
             if route_change:config_hash=route_change['after_sha256']
             expected=config_hash if path==option_change['path'] else value
+            if optimization and path==optimization['only_changed_source']:
+                verified_source(path,value)
+                expected=digest(ROOT/path)
             assert manifest['source_sha256'][path]==expected,path
         assert set(origin['source_sha256'])==set(manifest['source_sha256'])
     preserved = {}
@@ -109,6 +174,8 @@ def main():
             continue
         if path in ALLOWED:
             continue
+        if controller_proof and path=='rtl/game/game_p2_window_controller.v':
+            continue  # Exact A4 reference and this current module checked above.
         old = subprocess.check_output(['git', 'show', f'{P1}:{path}'], cwd=ROOT)
         current=(ROOT/path).read_bytes().replace(b'\r\n', b'\n')
         old=old.replace(b'\r\n', b'\n')
@@ -123,18 +190,27 @@ def main():
                       'tb_game_note_controller', 'tb_game_cdc', 'tb_game_chart_renderer',
                       'tb_game_audio_preservation', 'tb_game_miss_audio_cue', 'tb_game_competition_controls']
     evidence(ROOT/'sim/temp/touch_game', legacy_benches)
-    evidence(ROOT/'sim/temp/p2_final_connection', ['tb_game_p2_connection', 'tb_game_p2_display'])
-    evidence(ROOT/'sim/temp/p2_final_audio', ['tb_game_p2_audio_preservation'])
+    if controller_proof:
+        integration_dir=ROOT/manifest['integration_rtl_evidence']
+        audio_dir=integration_dir
+        core_dir=ROOT/manifest['core_rtl_evidence']
+        evidence(integration_dir,['tb_game_p2_connection','tb_game_p2_display','tb_game_p2_audio_preservation'])
+    else:
+        integration_dir=ROOT/'sim/temp/p2_final_connection'
+        audio_dir=ROOT/'sim/temp/p2_final_audio'
+        core_dir=ROOT/'sim/temp/game_p2/explicit_dpb_final'
+        evidence(integration_dir, ['tb_game_p2_connection', 'tb_game_p2_display'])
+        evidence(audio_dir, ['tb_game_p2_audio_preservation'])
     evidence(ROOT/'sim/temp/p2_button_compat', ['tb_guitar_effect_buttons','tb_guitar_effect_buttons_defaults'])
-    evidence(ROOT/'sim/temp/game_p2/explicit_dpb_final', ['tb_game_p2_window', 'tb_game_p2_legacy_equivalence',
+    evidence(core_dir, ['tb_game_p2_window', 'tb_game_p2_legacy_equivalence',
              'tb_game_p2_static_bank', 'tb_game_p2_judgement'], 'status')
-    for path in ['sim/temp/touch_game/fingering.log','sim/temp/game_p2/explicit_dpb_final/python.log']:
-        text=read(ROOT/path)
+    for path in [ROOT/'sim/temp/touch_game/fingering.log',core_dir/'python.log']:
+        text=read(path)
         assert 'Ran 5 tests' in text and re.search(r'^OK\s*$',text,re.M),path
-    audio = read(ROOT/'sim/temp/p2_final_audio/tb_game_p2_audio_preservation.log')
+    audio = read(audio_dir/'tb_game_p2_audio_preservation.log')
     assert '2097153 cycles / 8192 samples identical to accepted master' in audio
     assert 'sustain exit 1452 samples' in audio
-    display = read(ROOT/'sim/temp/p2_final_connection/tb_game_p2_display.log')
+    display = read(integration_dir/'tb_game_p2_display.log')
     assert '2636 complete P2 layouts' in display and 'max 445 clocks' in display
     from check_game_p2_font import check as check_font
     font_preservation=check_font()
@@ -307,6 +383,22 @@ def main():
         artifacts.extend([args.build_dir/'previous_config_clock0.json',previous/'source_manifest.json',
                           previous/'build_process.json',previous/'failed.json',previous/'failed_pnr.log',
                           previous/'failed_pnr.rpt.txt',previous/'failed_pnr_cmd.do'])
+    if controller_proof:
+        proof_path=ROOT/manifest['controller_optimization']['equivalence']
+        artifacts.extend([proof_path,proof_path.parent/'compile.log',proof_path.parent/'equivalence.log'])
+        guard_log=args.build_dir/'controller_guard_tests.log'
+        assert digest(guard_log)==manifest['controller_guard_tests_sha256']
+        assert 'Ran 8 tests' in read(guard_log) and re.search(r'^OK\s*$',read(guard_log),re.M)
+        artifacts.append(guard_log)
+        for attempt in manifest['prior_failed_attempts']:
+            folder=ROOT/attempt['path']
+            assert digest(folder/'failed.json')==attempt['failed_sha256']
+            artifacts.extend(folder/name for name in ['failed.json','failed_pnr.log','failed_pnr.rpt.txt','failed_pnr_cmd.do'])
+    rtl_evidence_paths=[ROOT/'sim/temp/touch_game/verification.json',integration_dir/'verification.json',
+        audio_dir/'verification.json',ROOT/'sim/temp/p2_button_compat/verification.json',core_dir/'verification.json',
+        ROOT/'sim/temp/p2_bank_gate_r1/verification.json']
+    supplemental_paths=[ROOT/'sim/temp/touch_game/fingering.log',core_dir/'python.log',
+        *[d/'compile.log' for d in [ROOT/'sim/temp/touch_game',integration_dir,audio_dir,ROOT/'sim/temp/p2_button_compat',core_dir]]]
     result = dict(result='PASS', artifact_scope=dict(kind='original_gprj_integrated_p2',
                   project=str(PROJECT/f'{NAME}.gprj'), implementation=str(PROJECT/'impl')),
                   source_sha256=manifest['source_sha256'], preserved_assets_sha256=preserved,
@@ -316,15 +408,11 @@ def main():
                   authorized_route_option_change=route_change,
                   actual_synthesis_run=str(actual_syn.relative_to(ROOT)).replace('\\','/'),
                   regenerated_netlist_graph_equivalence=graph_proof,
-                  rtl_evidence_sha256={p:digest(ROOT/p) for p in [
-                      'sim/temp/touch_game/verification.json','sim/temp/p2_final_connection/verification.json',
-                      'sim/temp/p2_final_audio/verification.json','sim/temp/p2_button_compat/verification.json',
-                      'sim/temp/game_p2/explicit_dpb_final/verification.json','sim/temp/p2_bank_gate_r1/verification.json']},
-                  supplemental_evidence_sha256={p:digest(ROOT/p) for p in [
-                      'sim/temp/touch_game/fingering.log','sim/temp/game_p2/explicit_dpb_final/python.log',
-                      *[f'sim/temp/{name}/compile.log' for name in ['touch_game','p2_final_connection',
-                          'p2_final_audio','p2_button_compat','game_p2/explicit_dpb_final']]]},
+                  controller_cycle_equivalence=controller_proof,
+                  rtl_evidence_sha256={str(p.relative_to(ROOT)).replace('\\','/'):digest(p) for p in rtl_evidence_paths},
+                  supplemental_evidence_sha256={str(p.relative_to(ROOT)).replace('\\','/'):digest(p) for p in supplemental_paths},
                   gate_evidence_sha256=digest(args.gate_dir/'verification.json'),
+                  gate_evidence_path=str((args.gate_dir/'verification.json').relative_to(ROOT)).replace('\\','/'),
                   artifacts_sha256={str(p.relative_to(ROOT)).replace('\\', '/'): digest(p) for p in artifacts},
                   bitstream_sha256=digest(fs), netlist_sha256=digest(vg), resources=resources, clocks=clocks,
                   score_bank=dict(implementation='explicit 16-bit true dual-port DPB slices',blocks=int(score_banks[0].attrib['Bsram']),logical_records=2048,record_bits=96,unit_verification=bank_check),
@@ -343,6 +431,9 @@ def main():
         'tools/run_touch_game_checks.ps1', 'tools/run_game_p2_checks.ps1','tools/generate_game_p2_bsram.py',
         'tools/archive_game_p2_integration.py','tools/continue_game_p2_gate.ps1','tools/check_game_p2_font.py',
         'tools/compare_synth_graph.py','tools/test_compare_synth_graph.py']}
+    if controller_proof:
+        result['verification_tools_sha256']['tools/run_game_p2_window_equivalence.ps1']=digest(ROOT/'tools/run_game_p2_window_equivalence.ps1')
+        result['verification_tools_sha256']['tools/test_p2_controller_guard.py']=digest(ROOT/'tools/test_p2_controller_guard.py')
     args.output.write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
     print(json.dumps({k: result[k] for k in ['result', 'resources', 'clocks', 'bitstream_sha256', 'margin_targets_met']}, indent=2))
 

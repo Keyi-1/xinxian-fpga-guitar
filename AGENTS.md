@@ -30,8 +30,8 @@
   已用 `tools/compare_synth_graph.py` 全量证明重建 VG 与已验证 A4 的原语、参数、全部引脚连接等价。
   两份原始 VG 和结构证明分别绑定；不要只用旧日志认证重建产物，不重复已完成的等价功能仿真。
 - Route_Maxfan=32 的重试仍有一条未布通网络。2026-10-16 用户再单独授权仅把 `Clock_Route_Order`
-  从 1 改为 0；其他配置与原暂存对象不变。当前运行记录在 `build/p2_integration/impl_a4_route32_clock0/`，
-  该次直接使用现有网表，仅重做 P&R。先查进程和结果，不重复启动。
+  从 1 改为 0；其他配置与原暂存对象不变。第三次失败记录在 `build/p2_integration/impl_a4_route32_clock0/`，
+  该次使用相同网表，仍剩一条未布通网络。失败证据保留。
 - Clock_Route_Order=0 的重试仍有一条未布通网络。2026-10-16 用户第三次单独授权仅把 `Route_Option`
   从 "2" 改为 "1"；仍保留 Maxfan32、ClockOrder0 及所有其余字节和原暂存对象。
   该试验已失败（376 条未布通），证据在 `build/p2_integration/impl_a4_route32_clock0_algo1/`；
@@ -51,7 +51,7 @@
 
 - 用户已明确报告使用 P1.fs 完成下板确认。当前 P2 源码已连接触控选曲、帧级显示与推荐音色握手；
   生产顶层 `USE_P2=1`，旧默认兼容路径留作回归。P2 的最终网表、P&R/STA 正在验证，未认证新发布。
-- 主工程仍是原 `.gprj` 和原 `impl`。当前实现源码清单在 `build/p2_integration/impl_a4/`，
+- 主工程仍是原 `.gprj` 和原 `impl`。当前 A5 实现源码清单在 `build/p2_integration/impl_a5_bound_time/`，
   恢复时先查其进程、日志与位流状态，禁止重复启动完整 P&R。
 - P2 采用 64 事件有界窗口、32 位时间/得分、16 位计数和静态多曲目录。
   曲谱使用显式 DPB16 切片；更改曲谱后同时生成并校验 `game_p2_bsram_init.vh`。
