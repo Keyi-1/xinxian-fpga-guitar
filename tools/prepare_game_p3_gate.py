@@ -110,10 +110,89 @@ def prepare(vg,out):
     harness=['piano_rock_gain_rom gain_dut('+','.join(connections)+');']
     harness += [f"assign gain_data[{i}]=1'b0;" for i in unmapped]
     (out/'p3_gate_gain.vh').write_text('\n'.join(harness)+'\n')
+    state_module=modules['piano_mode_state_ram']
+    nets={name:{bit:(name if bit is None else f'{name}[{bit}]') for bit in indices}
+          for name,indices in state_module['declarations'].items()}
+    constants={}
+    for kind,name,pins in state_module['cells']:
+        if kind in ['GND','VCC']:
+            for expr in pins.values():
+                for bit in bits(expr):constants[bit]='0' if kind=='GND' else '1'
+    state_pins={name:{p:[constants.get(b,b) for b in bits(expr)] for p,expr in pins.items()}
+                for kind,name,pins in state_module['cells'] if kind=='SDPB'}
+    assert set(state_pins)=={'states'}
+    sd_a=library.index('module SDPB (');sd_b=library.index('endmodule',sd_a)
+    sd_defaults=dict(re.findall(r"parameter\s+(INIT_RAM_[0-9A-F]{2})\s*=\s*(256'h[0-9a-fA-F]+)",library[sd_a:sd_b]))
+    assert len(sd_defaults)==64 and all(int(v.split("'h")[1],16)==0 for v in sd_defaults.values())
+    sdrive={};soutput={}
+    def connect(symbol,value):
+        assert symbol not in ['0','1']
+        assert symbol not in sdrive or sdrive[symbol]==value,(symbol,value)
+        sdrive[symbol]=value
+    pins=state_pins['states'];params=state_module['params']['states']
+    assert params['BIT_WIDTH_0']==params['BIT_WIDTH_1']=='32' and params['READ_MODE']=="1'b0"
+    assert all(int(params.get(k,v).split("'h")[1],16)==0 for k,v in sd_defaults.items())
+    assert pins['ADA'][:3]==pins['ADB'][:3]==['0']*3
+    assert pins['ADA'][-5:]==['0','1','1','1','1'] and pins['ADB'][-5:]==['0']*5
+    assert pins['ADA'][3:8]==pins['ADB'][3:8]
+    assert pins['OCE']==pins['RESET']==['0'] and pins['BLKSELA']==pins['BLKSELB']==['0']*3
+    connect(pins['CLKA'][0],'clk');connect(pins['CLKB'][0],'clk');connect(pins['CEB'][0],'read_enable')
+    gain_select=pins['ADA'][-6];read_select=pins['ADB'][-6]
+    connect(gain_select,'gain_write');connect(read_select,'read_gain')
+    for index,symbol in enumerate(reversed(pins['ADA'][3:8])):connect(symbol,f'address[{index}]')
+    # Gowin moved parent reset qualification into this module. Audit the
+    # actual gates and use normal-operation reset=1 at the component boundary.
+    assert state_module['ports']['audio_rst_n']==('input',[None])
+    connect('audio_rst_n',"1'b1")
+    lut_drivers={p['F']:(k,n,p) for k,n,p in state_module['cells'] if k.startswith('LUT')}
+    k,n,p=lut_drivers[pins['CEA'][0]]
+    assert k=='LUT3' and state_module['params'][n]['INIT']=="8'hF8"
+    assert p['I0']=='audio_rst_n' and p['I2']==gain_select
+    connect(p['I1'],'phase_write')
+    data_inputs={};data_outputs={}
+    for port,(kind,indices) in state_module['ports'].items():
+        if kind=='input' and len(indices) in [24,32]:
+            assert len(indices) not in data_inputs
+            data_inputs[len(indices)]=list(reversed(list(nets[port].values())))
+        if kind=='output':
+            assert len(indices) in [24,32] and len(indices) not in data_outputs
+            data_outputs[len(indices)]=list(reversed(list(nets[port].values())))
+    assert set(data_inputs)==set(data_outputs)=={24,32}
+    for width,name in [(24,'gain_data'),(32,'phase_data')]:
+        for index,symbol in enumerate(data_inputs[width]):connect(symbol,f'{name}[{index}]')
+    for index,symbol in enumerate(reversed(pins['DI'])):
+        k,n,p=lut_drivers[symbol]
+        if index<24:
+            assert k=='LUT3' and state_module['params'][n]['INIT']=="8'hAC"
+            assert p['I0']==data_inputs[24][index] and p['I1']==data_inputs[32][index] and p['I2']==gain_select
+        else:
+            assert k=='LUT2' and state_module['params'][n]['INIT']=="4'h4"
+            assert p['I0']==gain_select and p['I1']==data_inputs[32][index]
+    word=list(reversed(pins['DO']))
+    regs={p['Q']:(k,n,p) for k,n,p in state_module['cells'] if k.startswith('DFF')}
+    for index,symbol in enumerate(data_outputs[32]):
+        k,n,p=regs[symbol]
+        assert p['D']==word[index] and p['CLK']==pins['CLKA'][0] and p['RESET']=='GND'
+        assert state_module['params'][n]['INIT']=="1'b0"
+        ck,cn,cp=lut_drivers[p['CE']]
+        assert ck=='LUT2' and state_module['params'][cn]['INIT']=="4'h8"
+        assert {cp['I0'],cp['I1']}=={'audio_rst_n',read_select}
+        soutput[symbol]=f'phase_q[{index}]'
+    for index,symbol in enumerate(data_outputs[24]):
+        assert symbol==word[index]
+        soutput[symbol]=f'gain_q[{index}]'
+    sconns=[]
+    for port,(kind,indices) in state_module['ports'].items():
+        symbols=list(nets[port].values());actual=[(sdrive if kind=='input' else soutput)[b] for b in symbols]
+        sconns.append(f'.{port}('+(actual[0] if len(actual)==1 else '{'+','.join(actual)+'}')+')')
+    (out/'p3_gate_mode.vh').write_text('piano_mode_state_ram state_dut('+','.join(sconns)+');\n')
     report=dict(result='PASS',scope='Actual full VG; registered touch stimulus and all32 countdown Q only; no score/phase/launch injection',
         netlist_sha256=hashlib.sha256(vg.read_bytes()).hexdigest(),bank_dpb16=10,initial_rows=2048,initial_bits=96,physical_record_bits=77,
         gain_rom_entries=128,gain_rom_dpb16=1,
         gain_gate_connections=connections,gain_zero_output_bits=unmapped,
+        mode_state_sdpb_per_voice=1,mode_state_address_words=64,mode_state_byte_write_masks='all4 enabled, unused bit4zero',
+        mode_state_harness_assumptions='Parent audio reset normalized high; read_gain implies read_enable; no simultaneous read/write or both writes. Full top covers startup reset; frozen core proof includes warm reset.',
+        mode_state_gate_connections=sconns,
         countdown_registers={str(k):v for k,v in registers.items()},touch_ports=required,
         zero_init_parameters_elided=defaulted,primitive_library_sha256=hashlib.sha256(lib.read_bytes()).hexdigest())
     (out/'mapping.json').write_text(json.dumps(report,indent=2))

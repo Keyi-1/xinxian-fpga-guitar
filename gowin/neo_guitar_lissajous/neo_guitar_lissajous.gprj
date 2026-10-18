@@ -5,6 +5,9 @@
     <Version>5</Version>
     <Device name="GW5AT-60B" pn="GW5AT-LV60PG484AC1/I0">gw5at60b-002</Device>
     <FileList>
+        <File path="../../rtl/synth/piano_mode_state_ram.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/synth/piano_rock_gain_rom.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/config/piano_rock_gain_init.vh" type="file.other" enable="1" />
         <File path="../../rtl/config/guitar_config.vh" type="file.verilog" enable="1"/>
         <File path="../../rtl/config/rock_coeffs.vh" type="file.other" enable="1"/>
         <File path="../../rtl/top/guitar_audio_top.v" type="file.verilog" enable="1"/>

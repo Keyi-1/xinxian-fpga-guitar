@@ -48,40 +48,47 @@ module tb_game_p3_full_gate;
     always @(negedge ac)if(reference.audio_rst_n)begin
         if(reference.u_audio.sample_tick)samples=samples+1;
         if(reference.u_audio.note_on!=0)begin
-            if(reference.u_audio.note_on!=1 || reference.u_audio.target_phase[31:0]!=70150316)
-                $fatal(1,"FAIL: imported G5 golden phase");
-            attacks=attacks+1;
+            if(reference.u_audio.note_on!==4'b1111 || reference.u_audio.target_phase!==
+                {32'd46819719,32'd29494575,32'd13138339,32'd70150316} || reference.u_audio.note_velocity!==8'haa)
+                $fatal(1,"FAIL: imported four-voice G5/D3/E4/C5 golden phases/velocities");
+            attacks=attacks+4;
         end
         if(|reference.u_audio.u_chain.deadline_miss || reference.audio_game_snapshot[234])$fatal(1,"FAIL: reference deadline");
     end
     task automatic tap(input integer x,y);
         begin @(negedge clk);cx=x;cy=y;click=1;@(negedge clk);click=0;repeat(40)@(negedge clk);end
     endtask
-    reg [127:0] one;reg [31:0] song_crc;
+    reg [127:0] events[0:3];reg [31:0] song_crc;integer event_index;
     initial begin
         `include "p3_gate_touch.vh"
         wait(rst);repeat(40)@(negedge clk);tap(340,150);
         if(reference.page!=2)$fatal(1,"FAIL: gate song menu");
-        one={16'd0,16'hbeef,8'd0,8'd3,8'd0,8'd79,32'd128,32'd0};
-        song_crc=crc_record(32'hffffffff,one)^32'hffffffff;
+        events[0]={16'd0,16'hbeef,8'd0,8'd0,8'd0,8'd79,32'd128,32'd0};
+        events[1]={16'd0,16'h1234,8'd0,8'd1,8'd1,8'd50,32'd128,32'd0};
+        events[2]={16'd0,16'habcd,8'd0,8'd2,8'd2,8'd64,32'd128,32'd0};
+        events[3]={16'd0,16'hffff,8'd0,8'd3,8'd3,8'd72,32'd128,32'd0};
+        song_crc=32'hffffffff;
+        for(event_index=0;event_index<4;event_index=event_index+1)song_crc=crc_record(song_crc,events[event_index]);
+        song_crc=song_crc^32'hffffffff;
         transact(1,321,0,0,0);
-        transact(3,321,1,{32'd0,song_crc,32'd1024,16'd1,8'd1,8'd4},0);
-        transact(4,321,2,one,0);transact(4,321,2,one,0);
-        transact(5,321,3,0,0);transact(2,321,4,128'd4,0);
-        if(last_reply[50:40]!=703 || last_reply[62:51]!=1)$fatal(1,"FAIL: gate LIST imported extent");
+        transact(3,321,1,{32'd0,song_crc,32'd1024,16'd4,8'd1,8'd4},0);
+        transact(4,321,2,events[0],0);transact(4,321,2,events[0],0);
+        for(event_index=1;event_index<4;event_index=event_index+1)transact(4,321,2+event_index,events[event_index],0);
+        transact(5,321,6,0,0);transact(2,321,7,128'd4,0);
+        if(last_reply[50:40]!=703 || last_reply[62:51]!=4)$fatal(1,"FAIL: gate LIST imported extent");
         tap(100,240);if(reference.page!=3)$fatal(1,"FAIL: gate fifth touch row");
         tap(340,220);
         wait(reference.u_audio.p2.u_router.engine.controller.countdown);
         `include "p3_gate_countdown.vh"
         wait(reference.page==5);
         if(reference.timbre_mode!=1)$fatal(1,"FAIL: gate recommended timbre");
-        transact(3,321,5,{32'd0,song_crc,32'd1024,16'd1,8'd1,8'd4},1);
+        transact(3,321,8,{32'd0,song_crc,32'd1024,16'd4,8'd1,8'd4},1);
         wait(reference.page==6);
-        if(attacks!=1 || reference.display_fault)$fatal(1,"FAIL: gate imported preview completion");
+        if(attacks!=4 || reference.display_fault)$fatal(1,"FAIL: gate imported preview completion");
         tap(350,230);tap(100,150);wait(reference.page==1 && !reference.transition);
         last_frame=frames;wait(frames>=last_frame+2);
         if(pixels<500000 || samples<2000)$fatal(1,"FAIL: insufficient actual scan/audio coverage");
-        $display("PASS: full actual VG vs full RTL, %0d real115200 UART request/ACK packets incl duplicate/BUSY, actual DPB write+RAM-readback CRC/group+dual-clock commit, fifth touch row/second timbre/G5 real decode+audio/exit, %0d audio samples and %0d LCD clock samples across %0d frames incl spectrum/curve fade; no ROM/phase/launch injection; only registered touch stimulus and checked32 countdown Q",packets,samples,pixels,frames);
+        $display("PASS: full actual VG vs full RTL, %0d real115200 UART request/ACK packets incl duplicate/BUSY, actual DPB write+RAM-readback CRC/group/all4 velocity metadata+dual-clock commit, fifth touch row/second timbre/four voices G5-D3-E4-C5 real decode+existing preview velocity2/audio/exit, %0d audio samples and %0d LCD clock samples across %0d frames incl spectrum/curve fade; no ROM/phase/launch injection; only registered touch stimulus and checked32 countdown Q",packets,samples,pixels,frames);
         $finish;
     end
     initial begin #2000000000;$fatal(1,"FAIL: P3 actual gate watchdog");end

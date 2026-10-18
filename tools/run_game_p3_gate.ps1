@@ -1,6 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$RunName,
       [string]$Bench='tb_game_p3_full_gate',
-      [string]$ImplementationRun='impl_c5_packed_gainrom',
+      [string]$ImplementationRun='impl_c7_shared_state',
       [string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64')
 $ErrorActionPreference='Stop'
 if($RunName -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Simple name required'}
@@ -20,7 +20,7 @@ foreach($f in $rtl){
 }
 foreach($f in $headers){Copy-Item $f.FullName $src;$hashes[$f.FullName.Substring($repoDir.Length+1)]=(Get-FileHash $f.FullName).Hash.ToLower()}
 foreach($f in Get-ChildItem (Join-Path $repoDir 'mem') -File){$hashes[$f.FullName.Substring($repoDir.Length+1)]=(Get-FileHash $f.FullName).Hash.ToLower()}
-foreach($path in @("sim/tb/$Bench.sv",'sim/tb/game_p3_uart_host.vh','tools/prepare_game_p3_gate.py','tools/run_game_p3_gate.ps1','tools/compare_synth_graph.py')){
+foreach($path in @("sim/tb/$Bench.sv",'sim/tb/game_p3_uart_host.vh','sim/tb/piano_mode_ram_checks.vh','tools/prepare_game_p3_gate.py','tools/run_game_p3_gate.ps1','tools/compare_synth_graph.py')){
     $file=Join-Path $repoDir $path;$hashes[$path]=(Get-FileHash $file).Hash.ToLower()
     if($path -match '\.(sv|vh)$'){Copy-Item $file $runDir}
 }

@@ -28,6 +28,10 @@ module tb_piano_rock_gain_equivalence;
         if(da || db)$fatal(1,"FAIL: gain ROM deadline");
         if(dut.state==4 && dut.rock_gain_read!==rock_gain_for(dut.profile,dut.local_mode))
             $fatal(1,"FAIL: gain not ready before LOOKUP");
+        if(dut.state==3 && dut.mode_phase_value!==frozen.mode_phase[frozen.mode_index])
+            $fatal(1,"FAIL: synchronous phase state differs mode%0d",dut.mode_index);
+        if(dut.state==4 && dut.bright_gain_value!==frozen.bright_gain[frozen.mode_index])
+            $fatal(1,"FAIL: synchronous gain state differs mode%0d",dut.mode_index);
     end
     task automatic sample(input bit strike,stop,release_now);
         begin
@@ -56,6 +60,19 @@ module tb_piano_rock_gain_equivalence;
                 sample(0,0,1);repeat(1452)sample(0,0,0);
             end
         end
+        // Inputs can change while a frame is being calculated; attack seed
+        // settings must stay at the accepted sample boundary.
+        phase=32'd30000000;velocity=3;harmony=1;rock=256;
+        fork
+            begin sample(1,0,0);end
+            begin repeat(80)@(negedge clk);harmony=0;rock=0;phase=32'd70150316;end
+        join
+        repeat(32)sample(0,0,0);
+        // Reset during a modal pass. BSRAM contents remain, but every first
+        // post-reset read must act exactly like a freshly cleared array.
+        @(negedge clk);ce=1;on=1;@(negedge clk);ce=0;on=0;
+        repeat(20)@(negedge clk);rst=0;repeat(3)@(negedge clk);rst=1;
+        repeat(16)sample(0,0,0);sample(1,0,0);repeat(64)sample(0,0,0);
         $display("PASS: all128 exact gain ROM entries; original frozen32-mode voice %0d samples, all4 velocities/3 timbres/3 pitch profiles/hammer/harmony/sustain/wah age boundary/release; gain ready within existing LOAD->LOOKUP and zero deadlines",samples);
         $finish;
     end

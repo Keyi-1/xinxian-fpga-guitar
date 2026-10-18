@@ -100,6 +100,17 @@
 - 对应 `sim/temp/p3_c2_readback_02/`、`p3_c2_full_top_01/`、`p3_c2_display_01/`、`p3_c2_final_rtl_01/`、`p3_c2_full_gate_03/`；Python `build/p3_import/pc_checks/`。20项回归曾缺少两份冻结P2参考，保留前10项成功日志后补编参考续跑；`resume.json`完整记录，无需重跑。
 - 当前C5：合法96位逻辑曲谱无损打包为77有效位/10个DPB（全部group保留，公开读口仍96位一拍），哇音原96项增益表用每声部1个DPB在LOAD读出，现有LOOKUP使用，不加运算时钟、不改参数/模态。冻结原音源45096样本覆盖三音色/三频段轮廓/四力度、击弦/和声/延音/哇音年龄边界及释放通过；五项P3 RTL完整通过 `sim/temp/p3_c5_packed_rtl_02/`。
 - C5原工程综合已通过：LUT48770+ALU9279=58049、寄存器25450、BSRAM100，DSP配置恢复为原值（不以综合值代替最终CLS）。同一进程PID27940已审查放行完整P&R；日志 `build/p3_import/impl_c5_packed_gainrom/build.stdout.log`。20项回归 `sim/temp/p3_c5_final_twenty_01/` 全部通过，旧音频bench因新增DPB需GSR，只加一行并精确审计后保留前六项续跑（`resume.json`）。32项Python和两个生成器在 `build/p3_import/pc_checks_c5/`，不重复已完成项。
-- 当前实际完整VG门级对照正在 `sim/temp/p3_c5_full_gate_01/`（host session41198），实际增益ROM256读/128地址及一拍/使能保持已通过 `sim/temp/p3_c5_gain_gate_02/`。01因综合审查记录尚未写完而前置条件失败，未运行仿真，记录完整保留。
-- 当前仍待原工程完整P&R/STA、完整VG仿真完成及独立位流归档，不能提前宣称P3可交付。恢复先查已有PID/日志/仿真，不重复构建。最终使用 `tools/check_game_p3_result.py` / `tools/archive_game_p3.py`，旧校验器不放宽。
+- 当前实际完整VG门级对照 `sim/temp/p3_c5_full_gate_01/` 已通过：7次真实115200事务、12503音频样本、15帧/5483520 LCD时钟样本；实际增益ROM256读/128地址及一拍/使能保持也通过 `sim/temp/p3_c5_gain_gate_02/`。01因审查记录尚未写完而前置条件失败，未运行仿真，记录完整保留。完整严格 `tools/check_game_p3_result.py --preflight` 已PASS，勿重跑已完成测试。
+- 当前只待原工程完整P&R/STA及独立位流归档，不能提前宣称P3可交付。PID27940仍在布线，等待session31185；恢复先查已有PID/日志，不重复构建。C5源码/验证工具本地提交9ace08c，UART主体83de34b。最终使用 `tools/check_game_p3_result.py` / `tools/archive_game_p3.py`，旧校验器不放宽。
 - 用户要求完成当前任务后暂停，等明确指令再继续；即使有线下板成功，也不自动开始蓝牙、MPU或下一功能。
+
+### 最新恢复点：C7（2026-10-18，优先于上文旧C5进度）
+
+- C5最终失败1420未布通，Logic58396、CLS29815、BSRAM101；完整功能/实际VG均通过，但无可交付位流。失败实物资源报告在 `build/p3_import/impl_c5_packed_gainrom/pnr_failed/`。
+- C6把钢琴32模态相位/亮弦衰减数组移到RAM，原冻结音源逐模态及45210样本、20+6项RTL全部通过，综合Logic44622、寄存器18321、逻辑BSRAM112；实际映射PA2017为121/118，未进入布局。每个SDPB32占两个物理块，故改C7合存两类状态；C6失败在 `build/p3_import/impl_c6_mode_state/`。不复活C4力度移位候选，原乘法仍保留。
+- 当前C7：每声部一块SDPB32，两个相邻地址保存相位32位/衰减24位；在原LOAD/ENV_B读取，PHASE/ACC写入，无新增运算状态/时钟、无读写碰撞。复位和起音按样本边界锁存后逐模态惰性初始化，保持全部模态/参数/音效和原输出。独立冻结原数组45210样本、每次相位/增益使用前对照、帧中输入改变/运算中复位，以及352读对/384写/全部字节已通过：`sim/temp/p3_c7_mode_ram_proof_01/`。
+- C7原工程综合已通过：Logic44962、寄存器18449、逻辑BSRAM108（物理值待实现报告），DSP原配置。PID32616已审查放行完整P&R并进入布局，目录 `build/p3_import/impl_c7_shared_state/`；原工程/两个保护文件/约束哈希均保留。四项P3回归 `sim/temp/p3_c7_final_rtl_01/` 和20项 `sim/temp/p3_c7_final_twenty_01/` 均通过。Python32项和生成器与C5完全同源，继续用 `build/p3_import/pc_checks_c5/` 严格哈希复用，不重复运行。
+- 音源有限改动封存在 `sim/reference/game_p3/piano_shared_state_edit_spec.json`（相对9ace08c十处精确变换），旧C6规格另留。冻结原源仍精确等于M2 `cc8dbb7` 的piano_voice_core，仅改模块名。主校验器/归档器已指向C7；实际VG准备器已审计合存SDPB/32相位DFF/全部数据mux/父级复位资格，状态RAM与增益ROM门级均PASS：`p3_c7_mode_gate_01`、`p3_c7_gain_gate_01`。全机新实际VG正在 `sim/temp/p3_c7_full_gate_01/`（host76492），不要重启或用旧VG日志认证。
+- 全机门级bench已加强为四轨同时G5/D3/E4/C5、十次真实115200事务；四档力度metadata存储/CRC保留，但既有试听固定力度2保持，不能误称metadata改变试听力度。原CLI/协议/公开接口不变。
+- 六个其他既有含piano_voice_core的gprj仅补新共享模块/头文件依赖，未构建、未改器件/配置。记录 `build/p3_import/project_dependency_updates.json`。本批完整实现认证仍只覆盖触控主工程。
+- 当前原impl位流仍是旧M2，绝不可认证为P3。C7需实际P&R/STA合法、三个新实际VG验证及独立发布归档后才交付；完成后按用户要求停止等指令，不推送/烧录/自动开始后续阶段。

@@ -14,6 +14,7 @@ $files+=Get-Item (Join-Path $repoDir 'rtl/game/game_p2_catalog.v')
 if($Integration){$files=@(Get-ChildItem (Join-Path $repoDir 'rtl') -Recurse -Filter '*.v')}
 $files+=Get-ChildItem (Join-Path $repoDir 'rtl/config') -Filter '*.vh'
 if(Test-Path (Join-Path $repoDir 'sim/tb/game_p3_uart_host.vh')){$files+=Get-Item (Join-Path $repoDir 'sim/tb/game_p3_uart_host.vh')}
+if(Test-Path (Join-Path $repoDir 'sim/tb/piano_mode_ram_checks.vh')){$files+=Get-Item (Join-Path $repoDir 'sim/tb/piano_mode_ram_checks.vh')}
 if($Integration){$files+=@(Get-ChildItem (Join-Path $repoDir 'sim/reference/game_p3') -File)}
 $files+=@(foreach($bench in $Benches){Get-Item (Join-Path $repoDir "sim/tb/$bench.sv")})
 $hashes=@{}

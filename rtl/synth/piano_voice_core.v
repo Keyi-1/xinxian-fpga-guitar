@@ -59,7 +59,9 @@ module piano_voice_core #(
     reg harmony_latched;
     reg [31:0] increment_latched;
     reg frame_active;
-    reg [31:0] mode_phase [0:MODES-1];
+    reg clear_modes,frame_initialize,frame_attack,initialize_harmony,initialize_rock;
+    wire [31:0] stored_phase,mode_phase_value,mode_phase_next;
+    wire [23:0] stored_gain,bright_gain_value;
     reg [31:0] phase_seed [0:23];
     reg [23:0] ratio_rom [0:23];
     reg [15:0] envelope_rom [0:6143];
@@ -69,7 +71,6 @@ module piano_voice_core #(
     reg [25:0] envelope_weight_a, envelope_weight_b;
     reg [57:0] ratio_product;
     reg [52:0] harmony_product;
-    reg [23:0] bright_gain [0:MODES-1];
     reg [15:0] bright_decay_rom [0:31];
     reg [39:0] bright_decay_product;
     reg [15:0] body_level, bright_amplitude;
@@ -120,6 +121,20 @@ module piano_voice_core #(
     wire [7:0] next_frame = (frame == 255) ? 8'd255 : frame + 1'b1;
     wire harmony_mode = CONTROL_ENABLE!=0 && MODES==32 && harmony_latched && mode_index>=16;
     wire [4:0] local_mode = harmony_mode ? mode_index-5'd16 : mode_index;
+    wire [4:0] initialize_mode=initialize_harmony && mode_index>=16 ? mode_index-5'd16 : mode_index;
+    wire [31:0] initial_phase=initialize_rock ? rock_phase_for(profile,initialize_mode) :
+        (mode_index<8 || (CONTROL_ENABLE!=0 && initialize_harmony && mode_index>=16 && mode_index<24)) ?
+            phase_seed[{profile,mode_index[2:0]}] : 32'd0;
+    wire [23:0] initial_gain={piano_bright_gain_for(CONTROL_ENABLE!=0 && initialize_harmony && mode_index>=16 ?
+        mode_index-5'd16 : mode_index),8'd0};
+    assign mode_phase_value=frame_initialize ? (frame_attack ? initial_phase : 32'd0) : stored_phase;
+    assign bright_gain_value=frame_initialize ? (frame_attack ? initial_gain : 24'd0) : stored_gain;
+    assign mode_phase_next=mode_phase_value+ratio_product[51:20];
+    piano_mode_state_ram mode_state(.clk(clk),.read_enable(rst_n && (state==LOAD || state==ENV_B)),
+        .read_gain(state==ENV_B),.address(mode_index),
+        .phase_write(rst_n && state==PHASE),.gain_write(rst_n && state==ACC && (frame_bright_decay || frame_initialize)),
+        .phase_data(mode_phase_next),.gain_data(bright_decay_product[38:15]),
+        .phase_q(stored_phase),.gain_q(stored_gain));
     generate if(ROCK_ENABLE!=0)begin:rock_gain_storage
         piano_rock_gain_rom gain(.clk(clk),.read_enable(state==LOAD),
             .address({profile,local_mode}),.data(rock_gain_read));
@@ -162,7 +177,7 @@ module piano_voice_core #(
     wire [26:0] envelope_sum = {1'b0,envelope_weight_a}+{1'b0,envelope_weight_b};
     wire [15:0] measured_amplitude = local_mode<8 ? envelope_sum[24:9] : 16'd0;
     wire [15:0] bright_body = local_mode==0 ? envelope_sum[24:9] : body_level;
-    wire [39:0] bright_amplitude_wide = bright_body*bright_gain[mode_index];
+    wire [39:0] bright_amplitude_wide = bright_body*bright_gain_value;
     wire signed [27:0] component = {{2{mode_product[32]}},mode_product[32:7]};
     wire signed [27:0] hammer_component = {{4{hammer_value[15]}},hammer_value,8'd0};
     wire signed [27:0] with_hammer = accumulator + hammer_component;
@@ -230,7 +245,7 @@ module piano_voice_core #(
             ratio_product<=0; next_phase<=0; mode_enabled<=0;
             sine_value<=0; mode_product<=0; accumulator<=0; hammer_value<=0;
             velocity_product<=0; release_product<=0; continuity<=0;
-            for(i=0;i<MODES;i=i+1)begin mode_phase[i]<=0;bright_gain[i]<=0;end
+            clear_modes<=1;frame_initialize<=0;frame_attack<=0;initialize_harmony<=0;initialize_rock<=0;
         end else begin
             sample_valid<=0;
             // One physical 18 x 17 DSP, time-shared with the hammer filters.
@@ -258,6 +273,9 @@ module piano_voice_core #(
                     harmony_product<=phase_inc*HARMONY_RATIO_Q20;
                     frame_active<=active | note_on;
                     frame_age<=age;
+                    // Lazy per-mode initialization replaces the parallel
+                    // register-array reset/restrike, before each first use.
+                    frame_initialize<=clear_modes || note_on;frame_attack<=note_on;clear_modes<=0;
                     // Modal decay is separate from oscillator phase. Slowing
                     // these envelopes therefore extends open strings without
                     // changing their pitch or stretching the hammer transient.
@@ -273,14 +291,8 @@ module piano_voice_core #(
                         profile<=selected_profile; age<=0; frame_age<=0;
                         // Preserve waveform continuity on rapid re-strikes.
                         continuity<=pcm_out;
-                        for(i=0;i<MODES;i=i+1)begin
-                            mode_phase[i]<=ROCK_ENABLE!=0 && rock_blend>=128 ?
-                                rock_phase_for(selected_profile,harmony_enable && i>=16 ? i-16 : i) :
-                                i<8 ? phase_seed[{selected_profile,3'b000}+i] :
-                                (CONTROL_ENABLE!=0 && harmony_enable && i>=16 && i<24) ?
-                                    phase_seed[{selected_profile,3'b000}+i-16] : 32'd0;
-                            bright_gain[i]<={piano_bright_gain_for(CONTROL_ENABLE!=0 && harmony_enable && i>=16 ? i-16 : i),8'd0};
-                        end
+                        initialize_harmony<=harmony_enable;
+                        initialize_rock<=ROCK_ENABLE!=0 && rock_blend>=128;
                     end else begin
                         bright_decay_phase<=bright_decay_phase+1'b1;
                         sustain_age_phase<=sustain_age_phase+1'b1;
@@ -329,8 +341,7 @@ module piano_voice_core #(
                 PHASE: begin
                     envelope_weight_a<=env_a*envelope_inverse;
                     envelope_weight_b<=env_b*envelope_fraction;
-                    next_phase<=mode_phase[mode_index]+ratio_product[51:20];
-                    mode_phase[mode_index]<=mode_phase[mode_index]+ratio_product[51:20];
+                    next_phase<=mode_phase_next;
                     // Suppress modes above Nyquist, without folding them down.
                     mode_enabled<=frame_active && ratio_product[57:51]==0;
                     state<=LOOKUP;
@@ -348,14 +359,13 @@ module piano_voice_core #(
                 MULT: begin
                     bright_product<=$signed(sine_value)*$signed({1'b0,bright_amplitude});
                     rock_product<=$signed(sine_value)*$signed({1'b0,rock_amplitude});
-                    bright_decay_product<=bright_gain[mode_index]*bright_decay_rom[local_mode];
+                    bright_decay_product<=bright_gain_value*bright_decay_rom[local_mode];
                     state<=ACC;
                 end
                 ACC: begin
                     accumulator<=accumulator+component;
                     bright_accumulator<=bright_accumulator+bright_component;
                     rock_accumulator<=rock_accumulator+rock_component;
-                    if(frame_bright_decay)bright_gain[mode_index]<=bright_decay_product[38:15];
                     if(mode_index==MODES-1) state<=HAMMER;
                     else begin mode_index<=mode_index+1'b1; state<=LOAD; end
                 end
