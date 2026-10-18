@@ -1,6 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$RunName,
       [string[]]$Benches=@('tb_mpu6050_reader','tb_imu_posture_classifier','tb_imu_calibration_full','tb_posture_timbre_policy','tb_posture_timbre_cdc','tb_i2c_fault_recovery','tb_gt911_touch'),
       [switch]$Integration,
+      [switch]$VoiceReference,
       [string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64')
 $ErrorActionPreference='Stop'
 if($RunName -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Simple evidence name required'}
@@ -17,8 +18,16 @@ if($Integration){
  $relative+=@(Get-ChildItem (Join-Path $repoDir 'sim/reference/posture') -Filter '*.v' | ForEach-Object {$_.FullName.Substring($repoDir.Length+1)})
 }
 $relative+='sim/models/mpu6050_test_slave.sv'
+if($VoiceReference){
+ if(!$Integration){throw 'Voice reference needs production integration sources/vendor library'}
+ $relative+=@('sim/reference/game_p3/piano_voice_core_before_p3_rom.v','sim/tb/piano_mode_ram_checks.vh')
+}
+$relative+='tools/run_posture_checks.ps1'
 $relative+=@($Benches | ForEach-Object {"sim/tb/$_.sv"})
 $hashes=@{}
+foreach($asset in Get-ChildItem (Join-Path $repoDir 'mem') -File){
+ $hashes[$asset.FullName.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $asset.FullName).Hash.ToLower()
+}
 foreach($path in $relative){
  $full=Join-Path $repoDir $path
  $hashes[$path]=(Get-FileHash -LiteralPath $full).Hash.ToLower()

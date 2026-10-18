@@ -1,8 +1,8 @@
 """Bind P4 rhythm/posture/centred UI proofs to the fresh original-project build.
 
 Historical P3/P1 checkers and certificates are not weakened or overwritten.
-A previous run may be reused only through the explicitly sealed renderer edit
-or an unchanged, enumerated audio component dependency closure.
+A previous run may be reused only through the explicitly sealed renderer edit;
+the current voice replay includes all ROM hashes.
 """
 from pathlib import Path
 from datetime import datetime
@@ -107,7 +107,8 @@ def evidence():
     render_before=load(ROOT/'build/p4_posture/impl_a1/source_manifest.json')
     render_hash=render_before.get(RENDERER.replace('/','\\'),render_before.get(RENDERER))
     for name in ['p4_final_rtl_01','p4_twenty_01','p4_p3_rtl_01','p4_centered_display_01',
-                 'p4_a2_full_gate_01','p4_a2_posture_gate_01','p4_a2_gain_gate_01','p4_a2_mode_gate_01']:
+                 'p4_a2_full_gate_01','p4_a2_posture_gate_01','p4_a2_gain_gate_01','p4_a2_mode_gate_01',
+                 'p4_audio_dependency_closure_01']:
         folder=ROOT/'sim/temp'/name;receipt=folder/'verification.json';data=load(receipt)
         assert data.get('result',data.get('status'))=='PASS',name
         drift=[]
@@ -147,25 +148,12 @@ def evidence():
         for path in folder.glob('*'):
             if path.is_file() and path.suffix in ['.json','.sv','.vh','.log']:
                 proof[rel(path)]=digest(path)
-    # Reuse the exact original-array audio proof through its complete unchanged
-    # component dependency closure. Unused top/game/I2C files in its old all-RTL
-    # compile manifest do not certify current integration.
-    folder=ROOT/'sim/temp/p3_c7_mode_ram_proof_01';data=load(folder/'verification.json')
-    assert data['result']=='PASS'
-    closure=['rtl/synth/'+n+'.v' for n in ['piano_voice_core','piano_hammer_model','piano_mode_state_ram','piano_rock_gain_rom']]
-    closure+=['sim/tb/tb_piano_rock_gain_equivalence.sv','sim/tb/tb_piano_mode_state_ram.sv','sim/tb/piano_mode_ram_checks.vh',
-              'sim/reference/game_p3/piano_voice_core_before_p3_rom.v']
-    closure+=[p.relative_to(ROOT).as_posix() for p in (ROOT/'rtl/config').glob('*.vh') if p.name not in ['game_p2_bsram_init.vh','game_p3_bsram_init.vh']]
-    closure+=[f'mem/{n}.mem' for n in ['sine_lut','piano_ratio','piano_phase','piano_envelope','harmonic_decay_rock','rock_envelope']]
-    saved={p.replace('\\','/'):h for p,h in data['source_sha256'].items()}
-    current_hashes({p:saved[p] for p in closure})
-    vendor=Path('S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v')
-    original_mapping=load(ROOT/'sim/temp/p3_c7_full_gate_01/mapping.json')
-    assert digest(vendor)==original_mapping['primitive_library_sha256']
-    for bench,value in data['log_sha256'].items():
-        path=folder/(bench+'.log');check_log(path,value);proof[rel(path)]=value
-    proof[rel(folder/'verification.json')]=digest(folder/'verification.json')
-    reuse.append(dict(run='p3_c7_mode_ram_proof_01',scope='Only45210-sample/per-mode voice and704 reads/384 writes component proof; complete enumerated dependency closure unchanged; current full-top/VG independently tested',source_sha256={p:saved[p] for p in closure},primitive_library_sha256=digest(vendor)))
+    # The historical45210-sample run omitted per-run audio ROM hashes.
+    # A focused current replay (not the full regression/build) binds the entire
+    # unchanged voice/reference/RAM/coeff/ROM closure without an evidence gap.
+    closed=load(ROOT/'sim/temp/p4_audio_dependency_closure_01/verification.json')
+    assets={p.replace('\\','/'):v for p,v in closed['source_sha256'].items() if p.replace('\\','/').startswith('mem/')}
+    assert all('mem/'+name+'.mem' in assets for name in ['sine_lut','piano_ratio','piano_phase','piano_envelope','harmonic_decay_rock','rock_envelope'])
     pc=ROOT/'build/p4_posture/pc_checks_a1/verification.json';data=load(pc)
     assert data['result']=='PASS';current_hashes(data['source_sha256']);current_hashes(data['log_sha256'])
     proof[rel(pc)]=digest(pc);proof.update(data['log_sha256'])
@@ -268,6 +256,12 @@ def main():
     artifacts+=list((ROOT/'build/p4_posture/rtl_previews_centered').glob('*.png'))
     for path in (ROOT/'build/qing_ge_rhythm_review/preview_v1').glob('*'):
         if path.is_file() and path.suffix in ['.wav','.json']:artifacts.append(path)
+    posture_log=read(ROOT/'sim/temp/p4_a2_posture_gate_01/tb_posture_full_gate.log')
+    posture_counts=re.search(r'(\d+) audio samples (\d+) LCD clock samples (\d+) MPU bursts (\d+) tone changes',posture_log)
+    assert posture_counts
+    import_log=read(ROOT/'sim/temp/p4_a2_full_gate_01/tb_game_p3_full_gate.log')
+    import_counts=re.search(r'(\d+) audio samples and (\d+) LCD clock samples across (\d+) frames',import_log)
+    assert import_counts
     process=load(RUN/'process.json')
     process.update(status='COMPLETE_VERIFICATION_PASS',verified_at=datetime.now().astimezone().isoformat())
     (RUN/'process.json').write_text(json.dumps(process,indent=2)+'\n',encoding='utf-8')
@@ -286,7 +280,10 @@ def main():
             display='IMU labels/status only; visible characters centred, new right status background, same four pipeline stages and six clocks/pixel'),
         regression=dict(legacy_rtl_benches=20,p3_rtl_benches=4,posture_component_top_benches=8,posture_pixel_scenes=12,
             frozen_p3_pixels=1566720,python_tests=33,frozen_audio_samples=8192,frozen_audio_reference_clocks=2097153,
-            unchanged_voice_component_samples=45210,actual_vg_benches=4,bank_boolean_cases=384),
+            unchanged_voice_component_samples=45210,actual_vg_benches=4,bank_boolean_cases=384,
+            actual_posture_gate=dict(audio_samples=int(posture_counts[1]),lcd_system_clock_samples=int(posture_counts[2]),
+                mpu_bursts=int(posture_counts[3]),tone_changes=int(posture_counts[4])),
+            actual_uart_gate=dict(audio_samples=int(import_counts[1]),lcd_clock_samples=int(import_counts[2]),frames=int(import_counts[3]))),
         rhythm=dict(bars=[10,18],beat_grid='1_11|(1)5_3|(3)___|345',user_listening_approved=True,
             exact_changed_events=4,all_original_lanes_preserved=True,total_attacks=212,total_seconds=152,bpm=60,recommended_timbre=1),
         posture=dict(default='manual',mpu_address='0x68',scl='J8-11/Y21',sda='J8-12/Y22',calibration_packets=256,
