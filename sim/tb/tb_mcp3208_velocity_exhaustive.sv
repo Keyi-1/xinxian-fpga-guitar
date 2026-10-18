@@ -34,14 +34,14 @@ module tb_mcp3208_velocity_exhaustive;
     integer level_index;
 
     mcp3208_pluck_frontend #(
-        .SPI_CLK_DIV(2), .DEAD_SAMPLES(2), .SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0)
+        .SPI_CLK_DIV(4)
     ) dut (
         .clk(clk), .rst_n(rst_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk),
         .adc_mosi(adc_mosi), .adc_miso(adc_miso),
         .pluck_valid(pluck_valid), .velocity_level(velocity_level),
         .raw_adc(raw_adc), .peak_adc(peak_adc),
-        .event_timestamp(event_timestamp)
+        .event_timestamp(event_timestamp),.capture_pending()
     );
 
     always #5 clk = ~clk;
@@ -59,13 +59,13 @@ module tb_mcp3208_velocity_exhaustive;
     endfunction
 
     function [11:0] adc_value_for_level;
-        input integer level;
+        input integer level,channel;
         begin
-            case (level)
-                0: adc_value_for_level = 12'd2153;
-                1: adc_value_for_level = 12'd2253;
-                2: adc_value_for_level = 12'd2453;
-                default: adc_value_for_level = 12'd2853;
+            case(channel)
+                0:case(level)0:adc_value_for_level=2203;1:adc_value_for_level=2333;2:adc_value_for_level=2483;default:adc_value_for_level=2673;endcase
+                1:case(level)0:adc_value_for_level=2153;1:adc_value_for_level=2303;2:adc_value_for_level=2453;default:adc_value_for_level=2653;endcase
+                2:case(level)0:adc_value_for_level=2133;1:adc_value_for_level=2203;2:adc_value_for_level=2333;default:adc_value_for_level=2453;endcase
+                3:case(level)0:adc_value_for_level=2153;1:adc_value_for_level=2273;2:adc_value_for_level=2433;default:adc_value_for_level=2653;endcase
             endcase
         end
     endfunction
@@ -140,13 +140,13 @@ module tb_mcp3208_velocity_exhaustive;
         reg [1:0] observed_level;
         begin
             set_adc_value(selected_string, 12'd2053);
-            repeat (1000) @(posedge clk);
+            repeat (260000) @(posedge clk);
 
             event_count_before = event_count;
             set_adc_value(selected_string,
-                          adc_value_for_level(expected_level));
+                          adc_value_for_level(expected_level,selected_string));
             guard = 0;
-            while ((event_count == event_count_before) && (guard < 5000)) begin
+            while ((event_count == event_count_before) && (guard < 60000)) begin
                 @(posedge clk);
                 guard = guard + 1;
             end
@@ -197,7 +197,7 @@ module tb_mcp3208_velocity_exhaustive;
 
         repeat (6) @(posedge clk);
         #1 rst_n = 1'b1;
-        repeat (1000) @(posedge clk);
+        repeat (260000) @(posedge clk);
 
         for (string_index = 0; string_index < 4;
              string_index = string_index + 1)
@@ -205,7 +205,7 @@ module tb_mcp3208_velocity_exhaustive;
                  level_index = level_index + 1)
                 exercise_velocity(string_index, level_index);
 
-        repeat (1000) @(posedge clk);
+        repeat (260000) @(posedge clk);
         if (event_count != 16) begin
             $display("FAIL: exhaustive velocity event count=%0d expected=16",
                      event_count);
@@ -225,7 +225,7 @@ module tb_mcp3208_velocity_exhaustive;
             $fatal;
         end
 
-        $display("PASS: MCP3208 all strings x all velocity levels events=%0d",
+        $display("PASS: production MCP3208 SPI4/capture32/dead400/settle80 per-string calibration, all strings x levels events=%0d",
                  event_count);
         $finish;
     end

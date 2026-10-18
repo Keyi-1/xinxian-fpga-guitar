@@ -30,7 +30,7 @@ module guitar_touch_game_audio #(
     end
     wire stable_valid;
     wire [15:0] fret_id;
-    wire [3:0] pluck_valid,active,note_on,note_off,force_release;
+    wire [3:0] pluck_valid,active,note_on,note_off,force_release,capture_pending;
     wire [7:0] velocity,note_velocity;
     wire sample_tick,voice_valid;
     wire [1:0] mode;
@@ -41,7 +41,7 @@ module guitar_touch_game_audio #(
     assign posture_sample_tick=sample_tick;
     assign posture_performance=mode==1 && !switching;
     assign posture_voice_active=active;
-    assign posture_note_guard=note_activity | note_on | pluck_valid;
+    assign posture_note_guard=note_activity | note_on | pluck_valid | capture_pending;
     always @(posedge clk)begin
         if(!rst_n)note_activity<=0;
         else if(sample_tick)note_activity<=note_on | pluck_valid;
@@ -54,7 +54,7 @@ module guitar_touch_game_audio #(
     mcp3208_pluck_frontend #(.SPI_CLK_DIV(ADC_SPI_CLK_DIV),.DEAD_SAMPLES(PLUCK_DEAD_SAMPLES),
         .SETTLE_SAMPLES(PLUCK_SETTLE_SAMPLES),.FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE)) u_adc(
         .clk(clk),.rst_n(rst_n),.adc_cs_n(adc_cs_n),.adc_sclk(adc_sclk),.adc_mosi(adc_mosi),.adc_miso(adc_miso),
-        .pluck_valid(pluck_valid),.velocity_level(velocity),.raw_adc(),.peak_adc(),.event_timestamp());
+        .pluck_valid(pluck_valid),.velocity_level(velocity),.raw_adc(),.peak_adc(),.event_timestamp(),.capture_pending(capture_pending));
     generate if(USE_P2)begin:p2
     game_p2_mode_router #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.WRITABLE(WRITABLE)) u_router(
         .clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),

@@ -5,7 +5,11 @@ module mcp3208_pluck_frontend #(
     parameter integer SPI_CLK_DIV = `ADC_SPI_CLK_DIV,
     parameter integer DEAD_SAMPLES = `RETRIGGER_DEAD_SAMPLES,
     parameter integer SETTLE_SAMPLES = `PLUCK_SETTLE_SAMPLES,
-    parameter [11:0] BASELINE_CODE = `ADC_BASELINE_CODE,
+    parameter [11:0] BASELINE_CODE_CH0 = `ADC_BASELINE_CODE_CH0,
+    parameter [11:0] BASELINE_CODE_CH1 = `ADC_BASELINE_CODE_CH1,
+    parameter [11:0] BASELINE_CODE_CH2 = `ADC_BASELINE_CODE_CH2,
+    parameter [11:0] BASELINE_CODE_CH3 = `ADC_BASELINE_CODE_CH3,
+    parameter integer CAPTURE_SAMPLES = `VELOCITY_CAPTURE_SAMPLES,
     parameter integer FIXED_VELOCITY_ENABLE = `BOARD_FIXED_VELOCITY_ENABLE
 ) (
     input  wire        clk,
@@ -19,7 +23,8 @@ module mcp3208_pluck_frontend #(
     output wire [7:0]  velocity_level,
     output wire [47:0] raw_adc,
     output wire [47:0] peak_adc,
-    output wire [31:0] event_timestamp
+    output wire [31:0] event_timestamp,
+    output wire [3:0] capture_pending
 );
 
     wire        sample_valid;
@@ -42,7 +47,9 @@ module mcp3208_pluck_frontend #(
 
     four_string_pluck_detector #(
         .DEAD_SAMPLES(DEAD_SAMPLES),
-        .SETTLE_SAMPLES(SETTLE_SAMPLES), .BASELINE_CODE(BASELINE_CODE),
+        .SETTLE_SAMPLES(SETTLE_SAMPLES), .CAPTURE_SAMPLES(CAPTURE_SAMPLES),
+        .BASELINE_CODE_CH0(BASELINE_CODE_CH0),.BASELINE_CODE_CH1(BASELINE_CODE_CH1),
+        .BASELINE_CODE_CH2(BASELINE_CODE_CH2),.BASELINE_CODE_CH3(BASELINE_CODE_CH3),
         .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE)
     ) u_four_string_pluck_detector (
         .clk            (clk),
@@ -54,7 +61,7 @@ module mcp3208_pluck_frontend #(
         .velocity_level (velocity_level),
         .raw_adc        (raw_adc),
         .peak_adc       (peak_adc),
-        .event_timestamp(event_timestamp)
+        .event_timestamp(event_timestamp),.capture_pending(capture_pending)
     );
 
 endmodule

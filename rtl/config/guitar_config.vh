@@ -19,7 +19,8 @@
 `define BOARD_PIANO_HAMMER_ENABLE 1
 `define BOARD_PIANO_ROOM_ENABLE 1
 `define BOARD_ANTI_BEAT_ENABLE 1
-`define BOARD_FIXED_VELOCITY_ENABLE 1
+// Use measured MCP3208 magnitude rather than a fixed level-2 velocity.
+`define BOARD_FIXED_VELOCITY_ENABLE 0
 `define BOARD_FIXED_VELOCITY 2'd2
 
 // System clocks
@@ -55,13 +56,51 @@
 // ADC and matrix run in the 12.288 MHz audio domain, as on the verified board.
 `define ADC_SPI_HZ        1536000
 `define ADC_SPI_CLK_DIV   4
-`define ADC_BASELINE_CODE 12'd2053
-`define PLUCK_TRIGGER_THRESHOLD 12'd100
-`define PLUCK_REARM_THRESHOLD   12'd30
-// Optional magnitude-based velocity bins; physical calibration is pending.
-`define VELOCITY_LEVEL_1_THRESHOLD 12'd150
-`define VELOCITY_LEVEL_2_THRESHOLD 12'd300
-`define VELOCITY_LEVEL_3_THRESHOLD 12'd600
+// Per-string calibration.  CH0..CH3 map to MCP3208 CH0..CH3 and to
+// pluck_valid[0]..pluck_valid[3], respectively.  Start from a shared value;
+// replace each group after collecting labelled UART measurements.
+`define ADC_BASELINE_CODE_CH0 12'd2053
+`define ADC_BASELINE_CODE_CH1 12'd2053
+`define ADC_BASELINE_CODE_CH2 12'd2053
+`define ADC_BASELINE_CODE_CH3 12'd2053
+// rtl/config/guitar_config.vh
+
+// CH0..CH3 trigger at the measured absolute deviations below (inclusive).
+`define PLUCK_TRIGGER_THRESHOLD_CH0    12'd150
+`define PLUCK_TRIGGER_THRESHOLD_CH1    12'd100
+`define PLUCK_TRIGGER_THRESHOLD_CH2    12'd80
+`define PLUCK_TRIGGER_THRESHOLD_CH3    12'd100
+
+// All four channels must settle at deviation <=20 before rearming.
+`define PLUCK_REARM_THRESHOLD_CH0      12'd20
+`define PLUCK_REARM_THRESHOLD_CH1      12'd20
+`define PLUCK_REARM_THRESHOLD_CH2      12'd20
+`define PLUCK_REARM_THRESHOLD_CH3      12'd20
+
+`define VELOCITY_LEVEL_1_THRESHOLD_CH0 12'd280
+`define VELOCITY_LEVEL_2_THRESHOLD_CH0 12'd430
+`define VELOCITY_LEVEL_3_THRESHOLD_CH0 12'd620
+
+`define VELOCITY_LEVEL_1_THRESHOLD_CH1 12'd250
+`define VELOCITY_LEVEL_2_THRESHOLD_CH1 12'd400
+`define VELOCITY_LEVEL_3_THRESHOLD_CH1 12'd600
+
+`define VELOCITY_LEVEL_1_THRESHOLD_CH2 12'd150
+`define VELOCITY_LEVEL_2_THRESHOLD_CH2 12'd280
+`define VELOCITY_LEVEL_3_THRESHOLD_CH2 12'd400
+
+`define VELOCITY_LEVEL_1_THRESHOLD_CH3 12'd220
+`define VELOCITY_LEVEL_2_THRESHOLD_CH3 12'd380
+`define VELOCITY_LEVEL_3_THRESHOLD_CH3 12'd600
+
+// Compatibility aliases for older modules that do not use per-string values.
+`define ADC_BASELINE_CODE `ADC_BASELINE_CODE_CH0
+`define PLUCK_TRIGGER_THRESHOLD `PLUCK_TRIGGER_THRESHOLD_CH0
+`define PLUCK_REARM_THRESHOLD `PLUCK_REARM_THRESHOLD_CH0
+`define VELOCITY_LEVEL_1_THRESHOLD `VELOCITY_LEVEL_1_THRESHOLD_CH0
+`define VELOCITY_LEVEL_2_THRESHOLD `VELOCITY_LEVEL_2_THRESHOLD_CH0
+`define VELOCITY_LEVEL_3_THRESHOLD `VELOCITY_LEVEL_3_THRESHOLD_CH0
+`define VELOCITY_CAPTURE_SAMPLES   32
 `define RETRIGGER_DEAD_SAMPLES 400
 `define PLUCK_SETTLE_SAMPLES 80
 

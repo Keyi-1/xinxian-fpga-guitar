@@ -99,7 +99,7 @@ module guitar_audio_top #(
         .clk(audio_clk_12m288), .rst_n(audio_rst_n),
         .adc_cs_n(adc_cs_n), .adc_sclk(adc_sclk), .adc_mosi(adc_mosi), .adc_miso(adc_miso),
         .pluck_valid(pluck_valid_audio), .velocity_level(velocity_level),
-        .raw_adc(raw_adc), .peak_adc(peak_adc), .event_timestamp(event_timestamp)
+        .raw_adc(raw_adc), .peak_adc(peak_adc), .event_timestamp(event_timestamp),.capture_pending()
     );
     four_string_board_audio_chain #(
         .SAMPLE_DIV(SAMPLE_DIV), .REF_DIV(PT8211_REF_DIV), .I2S_ENABLE(I2S_ENABLE),

@@ -40,7 +40,7 @@ module tb_mcp3208_pluck_frontend;
         .velocity_level (velocity_level),
         .raw_adc        (raw_adc),
         .peak_adc       (peak_adc),
-        .event_timestamp(event_timestamp)
+        .event_timestamp(event_timestamp),.capture_pending()
     );
 
     always #5 clk = ~clk;
@@ -129,7 +129,7 @@ module tb_mcp3208_pluck_frontend;
             while (seen_plucks !== expected_mask) begin
                 @(posedge clk);
                 guard = guard + 1;
-                if (guard > 10000) begin
+                if (guard > 60000) begin
                     $display("FAIL: pluck timeout mask=%b expected=%b",
                              seen_plucks, expected_mask);
                     $finish;
@@ -146,7 +146,7 @@ module tb_mcp3208_pluck_frontend;
             while (event_count0 < expected_count) begin
                 @(posedge clk);
                 guard = guard + 1;
-                if (guard > 10000) begin
+                if (guard > 60000) begin
                     $display("FAIL: string 0 retrigger timeout count=%0d", event_count0);
                     $finish;
                 end
@@ -158,10 +158,10 @@ module tb_mcp3208_pluck_frontend;
         clk                 = 1'b0;
         rst_n               = 1'b0;
         adc_miso            = 1'b0;
-        adc_value0          = 12'd2153;
-        adc_value1          = 12'd2253;
-        adc_value2          = 12'd2453;
-        adc_value3          = 12'd2853;
+        adc_value0          = 12'd2203;
+        adc_value1          = 12'd2303;
+        adc_value2          = 12'd2333;
+        adc_value3          = 12'd2653;
         command_bits        = 5'd0;
         captured_command    = 5'd0;
         selected_channel    = 3'd0;
@@ -189,10 +189,10 @@ module tb_mcp3208_pluck_frontend;
                      velocity2_at_event, velocity3_at_event);
             $finish;
         end
-        if ((raw_adc[11:0] !== 12'd2153) ||
-            (raw_adc[23:12] !== 12'd2253) ||
-            (raw_adc[35:24] !== 12'd2453) ||
-            (raw_adc[47:36] !== 12'd2853)) begin
+        if ((raw_adc[11:0] !== 12'd2203) ||
+            (raw_adc[23:12] !== 12'd2303) ||
+            (raw_adc[35:24] !== 12'd2333) ||
+            (raw_adc[47:36] !== 12'd2653)) begin
             $display("FAIL: MCP3208 channel sample ordering");
             $finish;
         end
@@ -201,7 +201,7 @@ module tb_mcp3208_pluck_frontend;
         // two-sample dead time, then verify a new pluck can be emitted.
         adc_value0 = 12'd2053;
         repeat (1000) @(posedge clk);
-        adc_value0 = 12'd2253;
+        adc_value0 = 12'd2333;
 
         wait_for_string0_events(2);
         #1;
