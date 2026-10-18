@@ -1,10 +1,20 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**2026-10-18新源码正在验证P4：** 用户已确认第10/18小节电脑试听修订，并授权MPU-6050空闲姿态切音色；见[P4接线/操作及验证进度](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。P3提交7837a24已推送origin/master。下方P3记录只认证固定发布归档；本批原impl重建后须使用新的P4认证，不复用旧日志。
+**当前P4数字发布（2026-10-18，实物待验收）：** 已纳入用户试听确认的《情歌》10/18小节节奏、MPU-6050校准/手动优先/空闲姿态切音色，以及主页底部字体居中。原32模态/全部音效/采样率与游戏/UART功能保持；上电默认MANUAL。
 
-**当前P3数字发布（2026-10-18，实物待验收）：** 可写曲库/DEBUG-USB2 UART已接入，原创慢练移除，第二槽待导入；五槽共用1345条导入空间，完整接收/实际RAM读回CRC后原子发布。原32模态相位/衰减状态合存RAM，全部音色参数、模态、运算时钟及演奏行为保持。
+原工程可直接选择：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。使用用户原`.gprj`/原`impl`，`gw_sh`完整综合、P&R/STA；没有独立构建工程或伪造IDE完成状态。
+发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)，SHA256 `34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c`。
+[本批认证](p4_posture_verification.json)；[接线、操作、节奏、前后资源和验证范围](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。P3提交7837a24已按授权推送；新P4只作本地提交，不自动推送或烧录。
 
-原工程位流：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)，在用户原 `.gprj` / 原 `impl` 用 `gw_sh` 完成综合与完整P&R。直接选择 `.fs` 下载，无需重新综合布线。
+完整实现：Logic50580、Register20090、CLS28585/29952（95.44%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.020/13.858MHz，运行仍50/12.288。setup/hold/latch/未布通及已测deadline全部0。旧P1余量目标中CLS≤95%、系统≥55MHz仍未达到；不能宣称余量目标全部完成。
+
+20项既有RTL、4项P3、8项姿态组件/整机、12场景1566720像素（限定UI区外等价）、两项完整ROM输入哈希的45210样本/状态RAM组件、33项PC及4个实际VG入口均PASS。实际VG姿态覆盖生产256包校准/12815音频样本/1773读包/5次音色变化；实际VG UART覆盖10次真实115200事务/四声部/13397样本/16帧动态频谱和曲线。只有居中渲染有限改动按明确范围复用已过功能回归，不使用旧VG日志认证新VG。电平/安装轴向/实物姿态阈值/新节奏板上试听与长期稳定性待用户确认；未打开COM或代理烧录。
+
+下方均为**固定历史发布**，这些认证不认证当前P4原impl产物。
+
+**历史P3数字发布（2026-10-18，用户总体反馈可用）：** 可写曲库/DEBUG-USB2 UART已接入，原创慢练移除，第二槽待导入；五槽共用1345条导入空间，完整接收/实际RAM读回CRC后原子发布。原32模态相位/衰减状态合存RAM，全部音色参数、模态、运算时钟及演奏行为保持。
+
+P3发布时原工程位流为`impl/pnr/neo_guitar_touch_game.fs`；该路径现已更新为文首P4，获取P3请使用下列固定归档。
 独立归档：[neo_guitar_touch_game_p3_uart_import.fs](../../build/releases/touch_game/neo_guitar_touch_game_p3_uart_import.fs)，SHA256 `57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1`。
 [当前认证](p3_import_verification.json)；[使用步骤、协议、完整前后对比和验证范围](../../docs/P3_WRITABLE_SONG_IMPORT.md)。
 

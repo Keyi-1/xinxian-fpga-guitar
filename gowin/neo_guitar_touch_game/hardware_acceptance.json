@@ -108,9 +108,9 @@
   "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current P3 build",
   "current_original_project_bitstream": {
     "path": "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
-    "sha256": "57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1",
-    "verification": "gowin/neo_guitar_touch_game/p3_import_verification.json",
-    "scope": "Current P3 C7 digital build, not yet installed/board-confirmed"
+    "sha256": "34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c",
+    "verification": "gowin/neo_guitar_touch_game/p4_posture_verification.json",
+    "scope": "Current P4 A2 digital build, not yet board-confirmed; P3 archive remains fixed"
   },
   "p3_writable_uart_import": {
     "date": "2026-10-18",
@@ -164,8 +164,8 @@
   },
   "p4_posture_and_confirmed_rhythm": {
     "date": "2026-10-18",
-    "digital_result": "IN_PROGRESS",
-    "implementation": "A2 original gprj/impl; A1 stopped during routing after user requested centred footer",
+    "digital_result": "PASS",
+    "implementation": "A2 original gprj/impl; runtime be885621daae47e73bbe6956256db95eb884b0d5",
     "rhythm_software_listening": {
       "bars": [
         10,
@@ -187,6 +187,39 @@
     "installed_bitstream_sha256": null,
     "agent_programmed_hardware": false,
     "physical_com_opened": false,
-    "publication_authorized": false
+    "publication_authorized": false,
+    "bitstream_sha256": "34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c",
+    "archive": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "verification": "gowin/neo_guitar_touch_game/p4_posture_verification.json",
+    "resources": {
+      "Logic": 50580.0,
+      "Register": 20090.0,
+      "CLS": 28585.0,
+      "BSRAM": 113.0,
+      "DSP": 115.5
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 13.858
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 50.02
+      }
+    },
+    "margin_targets_met": false,
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_layout_deadline": 0,
+      "tested_posture_math_deadline": 0
+    },
+    "digital_scope": "20 existing RTL+4 P3+8 posture component/top+12-scene centred pixel proof+2 full current voice/RAM closure benches+33 PC tests+4 actual VG benches+384 bank Boolean cases+fresh full P&R/STA; renderer-only scoped reuse explicit",
+    "ui": "Visible-character centering in CALIBRATE/AUTO/status; right status rectangle; no new touch actions"
   }
 }

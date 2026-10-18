@@ -246,6 +246,10 @@ def main():
     # them as an FPGA waveform/acoustic acceptance.
     artifacts+=list((ROOT/'scores/p2').rglob('*.json'))+list((ROOT/'scores/p2').glob('*.bin'))
     artifacts+=list((ROOT/'scores/p2').glob('*.csv'))
+    # Include the PC proof inputs too (including the two supplied score images)
+    # so the archive is self-contained beyond the production ROM/source list.
+    pc_inputs=load(ROOT/'build/p4_posture/pc_checks_a1/verification.json')['source_sha256']
+    artifacts+=[ROOT/p for p in pc_inputs]
     example=ROOT/'build/p4_posture/upload_example'
     from upload_game_score import load_score
     events,duration,timbre=load_score(example/'qing_ge.bin',example/'qing_ge.json')
