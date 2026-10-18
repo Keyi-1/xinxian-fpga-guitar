@@ -8,7 +8,7 @@ module tb_game_p3_display_equivalence;
     reg [383:0] centres=0;reg [287:0] tails=0;reg [31:0] blocks=32'h03030303;
     wire [17:0] rgb,reference;wire [2:0] shown,ref_shown;
     integer song,p,px,py,k,pixels=0,scenes=0;
-    touch_game_renderer #(.USE_P2(1),.WRITABLE(1)) dut(.clk(clk),.rst_n(rst),.frame_start(frame),.page(page),
+    touch_game_renderer #(.USE_P2(1),.WRITABLE(1)) dut(.imu_status(10'd0),.clk(clk),.rst_n(rst),.frame_start(frame),.page(page),
         .selected_slot(slot),.display_fault(1'b0),.overlay_valid(valid),.overlay_data(descriptors),
         .touch_ready(1'b1),.transition(1'b0),.x(x),.y(y),.centres(centres),.tails(tails),.valid_blocks(blocks),
         .game_snapshot(snapshot),.rgb(rgb),.display_page(shown));

@@ -31,12 +31,12 @@ module tb_game_p2_connection;
         .command_ack(ack),.mode(mode),.switching(switching),.timbre_load(load),.timbre_code(code),
         .note_on(on),.note_off(off),.force_release(release_voice),.target_phase(target),.note_velocity(velocity),
         .game_snapshot(snapshot),.miss_event(miss));
-    guitar_effect_buttons #(.DEBOUNCE_CYCLES(2),.EXTERNAL_TIMBRE_ENABLE(1)) buttons(.clk(ac),.rst_n(rst),
+    guitar_effect_buttons #(.DEBOUNCE_CYCLES(2),.EXTERNAL_TIMBRE_ENABLE(1)) buttons(.manual_timbre_press(),.clk(ac),.rst_n(rst),
         .key_timbre_n(key),.key_chorus_n(1'b1),.key_space_n(1'b1),.load_timbre(load),.loaded_timbre(code),
         .timbre_select(bright),.rock_select(rock),.timbre_mode(timbre),.chorus_enable(chorus),.sustain_enable(sustain),
         .reverb_enable(room),.space_mode(space),.harmony_enable(harmony));
     four_string_board_audio_chain #(.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(1),.I2S_ENABLE(1),.USE_PIANO(1),
-        .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1)) chain(
+        .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1)) chain(.control_pipeline_idle(),.control_timbre_busy(),
         .clk_audio_ref(ac),.rst_n(rst),.stable_valid(1'b0),.stable_fret_id(16'd0),.pluck_valid(4'd0),
         .velocity_level(velocity),.timbre_select(bright),.rock_select(rock),.chorus_enable(chorus),.sustain_enable(1'b1),
         .harmony_enable(harmony),.reverb_enable(room),.sample_tick(tick),.pcm_mix_valid(pcm_valid),.pcm_mix(pcm),

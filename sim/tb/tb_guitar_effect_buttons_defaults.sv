@@ -6,7 +6,7 @@ module tb_guitar_effect_buttons_defaults;
     wire timbre,chorus,sustain,reverb,harmony;
     wire rock;
     wire [1:0] tone;
-    guitar_effect_buttons dut(
+    guitar_effect_buttons dut(.manual_timbre_press(),
         .load_timbre(1'b0),.loaded_timbre(2'd0),.rock_select(rock),.timbre_mode(tone),
         .clk(clk),.rst_n(rst_n),.key_timbre_n(k1),.key_chorus_n(k2),.key_space_n(k3),
         .timbre_select(timbre),.chorus_enable(chorus),.sustain_enable(sustain),

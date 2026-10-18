@@ -152,10 +152,12 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     endtask
     // Reuse the existing uppercase/digit glyphs and the same font pipeline.
     task imu_text;
-        input [95:0] text;input integer ox,oy;
-        reg [8:0] dx,dy;reg [3:0] index;reg [7:0] ch;
+        input [95:0] text;input integer centre_x,oy;input [3:0] characters;
+        reg [8:0] ox,dx,dy;reg [3:0] index;reg [7:0] ch;
         begin
-            if(x>=ox && x<ox+96 && y>=oy && y<oy+16)begin
+            // Centre the visible characters; trailing storage padding is not ink.
+            ox=centre_x-{characters,2'b00};
+            if(x>=ox && x<centre_x+{characters,2'b00} && y>=oy && y<oy+16)begin
                 dx=x-ox;dy=y-oy;index=dx[6:3];ch=text[(11-index)*8+:8];
                 text_enable=1;numeric_glyph=1;
                 glyph=ch>=65 && ch<=90 ? (`GAME_DIGIT_BASE-26)+(ch-65) :
@@ -245,17 +247,22 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                     if(y>=240)begin
                         if(x>=16 && x<144)background={6'd7,6'd22,6'd29};
                         else if(x>=160 && x<288)background=imu_display[4] ? {6'd7,6'd30,6'd15} : {6'd22,6'd16,6'd25};
+                        else if(x>=304 && x<464)background={6'd7,6'd22,6'd29};
                     end
-                    imu_text("CALIBRATE   ",32,248);
-                    imu_text(imu_display[4] ? "AUTO ON     " : "AUTO OFF    ",176,248);
+                    imu_text("CALIBRATE   ",80,248,9);
+                    imu_text(imu_display[4] ? "AUTO ON     " : "AUTO OFF    ",224,248,imu_display[4] ? 7 : 8);
                     imu_text(imu_display[9] ? "MATH ERROR  " : !imu_display[0] ? "IMU OFFLINE " :
                         imu_display[1] ? "CAL...      " : !imu_display[2] ? "NEED CAL    " :
                         !imu_display[3] ? "SETTLING    " : imu_display[6:5]==1 ? "FLAT        " :
-                        imu_display[6:5]==2 ? "GUITAR      " : imu_display[6:5]==3 ? "UPRIGHT     " : "READY       ",328,248);
+                        imu_display[6:5]==2 ? "GUITAR      " : imu_display[6:5]==3 ? "UPRIGHT     " : "READY       ",384,248,
+                        imu_display[9] ? 10 : !imu_display[0] ? 11 : imu_display[1] ? 6 :
+                        !imu_display[2] || !imu_display[3] ? 8 : imu_display[6:5]==1 ? 4 :
+                        imu_display[6:5]==2 ? 6 : imu_display[6:5]==3 ? 7 : 5);
                 end
             end
             1:if(IMU_ENABLE)imu_text(imu_display[7] ? "WAIT TAIL   " : !imu_display[3] ? "IMU OFFLINE " :
-                imu_display[4] ? "AUTO        " : "MANUAL      ",384,256);
+                imu_display[4] ? "AUTO        " : "MANUAL      ",432,256,
+                imu_display[7] ? 9 : !imu_display[3] ? 11 : imu_display[4] ? 4 : 6);
             2:begin
                 label(3,176,6,4,2,0);label(17,24,14,2,1,0);
                 if(x>=24 && x<=455 && y>=48)begin

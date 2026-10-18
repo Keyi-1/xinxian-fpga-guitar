@@ -35,6 +35,7 @@ module tb_game_p3_full_gate;
         #2;
         if(rst)begin
             if(tx!==rtx)$fatal(1,"FAIL: actual VG UART TX differs from RTL");
+            if({giscl,gisda}!=={riscl,risda})$fatal(1,"FAIL: actual P4 MPU GPIO differs at production I2C divider");
             if(gaudio!==raudio)$fatal(1,"FAIL: actual VG PT8211/I2S/PA differs, sample%0d",samples);
             if(reference.u_display.initialized)begin
                 if({gp,gh,gv,gd,gl,gr,gg,gb}!=={rp,rh,rv,rd,rl,rr,rg,rb})

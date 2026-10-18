@@ -32,7 +32,7 @@ module tb_posture_display_equivalence;
                 if(py==100 && px==0)status=~status; // Must not change active-frame UI state.
                 repeat(6)@(posedge clk);#1;
                 if(dut.imu_display!==held_status)$fatal(1,"FAIL: IMU status tears inside frame");
-                exception_pixel=page==0 && py>=240 && ((px>=16 && px<144)||(px>=160 && px<288)||(px>=328 && px<424)) ||
+                exception_pixel=page==0 && py>=240 && ((px>=16 && px<144)||(px>=160 && px<288)||(px>=304 && px<464)) ||
                     page==1 && py>=256 && px>=384;
                 if(shown!==old_shown || (!exception_pixel && rgb!==old_rgb))$fatal(1,"FAIL: unexpected P4 pixel scene%0d page%0d x%0d y%0d",scene,page,px,py);
                 if(rgb!==old_rgb)changed=changed+1;

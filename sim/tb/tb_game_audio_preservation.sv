@@ -24,11 +24,11 @@ module tb_game_audio_preservation;
         .display_note_on(),.display_voice_sample_valid(),.dac_bclk(),.dac_lrck(),.dac_din(),.i2s_bclk(),.i2s_ws(),.i2s_data()
     accepted_four_string_board_audio_chain #(`CHAIN_PARAMS) accepted(
         `COMMON_PORTS,.velocity_level(velocity),.sample_tick(tick_accepted),.voice_active(),.display_phase_inc());
-    four_string_board_audio_chain #(`CHAIN_PARAMS) default_chain(
+    four_string_board_audio_chain #(`CHAIN_PARAMS) default_chain(.control_pipeline_idle(),.control_timbre_busy(),
         `COMMON_PORTS,.velocity_level(velocity),.sample_tick(tick_default),.voice_active(),.display_phase_inc(),
         .external_note_on(4'd0),.external_note_off(4'd0),.external_force_release(4'd0),.external_phase_inc(128'd0),
         .game_cue_enable(1'b0),.game_miss_event(1'b0));
-    four_string_board_audio_chain #(`CHAIN_PARAMS,.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(1)) routed(
+    four_string_board_audio_chain #(`CHAIN_PARAMS,.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(1)) routed(.control_pipeline_idle(),.control_timbre_busy(),
         `COMMON_PORTS,.velocity_level(routed_velocity),.sample_tick(tick),.voice_active(active),.display_phase_inc(phase),
         .external_note_on(on),.external_note_off(off),.external_force_release(forced),.external_phase_inc(target),
         .game_cue_enable(mode==2 && !switching),.game_miss_event(miss_event));

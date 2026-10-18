@@ -18,7 +18,7 @@ module tb_game_p2_display;
     game_p2_chart_layout layout(.overlay_valid(5'd0),.overlay_data(480'd0),.clk(clk),.rst_n(rst),.frame_start(frame),.snapshot_update(update),.snapshot(snapshot),
         .score_read(read),.score_address(address),.score_data(data),.centres(centres),.tails(tails),.valid_blocks(blocks),
         .display_snapshot(),.overflow(overflow),.deadline_miss(deadline));
-    touch_game_renderer #(.USE_P2(1)) renderer(.overlay_valid(5'd0),.overlay_data(480'd0),.clk(clk),.rst_n(rst),.frame_start(frame),.page(page),
+    touch_game_renderer #(.USE_P2(1)) renderer(.imu_status(10'd0),.overlay_valid(5'd0),.overlay_data(480'd0),.clk(clk),.rst_n(rst),.frame_start(frame),.page(page),
         .selected_slot(selected),.display_fault(overflow|deadline),.touch_ready(1'b1),.transition(1'b0),
         .x(x),.y(y),.centres(centres),.tails(tails),.valid_blocks(blocks),.game_snapshot(snapshot),.rgb(rgb),.display_page(shown));
     task publish(input integer song,time_value,first,input [63:0] consumed);
