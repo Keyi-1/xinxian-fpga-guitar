@@ -12,9 +12,11 @@ module guitar_effect_buttons #(
     output reg chorus_enable,
     output wire sustain_enable,reverb_enable,
     output reg [1:0] space_mode,
-    output reg harmony_enable
+    output reg harmony_enable,
+    output wire manual_timbre_press
 );
     wire timbre_press,unused_timbre_state,unused_space_state,space_press;
+    assign manual_timbre_press=timbre_press;
     debounced_toggle #(.DEBOUNCE_CYCLES(DEBOUNCE_CYCLES)) u_timbre(
         .clk(clk),.rst_n(rst_n),.button_n(key_timbre_n),
         .toggle_state(unused_timbre_state),.pressed_pulse(timbre_press));

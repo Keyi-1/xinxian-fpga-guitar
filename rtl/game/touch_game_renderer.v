@@ -1,19 +1,25 @@
 // Full-width four-lane stage. Four pixel stages fit the six-clock DCLK cadence:
 // relative note coordinates, shape selection, palette/font, output.
 // No framebuffer, per-pixel divide, blur or added audio processing.
-module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0,WRITABLE=0)
+module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0,WRITABLE=0,IMU_ENABLE=0)
     (input wire clk,rst_n,frame_start,input wire [2:0] page,
     input wire [2:0] selected_slot,input wire display_fault,
     input wire [4:0] overlay_valid,input wire [479:0] overlay_data,
     input wire touch_ready,transition,input wire [8:0] x,y,
     input wire [383:0] centres,input wire [287:0] tails,input wire [31:0] valid_blocks,
-    input wire [255:0] game_snapshot,output reg [17:0] rgb,output reg [2:0] display_page);
+    input wire [255:0] game_snapshot,input wire [9:0] imu_status,
+    output reg [17:0] rgb,output reg [2:0] display_page);
     `include "../config/game_ui_messages.vh"
     `include "../config/game_score_config.vh"
     `include "../config/game_p2_progress.vh"
     localparam integer PROGRESS_STEP=(`GAME_DURATION_SAMPLES+479)/480;
     localparam SCORE_DIGITS=USE_P2 ? 6 : 5, COUNTER_DIGITS=USE_P2 ? 5 : 3;
     localparam BCD_WIDTH=SCORE_DIGITS*4, COUNTER_WIDTH=COUNTER_DIGITS*4;
+    reg [9:0] imu_display;
+    always @(posedge clk)begin
+        if(!rst_n)imu_display<=0;
+        else if(frame_start)imu_display<=imu_status;
+    end
     wire [31:0] time_value=USE_P2 ? game_snapshot[95:64] : game_snapshot[159:128];
     wire [31:0] score_value=USE_P2 ? game_snapshot[127:96] : {12'd0,game_snapshot[179:160]};
     wire [15:0] combo_value=USE_P2 ? game_snapshot[143:128] : {8'd0,game_snapshot[187:180]};
@@ -144,6 +150,20 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
             end
         end
     endtask
+    // Reuse the existing uppercase/digit glyphs and the same font pipeline.
+    task imu_text;
+        input [95:0] text;input integer ox,oy;
+        reg [8:0] dx,dy;reg [3:0] index;reg [7:0] ch;
+        begin
+            if(x>=ox && x<ox+96 && y>=oy && y<oy+16)begin
+                dx=x-ox;dy=y-oy;index=dx[6:3];ch=text[(11-index)*8+:8];
+                text_enable=1;numeric_glyph=1;
+                glyph=ch>=65 && ch<=90 ? (`GAME_DIGIT_BASE-26)+(ch-65) :
+                    ch>=48 && ch<=57 ? `GAME_DIGIT_BASE+(ch-48) : ch==46 ? `GAME_DIGIT_BASE+13 : `GAME_DIGIT_BASE+10;
+                font_row=dy[3:0];font_col={1'b0,dx[2:0]};
+            end
+        end
+    endtask
     task score_digits;
         input integer ox,oy,scale;
         reg [8:0] dx,dy;
@@ -221,7 +241,21 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                 end
                 label(1,94,144,4,1,0);label(2,322,144,4,1,0);
                 label(26,94,181,4,1,0);label(27,322,181,4,1,0);
+                if(IMU_ENABLE)begin
+                    if(y>=240)begin
+                        if(x>=16 && x<144)background={6'd7,6'd22,6'd29};
+                        else if(x>=160 && x<288)background=imu_display[4] ? {6'd7,6'd30,6'd15} : {6'd22,6'd16,6'd25};
+                    end
+                    imu_text("CALIBRATE   ",32,248);
+                    imu_text(imu_display[4] ? "AUTO ON     " : "AUTO OFF    ",176,248);
+                    imu_text(imu_display[9] ? "MATH ERROR  " : !imu_display[0] ? "IMU OFFLINE " :
+                        imu_display[1] ? "CAL...      " : !imu_display[2] ? "NEED CAL    " :
+                        !imu_display[3] ? "SETTLING    " : imu_display[6:5]==1 ? "FLAT        " :
+                        imu_display[6:5]==2 ? "GUITAR      " : imu_display[6:5]==3 ? "UPRIGHT     " : "READY       ",328,248);
+                end
             end
+            1:if(IMU_ENABLE)imu_text(imu_display[7] ? "WAIT TAIL   " : !imu_display[3] ? "IMU OFFLINE " :
+                imu_display[4] ? "AUTO        " : "MANUAL      ",384,256);
             2:begin
                 label(3,176,6,4,2,0);label(17,24,14,2,1,0);
                 if(x>=24 && x<=455 && y>=48)begin

@@ -20,7 +20,9 @@ module guitar_touch_game_audio #(
   input wire timbre_select,rock_select,chorus_enable,sustain_enable,harmony_enable,reverb_enable,
   output wire dac_bclk,dac_lrck,dac_din,i2s_bclk,i2s_ws,i2s_data,
   output wire [399:0] visual_snapshot,output wire [255:0] game_snapshot,
-  output wire final_pcm_valid,output wire signed [23:0] final_pcm);
+  output wire final_pcm_valid,output wire signed [23:0] final_pcm,
+  output wire posture_sample_tick,posture_performance,posture_pipeline_idle,posture_timbre_busy,
+  output wire [3:0] posture_voice_active,posture_note_guard);
     reg [7:0] col_meta,col_sync;
     always @(posedge clk)begin
         if(!rst_n)begin col_meta<=255;col_sync<=255;end
@@ -35,6 +37,16 @@ module guitar_touch_game_audio #(
     wire switching,miss_event;
     wire [127:0] target_phase,audible_phase;
     wire [95:0] voice_pcm;
+    reg [3:0] note_activity;
+    assign posture_sample_tick=sample_tick;
+    assign posture_performance=mode==1 && !switching;
+    assign posture_voice_active=active;
+    assign posture_note_guard=note_activity | note_on | pluck_valid;
+    always @(posedge clk)begin
+        if(!rst_n)note_activity<=0;
+        else if(sample_tick)note_activity<=note_on | pluck_valid;
+        else note_activity<=note_activity | note_on | pluck_valid;
+    end
     matrix_scanner #(.CLK_DIV(MATRIX_CLK_DIV),.SETTLE_CYCLES(MATRIX_SETTLE_CYCLES),
         .DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES)) u_matrix(
         .clk(clk),.rst_n(rst_n),.col_in_n(col_sync),.row_oe(fret_row_oe),.row_drive_n(fret_row_drive_n),
@@ -74,6 +86,7 @@ module guitar_touch_game_audio #(
         .display_phase_inc(audible_phase),.display_note_on(),.display_voice_sample_valid(voice_valid),
         .external_note_on(note_on),.external_note_off(note_off),.external_force_release(force_release),.external_phase_inc(target_phase),
         .game_cue_enable(mode==2 && !switching),.game_miss_event(miss_event),
+        .control_pipeline_idle(posture_pipeline_idle),.control_timbre_busy(posture_timbre_busy),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),.i2s_bclk(i2s_bclk),.i2s_ws(i2s_ws),.i2s_data(i2s_data));
     guitar_visual_telemetry #(.HOLD_INACTIVE_PITCH(1)) u_telemetry(.clk(clk),.rst_n(rst_n),
         .sample_tick(sample_tick),.voice_sample_valid(voice_valid),.phase_inc(audible_phase),

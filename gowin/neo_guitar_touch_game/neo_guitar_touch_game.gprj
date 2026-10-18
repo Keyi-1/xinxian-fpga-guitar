@@ -121,5 +121,12 @@
         <File path="../../rtl/config/game_p3_bsram_init.vh" type="file.other" enable="1" />
         <File path="../../rtl/game/game_p3_default_catalog.v" type="file.verilog" enable="1" />
         <File path="../../mem/game_p3_initial.mem" type="file.other" enable="1" />
+        <File path="../../rtl/input/mpu6050_reader.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/input/imu_serial_multiplier.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/input/imu_posture_classifier.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/input/mpu6050_posture.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/control/posture_timbre_policy.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/control/posture_touch_controls.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/posture_timbre_cdc.v" type="file.verilog" enable="1" />
     </FileList>
 </Project>

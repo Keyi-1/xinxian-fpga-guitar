@@ -14,7 +14,7 @@ class QingGeScoreTests(unittest.TestCase):
         self.assertEqual((report['measures'],report['total_quarter_beats'],len(events),duration),(38,'152',212,7296000))
         self.assertEqual(report['tie_continuations'],30)
         self.assertEqual(report['rest_tokens'],13)
-        self.assertEqual([x['bar'] for x in report['rhythm_revisions']],[10,18])
+        self.assertEqual([x['bar'] for x in report['rhythm_revisions']],[10,10,18,18])
         self.assertEqual(report['output_midi_range'],[50,79])
         self.assertEqual(report['source_midi_range'],[62,91])
         for note in report['printed_note_tokens']:
@@ -29,6 +29,20 @@ class QingGeScoreTests(unittest.TestCase):
         # The printed double upper tonic in bar 36 must not be silently folded.
         high=[e for e in events if e.midi==79]
         self.assertEqual([(e.onset,e.duration) for e in high],[(round(Fraction(285,2)*48000),24000)])
+
+    def test_confirmed_bar_grid_and_every_other_event_unchanged(self):
+        from preview_qing_ge_rhythm import baseline_score,candidate
+        before,total=baseline_score()
+        expected,changes=candidate(before,total)
+        actual,duration,_=compile_score()
+        self.assertEqual(duration,total)
+        self.assertEqual(actual,expected)
+        self.assertEqual(len(changes),4)
+        for bar in (10,18):
+            start=(bar-1)*4*48000
+            selected=[e for e in actual if start<=e.onset<start+4*48000]
+            self.assertEqual([e.onset-start for e in selected],[0,24000,36000,60000,84000,144000,160000,176000])
+            self.assertEqual([e.duration for e in selected],[24000,12000,24000,24000,60000,16000,16000,16000])
 
     def test_explicit_profile_preserves_physical_default(self):
         high=Event(0,48000,79,0)

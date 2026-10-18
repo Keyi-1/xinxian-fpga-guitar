@@ -14,7 +14,8 @@ module neo_guitar_touch_game_top #(
     parameter integer TOUCH_SWAP_AXES=-1,TOUCH_MIRROR_X=0,TOUCH_MIRROR_Y=0,
     // Training defaults; set both to zero for a player-triggered-only build.
     parameter integer ALLOW_AUTOPLAY_PREVIEW=1,ENABLE_MISS_CUE=1,USE_P2=1,WRITABLE=1,
-    parameter integer UART_CLKS_PER_BIT=434
+    parameter integer UART_CLKS_PER_BIT=434,ENABLE_IMU=1,IMU_I2C_QUARTER=125,
+    parameter integer IMU_CALIBRATION_LOG2=8,IMU_HEALTH_MS=1000,IMU_STABLE_MS=500,IMU_COOLDOWN_MS=1000
 )(input wire audio_clk_12m288,sys_clk_50m,
   input wire USER_BUTTON1_n,USER_BUTTON2_n,USER_BUTTON3_n,
   inout wire ROW0,ROW1,ROW2,ROW3,
@@ -25,7 +26,8 @@ module neo_guitar_touch_game_top #(
   output wire [5:0] lcd_r,lcd_g,lcd_b,
   output wire i2s_bclk,i2s_ws,i2s_data,
   inout wire ctp_scl,ctp_sda,ctp_int,output wire ctp_rst_n,
-  input wire song_uart_rx,output wire song_uart_tx);
+  input wire song_uart_rx,output wire song_uart_tx,
+  inout wire imu_scl,imu_sda);
     reg [7:0] startup_count=0;
     always @(posedge audio_clk_12m288)if(startup_count!=255)startup_count<=startup_count+1'b1;
     wire startup_done=startup_count==255;
@@ -35,9 +37,12 @@ module neo_guitar_touch_game_top #(
     wire timbre_select,rock_select,chorus_enable,sustain_enable,reverb_enable,harmony_enable;
     wire [1:0] timbre_mode,space_mode,timbre_code;
     wire timbre_load,display_read,display_fault;
+    wire auto_timbre_load,manual_timbre_press;
+    wire [1:0] auto_timbre_code;
     wire [10:0] display_address;wire [95:0] display_data;
-    guitar_effect_buttons #(.DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES),.LONG_PRESS_CYCLES(KEY_LONG_PRESS_CYCLES),.EXTERNAL_TIMBRE_ENABLE(USE_P2)) u_buttons(
-        .load_timbre(timbre_load),.loaded_timbre(timbre_code),
+    guitar_effect_buttons #(.DEBOUNCE_CYCLES(KEY_DEBOUNCE_CYCLES),.LONG_PRESS_CYCLES(KEY_LONG_PRESS_CYCLES),.EXTERNAL_TIMBRE_ENABLE(USE_P2 || ENABLE_IMU)) u_buttons(
+        .load_timbre(timbre_load || auto_timbre_load),.loaded_timbre(timbre_load ? timbre_code : auto_timbre_code),
+        .manual_timbre_press(manual_timbre_press),
         .clk(audio_clk_12m288),.rst_n(audio_rst_n),.key_timbre_n(USER_BUTTON1_n),
         .key_chorus_n(USER_BUTTON2_n),.key_space_n(USER_BUTTON3_n),
         .timbre_select(timbre_select),.rock_select(rock_select),.timbre_mode(timbre_mode),
@@ -77,6 +82,51 @@ module neo_guitar_touch_game_top #(
     wire [10:0] score_write_address;wire [95:0] score_write_data;
     wire [4:0] system_catalog_valid,audio_catalog_valid;
     wire [479:0] system_catalog_data,audio_catalog_data;
+    wire posture_sample_tick,posture_performance,posture_pipeline_idle,posture_timbre_busy;
+    wire [3:0] posture_voice_active,posture_note_guard;
+    wire [9:0] imu_status;
+    generate if(ENABLE_IMU)begin:posture
+        wire imu_ready,calibrated,calibrating,healthy,pose_event,tone_valid,math_deadline;
+        wire [1:0] stable_pose,pose_tone;
+        wire calibrate,auto_enable,arrived;
+        wire [1:0] arrived_tone;
+        wire pending;
+        reg previous_auto,previous_performance;
+        reg [1:0] healthy_sync,auto_sync,pending_sync;
+        posture_touch_controls controls(.clk(sys_clk_50m),.rst_n(lcd_rst_n),.click(click),.double_click(double_click),
+            .touch_ready(touch_ready),.page(page),.transition(transition),.import_locked(import_locked),
+            .click_x(click_x),.click_y(click_y),.ready(imu_ready),.calibrated(calibrated),.calibrating(calibrating),
+            .healthy(healthy),.calibrate(calibrate),.auto_enable(auto_enable));
+        mpu6050_posture #(.I2C_QUARTER(IMU_I2C_QUARTER),.CALIBRATION_LOG2(IMU_CALIBRATION_LOG2),.HEALTH_MS(IMU_HEALTH_MS),
+            .STABLE_MS(IMU_STABLE_MS),.COOLDOWN_MS(IMU_COOLDOWN_MS)) sensor(
+            .clk(sys_clk_50m),.rst_n(lcd_rst_n),.tick_ms(tick_ms),.calibrate(calibrate),.scl(imu_scl),.sda(imu_sda),
+            .ready(imu_ready),.calibrated(calibrated),.calibrating(calibrating),.healthy(healthy),
+            .stable_pose(stable_pose),.pose_event(pose_event),.pose_timbre_valid(tone_valid),.pose_timbre(pose_tone),.deadline_miss(math_deadline));
+        always @(posedge sys_clk_50m)begin
+            if(!lcd_rst_n)begin previous_auto<=0;previous_performance<=0;pending_sync<=0;end
+            else begin previous_auto<=auto_enable;previous_performance<=page==1;pending_sync<={pending_sync[0],pending};end
+        end
+        always @(posedge audio_clk_12m288)begin
+            if(!audio_rst_n)begin healthy_sync<=0;auto_sync<=0;end
+            else begin healthy_sync<={healthy_sync[0],healthy && !math_deadline};auto_sync<={auto_sync[0],auto_enable};end
+        end
+        posture_timbre_cdc transfer(.src_clk(sys_clk_50m),.src_rst_n(lcd_rst_n),
+            .src_event((pose_event || (auto_enable && !previous_auto) || (page==1 && !previous_performance)) &&
+                auto_enable && healthy && !math_deadline && page==1 && stable_pose!=0),
+            .src_timbre(tone_valid ? pose_tone : 2'd3),.dst_clk(audio_clk_12m288),.dst_rst_n(audio_rst_n),
+            .dst_event(arrived),.dst_timbre(arrived_tone));
+        posture_timbre_policy policy(.clk(audio_clk_12m288),.rst_n(audio_rst_n),.sample_tick(posture_sample_tick),
+            .auto_enable(auto_sync[1]),.sensor_healthy(healthy_sync[1]),.performance_mode(posture_performance),
+            .mode_switching(dst_command_valid),.manual_press(manual_timbre_press),.explicit_timbre_load(timbre_load),
+            .pose_event(arrived),.pose_timbre(arrived_tone),.current_timbre(timbre_mode),
+            .voice_active(posture_voice_active),.pending_note_on(posture_note_guard),
+            .pipeline_idle(posture_pipeline_idle),.timbre_busy(posture_timbre_busy),
+            .load_timbre(auto_timbre_load),.loaded_timbre(auto_timbre_code),.pending(pending));
+        assign imu_status={math_deadline,page!=1,pending_sync[1],stable_pose,auto_enable,healthy,calibrated,calibrating,imu_ready};
+    end else begin:no_posture
+        assign imu_scl=1'bz;assign imu_sda=1'bz;
+        assign imu_status=0;assign auto_timbre_load=0;assign auto_timbre_code=0;
+    end endgenerate
     generate if(USE_P2 && WRITABLE)begin:p3
     game_p3_service #(.UART_CLKS_PER_BIT(UART_CLKS_PER_BIT)) service(
         .clk(sys_clk_50m),.rst_n(lcd_rst_n),.audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),
@@ -118,8 +168,12 @@ module neo_guitar_touch_game_top #(
         .adc_mosi(adc_mosi),.adc_miso(adc_miso),.timbre_select(timbre_select),.rock_select(rock_select),
         .chorus_enable(chorus_enable),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),.reverb_enable(reverb_enable),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),.i2s_bclk(i2s_bclk),.i2s_ws(i2s_ws),.i2s_data(i2s_data),
-        .visual_snapshot(visual_snapshot),.game_snapshot(audio_game_snapshot),.final_pcm_valid(final_pcm_valid),.final_pcm(final_pcm));
-    guitar_touch_game_display #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2),.WRITABLE(WRITABLE)) u_display(
+        .visual_snapshot(visual_snapshot),.game_snapshot(audio_game_snapshot),.final_pcm_valid(final_pcm_valid),.final_pcm(final_pcm),
+        .posture_sample_tick(posture_sample_tick),.posture_performance(posture_performance),
+        .posture_pipeline_idle(posture_pipeline_idle),.posture_timbre_busy(posture_timbre_busy),
+        .posture_voice_active(posture_voice_active),.posture_note_guard(posture_note_guard));
+    guitar_touch_game_display #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2),.WRITABLE(WRITABLE),.IMU_ENABLE(ENABLE_IMU)) u_display(
+        .imu_status(imu_status),
         .overlay_valid(system_catalog_valid),.overlay_data(system_catalog_data),.frame_begin(frame_begin),
         .audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),.clk(sys_clk_50m),.rst_n(lcd_rst_n),
         .audio_snapshot(visual_snapshot),.audio_game_snapshot(audio_game_snapshot),.audio_pcm_valid(final_pcm_valid),.audio_pcm(final_pcm),

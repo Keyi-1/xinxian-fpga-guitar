@@ -24,9 +24,17 @@ def compile_score(path=SOURCE):
     for page in source['source_pages']:
         assert hashlib.sha256((ROOT/page['path']).read_bytes()).hexdigest()==page['sha256']
     review=source['rhythm_review']
-    assert review['status']=='USER_ACCEPTED_TRIAL', 'Rhythm revision needs user acceptance'
-    assert review['bars']==[10,18] and review['proposed_override']['token_index_zero_based']==4
-    assert review['user_authorization']=='2026-10-16 explicit reply: two bar-10/18 degree-5 half beats become one beat for listening review'
+    assert review['bars']==[10,18]
+    if review['status']=='USER_ACCEPTED_TRIAL':
+        # Preserve the earlier explicit trial for reproducible historical audio.
+        assert review['proposed_override']['token_index_zero_based']==4
+        assert review['user_authorization']=='2026-10-16 explicit reply: two bar-10/18 degree-5 half beats become one beat for listening review'
+        overrides={4:('5',Fraction(1,2),Fraction(1))}
+    else:
+        assert review['status']=='USER_CONFIRMED_BEAT_GRID', 'Rhythm revision needs user acceptance'
+        assert review['user_notation']=='1_11|(1)5_3|(3)___|345'
+        assert review['user_authorization']=='2026-10-18 explicit listening reply: rhythm correct, adopt this version in production score'
+        overrides={5:('3',Fraction(1,2),Fraction(1,4)),6:('~3',Fraction(1,4),Fraction(1))}
     scale=Fraction(SAMPLE_RATE*60,source['practice_bpm'])
     cursor=Fraction(0);notes=[];rows=[];ties=0;rests=0;revisions=[]
     for number,measure in enumerate(source['measures'],1):
@@ -35,9 +43,10 @@ def compile_score(path=SOURCE):
         for index,token in enumerate(measure['tokens']):
             value=token['pitch'];duration=Fraction(token['beats'])
             assert duration>0
-            if number in review['bars'] and index==4:
-                assert value=='5' and duration==Fraction(1,2)
-                duration=Fraction(1);revisions.append(dict(bar=number,token=index,pitch=value,from_beats='1/2',to_beats='1'))
+            if number in review['bars'] and index in overrides:
+                symbol,old,new=overrides[index]
+                assert value==symbol and duration==old
+                duration=new;revisions.append(dict(bar=number,token=index,pitch=value,from_beats=str(old),to_beats=str(new)))
             match=re.fullmatch(r'(~)?([+]*|[-]*)([0-7])',value)
             assert match,token
             tied,octaves,degree=match.groups();degree=int(degree)
@@ -57,7 +66,16 @@ def compile_score(path=SOURCE):
                     beat=str(cursor),source_midi=original,output_midi=midi,tied=bool(tied)))
             cursor+=duration
         assert cursor-bar_start==4,('bar is not four beats',number,cursor-bar_start)
-    events=allocate(notes,profile='game_extended');total=round(cursor*scale)
+    if review['status']=='USER_CONFIRMED_BEAT_GRID':
+        # This timing-only repair keeps the already accepted string choices.
+        # The complete new timeline is still checked for every lane conflict.
+        lane_map=json.loads((ROOT/'scores/p2/source/qing_ge_accepted_lanes.json').read_text(encoding='utf-8'))
+        assert lane_map['baseline_commit']=='7837a24837de29454f0da28f413bdd48abd5a592'
+        assert hashlib.sha256(bytes(e.midi for e in notes)).hexdigest()==lane_map['midi_sequence_sha256']
+        assert len(lane_map['lanes'])==len(notes)
+        events=[replace(e,lane=lane) for e,lane in zip(notes,lane_map['lanes'])]
+    else:events=allocate(notes,profile='game_extended')
+    total=round(cursor*scale)
     validate(events,total,profile='game_extended')
     report=dict(title=source['title'],measures=38,total_quarter_beats=str(cursor),
         practice_bpm=source['practice_bpm'],duration_samples=total,duration_seconds=total/SAMPLE_RATE,

@@ -116,3 +116,12 @@
 - C7原工程P&R/STA现已通过：Logic45324、Register18449、CLS26860/29952（89.6768%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.158/13.068MHz，运行仍50/12.288，setup/hold/latch/未布通0。源码/约束不变；PR1014两条通用时钟布线提示在旧M2也有，STA已按实际布线计入。旧55/13.5余量目标仍未达，不宣称P1全部目标完成。
 - 当前原impl已生成新C7位流，SHA256 `57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1`。严格最终 `tools/check_game_p3_result.py` 已PASS，认证 `gowin/neo_guitar_touch_game/p3_import_verification.json` 绑定源码、ROM、实际VG、全部证据、P&R/STA及位流；实际曲库384组布尔连线审计也已通过。PID32616、整机门级及最终校验均已结束，**不得重复构建或已通过的测试**；process.json为COMPLETE_VERIFICATION_PASS，C7运行时源码提交122d765。
 - 发布副本使用 `build/releases/touch_game/neo_guitar_touch_game_p3_uart_import.fs`，完整证据目录 `build/releases/touch_game/p3_uart_import_20261018/`，以其中archive.json及认证哈希核对归档。原工程`.fs`可直接用Programmer选择，无需重综合布线。PC上传环境和同一情歌导入样例已准备在 `build/p3_import/uploader_venv/`、`upload_example/`，步骤见 `docs/P3_WRITABLE_SONG_IMPORT.md`；未打开实物COM口。数字验证后只作归档和本地发布提交，随后按用户要求停止等指令；实物UART/听感/长期稳定性待用户验收，不推送/烧录/自动开始蓝牙或MPU。
+
+## P4 新授权与当前恢复点（2026-10-18，覆盖上节暂停决定）
+
+- 用户反馈当前版本没有明显问题，并明确要求先commit/push再修改。当前P3发布7837a24已成功推送origin/master（924ad7b..7837a24）；后续P4修改只在本地，不将此次许可扩展为自动推送新功能。未代理烧录、未采集实物文件哈希。
+- 用户将10/18小节明确为四个拍格 `1_11|(1)5_3|(3)___|345`，括号连音不复弹、最后345一拍三连音。60BPM软件拨弦试听已生成在 `build/qing_ge_rhythm_review/preview_v1/`，用户明确回复“节奏正确，采用这版修改正式曲谱”。正式源码/CSV/BIN/双曲库BSRAM初值已更新：5仍半拍、3提前半拍并持续5/4拍；每小节8起音，整曲212起音/152秒不变。独立测试逐事件证明仅四条事件时间变化，原分弦全部保留，其他曲目保持；旧P3归档不改。试听是软件参考音，不是板上PCM或新音色等价证据。
+- 用户授权尝试MPU-6050姿态切音色，确认GY-521，预计3V3，已有杜邦线但未接板/固定琴身。已读保护方案但不修改。选择独立GPIO：J8-11/Y21 SCL、J8-12/Y22 SDA、J8-1 3V3、J8-3 GND，AD0接模块GND；其他三脚不接。31005第19页及两版60K Bank8/已有官方约束已核对，ADC仍J8-5..8、原触控/I2S/矩阵不动。新渲染原图在 `build/p4_posture/board_evidence/`；模块供电/上拉电压和轴向仍待实测。
+- 当前已实现独立一字节指针MPU读取（既有I2C默认两字节保持）、复位/ID/10配置回读/14字节包/故障重试；256包平放校准、Q4低通、幅度/陀螺/变化门控、回差/500ms稳定/1s间隔/健康恢复，36位串行算术无新增DSP乘法表达式；姿态持有握手CDC；仅演奏模式空闲自动切换，手动优先并取消待命目标，竖抱不冒充琵琶。主页底部CALIBRATE/AUTO、演奏页底部小状态区，开机手动、游戏保留推荐/手动音色。
+- 组件 `sim/temp/p4_components_05/` 7项已PASS（含生产256包校准）；策略修订后 `p4_policy_06` PASS。整机 `p4_top_03` PASS：真实MPU GPIO、触控校准/AUTO、实际音色键、旧音待命/手动取消/退出/重入/故障恢复，2853音频样本/347读包/2次实际自动切换。明确刺激边界为触控/ADC注册输出与加速ms；真实音频时钟/采样方程保持。01/02发现正常PCM valid反复清空quiet计数而无法切换，已改采样边界排空、并加入脉冲/新拨弦优先回归，失败日志保留。
+- P4尚待整机回归、像素边界检查、新综合/原工程P&R/STA及当前实际VG验证/归档，不能用旧P3认证新源码或宣称新位流可下板。构建仍用原gprj/impl，入口 `tools/start_original_posture_build.ps1`，证据 `build/p4_posture/`。恢复先查既有Gowin PID/process.json，禁止重复启动。保护两个用户文件字节/暂存对象；不改音源参数/时钟/SDC或路由配置，不复活频带实验。不开始蓝牙/Flash/新音色。

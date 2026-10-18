@@ -63,12 +63,12 @@
       "test_only": false,
       "pitch_profile": "game_extended",
       "transpose_semitones": -12,
-      "provenance": "Complete 38-bar upper staff from two user-supplied images; 60 BPM, one octave down, no loop. Two explicitly accepted bar10/18 rhythm revisions await listening confirmation; not the full original-recording arrangement.",
+      "provenance": "Complete 38-bar upper staff from two user-supplied images; 60 BPM, one octave down, no loop. Bar10/18 beat grid explicitly confirmed by computer audition on 2026-10-18; not the full original-recording arrangement.",
       "reference": "scores/p2/source/qing_ge_user_melody.json",
       "offset": 491,
       "count": 212,
       "valid": true,
-      "crc32": "49355fa2"
+      "crc32": "c3451bbc"
     },
     {
       "slot": 4,
@@ -87,5 +87,5 @@
     }
   ],
   "integration": "Production touch UI/audio; Qing Ge user-score melody trial",
-  "bank_sha256": "b95418a7c187b5cd5ce62cf0b08dadff94e1916d40bdf627470eeea4a143b11c"
+  "bank_sha256": "fac18a76279199294cf5cfcc2709489e74c1131044e50fa81aff732130fb75e9"
 }

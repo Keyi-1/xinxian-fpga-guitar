@@ -1,5 +1,7 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
+**2026-10-18新源码正在验证P4：** 用户已确认第10/18小节电脑试听修订，并授权MPU-6050空闲姿态切音色；见[P4接线/操作及验证进度](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。P3提交7837a24已推送origin/master。下方P3记录只认证固定发布归档；本批原impl重建后须使用新的P4认证，不复用旧日志。
+
 **当前P3数字发布（2026-10-18，实物待验收）：** 可写曲库/DEBUG-USB2 UART已接入，原创慢练移除，第二槽待导入；五槽共用1345条导入空间，完整接收/实际RAM读回CRC后原子发布。原32模态相位/衰减状态合存RAM，全部音色参数、模态、运算时钟及演奏行为保持。
 
 原工程位流：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)，在用户原 `.gprj` / 原 `impl` 用 `gw_sh` 完成综合与完整P&R。直接选择 `.fs` 下载，无需重新综合布线。

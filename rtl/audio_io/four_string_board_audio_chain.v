@@ -46,7 +46,8 @@ module four_string_board_audio_chain #(
     output wire i2s_bclk, i2s_ws, i2s_data,
     input wire [3:0] external_note_on,external_note_off,external_force_release,
     input wire [127:0] external_phase_inc,
-    input wire game_cue_enable,game_miss_event
+    input wire game_cue_enable,game_miss_event,
+    output wire control_pipeline_idle,control_timbre_busy
 );
     wire [3:0] note_on, note_off, slide_busy;
     wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc;
@@ -59,6 +60,7 @@ module four_string_board_audio_chain #(
     wire [8:0] timbre_blend, chorus_blend, reverb_blend;
     wire [8:0] rock_blend;
     wire timbre_busy, chorus_busy, reverb_busy;
+    assign control_timbre_busy=timbre_busy;
     wire [7:0] piano_profile;
 
     generate if(EXTERNAL_CONTROL_ENABLE==0)begin : performance_control
@@ -299,6 +301,7 @@ module four_string_board_audio_chain #(
     assign pcm_mix_valid = stereo_valid;
 
     wire pcm16_left_valid, pcm16_right_valid;
+    assign control_pipeline_idle=!(voice_sample_valid || stereo_valid || pcm16_left_valid || pcm16_right_valid);
     wire signed [15:0] pcm16_left_out, pcm16_right_out;
     pcm24_to_16 u_pcm_left (
         .clk(clk_audio_ref), .rst_n(rst_n), .pcm_valid(stereo_valid),

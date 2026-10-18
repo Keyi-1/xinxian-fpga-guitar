@@ -21,21 +21,35 @@
   "rhythm_revisions": [
     {
       "bar": 10,
-      "token": 4,
-      "pitch": "5",
+      "token": 5,
+      "pitch": "3",
       "from_beats": "1/2",
+      "to_beats": "1/4"
+    },
+    {
+      "bar": 10,
+      "token": 6,
+      "pitch": "~3",
+      "from_beats": "1/4",
       "to_beats": "1"
     },
     {
       "bar": 18,
-      "token": 4,
-      "pitch": "5",
+      "token": 5,
+      "pitch": "3",
       "from_beats": "1/2",
+      "to_beats": "1/4"
+    },
+    {
+      "bar": 18,
+      "token": 6,
+      "pitch": "~3",
+      "from_beats": "1/4",
       "to_beats": "1"
     }
   ],
   "scope": "All 38 printed measures of the supplied two-page arrangement; not a reconstruction of unprovided original-recording sections",
-  "source_sha256": "6d6b9afdf0c8f4bde8ce8da1624c642b809919bea215a32ad2f4c8379c7b3745",
+  "source_sha256": "33f10fe9a10ad68e4ce0c9f85570a749d3aabc1a360a519af70d39cc7ba215c0",
   "source_pages": [
     {
       "page": 1,
@@ -545,7 +559,7 @@
       "bar": 10,
       "token": 4,
       "printed_pitch": "5",
-      "beats": "1",
+      "beats": "1/2",
       "beat": "149/4",
       "source_midi": 74,
       "output_midi": 62,
@@ -555,8 +569,8 @@
       "bar": 10,
       "token": 5,
       "printed_pitch": "3",
-      "beats": "1/2",
-      "beat": "153/4",
+      "beats": "1/4",
+      "beat": "151/4",
       "source_midi": 71,
       "output_midi": 59,
       "tied": false
@@ -565,8 +579,8 @@
       "bar": 10,
       "token": 6,
       "printed_pitch": "~3",
-      "beats": "1/4",
-      "beat": "155/4",
+      "beats": "1",
+      "beat": "38",
       "source_midi": 71,
       "output_midi": 59,
       "tied": true
@@ -1085,7 +1099,7 @@
       "bar": 18,
       "token": 4,
       "printed_pitch": "5",
-      "beats": "1",
+      "beats": "1/2",
       "beat": "277/4",
       "source_midi": 74,
       "output_midi": 62,
@@ -1095,8 +1109,8 @@
       "bar": 18,
       "token": 5,
       "printed_pitch": "3",
-      "beats": "1/2",
-      "beat": "281/4",
+      "beats": "1/4",
+      "beat": "279/4",
       "source_midi": 71,
       "output_midi": 59,
       "tied": false
@@ -1105,8 +1119,8 @@
       "bar": 18,
       "token": 6,
       "printed_pitch": "~3",
-      "beats": "1/4",
-      "beat": "283/4",
+      "beats": "1",
+      "beat": "70",
       "source_midi": 71,
       "output_midi": 59,
       "tied": true

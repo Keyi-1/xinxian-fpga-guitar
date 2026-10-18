@@ -56,7 +56,7 @@ def build():
         dict(slot=3, alias='QING_GE_MELODY', title='情歌旋律（用户谱完整38小节）', events=qing_melody, duration=qing_duration,
              bpm=60, timbre=1, playable=True, test_only=False,
              pitch_profile='game_extended',transpose_semitones=-12,
-             provenance='Complete 38-bar upper staff from two user-supplied images; 60 BPM, one octave down, no loop. Two explicitly accepted bar10/18 rhythm revisions await listening confirmation; not the full original-recording arrangement.',
+             provenance='Complete 38-bar upper staff from two user-supplied images; 60 BPM, one octave down, no loop. Bar10/18 beat grid explicitly confirmed by computer audition on 2026-10-18; not the full original-recording arrangement.',
              reference='scores/p2/source/qing_ge_user_melody.json'),
         dict(slot=4, alias='TIME_10MIN', title='十分钟边界测试', events=boundary, duration=600*48000,
              bpm=60, timbre=1, playable=False, test_only=True, provenance='Generated timing fixture, not a performance song'),

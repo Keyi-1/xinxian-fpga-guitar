@@ -1,0 +1,43 @@
+{
+  "status": "USER_CONFIRMED_FOR_PRODUCTION",
+  "baseline_commit": "7837a24837de29454f0da28f413bdd48abd5a592",
+  "bars": [
+    10,
+    18
+  ],
+  "bpm": 60,
+  "user_notation": "1_11|(1)5_3|(3)___|345",
+  "interpretation": "Each | separates quarter-note beats, not measures. First three beats use four sixteenth slots; final 345 is one quarter-note triplet. Parentheses continue the previous note without another attack.",
+  "attacks_in_quarter_beats": [
+    "0",
+    "1/2",
+    "3/4",
+    "5/4",
+    "7/4",
+    "3",
+    "10/3",
+    "11/3"
+  ],
+  "durations_in_quarter_beats": [
+    "1/2",
+    "1/4",
+    "1/2",
+    "1/2",
+    "5/4",
+    "1/3",
+    "1/3",
+    "1/3"
+  ],
+  "degrees": [
+    "+1",
+    "+1",
+    "+1",
+    "5",
+    "3",
+    "3",
+    "4",
+    "5"
+  ],
+  "scope": "Confirmed computer rhythm audition; production score may adopt these four changed events. A new FPGA build requires its own verification; old P3 archive remains unchanged.",
+  "listening_confirmation": "2026-10-18 user: 节奏正确，采用这版修改正式曲谱"
+}

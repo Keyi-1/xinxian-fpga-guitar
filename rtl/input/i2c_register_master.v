@@ -1,7 +1,8 @@
-// Single-master, open-drain I2C; 16-bit register pointer, 1..16 byte reads,
+// Single-master, open-drain I2C; 1/2-byte register pointer, 1..16 byte reads,
 // or one byte writes. All state uses clk, including clock-stretch timeout.
 module i2c_register_master #(
     parameter integer QUARTER_CYCLES=125,
+    parameter integer REGISTER_BYTES=2,
     parameter integer TIMEOUT_CYCLES=500000
 )(input wire clk,rst_n,start,read_request,
   input wire [6:0] device_address,input wire [15:0] register_address,
@@ -78,7 +79,11 @@ module i2c_register_master #(
                                 scl_low<=1;quarter<=0;bit_index<=7;
                                 if(error)state<=STOP;
                                 else case(kind)
-                                    0:begin kind<=1;tx_byte<=pointer[15:8];state<=TX;end
+                                    0:begin
+                                        kind<=REGISTER_BYTES==1 ? 3'd2 : 3'd1;
+                                        tx_byte<=REGISTER_BYTES==1 ? pointer[7:0] : pointer[15:8];
+                                        state<=TX;
+                                    end
                                     1:begin kind<=2;tx_byte<=pointer[7:0];state<=TX;end
                                     2:if(rd)state<=RESTART;
                                       else begin kind<=3;tx_byte<=data_byte;state<=TX;end

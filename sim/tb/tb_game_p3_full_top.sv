@@ -8,7 +8,7 @@ module tb_game_p3_full_top;
     reg clk=0,ac=0;always #10 clk=~clk;always #40.690104 ac=~ac;
     reg rx=1,click=0,dbl=0;reg [8:0] cx=0,cy=0;reg [3:0] pluck=0;
     wire tx;wire rst=dut.lcd_rst_n;
-    tri r0,r1,r2,r3;tri1 scl,sda,int_n;
+    tri r0,r1,r2,r3;tri1 scl,sda,int_n,imu_scl,imu_sda;
     integer rx_count=0,packets=0,samples=0,nonzero=0,attacks=0,frames=0;
     reg [7:0] received[0:4095];
     wire [31:0] game_time=dut.u_audio.p2.u_router.engine.song_time;
@@ -19,7 +19,7 @@ module tb_game_p3_full_top;
         .COL4(1'b1),.COL5(1'b1),.COL6(1'b1),.COL7(1'b1),.adc_cs_n(),.adc_sclk(),.adc_mosi(),.adc_miso(1'b0),
         .dac_bclk(),.dac_lrck(),.dac_din(),.pa_en_n(),.event_led(),.lcd_pclk(),.lcd_hsync(),.lcd_vsync(),.lcd_de(),.lcd_backlight(),
         .lcd_r(),.lcd_g(),.lcd_b(),.i2s_bclk(),.i2s_ws(),.i2s_data(),
-        .ctp_scl(scl),.ctp_sda(sda),.ctp_int(int_n),.ctp_rst_n(),.song_uart_rx(rx),.song_uart_tx(tx));
+        .ctp_scl(scl),.ctp_sda(sda),.ctp_int(int_n),.ctp_rst_n(),.song_uart_rx(rx),.song_uart_tx(tx),.imu_scl(imu_scl),.imu_sda(imu_sda));
     defparam dut.u_audio.p2.u_router.engine.COUNTDOWN_SAMPLES=4;
     `include "game_p3_uart_host.vh"
     always @(negedge ac)if(dut.audio_rst_n)begin

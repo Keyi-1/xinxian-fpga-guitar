@@ -8,7 +8,7 @@ module tb_game_p3_full_gate;
     reg clk=0,ac=0;always #10 clk=~clk;always #40.690104 ac=~ac;
     reg rx=1,click=0,dbl=0;reg [8:0] cx=0,cy=0;
     wire tx,rtx;wire rst=reference.lcd_rst_n;
-    tri1 gscl,gsda,gint,rscl,rsda,rint;tri [3:0] grow,rrow;
+    tri1 gscl,gsda,gint,rscl,rsda,rint,giscl,gisda,riscl,risda;tri [3:0] grow,rrow;
     wire gp,gh,gv,gd,gl,rp,rh,rv,rd,rl,grst,rrst;
     wire [5:0] gr,gg,gb,rr,rg,rb;wire [6:0] gaudio,raudio;
     integer rx_count=0,packets=0,samples=0,frames=0,pixels=0,attacks=0,last_frame;
@@ -22,13 +22,13 @@ module tb_game_p3_full_gate;
         .dac_bclk(gaudio[0]),.dac_lrck(gaudio[1]),.dac_din(gaudio[2]),.pa_en_n(gaudio[3]),
         .i2s_bclk(gaudio[4]),.i2s_ws(gaudio[5]),.i2s_data(gaudio[6]),
         .lcd_pclk(gp),.lcd_hsync(gh),.lcd_vsync(gv),.lcd_de(gd),.lcd_backlight(gl),.lcd_r(gr),.lcd_g(gg),.lcd_b(gb),
-        .ctp_scl(gscl),.ctp_sda(gsda),.ctp_int(gint),.ctp_rst_n(grst));
+        .ctp_scl(gscl),.ctp_sda(gsda),.ctp_int(gint),.ctp_rst_n(grst),.imu_scl(giscl),.imu_sda(gisda));
     rtlref_neo_guitar_touch_game_top reference(`COMMON,.song_uart_tx(rtx),
         .ROW0(rrow[0]),.ROW1(rrow[1]),.ROW2(rrow[2]),.ROW3(rrow[3]),
         .dac_bclk(raudio[0]),.dac_lrck(raudio[1]),.dac_din(raudio[2]),.pa_en_n(raudio[3]),
         .i2s_bclk(raudio[4]),.i2s_ws(raudio[5]),.i2s_data(raudio[6]),
         .lcd_pclk(rp),.lcd_hsync(rh),.lcd_vsync(rv),.lcd_de(rd),.lcd_backlight(rl),.lcd_r(rr),.lcd_g(rg),.lcd_b(rb),
-        .ctp_scl(rscl),.ctp_sda(rsda),.ctp_int(rint),.ctp_rst_n(rrst));
+        .ctp_scl(rscl),.ctp_sda(rsda),.ctp_int(rint),.ctp_rst_n(rrst),.imu_scl(riscl),.imu_sda(risda));
     `undef COMMON
     `include "game_p3_uart_host.vh"
     always @(posedge clk)begin
