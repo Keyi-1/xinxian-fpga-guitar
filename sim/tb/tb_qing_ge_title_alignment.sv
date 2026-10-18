@@ -13,9 +13,9 @@ module tb_qing_ge_title_alignment;
 `define ARGS .clk(clk),.rst_n(rst),.frame_start(frame),.page(page),.selected_slot(selected), \
     .display_fault(1'b0),.touch_ready(1'b1),.transition(1'b0),.x(x),.y(y), \
     .centres(384'd0),.tails(288'd0),.valid_blocks(32'd0),.game_snapshot(snapshot),.display_page()
-    touch_game_renderer #(.USE_P2(1)) dut(`ARGS,.rgb(now_rgb));
+    touch_game_renderer #(.USE_P2(1)) dut(.overlay_valid(5'd0),.overlay_data(480'd0),`ARGS,.rgb(now_rgb));
     touch_game_renderer_m1 #(.USE_P2(1)) frozen(`ARGS,.rgb(old_rgb));
-    touch_game_renderer #(.USE_P2(0)) legacy_dut(`ARGS,.rgb(legacy_now));
+    touch_game_renderer #(.USE_P2(0)) legacy_dut(.overlay_valid(5'd0),.overlay_data(480'd0),`ARGS,.rgb(legacy_now));
     touch_game_renderer_m1 #(.USE_P2(0)) legacy_frozen(`ARGS,.rgb(legacy_old));
 `undef ARGS
     initial begin

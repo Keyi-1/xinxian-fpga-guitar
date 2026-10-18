@@ -17,7 +17,7 @@ module tb_game_p2_top_gate;
         .COL0(1'b1),.COL1(1'b1),.COL2(1'b1),.COL3(1'b1), \
         .COL4(1'b1),.COL5(1'b1),.COL6(1'b1),.COL7(1'b1), \
         .adc_cs_n(),.adc_sclk(),.adc_mosi(),.adc_miso(1'b0),.event_led()
-    neo_guitar_touch_game_top gate(`PORTS,
+    neo_guitar_touch_game_top gate(.song_uart_rx(1'b1),.song_uart_tx(),`PORTS,
         .ROW0(grow[0]),.ROW1(grow[1]),.ROW2(grow[2]),.ROW3(grow[3]),
         .dac_bclk(gaudio[0]),.dac_lrck(gaudio[1]),.dac_din(gaudio[2]),.pa_en_n(gaudio[3]),
         .i2s_bclk(gaudio[4]),.i2s_ws(gaudio[5]),.i2s_data(gaudio[6]),

@@ -81,7 +81,7 @@
     "reference_sha256": "c0a138912edbf2504f64143049066234c4f10ea381fd974b9c58f6b147bd3bf4",
     "verification": "gowin/neo_guitar_touch_game/p2_qing_ge_melody_verification.json",
     "digital_status": "PASS: original-project full synthesis/P&R/STA and current-source RTL/Python/actual-netlist checks",
-    "hardware_status": "Awaiting this supplied-score melody listening and on-board confirmation; prior fragment feedback does not certify this version",
+    "hardware_status": "User reports on-board confirmation of the current melody version on 2026-10-18; minor rhythm discrepancies in bars 10 and 18 are accepted for now. Installed image hash and quantitative measurements were not independently captured.",
     "installed_bitstream_sha256": null,
     "publication_authorized": false,
     "agent_programmed_hardware": false,
@@ -91,6 +91,15 @@
       18
     ],
     "listening_check_high_pitch": "bar36 G5",
+    "user_feedback": {
+      "date": "2026-10-18",
+      "user_statement": "我觉得还好，10和18那两个小节好像是有一点节奏不对，但是影响不大，而且已经经过了下板验证。",
+      "reported_scope": "Current supplied-score melody version; overall board confirmation with a known minor rhythm discrepancy accepted for now, not a claim of score-perfect rhythm or separately measured bar36 G5",
+      "known_rhythm_bars": [10, 18],
+      "rhythm_disposition": "Keep current accepted timing; defer correction until explicitly revisited",
+      "installed_bitstream_sha256": null,
+      "agent_programmed_hardware": false
+    },
     "measurements": "No new quantitative acoustic or long-duration stability measurements"
   },
   "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the melody build",

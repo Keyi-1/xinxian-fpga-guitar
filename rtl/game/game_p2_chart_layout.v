@@ -1,7 +1,8 @@
 `include "../config/game_score_config.vh"
 // Positions come from absolute 48 kHz song time. One serial constant divider
 // is reused for centres and duration tails, entirely during vertical blank.
-module game_p2_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
+module game_p2_chart_layout #(parameter integer WRITABLE=0)(input wire clk,rst_n,frame_start,snapshot_update,
+    input wire [4:0] overlay_valid,input wire [479:0] overlay_data,
     input wire [255:0] snapshot,
     output wire score_read,output wire [10:0] score_address,input wire [95:0] score_data,
     output wire [383:0] centres,output wire [287:0] tails,
@@ -12,9 +13,16 @@ module game_p2_chart_layout(input wire clk,rst_n,frame_start,snapshot_update,
     reg [11:0] address,limit;
     wire [95:0] event_word=score_data;
     wire [1:0] lane=event_word[72:71];
-    wire [10:0] base;wire [11:0] event_count;
+    wire [10:0] base,static_base;wire [11:0] event_count,static_count;
+    assign base=static_base;
+    assign event_count=static_count;
     reg [5:0] previous_generation;
-    game_p2_catalog catalog(.slot(snapshot[237:235]),.valid(),.playable(),.test_only(),.timbre(),.duration(),.base(base),.event_count(event_count));
+    generate if(WRITABLE)begin:runtime_catalog
+    game_p3_catalog catalog(.slot(snapshot[237:235]),.overlay_valid(overlay_valid),.overlay_data(overlay_data),
+        .valid(),.playable(),.test_only(),.timbre(),.duration(),.progress_step(),.base(static_base),.event_count(static_count));
+    end else begin:immutable_catalog
+    game_p2_catalog catalog(.slot(snapshot[237:235]),.valid(),.playable(),.test_only(),.timbre(),.duration(),.base(static_base),.event_count(static_count));
+    end endgenerate
     assign score_read=state==READ;
     assign score_address=base+address[10:0];
     // game_snapshot_cdc already holds this word until the next frame request.

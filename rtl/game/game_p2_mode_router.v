@@ -1,6 +1,6 @@
 // Sample-aligned release handshake; one unchanged synthesis/effects chain.
 module game_p2_mode_router #(
-    parameter integer COUNTDOWN_SAMPLES=96000,ALLOW_AUTOPLAY_PREVIEW=1
+    parameter integer COUNTDOWN_SAMPLES=96000,ALLOW_AUTOPLAY_PREVIEW=1,WRITABLE=0
 )(input wire clk,rst_n,sample_tick,command_valid,input wire [1:0] command_mode,
   input wire [2:0] command_slot,
   input wire stable_valid,input wire [15:0] fret_id,
@@ -8,6 +8,9 @@ module game_p2_mode_router #(
   input wire [127:0] audible_phase,
   input wire display_clk,display_read,input wire [10:0] display_address,
   output wire [95:0] display_data,
+  input wire [4:0] overlay_valid,input wire [479:0] overlay_data,
+  input wire write_enable,input wire [10:0] write_address,input wire [95:0] write_data,
+  output wire storage_idle,
   output reg command_ack,output reg [1:0] mode,output reg switching,
   output reg timbre_load,output reg [1:0] timbre_code,
   output wire [3:0] note_on,note_off,force_release,
@@ -27,16 +30,23 @@ module game_p2_mode_router #(
     wire [2:0] active_slot;
     wire countdown,finished,fault,deadline;
     wire [1:0] song_timbre;
+    assign storage_idle=mode==0 && !switching && !command_valid;
+    generate if(WRITABLE)begin:runtime_catalog
+    game_p3_catalog catalog(.slot(selected_slot),.overlay_valid(overlay_valid),.overlay_data(overlay_data),
+        .valid(),.playable(),.test_only(),.base(),.event_count(),.duration(),.progress_step(),.timbre(song_timbre));
+    end else begin:static_catalog
     game_p2_catalog catalog(.slot(selected_slot),.valid(),.playable(),.test_only(),.base(),.event_count(),.duration(),.timbre(song_timbre));
+    end endgenerate
     guitar_play_control performance(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
         .stable_valid(stable_valid),.stable_fret_id(fret_id),
         .pluck_valid(pluck_valid & {4{mode==1 && !switching}}),.voice_active(voice_active),
         .smoothed_phase_inc(audible_phase),.note_on(play_on),.note_off(play_off),.target_phase_inc(play_phase));
-    game_p2_static_engine #(.COUNTDOWN_SAMPLES(COUNTDOWN_SAMPLES)) engine(
+    game_p2_static_engine #(.COUNTDOWN_SAMPLES(COUNTDOWN_SAMPLES),.WRITABLE(WRITABLE)) engine(
         .clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),.enable(mode>=2 && !switching),
         .start_song(start_song),.demo(mode==3),.selected_slot(selected_slot),.allow_test_slot(1'b0),
         .pluck_valid(pluck_valid),.velocity(velocity),.display_clk(display_clk),.display_read(display_read),
         .display_address(display_address),.display_data(display_data),.active_slot(active_slot),
+        .overlay_valid(overlay_valid),.overlay_data(overlay_data),.write_enable(write_enable),.write_address(write_address),.write_data(write_data),
         .note_on(game_on),.note_off(game_off),.target_phase(game_phase),.note_velocity(game_velocity),
         .song_time(song_time),.score(score),.combo(combo),.max_combo(max_combo),.hits(hits),.misses(misses),.wrongs(wrongs),
         .judgement(judgement),.judgement_epoch(epoch),.window_head(head),.consumed_snapshot(consumed),.generation(generation),
@@ -64,7 +74,7 @@ module game_p2_mode_router #(
             if(!command_valid)seen<=0;
             if(command_valid && !seen && !switching)begin
                 seen<=1;switching<=1;stop_sent<=0;aborting<=0;selected_slot<=command_slot;
-                requested_mode<=(command_mode>=2 && command_slot>=4) ||
+                requested_mode<=(command_mode>=2 && (command_slot>=5 || (command_slot==4 && !(WRITABLE && overlay_valid[4])))) ||
                     (command_mode==3 && !ALLOW_AUTOPLAY_PREVIEW) ? 2'd0 : command_mode;
                 stop_phase<=audible_phase;
             end else if(mode>=2 && fault && !start_song && !switching)begin

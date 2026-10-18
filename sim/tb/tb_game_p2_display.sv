@@ -15,10 +15,10 @@ module tb_game_p2_display;
     reg [31:0] expected_blocks;reg [383:0] expected_centres;reg [287:0] expected_tails;
     game_p2_score_bank bank(.audio_clk(ac),.audio_read(1'b1),.audio_address(address),.audio_data(),
         .display_clk(clk),.display_read(read),.display_address(address),.display_data(data));
-    game_p2_chart_layout layout(.clk(clk),.rst_n(rst),.frame_start(frame),.snapshot_update(update),.snapshot(snapshot),
+    game_p2_chart_layout layout(.overlay_valid(5'd0),.overlay_data(480'd0),.clk(clk),.rst_n(rst),.frame_start(frame),.snapshot_update(update),.snapshot(snapshot),
         .score_read(read),.score_address(address),.score_data(data),.centres(centres),.tails(tails),.valid_blocks(blocks),
         .display_snapshot(),.overflow(overflow),.deadline_miss(deadline));
-    touch_game_renderer #(.USE_P2(1)) renderer(.clk(clk),.rst_n(rst),.frame_start(frame),.page(page),
+    touch_game_renderer #(.USE_P2(1)) renderer(.overlay_valid(5'd0),.overlay_data(480'd0),.clk(clk),.rst_n(rst),.frame_start(frame),.page(page),
         .selected_slot(selected),.display_fault(overflow|deadline),.touch_ready(1'b1),.transition(1'b0),
         .x(x),.y(y),.centres(centres),.tails(tails),.valid_blocks(blocks),.game_snapshot(snapshot),.rgb(rgb),.display_page(shown));
     task publish(input integer song,time_value,first,input [63:0] consumed);

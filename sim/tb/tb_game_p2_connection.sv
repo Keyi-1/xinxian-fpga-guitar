@@ -13,7 +13,7 @@ module tb_game_p2_connection;
     reg key=1;wire bright,rock,chorus,sustain,room,harmony;wire [1:0] space;
     wire pcm_valid;wire signed [23:0] pcm;
     integer samples=0,loads=0,nonzero=0,s,before_sample;
-    touch_game_ui #(.USE_P2(1)) ui(.clk(sc),.rst_n(rst),.tick_ms(1'b0),.touch_ready(1'b1),
+    touch_game_ui #(.USE_P2(1)) ui(.import_busy(1'b0),.overlay_valid(5'd0),.clk(sc),.rst_n(rst),.tick_ms(1'b0),.touch_ready(1'b1),
         .click(click),.double_click(dbl),.click_x(cx),.click_y(cy),.game_snapshot(ui_snapshot),
         .command_busy(busy),.command_done(done),.command_send(send),.command_mode(command),
         .selected_slot(slot),.display_fault(1'b0),.page(page),.flush_gesture(flush),.transition(transition));
@@ -24,7 +24,7 @@ module tb_game_p2_connection;
     always @(posedge sc)frame_counter<=frame_counter+1'b1;
     game_snapshot_cdc snap(.src_clk(ac),.src_rst_n(rst),.src_snapshot(snapshot),.dst_clk(sc),.dst_rst_n(rst),
         .dst_request(frame_counter==0),.dst_snapshot(ui_snapshot),.dst_update(update));
-    game_p2_mode_router #(.COUNTDOWN_SAMPLES(4)) router(.clk(ac),.rst_n(rst),.sample_tick(tick),
+    game_p2_mode_router #(.COUNTDOWN_SAMPLES(4)) router(.overlay_valid(5'd0),.overlay_data(480'd0),.write_enable(1'b0),.write_address(11'd0),.write_data(96'd0),.storage_idle(),.clk(ac),.rst_n(rst),.sample_tick(tick),
         .command_valid(valid),.command_mode(destination[1:0]),.command_slot(destination[4:2]),
         .stable_valid(1'b0),.fret_id(16'd0),.pluck_valid(pluck),.voice_active(active),.velocity(8'haa),.audible_phase(phase),
         .display_clk(sc),.display_read(1'b0),.display_address(11'd0),.display_data(),

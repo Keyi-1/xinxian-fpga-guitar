@@ -16,7 +16,7 @@ module tb_game_p2_static_bank;
     reg [95:0] expected[0:2047];
     reg [95:0] previous_display=0;
     integer i,reads=0;
-    game_p2_static_engine #(.COUNTDOWN_SAMPLES(0)) dut(
+    game_p2_static_engine #(.COUNTDOWN_SAMPLES(0)) dut(.overlay_valid(5'd0),.overlay_data(480'd0),.write_enable(1'b0),.write_address(11'd0),.write_data(96'd0),
         .clk(clk),.rst_n(rst_n),.sample_tick(tick),.enable(1'b1),.start_song(start),.demo(1'b1),
         .selected_slot(selected),.allow_test_slot(allow_test),.pluck_valid(4'd0),.velocity(8'd0),
         .display_clk(display_clk),.display_read(display_read),.display_address(display_address),.display_data(display_data),

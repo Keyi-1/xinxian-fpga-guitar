@@ -108,5 +108,15 @@
         <File path="../../rtl/game/game_p2_mode_router.v" type="file.verilog" enable="1" />
         <File path="../../rtl/game/game_p2_chart_layout.v" type="file.verilog" enable="1" />
         <File path="../../rtl/config/game_p2_bsram_init.vh" type="file.other" enable="1" />
+        <File path="../../rtl/game/game_p3_catalog.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p3_catalog_cdc.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p3_import.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p3_protocol.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p3_score_bank.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p3_service.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/game/game_p3_uart.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/config/game_p3_bsram_init.vh" type="file.other" enable="1" />
+        <File path="../../rtl/game/game_p3_default_catalog.v" type="file.verilog" enable="1" />
+        <File path="../../mem/game_p3_initial.mem" type="file.other" enable="1" />
     </FileList>
 </Project>

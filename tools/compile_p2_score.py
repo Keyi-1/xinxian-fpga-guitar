@@ -12,8 +12,9 @@ def main():
     parser.add_argument('output_prefix', type=Path)
     parser.add_argument('--bpm', type=int, default=60)
     parser.add_argument('--timbre', type=int, choices=[0,1,2], default=1)
+    parser.add_argument('--profile', choices=['physical','game_extended'], default='physical')
     args = parser.parse_args()
-    events = read_csv(args.csv, args.bpm)
+    events = read_csv(args.csv, args.bpm, profile=args.profile)
     outputs = [args.output_prefix.with_suffix(s) for s in ['.mem', '.bin', '.json']]
     if any(p.exists() for p in outputs):
         raise SystemExit('Choose a new output prefix; existing files are preserved')
@@ -22,7 +23,7 @@ def main():
     outputs[0].write_text(''.join(f'{e.word():024x}\n' for e in events), encoding='ascii')
     outputs[1].write_bytes(payload)
     outputs[2].write_text(json.dumps(dict(format_version=2, event_bytes=16,
-        sample_rate_hz=SAMPLE_RATE, event_count=len(events),
+        sample_rate_hz=SAMPLE_RATE, pitch_profile=args.profile,event_count=len(events),
         duration_samples=max(e.onset+e.duration for e in events), bpm=args.bpm,
         recommended_timbre=args.timbre, crc32=crc,
         source_csv_sha256=hashlib.sha256(args.csv.read_bytes()).hexdigest()),indent=2)+'\n')

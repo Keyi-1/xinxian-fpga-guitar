@@ -12,7 +12,7 @@ module tb_game_p2_audio_preservation;
     wire [127:0] phase,target;
     wire [7:0] routed_velocity;
     wire [255:0] snapshot;
-    game_p2_mode_router router(.clk(clk),.rst_n(rst_n),.sample_tick(tick),.command_valid(command_valid),
+    game_p2_mode_router router(.overlay_valid(5'd0),.overlay_data(480'd0),.write_enable(1'b0),.write_address(11'd0),.write_data(96'd0),.storage_idle(),.clk(clk),.rst_n(rst_n),.sample_tick(tick),.command_valid(command_valid),
         .command_slot(3'd0),.display_clk(clk),.display_read(1'b0),.display_address(11'd0),.display_data(),.timbre_load(),.timbre_code(),
         .command_mode(command_mode),.command_ack(ack),.mode(mode),.switching(switching),
         .stable_valid(stable_valid),.fret_id(frets),.pluck_valid(pluck),.velocity(velocity),

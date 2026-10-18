@@ -1,9 +1,10 @@
 // Full-width four-lane stage. Four pixel stages fit the six-clock DCLK cadence:
 // relative note coordinates, shape selection, palette/font, output.
 // No framebuffer, per-pixel divide, blur or added audio processing.
-module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0)
+module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0,WRITABLE=0)
     (input wire clk,rst_n,frame_start,input wire [2:0] page,
     input wire [2:0] selected_slot,input wire display_fault,
+    input wire [4:0] overlay_valid,input wire [479:0] overlay_data,
     input wire touch_ready,transition,input wire [8:0] x,y,
     input wire [383:0] centres,input wire [287:0] tails,input wire [31:0] valid_blocks,
     input wire [255:0] game_snapshot,output reg [17:0] rgb,output reg [2:0] display_page);
@@ -25,7 +26,12 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     wire [2:0] title_slot=(display_page==3) ? selected_slot : active_slot;
     wire error_value=USE_P2 && (game_snapshot[233] || display_fault);
     // Generated from the immutable catalogue; no independently maintained times.
-    wire [31:0] progress_step=USE_P2 ? game_p2_progress_step(active_slot) : PROGRESS_STEP;
+    wire runtime_active=WRITABLE && active_slot<5 && overlay_valid[active_slot];
+    wire runtime_selected=WRITABLE && selected_slot<5 && overlay_valid[selected_slot];
+    wire [31:0] runtime_progress=({32{active_slot==0}}&overlay_data[0*96+:32]) |
+        ({32{active_slot==1}}&overlay_data[1*96+:32]) | ({32{active_slot==2}}&overlay_data[2*96+:32]) |
+        ({32{active_slot==3}}&overlay_data[3*96+:32]) | ({32{active_slot==4}}&overlay_data[4*96+:32]);
+    wire [31:0] progress_step=runtime_active ? runtime_progress : USE_P2 ? game_p2_progress_step(active_slot) : PROGRESS_STEP;
     reg [8:0] progress_identity;
     reg [7:0] animation;
     reg [19:0] score_shift;
@@ -169,7 +175,8 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     endtask
     task song_title;
         input [2:0] song;input integer ox,oy,scale;
-        begin case(song)
+        begin if(WRITABLE && song<5 && overlay_valid[song])label(58+song,ox,oy,6,scale,1);
+        else case(song)
             1:label(42,ox,oy,2,scale,0);
             2:if(scale==1)label(55,ox,oy,17,1,1);else label(43,ox,oy,4,scale,1);
             3:label(52,ox,oy,2,scale,0);
@@ -218,19 +225,22 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
             2:begin
                 label(3,176,6,4,2,0);label(17,24,14,2,1,0);
                 if(x>=24 && x<=455 && y>=48)begin
-                    background=y<(USE_P2 ? 224 : 92) ? {6'd6,6'd23,6'd36} : {6'd6,6'd9,6'd16};
+                    background=(WRITABLE ? (y<92 || (y<136 ? overlay_valid[1] : y<224 || (overlay_valid[4] && y<268))) : y<(USE_P2 ? 224 : 92)) ? {6'd6,6'd23,6'd36} : {6'd6,6'd9,6'd16};
                     if(y==48 || y==91 || y==135 || y==179 || y==223 || y==267)background={6'd12,6'd23,6'd35};
                 end
-                label(4,56,60,3,1,0);label(USE_P2 ? 48 : 24,268,60,USE_P2 ? 12 : 5,1,USE_P2);
+                if(WRITABLE && overlay_valid[0])begin song_title(0,56,60,1);label(63,268,60,3,1,1);end
+                else begin label(4,56,60,3,1,0);label(USE_P2 ? 48 : 24,268,60,USE_P2 ? 12 : 5,1,USE_P2);end
                 if(USE_P2)begin
-                    song_title(1,56,104,1);label(46,268,104,13,1,1);
-                    song_title(2,56,148,1);label(47,268,148,10,1,1);
-                    song_title(3,56,192,1);label(46,268,192,13,1,1);
-                    label(45,56,236,9,1,1);
+                    if(WRITABLE && !overlay_valid[1])label(5,56,104,3,1,0);
+                    else begin song_title(1,56,104,1);label(WRITABLE && overlay_valid[1] ? 63 : 46,268,104,WRITABLE && overlay_valid[1] ? 3 : 13,1,1);end
+                    song_title(2,56,148,1);label(WRITABLE && overlay_valid[2] ? 63 : 47,268,148,WRITABLE && overlay_valid[2] ? 3 : 10,1,1);
+                    song_title(3,56,192,1);label(WRITABLE && overlay_valid[3] ? 63 : 46,268,192,WRITABLE && overlay_valid[3] ? 3 : 13,1,1);
+                    if(WRITABLE && overlay_valid[4])begin song_title(4,56,236,1);label(63,268,236,3,1,1);end
+                    else label(45,56,236,9,1,1);
                 end else begin label(5,56,104,3,1,0);label(5,56,148,3,1,0);label(5,56,192,3,1,0);label(5,56,236,3,1,0);end
             end
             3:begin
-                label(6,176,20,4,2,0);label(17,24,14,2,1,0);song_title(USE_P2 ? selected_slot : 3'd0,USE_P2 && selected_slot==3 ? 224 : 192,70,1);
+                label(6,176,20,4,2,0);label(17,24,14,2,1,0);song_title(USE_P2 ? selected_slot : 3'd0,runtime_selected ? 216 : USE_P2 && selected_slot==3 ? 224 : 192,70,1);
                 label(25,184,170,6,1,0);
                 if(x>=64 && x<416 && y>=104 && y<144)begin
                     if(x<152)background={6'd12,6'd29,6'd60};
@@ -282,7 +292,8 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                         background=lane_judgement==1 || lane_judgement==2 ? {6'd52,6'd61,6'd63} : {6'd63,6'd25,6'd31};
                 end
                 if(x>=91 && x<101 && ((y>=57 && y<60)||(y>=254 && y<257)))background={6'd45,6'd60,6'd63};
-                if(!USE_P2 || active_slot==0)begin stage_title();label(34,16,32,3,1,0);label(35,88,32,6,1,1);end
+                if(runtime_active)begin song_title(active_slot,16,8,1);label(63,16,32,3,1,1);end
+                else if(!USE_P2 || active_slot==0)begin stage_title();label(34,16,32,3,1,0);label(35,88,32,6,1,1);end
                 else begin
                     if(active_slot==3)label(52,16,0,2,2,0);else song_title(active_slot,16,0,2);label(active_slot==1 ? 51 : active_slot==2 ? 50 : 57,16,32,10,1,1);
                     label(54,104,16,6,1,1);
@@ -305,7 +316,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                 end
             end
             6:begin
-                label(11,176,18,4,2,0);song_title(active_slot,USE_P2 && active_slot==3 ? 224 : 192,67,1);
+                label(11,176,18,4,2,0);song_title(active_slot,runtime_active ? 216 : USE_P2 && active_slot==3 ? 224 : 192,67,1);
                 if(error_value)label(53,208,88,5,1,1);
                 label(19,100,105,5,1,1);score_digits(100,126,1);
                 label(21,268,105,3,1,1);pair_digits(268,126,number_bcd[1*COUNTER_WIDTH+:COUNTER_WIDTH]);

@@ -13,7 +13,7 @@ module tb_touch_gesture_ui;
         .raw_x(raw_x),.raw_y(raw_y),.max_x(max_x),.max_y(max_y),.valid(mapped_valid),.mapped_count(mapped_count),.mapped_id(mapped_id),.x(x),.y(y));
     touch_gesture gesture(.clk(clk),.rst_n(rst_n),.tick_ms(tick_ms),.flush(flush|ui_flush),.frame_valid(mapped_valid),
         .count(mapped_count),.track_id(mapped_id),.x(x),.y(y),.click(click),.double_click(double_click),.click_x(cx),.click_y(cy));
-    touch_game_ui #(.FALLBACK_MS(20)) ui(.selected_slot(),.display_fault(1'b0),.clk(clk),.rst_n(rst_n),.tick_ms(tick_ms),.touch_ready(ready),
+    touch_game_ui #(.FALLBACK_MS(20)) ui(.import_busy(1'b0),.overlay_valid(5'd0),.selected_slot(),.display_fault(1'b0),.clk(clk),.rst_n(rst_n),.tick_ms(tick_ms),.touch_ready(ready),
         .click(click),.double_click(double_click),.click_x(cx),.click_y(cy),.game_snapshot(game_snapshot),
         .command_busy(command_busy),.command_done(command_done),.command_send(send),.command_mode(mode),.page(page),
         .flush_gesture(ui_flush),.transition(transition));

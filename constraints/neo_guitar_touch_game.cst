@@ -138,3 +138,10 @@ IO_LOC "ctp_sda" U16;
 IO_PORT "ctp_sda" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
 IO_LOC "ctp_scl" W16;
 IO_PORT "ctp_scl" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
+
+# NEO Dock 31005 DEBUG-USB2 / BL616 UART: J2-50 TX, J2-54 RX.
+# Verified against both 60K SOM schematics and the 31005 dock, not 31002 Y14.
+IO_LOC "song_uart_tx" U15;
+IO_PORT "song_uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "song_uart_rx" V14;
+IO_PORT "song_uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;

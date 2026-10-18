@@ -15,7 +15,7 @@ wire [5:0] r,g,b,rr,rg,rb;
 `define DISPLAY_INPUTS .clk(clk),.rst_n(rst_n),.audio_clk(audio_clk),.audio_rst_n(rst_n), \
  .audio_snapshot(snapshot),.audio_game_snapshot(game_snapshot),.audio_pcm_valid(pcm_valid), \
  .audio_pcm(pcm),.page(page),.touch_ready(1'b1),.transition(1'b0),.ui_game_snapshot()
-guitar_touch_game_display dut(`DISPLAY_INPUTS,.lcd_pclk(p),.lcd_hsync(h),.lcd_vsync(v),
+guitar_touch_game_display dut(.overlay_valid(5'd0),.overlay_data(480'd0),.frame_begin(),`DISPLAY_INPUTS,.lcd_pclk(p),.lcd_hsync(h),.lcd_vsync(v),
  .lcd_de(d),.lcd_backlight(l),.lcd_r(r),.lcd_g(g),.lcd_b(b));
 frozen_guitar_touch_game_display reference(`DISPLAY_INPUTS,.lcd_pclk(rp),.lcd_hsync(rh),.lcd_vsync(rv),
  .lcd_de(rd),.lcd_backlight(rl),.lcd_r(rr),.lcd_g(rg),.lcd_b(rb));

@@ -13,7 +13,8 @@ module neo_guitar_touch_game_top #(
     parameter integer FIXED_VELOCITY_ENABLE=`BOARD_FIXED_VELOCITY_ENABLE,
     parameter integer TOUCH_SWAP_AXES=-1,TOUCH_MIRROR_X=0,TOUCH_MIRROR_Y=0,
     // Training defaults; set both to zero for a player-triggered-only build.
-    parameter integer ALLOW_AUTOPLAY_PREVIEW=1,ENABLE_MISS_CUE=1,USE_P2=1
+    parameter integer ALLOW_AUTOPLAY_PREVIEW=1,ENABLE_MISS_CUE=1,USE_P2=1,WRITABLE=1,
+    parameter integer UART_CLKS_PER_BIT=434
 )(input wire audio_clk_12m288,sys_clk_50m,
   input wire USER_BUTTON1_n,USER_BUTTON2_n,USER_BUTTON3_n,
   inout wire ROW0,ROW1,ROW2,ROW3,
@@ -23,7 +24,8 @@ module neo_guitar_touch_game_top #(
   output wire lcd_pclk,lcd_hsync,lcd_vsync,lcd_de,lcd_backlight,
   output wire [5:0] lcd_r,lcd_g,lcd_b,
   output wire i2s_bclk,i2s_ws,i2s_data,
-  inout wire ctp_scl,ctp_sda,ctp_int,output wire ctp_rst_n);
+  inout wire ctp_scl,ctp_sda,ctp_int,output wire ctp_rst_n,
+  input wire song_uart_rx,output wire song_uart_tx);
     reg [7:0] startup_count=0;
     always @(posedge audio_clk_12m288)if(startup_count!=255)startup_count<=startup_count+1'b1;
     wire startup_done=startup_count==255;
@@ -70,7 +72,26 @@ module neo_guitar_touch_game_top #(
     wire [2:0] page,selected_slot;
     wire [4:0] dst_command;
     wire [255:0] ui_game_snapshot,audio_game_snapshot;
-    touch_game_ui #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2)) u_ui(
+    wire import_locked,storage_idle,frame_begin,score_write;
+    wire verify_read;wire [10:0] verify_address;
+    wire [10:0] score_write_address;wire [95:0] score_write_data;
+    wire [4:0] system_catalog_valid,audio_catalog_valid;
+    wire [479:0] system_catalog_data,audio_catalog_data;
+    generate if(USE_P2 && WRITABLE)begin:p3
+    game_p3_service #(.UART_CLKS_PER_BIT(UART_CLKS_PER_BIT)) service(
+        .clk(sys_clk_50m),.rst_n(lcd_rst_n),.audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),
+        .rx(song_uart_rx),.tx(song_uart_tx),.audio_idle(storage_idle),.frame_begin(frame_begin),
+        .menu_idle((page==0 || page==2) && !transition && touch_ready && (import_locked || (!command_send && !click && !double_click))),
+        .locked(import_locked),.write_enable(score_write),.write_address(score_write_address),.write_data(score_write_data),
+        .verify_read(verify_read),.verify_address(verify_address),.verify_data(display_data),
+        .system_valid(system_catalog_valid),.system_data(system_catalog_data),.audio_valid(audio_catalog_valid),.audio_data(audio_catalog_data));
+    end else begin:no_import
+    assign song_uart_tx=1;assign import_locked=0;assign score_write=0;assign score_write_address=0;assign score_write_data=0;
+    assign verify_read=0;assign verify_address=0;
+    assign system_catalog_valid=0;assign audio_catalog_valid=0;assign system_catalog_data=0;assign audio_catalog_data=0;
+    end endgenerate
+    touch_game_ui #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2),.WRITABLE(WRITABLE)) u_ui(
+        .import_busy(import_locked),.overlay_valid(system_catalog_valid),
         .clk(sys_clk_50m),.rst_n(lcd_rst_n),.tick_ms(tick_ms),.touch_ready(touch_ready),
         .click(click),.double_click(double_click),.click_x(click_x),.click_y(click_y),.game_snapshot(ui_game_snapshot),
         .command_busy(command_busy),.command_done(command_done),.command_send(command_send),.command_mode(command_mode),
@@ -87,21 +108,23 @@ module neo_guitar_touch_game_top #(
         .MATRIX_DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES),.ADC_SPI_CLK_DIV(ADC_SPI_CLK_DIV),
         .PLUCK_DEAD_SAMPLES(PLUCK_DEAD_SAMPLES),.PLUCK_SETTLE_SAMPLES(PLUCK_SETTLE_SAMPLES),
         .FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE),.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),
-        .ENABLE_MISS_CUE(ENABLE_MISS_CUE),.USE_P2(USE_P2)) u_audio(
+        .ENABLE_MISS_CUE(ENABLE_MISS_CUE),.USE_P2(USE_P2),.WRITABLE(WRITABLE)) u_audio(
+        .overlay_valid(audio_catalog_valid),.overlay_data(audio_catalog_data),.write_enable(score_write),.write_address(score_write_address),.write_data(score_write_data),.storage_idle(storage_idle),
         .clk(audio_clk_12m288),.rst_n(audio_rst_n),.command_valid(dst_command_valid),.command_mode(dst_command_mode),
-        .command_slot(dst_command[4:2]),.display_clk(sys_clk_50m),.display_read(display_read),
-        .display_address(display_address),.display_data(display_data),.timbre_load(timbre_load),.timbre_code(timbre_code),
+        .command_slot(dst_command[4:2]),.display_clk(sys_clk_50m),.display_read(display_read || verify_read),
+        .display_address(verify_read ? verify_address : display_address),.display_data(display_data),.timbre_load(timbre_load),.timbre_code(timbre_code),
         .command_ack(dst_command_ack),.fret_col_in_n({COL7,COL6,COL5,COL4,COL3,COL2,COL1,COL0}),
         .fret_row_oe(row_oe),.fret_row_drive_n(row_drive_n),.adc_cs_n(adc_cs_n),.adc_sclk(adc_sclk),
         .adc_mosi(adc_mosi),.adc_miso(adc_miso),.timbre_select(timbre_select),.rock_select(rock_select),
         .chorus_enable(chorus_enable),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),.reverb_enable(reverb_enable),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),.i2s_bclk(i2s_bclk),.i2s_ws(i2s_ws),.i2s_data(i2s_data),
         .visual_snapshot(visual_snapshot),.game_snapshot(audio_game_snapshot),.final_pcm_valid(final_pcm_valid),.final_pcm(final_pcm));
-    guitar_touch_game_display #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2)) u_display(
+    guitar_touch_game_display #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2),.WRITABLE(WRITABLE)) u_display(
+        .overlay_valid(system_catalog_valid),.overlay_data(system_catalog_data),.frame_begin(frame_begin),
         .audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),.clk(sys_clk_50m),.rst_n(lcd_rst_n),
         .audio_snapshot(visual_snapshot),.audio_game_snapshot(audio_game_snapshot),.audio_pcm_valid(final_pcm_valid),.audio_pcm(final_pcm),
         .selected_slot(selected_slot),.score_read(display_read),.score_address(display_address),.score_data(display_data),
-        .display_fault(display_fault),.page(page),.touch_ready(touch_ready),.transition(transition),.ui_game_snapshot(ui_game_snapshot),
+        .display_fault(display_fault),.page(page),.touch_ready(touch_ready),.transition(transition || import_locked),.ui_game_snapshot(ui_game_snapshot),
         .lcd_pclk(lcd_pclk),.lcd_hsync(lcd_hsync),.lcd_vsync(lcd_vsync),.lcd_de(lcd_de),.lcd_backlight(lcd_backlight),
         .lcd_r(lcd_r),.lcd_g(lcd_g),.lcd_b(lcd_b));
     assign ROW0=row_oe[0]?row_drive_n[0]:1'bz;assign ROW1=row_oe[1]?row_drive_n[1]:1'bz;

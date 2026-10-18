@@ -40,12 +40,27 @@ foreach($file in (Get-ChildItem -LiteralPath (Join-Path $repoDir 'rtl') -Recurse
     Set-Content -LiteralPath (Join-Path $sourceDir $file.Name) -Value $body -Encoding UTF8
     $hashes[$file.FullName.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $file.FullName).Hash.ToLower()
 }
+foreach($path in @('sim/reference/game_p2/game_note_controller_p1.v','sim/reference/game_p2/game_score_rom_p1.v')){
+    $file=Join-Path $repoDir $path
+    $body=(Get-Content -Raw $file).Replace('`include "../config/','`include "').Replace('"../../mem/',('"'+$repoDir.Replace('\','/')+'/mem/'))
+    [IO.File]::WriteAllText((Join-Path $sourceDir (Split-Path $file -Leaf)),$body,[Text.UTF8Encoding]::new($false))
+    $hashes[$path]=(Get-FileHash $file).Hash.ToLower()
+}
 Push-Location $simDir
 try{
     if(!(Test-Path -LiteralPath work)){& (Join-Path $ModelSimBin 'vlib.exe') work | Out-Null}
     $sources=Get-ChildItem -LiteralPath $sourceDir -Filter '*.v'|ForEach-Object FullName
-    $tests=@($Benches|ForEach-Object {Join-Path $repoDir "sim\tb\$_.sv"})
-    foreach($test in $tests){$hashes[$test.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $test).Hash.ToLower()}
+    $tests=@(foreach($bench in $Benches){
+        $test=Join-Path $repoDir "sim/tb/$bench.sv"
+        $hashes[$test.Substring($repoDir.Length+1)]=(Get-FileHash -LiteralPath $test).Hash.ToLower()
+        # Some P2 benches predate sim/temp and use ../../mem. Freeze and
+        # resolve that path exactly, rather than compiling a live bench with
+        # a cwd-dependent missing ROM or ignoring its simulator diagnostic.
+        $body=(Get-Content -Raw -LiteralPath $test).Replace('`include "../config/','`include "').Replace('"../../mem/',('"'+$repoDir.Replace('\','/')+'/mem/'))
+        $copy=Join-Path $sourceDir "$bench.sv"
+        [IO.File]::WriteAllText($copy,$body,[Text.UTF8Encoding]::new($false));$copy
+    })
+    [ordered]@{status='running';pid=$PID;started=(Get-Date).ToString('o');baseline_commit=$baseline;benches=$Benches;source_sha256=$hashes} | ConvertTo-Json -Depth 6 | Set-Content run.json -Encoding UTF8
     & (Join-Path $ModelSimBin 'vlog.exe') -sv "+incdir+$sourceDir" (Join-Path $GowinHome 'simlib/gw5a/prim_sim.v') @sources @tests > compile.log 2>&1
     if($LASTEXITCODE -or (Get-Content -Raw compile.log) -match '\*\* (Error|Fatal|Warning):'){throw 'Touch/game compile diagnostics'}
     foreach($bench in $Benches){

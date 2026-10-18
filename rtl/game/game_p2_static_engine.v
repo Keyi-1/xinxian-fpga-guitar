@@ -1,11 +1,13 @@
 // Immutable score bank shared by the production P2 audio and display paths.
 // Timbre is metadata only here; use it after the router's release/ack handshake.
-module game_p2_static_engine #(parameter integer COUNTDOWN_SAMPLES=96000)
+module game_p2_static_engine #(parameter integer COUNTDOWN_SAMPLES=96000,WRITABLE=0)
   (input wire clk,rst_n,sample_tick,enable,start_song,demo,
    input wire [2:0] selected_slot,input wire allow_test_slot,
    input wire [3:0] pluck_valid,input wire [7:0] velocity,
    input wire display_clk,display_read,input wire [10:0] display_address,
    output wire [95:0] display_data,
+   input wire [4:0] overlay_valid,input wire [479:0] overlay_data,
+   input wire write_enable,input wire [10:0] write_address,input wire [95:0] write_data,
    output reg [2:0] active_slot,output reg [1:0] recommended_timbre,
    output reg [10:0] active_base,output reg [11:0] active_count,
    output reg [31:0] active_duration,
@@ -23,10 +25,19 @@ module game_p2_static_engine #(parameter integer COUNTDOWN_SAMPLES=96000)
     wire [1:0] timbre;
     wire read_enable;
     wire [95:0] data;
+    generate if(WRITABLE)begin:runtime_bank
+    game_p3_catalog catalog(.slot(selected_slot),.overlay_valid(overlay_valid),.overlay_data(overlay_data),
+        .valid(valid),.playable(playable),.test_only(test_only),.progress_step(),
+        .base(base),.event_count(count),.duration(duration),.timbre(timbre));
+    game_p3_score_bank bank(.audio_clk(clk),.audio_read(read_enable),.audio_address(address),.audio_data(data),
+        .display_clk(display_clk),.display_read(display_read),.display_address(display_address),.display_data(display_data),
+        .write_enable(write_enable),.write_address(write_address),.write_data(write_data));
+    end else begin:static_bank
     game_p2_catalog catalog(.slot(selected_slot),.valid(valid),.playable(playable),.test_only(test_only),
         .base(base),.event_count(count),.duration(duration),.timbre(timbre));
     game_p2_score_bank bank(.audio_clk(clk),.audio_read(read_enable),.audio_address(address),.audio_data(data),
         .display_clk(display_clk),.display_read(display_read),.display_address(display_address),.display_data(display_data));
+    end endgenerate
     game_p2_window_controller #(.COUNTDOWN_SAMPLES(COUNTDOWN_SAMPLES)) controller(
         .clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),.enable(enable),.start_song(start_song),.demo(demo),
         .catalog_valid(valid && (playable || (test_only && allow_test_slot))),
