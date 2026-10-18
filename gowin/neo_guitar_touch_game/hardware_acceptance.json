@@ -146,8 +146,47 @@
     "hardware_status": "Awaiting user programming and DEBUG-USB2 physical UART/playing/listening/power/endurance checks; no COM port opened by agent",
     "installed_bitstream_sha256": null,
     "agent_programmed_hardware": false,
-    "publication_authorized": false,
+    "publication_authorized": true,
     "measurements": "No new quantitative acoustic or long-duration stability measurements",
-    "next_action_policy": "After this digital delivery stop and wait for explicit human instruction. No automatic Bluetooth/MPU/Flash work."
+    "next_action_policy": "After this digital delivery stop and wait for explicit human instruction. No automatic Bluetooth/MPU/Flash work.",
+    "user_feedback": {
+      "date": "2026-10-18",
+      "user_statement": "现在的版本没什么问题了，我觉得可以先commit并push到远端仓库，然后再进行修改。",
+      "reported_scope": "General positive feedback on accepted current P3 version; no separate claim of every UART failure/endurance test or installed-file hash",
+      "installed_bitstream_sha256": null,
+      "agent_programmed_hardware": false
+    },
+    "publication": {
+      "commit": "7837a24837de29454f0da28f413bdd48abd5a592",
+      "target": "origin/master",
+      "result": "Pushed successfully before new P4 edits; this authorization does not publish new P4 work"
+    }
+  },
+  "p4_posture_and_confirmed_rhythm": {
+    "date": "2026-10-18",
+    "digital_result": "IN_PROGRESS",
+    "implementation": "A2 original gprj/impl; A1 stopped during routing after user requested centred footer",
+    "rhythm_software_listening": {
+      "bars": [
+        10,
+        18
+      ],
+      "user_statement": "节奏正确，采用这版修改正式曲谱",
+      "reference": "scores/p2/review/qing_ge_rhythm_10_18_v1.json",
+      "scope": "Software reference for rhythm, not FPGA PCM/hardware acceptance"
+    },
+    "mpu_hardware": {
+      "model": "GY-521 / MPU-6050",
+      "user_supply_statement": "应该3V3",
+      "dupont_leads_available": true,
+      "wired_to_fpga": false,
+      "mounted_on_guitar": false,
+      "measured_supply_or_pullup_voltage": null
+    },
+    "hardware_status": "Awaiting new P4 board listening, physical MPU supply/pull-up checks, mounting axes, motion/pose/idle-tail switching and existing game/UART/endurance checks",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "publication_authorized": false
   }
 }

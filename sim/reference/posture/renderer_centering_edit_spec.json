@@ -1,0 +1,48 @@
+{
+  "base_commit": "2e0a2b9",
+  "scope": "Visible-character centering and right status rectangle inside existing IMU_ENABLE branch; pixel pipeline and touch geometry unchanged",
+  "files": {
+    "rtl/game/touch_game_renderer.v": {
+      "base_normalized_sha256": "bc25510e841d4c866a8a42a25b8ab9dd07897b3344d172f11168e3f94502fe2d",
+      "candidate_normalized_sha256": "2db6ae25ac92727ac5cf85d7c112de7f11e9ca15a53c3192238d566439de5f4e",
+      "changes": [
+        {
+          "start": 154,
+          "end": 156,
+          "before": "        input [95:0] text;input integer ox,oy;\n        reg [8:0] dx,dy;reg [3:0] index;reg [7:0] ch;\n",
+          "after": "        input [95:0] text;input integer centre_x,oy;input [3:0] characters;\n        reg [8:0] ox,dx,dy;reg [3:0] index;reg [7:0] ch;\n"
+        },
+        {
+          "start": 157,
+          "end": 158,
+          "before": "            if(x>=ox && x<ox+96 && y>=oy && y<oy+16)begin\n",
+          "after": "            // Centre the visible characters; trailing storage padding is not ink.\n            ox=centre_x-{characters,2'b00};\n            if(x>=ox && x<centre_x+{characters,2'b00} && y>=oy && y<oy+16)begin\n"
+        },
+        {
+          "start": 247,
+          "end": 247,
+          "before": "",
+          "after": "                        else if(x>=304 && x<464)background={6'd7,6'd22,6'd29};\n"
+        },
+        {
+          "start": 248,
+          "end": 250,
+          "before": "                    imu_text(\"CALIBRATE   \",32,248);\n                    imu_text(imu_display[4] ? \"AUTO ON     \" : \"AUTO OFF    \",176,248);\n",
+          "after": "                    imu_text(\"CALIBRATE   \",80,248,9);\n                    imu_text(imu_display[4] ? \"AUTO ON     \" : \"AUTO OFF    \",224,248,imu_display[4] ? 7 : 8);\n"
+        },
+        {
+          "start": 253,
+          "end": 254,
+          "before": "                        imu_display[6:5]==2 ? \"GUITAR      \" : imu_display[6:5]==3 ? \"UPRIGHT     \" : \"READY       \",328,248);\n",
+          "after": "                        imu_display[6:5]==2 ? \"GUITAR      \" : imu_display[6:5]==3 ? \"UPRIGHT     \" : \"READY       \",384,248,\n                        imu_display[9] ? 10 : !imu_display[0] ? 11 : imu_display[1] ? 6 :\n                        !imu_display[2] || !imu_display[3] ? 8 : imu_display[6:5]==1 ? 4 :\n                        imu_display[6:5]==2 ? 6 : imu_display[6:5]==3 ? 7 : 5);\n"
+        },
+        {
+          "start": 257,
+          "end": 258,
+          "before": "                imu_display[4] ? \"AUTO        \" : \"MANUAL      \",384,256);\n",
+          "after": "                imu_display[4] ? \"AUTO        \" : \"MANUAL      \",432,256,\n                imu_display[7] ? 9 : !imu_display[3] ? 11 : imu_display[4] ? 4 : 6);\n"
+        }
+      ]
+    }
+  }
+}
