@@ -95,17 +95,59 @@
       "date": "2026-10-18",
       "user_statement": "我觉得还好，10和18那两个小节好像是有一点节奏不对，但是影响不大，而且已经经过了下板验证。",
       "reported_scope": "Current supplied-score melody version; overall board confirmation with a known minor rhythm discrepancy accepted for now, not a claim of score-perfect rhythm or separately measured bar36 G5",
-      "known_rhythm_bars": [10, 18],
+      "known_rhythm_bars": [
+        10,
+        18
+      ],
       "rhythm_disposition": "Keep current accepted timing; defer correction until explicitly revisited",
       "installed_bitstream_sha256": null,
       "agent_programmed_hardware": false
     },
     "measurements": "No new quantitative acoustic or long-duration stability measurements"
   },
-  "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the melody build",
+  "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current P3 build",
   "current_original_project_bitstream": {
     "path": "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
-    "sha256": "c0a138912edbf2504f64143049066234c4f10ea381fd974b9c58f6b147bd3bf4",
-    "verification": "gowin/neo_guitar_touch_game/p2_qing_ge_melody_verification.json"
+    "sha256": "57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1",
+    "verification": "gowin/neo_guitar_touch_game/p3_import_verification.json",
+    "scope": "Current P3 C7 digital build, not yet installed/board-confirmed"
+  },
+  "p3_writable_uart_import": {
+    "date": "2026-10-18",
+    "digital_result": "PASS",
+    "implementation": "C7 original gprj and original impl",
+    "bitstream_sha256": "57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1",
+    "archive": "build/releases/touch_game/neo_guitar_touch_game_p3_uart_import.fs",
+    "resources": {
+      "Logic": 45324,
+      "Register": 18449,
+      "CLS": 26860,
+      "BSRAM": 113,
+      "DSP": 115.5
+    },
+    "fmax_mhz": {
+      "system": 50.158,
+      "audio": 13.068
+    },
+    "operating_clocks_mhz": {
+      "system": 50,
+      "audio": 12.288
+    },
+    "margin_targets_met": false,
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_deadlines": 0
+    },
+    "features": "Five-slot writable bank,1345 shared imported records, RAM readback CRC and frame-atomic commit, DEBUG-USB2 UART115200 8N1, original slow practice removed, full Qing Ge content/timbre retained",
+    "audio_preservation": "All original32 modes/parameters/sample clocks; frozen8192-sample performance and45210-sample/per-mode original-array proof; existing preview and physical frontend velocity2 retained",
+    "hardware_status": "Awaiting user programming and DEBUG-USB2 physical UART/playing/listening/power/endurance checks; no COM port opened by agent",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "publication_authorized": false,
+    "measurements": "No new quantitative acoustic or long-duration stability measurements",
+    "next_action_policy": "After this digital delivery stop and wait for explicit human instruction. No automatic Bluetooth/MPU/Flash work."
   }
 }

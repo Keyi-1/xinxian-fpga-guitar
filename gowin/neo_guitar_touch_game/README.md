@@ -1,17 +1,25 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**P3 开发进度（2026-10-18）：** 可写曲库和DEBUG-USB2 UART已接入，原创慢练移除，第二槽待导入。C2/C5布线失败、C6物理RAM超限后，C7把原32模态相位/衰减状态合存RAM，保持全部参数/模态及运算时钟。C7综合Logic44962、Register18449、逻辑BSRAM108；20+6项RTL、45210样本独立冻结音源、32项同源Python、实际状态RAM/增益ROM门级验证通过，当前完整P&R/STA与全机新VG验证进行中，尚无P3交付位流。下方M2认证只对应固定归档。见 [P3说明](../../docs/P3_WRITABLE_SONG_IMPORT.md)。本批交付后暂停等指令。
+**当前P3数字发布（2026-10-18，实物待验收）：** 可写曲库/DEBUG-USB2 UART已接入，原创慢练移除，第二槽待导入；五槽共用1345条导入空间，完整接收/实际RAM读回CRC后原子发布。原32模态相位/衰减状态合存RAM，全部音色参数、模态、运算时钟及演奏行为保持。
 
-**当前：《情歌》用户谱 38 小节主旋律（2026-10-16 发布，2026-10-18 用户下板确认）**：触控第四行“情歌”，60 BPM、152 秒、212 次起音，实际推荐第二音色。按用户确认整曲降一八度，游戏 D3～G5；演奏模式保持。仅上声部，第10／18小节仍有轻微节奏偏差，用户认为影响不大，当前保留为已知待改进项。
+原工程位流：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)，在用户原 `.gprj` / 原 `impl` 用 `gw_sh` 完成综合与完整P&R。直接选择 `.fs` 下载，无需重新综合布线。
+独立归档：[neo_guitar_touch_game_p3_uart_import.fs](../../build/releases/touch_game/neo_guitar_touch_game_p3_uart_import.fs)，SHA256 `57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1`。
+[当前认证](p3_import_verification.json)；[使用步骤、协议、完整前后对比和验证范围](../../docs/P3_WRITABLE_SONG_IMPORT.md)。
 
-M2发布时原工程位流为 `impl/pnr/neo_guitar_touch_game.fs`；当前P3正在原工程构建，请使用下面固定M2归档获取已验收版本。
+完整实现：Logic45324、Register18449、CLS26860/29952（89.68%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.158/13.068MHz，运行仍50/12.288。setup/hold/latch/未布通和已测deadline均0。CLS已达95%余量目标，55/13.5MHz两项仍未达到，不宣称旧P1余量目标全部完成。
+
+26项RTL、32项严格同源Python、8192冻结演奏样本、45210样本原数组/新RAM逐模态对照、22场景2715456有效像素、三个新实际VG入口均通过。完整VG仿真10次真实115200事务、四声部G5/D3/E4/C5、13397音频样本、16帧/5875200 LCD时钟样本；实际RAM/增益表另逐项验证。未打开实物COM口、未代理烧录或推送；DEBUG-USB2有线导入、听感和长期稳定性等待用户实测。本批交付后暂停，等明确指令，不自动开始蓝牙或MPU。
+
+**历史已下板基线M2：《情歌》用户谱38小节主旋律（2026-10-16发布，2026-10-18下板确认）**：触控第四行“情歌”，60BPM、152秒、212次起音、第二音色，游戏D3～G5。内容继续保留在P3；第10/18小节轻微节奏偏差仍按用户决定保留。
+
+M2发布时原工程位流为 `impl/pnr/neo_guitar_touch_game.fs`；当前该路径已更新为文首P3，请使用下面固定M2归档获取已验收版本。
 同哈希归档：[neo_guitar_touch_game_qing_ge_melody.fs](../../build/releases/touch_game/neo_guitar_touch_game_qing_ge_melody.fs)，SHA256 `c0a138912edbf2504f64143049066234c4f10ea381fd974b9c58f6b147bd3bf4`。
 本次使用 `gw_sh` 在同一 `.gprj` / 原 `impl` 完成综合和完整 P&R/STA。
 Logic **52286**、Register **23079**、CLS **28470/29952（95.052%）**、BSRAM **99/118**、DSP **115.5/118**；系统／音频 Fmax **55.334／13.143 MHz**。未布通、latch、setup／hold 及已测 deadline 为 0。
 CLS 为 95.052%；三项旧 P1 余量目标未全部达到，不能用本批合法实现宣称余量目标达成。实际运行时钟保持 50／12.288 MHz。
 
 20 项主旋律 RTL bench、20 屏标题像素对照、24 项曲谱／分弦 Python、冻结音频、完整 27/32 位扩展音域音频参考，以及本批实际 VG 的音乐、布局、10 帧／1,305,600 像素、4096 次双端口曲库读和 G5 持音／滑音／退出对照通过。
-[本批认证](p2_qing_ge_melody_verification.json)；[曲谱边界、完整前后对比和下板步骤](../../docs/QING_GE_USER_MELODY.md)。用户已报告本批下板确认，现场文件哈希未另行采集；没有代理烧录或新 push。后续以本批认证匹配当前原工程产物，旧认证仍只用于对应归档。
+[M2认证](p2_qing_ge_melody_verification.json)；[曲谱边界和历史下板步骤](../../docs/QING_GE_USER_MELODY.md)。用户已报告M2下板确认，现场文件哈希未另行采集；该认证只对应固定M2归档，当前原工程以文首P3认证为准。
 
 **历史片段 P2 集成（2026-10-16）：** 原工程综合、完整 P&R/STA 和所需回归已通过；用户已反馈片段练习循环通过。
 原工程 `impl` 已由文首新主旋律构建更新；片段历史请使用固定发布副本。

@@ -170,6 +170,12 @@ def evidence():
     hashes_current(data['log_sha256'])
     result[rel(pc)] = digest(pc)
     result.update(data['log_sha256'])
+    bank_audit=RUN/'bank_write_audit.json'
+    audit=load(bank_audit)
+    assert audit['result']=='PASS' and audit['boolean_cases']==384 and audit['pages']==2
+    assert audit['netlist_sha256']==digest(PROJECT/'impl/gwsynthesis'/f'{NAME}.vg')
+    assert audit['tool_sha256']==digest(ROOT/'tools/audit_game_p3_bank.py')
+    result[rel(bank_audit)]=digest(bank_audit)
     return result
 
 
@@ -200,7 +206,7 @@ def main():
         resources[name] = dict(used=float(hit[1]), available=float(hit[2]))
     assert resources['DSP']['used'] == 115.5
     tree = ET.parse(PROJECT/'impl/gwsynthesis'/f'{NAME}_syn_rsc.xml')
-    assert len([n for n in tree.iter('SubModule') if n.attrib.get('name') == 'bank' and n.attrib.get('Bsram') == '10']) == 1
+    assert len([n for n in tree.iter('SubModule') if n.attrib.get('name') == 'runtime_bank.bank' and n.attrib.get('Bsram') == '10']) == 1
     assert len([n for n in tree.iter('SubModule') if n.attrib.get('name')=='mode_state' and n.attrib.get('Bsram')=='1'])==4
     clocks = {}
     for name, required in [('audio_clk_12m288', 12.288), ('sys_clk_50m', 50.0)]:
@@ -251,7 +257,7 @@ def main():
     tools = [Path(__file__), ROOT/'tools/archive_game_p3.py', ROOT/'tools/prepare_game_p3_gate.py',
         ROOT/'tools/run_game_p3_checks.ps1', ROOT/'tools/run_game_p3_gate.ps1', ROOT/'tools/start_original_p3_build.ps1',
         ROOT/'tools/run_touch_game_checks.ps1', ROOT/'tools/continue_touch_game_checks.ps1',
-        ROOT/'sim/reference/game_p3/piano_shared_state_edit_spec.json']
+        ROOT/'sim/reference/game_p3/piano_shared_state_edit_spec.json',ROOT/'tools/audit_game_p3_bank.py']
     gate_body=read(ROOT/'sim/temp/p3_c7_full_gate_01/tb_game_p3_full_gate.log')
     gate_counts=re.search(r'(\d+) audio samples and (\d+) LCD clock samples across (\d+) frames',gate_body)
     assert gate_counts
