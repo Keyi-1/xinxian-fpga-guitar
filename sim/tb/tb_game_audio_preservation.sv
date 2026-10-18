@@ -1,5 +1,6 @@
 `timescale 1ns/1ps
 module tb_game_audio_preservation;
+    GSR GSR(.GSRI(1'b1));
     reg clk=0;always #5 clk=~clk;
     reg rst_n=0,stable_valid=0,command_valid=0,compare_audio=1;
     reg [1:0] command_mode=1;

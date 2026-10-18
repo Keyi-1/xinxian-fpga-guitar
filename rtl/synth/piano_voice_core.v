@@ -48,6 +48,7 @@ module piano_voice_core #(
     reg [21:0] rock_env_product;
     reg [11:0] rock_interp_level;
     reg [27:0] rock_amplitude_product;
+    wire [15:0] rock_gain_read;
     reg signed [32:0] rock_product;
     reg signed [27:0] rock_accumulator;
     reg signed [37:0] prior_blend_product,rock_blend_product;
@@ -119,6 +120,12 @@ module piano_voice_core #(
     wire [7:0] next_frame = (frame == 255) ? 8'd255 : frame + 1'b1;
     wire harmony_mode = CONTROL_ENABLE!=0 && MODES==32 && harmony_latched && mode_index>=16;
     wire [4:0] local_mode = harmony_mode ? mode_index-5'd16 : mode_index;
+    generate if(ROCK_ENABLE!=0)begin:rock_gain_storage
+        piano_rock_gain_rom gain(.clk(clk),.read_enable(state==LOAD),
+            .address({profile,local_mode}),.data(rock_gain_read));
+    end else begin:no_rock_gain_storage
+        assign rock_gain_read=16'd0;
+    end endgenerate
     // Three measured dry-wah profiles, 32 modes x 32 envelope observations.
     // Keep the first 2048 samples intact, then play only the wah envelope at
     // half speed. DDS phase, piano/bright envelopes and pick ramp still use
@@ -335,7 +342,7 @@ module piano_voice_core #(
                     bright_amplitude<=CONTROL_ENABLE!=0 && mode_enabled ?
                         (harmony_mode ? bright_amplitude_wide[38:23]>>1 : bright_amplitude_wide[38:23]) : 16'd0;
                     rock_amplitude_product<=ROCK_ENABLE!=0 && mode_enabled ?
-                        rock_env_product[16:5]*rock_gain_for(profile,local_mode) : 28'd0;
+                        rock_env_product[16:5]*rock_gain_read : 28'd0;
                     state<=MULT;
                 end
                 MULT: begin

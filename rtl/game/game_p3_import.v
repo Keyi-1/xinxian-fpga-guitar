@@ -164,7 +164,11 @@ module game_p3_import #(
                 end
                 STORE:begin
                     write_address<=candidate[10:0]+received[10:0];write_enable<=1;
-                    write_data<={record[111:96],5'd0,record[81:80],lane,record[70:64],length,onset};
+                    // CHECK already proved onset+length<=total<=28800000.
+                    // Make the resulting seven zero bits explicit so the
+                    // writable bank keeps the same range propagation as ROM.
+                    write_data<={record[111:96],5'd0,record[81:80],lane,record[70:64],
+                                 7'd0,length[24:0],7'd0,onset[24:0]};
                     last_onset<=onset;lane_seen[lane]<=1;lane_end[lane]<=end_time[31:0];lane_last[lane]<=onset;
                     lane_history[{lane,lane_pointer[lane]}]<=onset;lane_pointer[lane]<=lane_pointer[lane]+1'b1;
                     if(lane_count[lane]<8)lane_count[lane]<=lane_count[lane]+1'b1;
@@ -174,7 +178,10 @@ module game_p3_import #(
                     dividend<={dividend[30:0],1'b0};quotient<=next_quotient;
                     remainder<=subtract ? trial-11'd480 : trial[9:0];
                     if(divide_bit==31)begin
-                        commit_descriptor<={7'd0,song_timbre,total,count,candidate[10:0],next_quotient};state<=PUBLISH;
+                        // Successful allocation bounds count<=1345; the
+                        // accepted duration gives ceil(total/480)<=60000.
+                        commit_descriptor<={7'd0,song_timbre,7'd0,total[24:0],1'b0,count[10:0],
+                                            candidate[10:0],16'd0,next_quotient[15:0]};state<=PUBLISH;
                     end else divide_bit<=divide_bit+1'b1;
                 end
                 PUBLISH:if(commit_ready)begin

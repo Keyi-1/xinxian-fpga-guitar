@@ -2,8 +2,10 @@
 from pathlib import Path
 from datetime import datetime
 import hashlib
+import argparse
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -15,16 +17,28 @@ def digest(path):
 
 
 def main():
-    folder = ROOT/'build/p3_import/pc_checks'
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--name', default='pc_checks_c5')
+    args = parser.parse_args()
+    assert re.fullmatch(r'[a-zA-Z0-9_-]+', args.name)
+    folder = ROOT/'build/p3_import'/args.name
     assert not folder.exists(), 'Preserve completed evidence'
     folder.mkdir(parents=True)
-    sources = list((ROOT/'tools').glob('*.py'))
+    # Audit the actual Python dependency closure, rather than unrelated
+    # netlist/packaging tools that can legitimately change after this test.
+    names = ['test_game_fingering', 'test_game_score_v2', 'test_qing_ge_user_score',
+        'test_import_p2_melody_midi', 'test_game_score_upload', 'game_fingering',
+        'game_score_v2', 'qing_ge_user_score', 'generate_p2_static_scores',
+        'import_p2_melody_midi', 'game_score_upload', 'upload_game_score',
+        'compile_p2_score', 'generate_game_p3_bsram', 'generate_game_p2_bsram',
+        'generate_jasmine_score', 'run_game_p3_pc_checks', 'generate_piano_rock_gain_rom']
+    sources = [ROOT/'tools'/(name+'.py') for name in names]
     sources += [p for p in (ROOT/'scores/p2').rglob('*') if p.is_file()]
     hashes = {p.relative_to(ROOT).as_posix(): digest(p) for p in sources}
     commands = [
         ['-m', 'unittest', 'test_game_fingering', 'test_game_score_v2',
          'test_qing_ge_user_score', 'test_import_p2_melody_midi', 'test_game_score_upload', '-v'],
-        ['generate_game_p3_bsram.py', '--check']]
+        ['generate_game_p3_bsram.py', '--check'], ['generate_piano_rock_gain_rom.py', '--check']]
     logs = {}
     for i, command in enumerate(commands):
         result = subprocess.run([sys.executable]+command, cwd=ROOT/'tools', capture_output=True,

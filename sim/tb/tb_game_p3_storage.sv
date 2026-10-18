@@ -153,6 +153,21 @@ module tb_game_p3_storage;
         if(od[4*96+43+:12]!=1345 || od[4*96+:32]!=33625)$fatal(1,"FAIL: full-capacity metadata");
         begin_song(1,48000,0,2);
         for(i=0;i<2048;i=i+1)read_both(i,expected[i]);
+        // Validated bounds must propagate through the physical write and
+        // descriptor unchanged, including the final legal 25-bit onset.
+        for(j=0;j<7;j=j+1)begin
+            @(negedge clk);rst=0;repeat(3)@(negedge clk);rst=1;
+            case(j)
+                0:duration=1;1:duration=479;2:duration=480;3:duration=481;
+                4:duration=16777215;5:duration=16777216;6:duration=28800000;
+            endcase
+            one=event_word(duration-1,1,79,3,16'hffff);one[87:80]=3;
+            crc=crc_record(32'hffffffff,one)^32'hffffffff;
+            begin_song(1,duration,crc,0);data=one;send(1,0);ack=1;send(2,0);ack=0;
+            if(od[4*96+:96]!=={7'd0,2'd1,duration,12'd1,11'd703,(duration+32'd479)/32'd480})
+                $fatal(1,"FAIL: legal-bound descriptor duration%0d",duration);
+            read_both(703,{16'hffff,5'd0,2'd3,2'd3,7'd79,32'd1,duration-32'd1});
+        end
         $display("PASS: writable DPB %0d port reads; frozen initial image, all96/group/page writes, five-slot allocation/replacement/hole reuse/full1345 pool; %0d responses, CRC/interval/range/density/count/timeout/abort/reset; old directory preserved; ack-atomic publication",port_reads,tests);
         $finish;
     end

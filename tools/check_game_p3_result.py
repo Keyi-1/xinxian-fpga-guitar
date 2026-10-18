@@ -12,17 +12,18 @@ ROOT = Path(__file__).resolve().parent.parent
 PROJECT = ROOT/'gowin/neo_guitar_touch_game'
 NAME = 'neo_guitar_touch_game'
 BASE = 'cc8dbb7bd0d14be19c136d68f8d16679e823c0e9'
-RUN = ROOT/'build/p3_import/impl_c2'
+RUN = ROOT/'build/p3_import/impl_c5_packed_gainrom'
 VENDOR = re.compile(r'prim_sim\.v\((1860|1864|1868|1884|1888|1893|3130|3134|3138|3142|3313|3317)\): \(vopt-2697\)')
 ALLOWED = {'rtl/game/'+s+'.v' for s in ['game_p2_chart_layout', 'game_p2_mode_router',
     'game_p2_static_engine', 'guitar_touch_game_audio', 'guitar_touch_game_display',
     'touch_game_renderer', 'touch_game_ui']}
 ALLOWED |= {'rtl/top/neo_guitar_touch_game_top.v', 'rtl/config/game_ui_messages.vh',
     'mem/game_message_index.mem', 'constraints/'+NAME+'.cst',
-    'gowin/neo_guitar_touch_game/'+NAME+'.gprj'}
+    'gowin/neo_guitar_touch_game/'+NAME+'.gprj', 'rtl/synth/piano_voice_core.v'}
 NEW = {'rtl/game/game_p3_'+s+'.v' for s in ['catalog', 'catalog_cdc', 'default_catalog',
     'import', 'protocol', 'score_bank', 'service', 'uart']}
-NEW |= {'rtl/config/game_p3_bsram_init.vh', 'mem/game_p3_initial.mem'}
+NEW |= {'rtl/config/game_p3_bsram_init.vh', 'mem/game_p3_initial.mem',
+        'rtl/config/piano_rock_gain_init.vh', 'rtl/synth/piano_rock_gain_rom.v'}
 
 
 def digest(path):
@@ -62,6 +63,25 @@ def source_guard():
             changed.add(path)
     assert changed == ALLOWED, ('review exact P3 source boundary', changed ^ ALLOWED)
     assert NEW <= manifest.keys()
+    original_voice = old('rtl/synth/piano_voice_core.v').decode()
+    expected_voice = original_voice.replace('    reg [27:0] rock_amplitude_product;',
+        '    reg [27:0] rock_amplitude_product;\n    wire [15:0] rock_gain_read;')
+    assert expected_voice != original_voice
+    anchor="    wire [4:0] local_mode = harmony_mode ? mode_index-5'd16 : mode_index;"
+    expected_voice = expected_voice.replace(anchor, anchor+'''
+    generate if(ROCK_ENABLE!=0)begin:rock_gain_storage
+        piano_rock_gain_rom gain(.clk(clk),.read_enable(state==LOAD),
+            .address({profile,local_mode}),.data(rock_gain_read));
+    end else begin:no_rock_gain_storage
+        assign rock_gain_read=16'd0;
+    end endgenerate''')
+    expected_voice = expected_voice.replace('rock_env_product[16:5]*rock_gain_for(profile,local_mode)',
+        'rock_env_product[16:5]*rock_gain_read')
+    assert read(ROOT/'rtl/synth/piano_voice_core.v') == expected_voice, 'Only exact gain ROM storage may change in audio'
+    frozen_voice = read(ROOT/'sim/reference/game_p3/piano_voice_core_before_p3_rom.v')
+    assert frozen_voice == original_voice.replace('module piano_voice_core #(', 'module accepted_p3_source_voice #(')
+    from generate_piano_rock_gain_rom import build as gain_rom
+    assert (ROOT/'rtl/config/piano_rock_gain_init.vh').read_bytes() == gain_rom()
     # Freeze every allowed change to the reviewed synthesis snapshot, rather
     # than treating a module name as permission for arbitrary future edits.
     for path in ALLOWED | NEW:
@@ -84,7 +104,7 @@ def source_guard():
     current = ET.parse(PROJECT/f'{NAME}.gprj').find('FileList')
     before = {tuple(sorted(n.attrib.items())) for n in previous}
     after = {tuple(sorted(n.attrib.items())) for n in current}
-    assert before <= after and len(after-before) == 10
+    assert before <= after and len(after-before) == 12
     font = load(ROOT/'scores/game_font.json')
     frozen = json.loads(old('scores/game_font.json'))
     assert font['characters'] == frozen['characters'] and font['stage_title'] == frozen['stage_title']
@@ -102,8 +122,7 @@ def source_guard():
 
 def evidence():
     result = {}
-    runs = ['p3_c2_readback_02', 'p3_c2_full_top_01', 'p3_c2_display_01',
-            'p3_c2_final_rtl_01', 'p3_c2_full_gate_03']
+    runs = ['p3_c5_packed_rtl_02', 'p3_c5_final_twenty_01', 'p3_c5_full_gate_01', 'p3_c5_gain_gate_02']
     for name in runs:
         folder = ROOT/'sim/temp'/name
         receipt = folder/'verification.json'
@@ -114,11 +133,13 @@ def evidence():
         if isinstance(data['log_sha256'], dict):
             logs = {folder/(b+'.log'): h for b, h in data['log_sha256'].items()}
         else:
-            logs = {folder/'tb_game_p3_full_gate.log': data['log_sha256']}
+            bench = 'tb_game_p3_rock_gain_gate' if name == 'p3_c5_gain_gate_02' else 'tb_game_p3_full_gate'
+            logs = {folder/(bench+'.log'): data['log_sha256']}
             assert data['netlist_sha256'] == digest(PROJECT/'impl/gwsynthesis'/f'{NAME}.vg')
             assert digest(folder/'mapping.json') == data['mapping_sha256']
             mapping = load(folder/'mapping.json')
-            assert mapping['bank_dpb16'] == 12 and mapping['initial_rows'] == 2048
+            assert mapping['bank_dpb16'] == 10 and mapping['initial_rows'] == 2048
+            assert mapping['gain_rom_entries'] == 128 and mapping['gain_rom_dpb16'] == 1
             assert mapping['netlist_sha256'] == data['netlist_sha256']
         for path, value in logs.items():
             assert digest(path) == value
@@ -126,12 +147,12 @@ def evidence():
             assert 'PASS:' in body and not re.search(r'FAIL:|\*\* (Error|Fatal):', body)
             for line in body.splitlines():
                 if '** Warning:' in line:
-                    assert name == 'p3_c2_full_gate_03' and VENDOR.search(line), (path, line)
+                    assert name in ['p3_c5_full_gate_01', 'p3_c5_gain_gate_02'] and VENDOR.search(line), (path, line)
             result[rel(path)] = value
         for path in folder.glob('*'):
             if path.is_file() and path.suffix in ['.json', '.sv', '.vh', '.log']:
                 result[rel(path)] = digest(path)
-    pc = ROOT/'build/p3_import/pc_checks/verification.json'
+    pc = ROOT/'build/p3_import/pc_checks_c5/verification.json'
     data = load(pc)
     assert data['result'] == 'PASS'
     hashes_current(data['source_sha256'])
@@ -148,7 +169,7 @@ def main():
     manifest = source_guard()
     proof = evidence()
     if args.preflight:
-        print('PASS: current C2 source/ROM/protected files, 20+4 RTL benches, actual full VG and PC evidence; P&R not certified')
+        print('PASS: current C5 source/ROM/protected files, frozen gain ROM proof, 20+5 RTL benches, actual full VG/gain table and PC evidence; P&R not certified')
         return
     pnr = PROJECT/'impl/pnr'
     log = read(pnr/f'{NAME}.log')
@@ -166,9 +187,9 @@ def main():
         hit = re.search(rf'^\s+{name}\s+\|\s+([\d.]+)/([\d.]+)', report, re.M)
         assert hit and float(hit[1]) <= float(hit[2]), name
         resources[name] = dict(used=float(hit[1]), available=float(hit[2]))
-    assert resources['DSP']['used'] == 115.5 and resources['BSRAM']['used'] == 102
+    assert resources['DSP']['used'] == 115.5
     tree = ET.parse(PROJECT/'impl/gwsynthesis'/f'{NAME}_syn_rsc.xml')
-    assert len([n for n in tree.iter('SubModule') if n.attrib.get('name') == 'bank' and n.attrib.get('Bsram') == '12']) == 1
+    assert len([n for n in tree.iter('SubModule') if n.attrib.get('name') == 'bank' and n.attrib.get('Bsram') == '10']) == 1
     clocks = {}
     for name, required in [('audio_clk_12m288', 12.288), ('sys_clk_50m', 50.0)]:
         hit = re.search(rf'<td>{name}</td>\s*<td>([\d.]+)\(MHz\)</td>\s*<td>([\d.]+)\(MHz\)</td>', timing)
@@ -203,6 +224,16 @@ def main():
         assert path.stat().st_mtime >= started, ('stale implementation artifact', path)
     artifacts += [RUN/p for p in ['process.json', 'source_manifest.json', 'protected_user_files.json',
         'synthesis_review.json', 'build.tcl', 'build.stdout.log', 'build.stderr.log']]
+    config_snapshot = RUN/'protected_process_config.snapshot.json'
+    assert digest(config_snapshot) == load(RUN/'protected_user_files.json')['gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json']['sha256']
+    artifacts.append(config_snapshot)
+    runtime = ROOT/'build/p3_import/pc_checks/runtime_environment.json'
+    environment = load(runtime)
+    assert environment['physical_port_opened'] is False and environment['system_python_changed'] is False
+    wheel = ROOT/'build/p3_import/uploader_wheels/pyserial-3.5-py2.py3-none-any.whl'
+    assert environment['wheel_sha256'] == digest(wheel) == 'c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0'
+    artifacts += [runtime, wheel]
+    artifacts += [ROOT/'build/p3_import/upload_example'/('qing_ge'+suffix) for suffix in ['.bin', '.json', '.mem']]
     prior = load(PROJECT/'p2_qing_ge_melody_verification.json')
     assert digest(ROOT/'build/releases/touch_game/neo_guitar_touch_game_qing_ge_melody.fs') == prior['bitstream_sha256']
     tools = [Path(__file__), ROOT/'tools/archive_game_p3.py', ROOT/'tools/prepare_game_p3_gate.py',
@@ -212,16 +243,18 @@ def main():
         project=rel(PROJECT/f'{NAME}.gprj'), implementation=rel(PROJECT/'impl')),
         previous_release_commit=BASE, validated_source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         source_sha256=manifest, source_guard=dict(reviewed_changed_modules=sorted(ALLOWED), new_files=sorted(NEW),
-            unchanged='All other RTL, audio, tone parameters, ROM assets, scan timing and SDC equal board-confirmed M2'),
+            unchanged='All other RTL, tone parameters, ROM assets, scan timing and SDC equal board-confirmed M2; piano voice has exactly three reviewed edits moving the unchanged gain table into BSRAM'),
         artifacts_sha256={rel(p): digest(p) for p in artifacts}, evidence_sha256=proof,
         verification_tools_sha256={rel(p): digest(p) for p in tools},
         resources=resources, clocks=clocks, previous_release_resources=prior['resources'], previous_release_clocks=prior['clocks'],
         margin_targets_met=(resources['CLS']['used']/resources['CLS']['available'] <= .95 and clocks['sys_clk_50m']['fmax_mhz'] >= 55 and clocks['audio_clk_12m288']['fmax_mhz'] >= 13.5),
         bitstream_sha256=digest(fs), netlist_sha256=digest(vg),
         violations=dict(setup=0, hold=0, latch=0, unrouted=0, tested_audio_deadline=0, tested_score_deadline=0, tested_layout_deadline=0),
-        bank=dict(total_records=2048, reserved_initial_records=703, shared_import_records=1345, actual_dpb16_blocks=12,
-            crc_readback='All96 stored bits/group retained; full1345 RTL stress; actual gate imports one G5 event'),
-        audio=dict(frozen_baseline='655458f32ba4f7e06403fd6c5c4da0b6f0dad8a7', samples=8192, reference_clocks=2097153, sustained_exit_samples=1452),
+        bank=dict(total_records=2048, logical_record_bits=96, stored_nonconstant_bits=77,
+            reserved_initial_records=703, shared_import_records=1345, actual_dpb16_blocks=10,
+            crc_readback='All96 logical bits/group retained exactly; full1345 RTL stress; actual full gate imports one G5 event'),
+        audio=dict(frozen_baseline='655458f32ba4f7e06403fd6c5c4da0b6f0dad8a7', samples=8192, reference_clocks=2097153, sustained_exit_samples=1452,
+            independent_frozen_voice_samples=45096, velocity_levels=4, timbres=3, pitch_profiles=3, exact_gain_rom_entries=128),
         display=dict(frozen_m2_effective_pixels=2715456, scenes=22, menu_exception='Removed slow practice row only',
             actual_full_gate_audio_samples=12503, actual_full_gate_lcd_clock_samples=5483520, actual_full_gate_frames=15),
         training_defaults=dict(ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1),

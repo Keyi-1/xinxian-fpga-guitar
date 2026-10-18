@@ -1,5 +1,6 @@
 param([Parameter(Mandatory=$true)][string]$RunName,
       [string]$Bench='tb_game_p3_full_gate',
+      [string]$ImplementationRun='impl_c5_packed_gainrom',
       [string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64')
 $ErrorActionPreference='Stop'
 if($RunName -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Simple name required'}
@@ -24,7 +25,8 @@ foreach($path in @("sim/tb/$Bench.sv",'sim/tb/game_p3_uart_host.vh','tools/prepa
     if($path -match '\.(sv|vh)$'){Copy-Item $file $runDir}
 }
 $vg=Join-Path $repoDir 'gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.vg'
-$review=Get-Content -Raw (Join-Path $repoDir 'build/p3_import/impl_c2/synthesis_review.json') | ConvertFrom-Json
+if($ImplementationRun -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Simple implementation name required'}
+$review=Get-Content -Raw (Join-Path $repoDir "build/p3_import/$ImplementationRun/synthesis_review.json") | ConvertFrom-Json
 if((Get-FileHash $vg).Hash.ToLower() -ne $review.netlist_sha256){throw 'Inspect current netlist before testing'}
 Copy-Item $vg (Join-Path $runDir 'compiled.vg')
 $record=[ordered]@{status='running';pid=$PID;started=(Get-Date).ToString('o');source_sha256=$hashes;netlist_sha256=$review.netlist_sha256;scope='Complete actual production VG versus current full RTL; no ROM/phase injection'}

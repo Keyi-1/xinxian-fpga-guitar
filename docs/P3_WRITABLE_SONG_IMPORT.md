@@ -1,6 +1,6 @@
 # P3 可写曲库与 DEBUG-USB2 UART 导入
 
-2026-10-18 实施中。当前 C2 原工程综合、20+4项RTL、32项Python以及完整实际VG对照已通过；同一次完整P&R仍在进行，尚无本阶段可交付位流或完整STA。不要将原 `impl/pnr` 仍保留的 M2 位流认作本阶段产物。
+2026-10-18 实施中。C2功能和实际VG通过但P&R失败（2218未布通），不能交付。C5原工程综合、20+5项RTL、45096样本独立冻结音源、32项Python及实际增益ROM门级验证已通过，同次完整P&R/STA和完整VG仿真仍在进行。仍无本阶段合法位流。不要将原 `impl/pnr` 保留的 M2 位流认作本阶段产物。
 
 用户指定顺序：可写曲库 → UART → 有线下板成功后尝试蓝牙。本批不加入 MPU、蓝牙、Flash/SD 或新音色。主工程保持原 `.gprj` 与原 `impl`，发布归档独立保存；不推送、不代理烧录。
 
@@ -12,6 +12,7 @@
 - 新曲先写空闲连续范围，提交前旧版本仍占用空间；空闲范围不足返回 `NO_SPACE`。成功后才释放旧导入范围供复用；内置前缀不回收。接口重置后恢复默认目录，旧导入数据不可达。
 - 导入只允许主页/选曲页，且音频路由已确认空闲、触控可用、无模式切换。导入事务锁定触控操作；演奏/试听/游戏/准备/结果页返回 `BUSY`。
 - 收到整曲后检查 CRC32，并从**实际 BSRAM 逐条读回重算 CRC**；成功后将目录描述符握手传到音频域，收到确认后在下一帧消隐开始发布系统域目录并 ACK。不能只靠电脑检查，也不能在半曲状态下选中。
+- C5物理存储只保存合法记录的77个有效位（25位起音/25位时长/7位MIDI/两位轨道和力度/完整16位group），用10个DPB16承载；对外恢复完整96位逻辑记录及原一时钟读取。省去的高位/flags必须在写入前已验证为零；所有合法事件和CRC保持，不缩减时间/音域或音频位宽。
 - 保持游戏 D3–G5/MIDI50–79、四轨无需按品、实际拨弦力度和实时合成。数据包含时间、音高和轨道，不传 PCM 或任意 DDS。第10/18小节目前时值按用户已接受版本保留。
 - 导入数据仅在持续供电时保留，复位、重新配置或断电后丢失。拔电脑时需保留独立供电。持久化存储另行实施。
 
@@ -65,6 +66,17 @@ FPGA 校验事件总时长≤10min、非零时长、结束时间不溢出且≤�
 
 Python 工具只有显式调用并指定 `--port` 才打开串口；本次未自动向实物发送、烧录或更新固件。
 
+本机已在仓库内准备独立上传环境，不改 `E:\anaconda3`：`build/p3_import/uploader_venv/Scripts/python.exe`，已校验并安装 [PyPI pyserial 3.5](https://pypi.org/project/pyserial/3.5/)（wheel SHA256 `c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0`）。模块导入和CLI帮助通过，记录 `build/p3_import/pc_checks/runtime_environment.json`。若换机器，可重新建虚拟环境安装此依赖。
+
+待位流验收通过、烧录并确认COM号后，在仓库根目录执行（COM5只是示例）：
+
+```powershell
+.\build\p3_import\uploader_venv\Scripts\python.exe tools/upload_game_score.py --port COM5 --list
+.\build\p3_import\uploader_venv\Scripts\python.exe tools/upload_game_score.py --port COM5 --slot 2 --bin build/p3_import/upload_example/qing_ge.bin --metadata build/p3_import/upload_example/qing_ge.json
+```
+
+示例直接用已接受的同一份《情歌》CSV，以60BPM/第二音色/游戏扩展音域编译：212事件、7296000样本，CRC32 `49355fa2`；已经过上传器文件配对校验。它用于先验证导入到空第二槽的有线闭环，不替换内置第四槽，也未向实物发送。第二槽名称显示为 `USER 2`。
+
 ## 当前证据和限制
 
 - C1 整机综合失败：66497 Logic >59904；未启动 P&R。因失败未更新 VG/资源XML，原目录留下的旧 M2 网表/报告不能认证 C1。
@@ -75,5 +87,7 @@ Python 工具只有显式调用并指定 `--port` 才打开串口；本次未自
 - 原九项RTL、P2有界窗口/全曲控制/判定、三音色冻结音频8192样本/2097153时钟、延音退出1452样本、D3–G5完整32位音频参考和按键回归已通过。与C2修改无关的既有音源证据保留；最终认证仍须逐项匹配当前源码或明确冻结边界。
 - 32项电脑测试通过（其中8项协议/上传器），覆盖分弦/同轨约束、v2编谱、用户全曲/移调、MIDI输入、黄金CRC、32字节损坏/截断、分段写、丢ACK、噪声、重复提交、未知提交结果和编谱文件配对。证据 `build/p3_import/pc_checks/`；未打开实物串口。
 - 实际完整VG与当前完整RTL：`sim/temp/p3_c2_full_gate_03/`，7次真实115200 UART请求/ACK、真实DPB写入及读回CRC/group、双域提交、第五行触控/实际第二音色/G5起音/退出、12503音频样本、15帧/5483520 LCD时钟样本（不是独立有效像素数），包括频谱和曲线渐暗。只在注册触控输出刺激和经审计的全部32位倒计时Q上加速；没有注入曲谱、DDS或起音。12个实际DPB的2048×96初值全部核对；实际门级动态导入为1事件，满1345事件及跨页写读属于RTL压力验证。
-- 原工程 C2：`build/p3_import/impl_c2/`，PID35316，源码/ROM/约束/保护文件哈希及stdout/stderr留存；综合审查通过后已放行同进程完整P&R。综合LUT49645、ALU9295、寄存器25708、BSRAM102；这些不是最终CLS和Fmax，待完整实现报告。
+- 原工程C2 `build/p3_import/impl_c2/` 已结束，实际P&R Logic59282、CLS29937/29952、BSRAM103、2218未布通。C3仅显式高位常量省270Logic；C4精确力度移位加减虽等价但比C3增加601Logic，均审查否决、未P&R，原乘法已恢复。
+- 当前C5 `build/p3_import/impl_c5_packed_gainrom/` PID27940。除曲库无损打包外，原哇音96项增益常量改为每声部1个DPB在LOAD提前读取，仍在现有LOOKUP使用，全部系数、模态和时钟计划不变。冻结原源 `sim/reference/game_p3/piano_voice_core_before_p3_rom.v`；独立45096样本覆盖三音色/三频段轮廓/四力度、击弦/和声/延音/哇音年龄边界及退出，128地址含默认零逐条对照。五项回归 `sim/temp/p3_c5_packed_rtl_02/`，13712读/1445响应。32项Python与两个生成器 `build/p3_import/pc_checks_c5/`。综合LUT48770+ALU9279=58049、寄存器25450、BSRAM100；完整实现/CLS/Fmax待报告。
+- 20项最终C5回归 `sim/temp/p3_c5_final_twenty_01/` 已通过；从缺失vendor GSR处接续，旧音频bench只补全局GSR一行并保留已通过六项，源码/修订/旧失败在 `resume.json`，不忽略诊断或删除音频断言。实际新VG的增益ROM `sim/temp/p3_c5_gain_gate_02/` 256读/128地址、同步一拍和使能保持已通过；完整VG仿真 `sim/temp/p3_c5_full_gate_01/` 进行中。旧C2通过记录只认证C2。
 - 当前工作完成归档后按用户要求暂停，等进一步指令；不自动开始蓝牙或MPU。

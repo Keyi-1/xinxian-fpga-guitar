@@ -95,8 +95,11 @@
 
 - 原创“慢练”按用户要求从生产初始曲库移除；第二行待导入，茉莉花/riff/情歌仍在第1/3/4行。历史 P2 资产不删除。初始保留703事件，2048条总库中1345条共享导入空间，五槽覆盖目录、暂存/实际RAM读回CRC/双时钟原子提交。
 - DEBUG-USB2 官方31005底板和两版60K核心板网络核对后，新增TX=U15、RX=V14、LVCMOS33；仅追加两脚，SDC与原接线不变。证据在 `build/p3_import/board_evidence/`。115200/8N1，XG3固定32字节帧及停等ACK；尚未打开实物COM口。
-- 原工程C1综合66497 Logic超限，未P&R；旧M2网表不能认证C1。C2固定五槽选择/窄字节索引消除了动态乘96导致的大量逻辑和意外DSP。原工程C2综合已通过，当前完整P&R进程PID35316，日志 `build/p3_import/impl_c2/build.stdout.log`；同目录绑定源码/ROM/约束/保护文件及实际VG。恢复先查该进程和日志，禁止重复启动。
+- 原工程C1综合66497 Logic超限，未P&R。C2固定五槽选择/窄字节索引后综合通过，但完整P&R有2218未布通；Logic59282、CLS29937、BSRAM103，失败证据在 `build/p3_import/impl_c2/pnr_failed/`，不认证位流。C3合法高位显式常量只省270Logic，未P&R；C4精确力度移位算术虽通过百万乘积/25128样本等价，却增加601Logic，已否决并恢复原乘法。不要复活这些失败候选。
 - C2所需20项RTL、4项新增P3 RTL（存储/UART/整机/冻结显示）、32项Python已通过；整机当前实际VG对当前完整RTL门级验证通过，7次真实115200请求/ACK、12503音频样本、15帧/5483520 LCD时钟样本。冻结M2显示2715456有效像素/22场景，删除慢练行是明确限定例外。综合网表与P&R不能混用旧证据。
 - 对应 `sim/temp/p3_c2_readback_02/`、`p3_c2_full_top_01/`、`p3_c2_display_01/`、`p3_c2_final_rtl_01/`、`p3_c2_full_gate_03/`；Python `build/p3_import/pc_checks/`。20项回归曾缺少两份冻结P2参考，保留前10项成功日志后补编参考续跑；`resume.json`完整记录，无需重跑。
-- 当前仍待原工程完整P&R/STA及最终独立位流归档；不能提前宣称P3可交付。最终使用 `tools/check_game_p3_result.py` / `tools/archive_game_p3.py`，旧校验器不放宽。
+- 当前C5：合法96位逻辑曲谱无损打包为77有效位/10个DPB（全部group保留，公开读口仍96位一拍），哇音原96项增益表用每声部1个DPB在LOAD读出，现有LOOKUP使用，不加运算时钟、不改参数/模态。冻结原音源45096样本覆盖三音色/三频段轮廓/四力度、击弦/和声/延音/哇音年龄边界及释放通过；五项P3 RTL完整通过 `sim/temp/p3_c5_packed_rtl_02/`。
+- C5原工程综合已通过：LUT48770+ALU9279=58049、寄存器25450、BSRAM100，DSP配置恢复为原值（不以综合值代替最终CLS）。同一进程PID27940已审查放行完整P&R；日志 `build/p3_import/impl_c5_packed_gainrom/build.stdout.log`。20项回归 `sim/temp/p3_c5_final_twenty_01/` 全部通过，旧音频bench因新增DPB需GSR，只加一行并精确审计后保留前六项续跑（`resume.json`）。32项Python和两个生成器在 `build/p3_import/pc_checks_c5/`，不重复已完成项。
+- 当前实际完整VG门级对照正在 `sim/temp/p3_c5_full_gate_01/`（host session41198），实际增益ROM256读/128地址及一拍/使能保持已通过 `sim/temp/p3_c5_gain_gate_02/`。01因综合审查记录尚未写完而前置条件失败，未运行仿真，记录完整保留。
+- 当前仍待原工程完整P&R/STA、完整VG仿真完成及独立位流归档，不能提前宣称P3可交付。恢复先查已有PID/日志/仿真，不重复构建。最终使用 `tools/check_game_p3_result.py` / `tools/archive_game_p3.py`，旧校验器不放宽。
 - 用户要求完成当前任务后暂停，等明确指令再继续；即使有线下板成功，也不自动开始蓝牙、MPU或下一功能。

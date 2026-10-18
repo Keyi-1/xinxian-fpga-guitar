@@ -58,7 +58,7 @@ def main():
                 copy(source, target/'supplemental'/source.relative_to(ROOT))
     for path in ['AGENTS.md', 'gowin/neo_guitar_touch_game/README.md', 'gowin/neo_guitar_touch_game/hardware_acceptance.json']:
         copy(ROOT/path, target/'documentation'/path)
-    started = datetime.fromisoformat(json.loads((ROOT/'build/p3_import/impl_c2/process.json').read_text(encoding='utf-8-sig'))['started']).timestamp()
+    started = datetime.fromisoformat(json.loads((ROOT/'build/p3_import/impl_c5_packed_gainrom/process.json').read_text(encoding='utf-8-sig'))['started']).timestamp()
     for source in (PROJECT/'impl/pnr').glob('*'):
         if source.is_file() and source.stat().st_mtime >= started and source.suffix in ['.html', '.txt', '.css', '.do', '.cfg', '.log']:
             copy(source, target/'reports'/source.name)
