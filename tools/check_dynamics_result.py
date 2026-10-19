@@ -94,6 +94,14 @@ def evidence():
     assert d['result']=='PASS' and d['boolean_cases']==384 and d['netlist_sha256']==digest(PROJECT/'impl/gwsynthesis'/f'{NAME}.vg')
     assert d['tool_sha256']==digest(ROOT/'tools/audit_dynamics_bank.py')
     result[rel(audit)]=digest(audit)
+    gain_audit=RUN/'gain_operand_audit.json';gain=load(gain_audit)
+    assert gain['result']=='PASS' and gain['boolean_cases']==128 and len(gain['voices'])==4
+    assert gain['netlist_sha256']==digest(PROJECT/'impl/gwsynthesis'/f'{NAME}.vg')
+    assert gain['tool_sha256']==digest(ROOT/'tools/audit_dynamics_gain.py')
+    saved_vg=SAVED/'evidence/gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.vg'
+    assert digest(saved_vg)==gain['saved_netlist_sha256']=='f64a6960a33513f73e2c60006b31a0fdf18970cce2fd0a23a128eb81e816e3c2'
+    for voice in gain['voices'].values():assert voice['values']==[64,160,208,256] and voice['dsp_parameters_unchanged'] is True
+    result[rel(gain_audit)]=digest(gain_audit)
     return result
 
 
@@ -162,11 +170,12 @@ def main():
     artifacts.append(config_snapshot)
     prior=load(SAVED/'verification.json')
     artifacts+=[SAVED/'verification.json',ROOT/'sim/reference/velocity_teammate/reference.json']
+    artifacts+=[SAVED/'evidence/gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.vg']
     artifacts+=list((ROOT/'sim/reference/velocity_teammate/user_inputs').glob('*'))
     pc_inputs=load(ROOT/'build/p4_posture/pc_checks_a1/verification.json')['source_sha256']
     artifacts+=[ROOT/p for p in pc_inputs]
     tools=[Path(__file__)]+[ROOT/'tools'/n for n in ['archive_dynamics.py','run_dynamics_checks.ps1','run_dynamics_legacy.ps1','review_dynamics_synthesis.py','run_velocity_gate.ps1',
-        'prepare_velocity_gate.py','prepare_posture_gate.py','prepare_game_p3_gate.py','compare_synth_graph.py','audit_dynamics_bank.py',
+        'prepare_velocity_gate.py','prepare_posture_gate.py','prepare_game_p3_gate.py','compare_synth_graph.py','audit_dynamics_bank.py','audit_dynamics_gain.py',
         'start_original_dynamics_synthesis.ps1','route_original_velocity.ps1','run_touch_game_checks.ps1']]
     route=load(RUN/'route_process.json');route.update(status='COMPLETE_VERIFICATION_PASS',verified_at=datetime.now().astimezone().isoformat())
     (RUN/'route_process.json').write_text(json.dumps(route,indent=2)+'\n',encoding='utf-8')
@@ -187,7 +196,8 @@ def main():
             timbres=3,velocity_levels=4,measured_samples_per_level=1024,single_voice_dry_hard_rails=0,
             current_gain_pcm_pt8211_i2s_oracle=True,old_voice_levels1_to3_exact=True,level0_gain_scaling_rounding_checked=True,synthetic_crosstalk_trials=140,frozen_authorized_level0_gain_only=True,frozen_audio_samples=8192,frozen_audio_reference_clocks=2097153,
             extended_full32_oracle_samples=9032,sustain_exit_samples=1452,current_actual_vg_benches=3,
-            actual_adc_gate_clocks=4739008,actual_adc_conversions=32238,bank_boolean_cases=384,
+            actual_adc_gate_clocks=4739008,actual_adc_conversions=32238,bank_boolean_cases=384,actual_four_voice_gain_operand_cases=128,
+            previous_voice_samples=30024,previous_voice_levels1_to3_exact_samples=8694,previous_voice_low_level_scaling_samples=21330,
             unchanged_pc_tests_reused=33,unchanged_pc_scope='Exact complete PC source/input hashes; no Python score/protocol changes'),
         publication=dict(user_authorized_same_name_overwrite=True,path='build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs',
             saved_old_archive=rel(SAVED),saved_old_sha256=prior['bitstream_sha256'],local_tag='snapshot/p4-velocity-before-ch0-threshold-20261019'),
