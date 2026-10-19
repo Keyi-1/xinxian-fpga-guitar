@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 import sys
 import threading
+import tempfile
+import uuid
 
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QRectF, QTimer
 from PyQt5.QtGui import QColor, QFont, QPainter, QPainterPath, QPen
@@ -17,6 +19,8 @@ from PyQt5.QtWidgets import (QApplication, QComboBox, QFileDialog, QFrame,
 from . import VERSION
 from .core import (Journal, TIMBRES, Cancelled, CommitUncertain, CommittedUnverified,
                    export_package, friendly_error, load_score, probe, upload)
+from .preview_audio import render_preview
+from .preview_panel import PreviewPanel
 
 
 STYLE = """
@@ -53,6 +57,10 @@ QProgressBar { border:0; background:#e6e8de; border-radius:4px; min-height:9px; 
 QProgressBar::chunk { background:#6e8c73; border-radius:4px; }
 QPlainTextEdit { background:#eeece4; border:0; border-radius:7px; color:#586057; padding:8px; font-family:Consolas; font-size:12px; }
 QToolTip { background:#fffdf8; color:#343d38; border:1px solid #d7d9ce; padding:6px; }
+QSlider::groove:horizontal { background:#dedfd4; height:4px; border-radius:2px; }
+QSlider::sub-page:horizontal { background:#82957e; border-radius:2px; }
+QSlider::handle:horizontal { background:#526f58; border-radius:6px; width:12px; margin:-4px 0; }
+QSlider:disabled::handle:horizontal { background:#bfc4b8; }
 """
 STYLE = STYLE.replace("ICON_DIR", (Path(__file__).resolve().parent / "assets").as_posix())
 
@@ -101,6 +109,7 @@ class Notes(QWidget):
     def __init__(self):
         super().__init__()
         self.score = None
+        self.playhead = None
         self.setMinimumHeight(125)
         self.setToolTip("横轴为全曲时间；每一块来自实际曲谱事件，纵轴为四根弦。此图不播放声音。")
 
@@ -129,6 +138,10 @@ class Notes(QWidget):
         p.setPen(QColor("#85887c"))
         p.drawText(QRectF(36, self.height()-24, 80, 20), Qt.AlignLeft, "0:00")
         p.drawText(QRectF(self.width()-95, self.height()-24, 80, 20), Qt.AlignRight, duration_text(self.score.seconds))
+        if self.playhead is not None:
+            x = area.left() + min(1,max(0,self.playhead))*area.width()
+            p.setPen(QPen(QColor("#395e49"), 1.5))
+            p.drawLine(int(x), int(area.top()), int(x), int(area.bottom()))
 
 
 def duration_text(seconds):
@@ -155,7 +168,8 @@ class Job(QThread):
 
 
 class Window(QMainWindow):
-    def __init__(self, data_dir, examples, port_provider=None, probe_fn=probe, upload_fn=upload):
+    def __init__(self, data_dir, examples, port_provider=None, probe_fn=probe, upload_fn=upload,
+                 player_factory=None):
         super().__init__()
         self.journal = Journal(Path(data_dir) / "pending_commit.json")
         self.examples = Path(examples)
@@ -171,6 +185,7 @@ class Window(QMainWindow):
         self.worker = None
         self.close_requested = False
         self.completed_target = None
+        self.preview_temp = None
         self.setWindowTitle(f"FPGA 吉他 · 曲谱上传 {VERSION}")
         self.resize(1100, 825)
         self.setMinimumSize(900, 650)
@@ -272,14 +287,20 @@ class Window(QMainWindow):
         rl.addLayout(metrics)
         self.notes = Notes()
         rl.addWidget(self.notes, 1)
+        self.preview = PreviewPanel(self, player_factory)
+        self.preview.render_requested.connect(self.start_preview)
+        self.preview.cancel_requested.connect(self.cancel_job)
+        self.preview.position_changed.connect(self.preview_position)
+        rl.addWidget(self.preview)
         self.score_info = label("曲谱将在本机校验音域、节奏、分弦和文件完整性。", "muted")
         rl.addWidget(self.score_info)
         shortcuts = QHBoxLayout()
-        example = QPushButton("打开示例曲谱")
+        example = QPushButton("示例曲谱")
+        example.setToolTip("打开附带的《情歌》和入门示例，先试听再上传。")
         example.clicked.connect(lambda: self.choose_file(str(self.examples)))
         self.export = QPushButton("另存曲谱包…")
         self.export.clicked.connect(self.export_score)
-        shortcuts.addWidget(example)
+        file_row.addWidget(example)
         shortcuts.addWidget(self.export)
         rl.addLayout(shortcuts)
         self.example = example
@@ -386,6 +407,8 @@ class Window(QMainWindow):
     def run_job(self, fn, complete, kind):
         if self.busy:
             return
+        if kind != "render":
+            self.preview.stop_playback()
         self.busy = True
         self.phase = kind
         self.worker = Job(fn, self)
@@ -437,6 +460,8 @@ class Window(QMainWindow):
         self.load_path(path, metadata)
 
     def load_path(self, path, metadata=None):
+        self.preview.set_score(None)
+        self.notes.playhead = None
         self.path = Path(path)
         self.metadata = metadata
         self.score = None
@@ -460,6 +485,7 @@ class Window(QMainWindow):
         self.metrics[1].setText(duration_text(score.seconds))
         self.metrics[2].setText(TIMBRES[score.timbre])
         self.notes.score = score
+        self.preview.set_score(score)
         self.notes.update()
         low, high = min(e.midi for e in score.events), max(e.midi for e in score.events)
         self.score_info.setText(f"已校验 · {score.title}\n{score.source} · MIDI {low}–{high} · CRC32 {score.crc32.upper()}")
@@ -469,6 +495,44 @@ class Window(QMainWindow):
     def csv_changed(self):
         if not self.busy and self.path and self.path.suffix.lower() == ".csv":
             self.load_path(self.path)
+
+    def start_preview(self):
+        if self.busy or not self.score:
+            return
+        try:
+            if self.preview_temp is None:
+                directory = self.journal.path.parent
+                directory.mkdir(parents=True,exist_ok=True)
+                self.preview_temp = tempfile.TemporaryDirectory(prefix='audio_',dir=directory,
+                                                                ignore_cleanup_errors=True)
+        except OSError as exc:
+            self.preview.failed("无法创建电脑试听缓存，请检查本机应用数据目录的空间和权限。")
+            self.record(str(exc))
+            return
+        path = Path(self.preview_temp.name)/(uuid.uuid4().hex+'.wav')
+        score = self.score
+        self.preview.render_started()
+        self.message.setText("正在生成电脑试听；无需串口，不会修改上传的曲谱。")
+        self.run_job(lambda job:render_preview(score,path,job.cancel,job.progress.emit),
+                     self.preview_ready,"render")
+
+    def preview_ready(self, path):
+        if self.close_requested or self.worker.cancel.is_set():
+            Path(path).unlink(missing_ok=True)
+            self.preview.failed("已取消生成电脑试听。")
+            return
+        try:
+            self.preview.ready(path)
+        except Exception as exc:
+            self.preview.failed("电脑播放组件启动失败，请检查 Windows 音频设备。曲谱仍可正常上传。")
+            self.record(str(exc))
+            return
+        self.message.setText("电脑试听已开始。确认节奏后可上传；实际音色以琴为准。")
+
+    def preview_position(self, ms):
+        if self.notes.score:
+            self.notes.playhead = ms/(self.notes.score.seconds*1000)
+            self.notes.update()
 
     def export_score(self):
         if not self.score:
@@ -502,6 +566,7 @@ class Window(QMainWindow):
         choice = QMessageBox.question(self, "确认上传", f"曲目：{score.title}\n音色：{TIMBRES[score.timbre]}\n事件：{len(score.events)} · 时长：{duration_text(score.seconds)}\n\n目标：{self.slot.currentText()}\n该槽的运行时曲谱将被替换。请让琴保持在主页/选曲页，保持供电。\n\n现在上传？", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if choice != QMessageBox.Yes:
             return
+        self.preview.stop_playback()
         self.progress.setValue(0)
         self.run_job(lambda job: self.upload_fn(port, slot, score, self.journal,
             job.progress.emit, job.stage.emit, job.cancel, expected_slot=expected),
@@ -516,6 +581,9 @@ class Window(QMainWindow):
         self.record("上传成功：已收到 COMMIT ACK，且槽位/数量/时长/音色目录回读一致。")
 
     def on_progress(self, n, total):
+        if self.phase == "render":
+            self.preview.render_progress(n,total)
+            return
         self.progress.setValue(round(95 * n / total))
         self.message.setText(f"已确认 {n} / {total} 个事件 · 请保持连接和供电")
 
@@ -526,10 +594,11 @@ class Window(QMainWindow):
         self.update_guide()
 
     def cancel_job(self):
-        if self.worker and self.phase in ("upload", "connect", "data"):
+        if self.worker and self.phase in ("upload", "connect", "data", "render"):
             self.worker.cancel.set()
             self.cancel.setEnabled(False)
-            self.message.setText("正在停止传输，并请求释放尚未提交的数据…")
+            self.message.setText("正在取消生成电脑试听…" if self.phase == "render" else
+                                 "正在停止传输，并请求释放尚未提交的数据…")
 
     def show_error(self, exc):
         message = friendly_error(exc)
@@ -539,6 +608,8 @@ class Window(QMainWindow):
             self.connection.setText("设备检查未通过 · 请看下方提示")
         if self.phase == "load":
             self.score_info.setText("曲谱未通过校验 · 请看下方提示")
+        if self.phase == "render":
+            self.preview.failed(message)
         if self.phase in ("upload", "connect", "data", "commit", "verify"):
             self.device = None
             self.connection.setText("上传未完成 · 请重新检查设备")
@@ -580,10 +651,12 @@ class Window(QMainWindow):
         self.timbre.setEnabled(csv and not self.busy)
         self.export.setEnabled(bool(self.score) and not self.busy)
         self.action.setEnabled(not self.busy)
+        self.preview.set_allowed(not self.busy)
         self.cancel.setVisible(self.busy and self.phase in ("upload", "connect", "data", "commit", "verify"))
         self.cancel.setEnabled(self.busy and self.phase in ("upload", "connect", "data") and self.worker and not self.worker.cancel.is_set())
         if self.busy:
-            self.guide.setText("正在处理，请稍候。提交开始后请保持连接，等待最终结果。")
+            self.guide.setText("正在生成电脑试听，可点击“停止”取消。" if self.phase == "render" else
+                               "正在处理，请稍候。提交开始后请保持连接，等待最终结果。")
             self.action.setText("处理中…")
         elif pending:
             self.guide.setText("有一笔上次提交待确认。可先检查设备并试听，再处理记录。")
@@ -598,7 +671,7 @@ class Window(QMainWindow):
             self.guide.setText(f"上传完成：请在琴上选择 USER {self.slot.currentIndex()+1}，试听后开始练习。")
             self.action.setText("再次上传…")
         else:
-            self.guide.setText(f"第 3 步：已准备好 · {self.score.title} → 第 {self.slot.currentIndex()+1} 槽")
+            self.guide.setText(f"第 3 步：可先电脑试听 · {self.score.title} → 第 {self.slot.currentIndex()+1} 槽")
             self.action.setText("确认并上传…")
 
     def record(self, text):
@@ -609,7 +682,7 @@ class Window(QMainWindow):
         self.log.setVisible(not self.log.isVisible())
 
     def help(self):
-        QMessageBox.information(self, "三步开始练习", "① 连接设备\n将 DEBUG-USB2 连接电脑，在琴上回到主页或选曲页。刷新串口，选择 COM 后点击“检查设备”。如果不确定 COM 号，可拔插 USB 对照列表。\n\n② 选择曲谱\n新手可用“打开示例曲谱”。.xgscore 是单文件包；BIN 与同名 JSON 需放在一起；CSV 是音符表，可设置速度和音色。拍数支持 1/2、1/3 等分数。样本时间 CSV 已含绝对时间，BPM 不改变其节奏。\n\n③ 上传与试听\n推荐先用第 2 槽。确认替换后等待成功，再在琴上选择 USER 槽试听。传输进度根据 FPGA 的真实确认更新；提交完成前请保持供电。\n\n曲谱限制\nMIDI 50–79（D3–G5）、最长 10 分钟、最多 1345 个导入事件（五槽共享）。同弦不能重叠，也不能过密。不符合要求会提示原因。图片、PDF 和 MP3 需先整理成音符事件。\n\n常见问题\n串口打不开：关闭其他占用串口的软件。BUSY：回主页/选曲页。NO_SPACE：新曲需要额外暂存空间。提交结果未知：先检查设备和实物，再处理记录，勿直接重传。\n\n导入曲仅保存在 RAM，断电、复位或重新配置后丢失。")
+        QMessageBox.information(self, "三步开始练习", "① 连接设备\n将 DEBUG-USB2 连接电脑，在琴上回到主页或选曲页。刷新串口，选择 COM 后点击“检查设备”。如果不确定 COM 号，可拔插 USB 对照列表。\n\n② 选择曲谱\n新手可用“打开示例曲谱”。.xgscore 是单文件包；BIN 与同名 JSON 需放在一起；CSV 是音符表，可设置速度和音色。拍数支持 1/2、1/3 等分数。样本时间 CSV 已含绝对时间，BPM 不改变其节奏。 选好曲谱后可点“电脑试听”，支持暂停、停止、拖动进度和独立音量，无需连接开发板；电脑参考音用于核对节奏，实际音色以琴为准。\n\n③ 上传与试听\n推荐先用第 2 槽。确认替换后等待成功，再在琴上选择 USER 槽试听。传输进度根据 FPGA 的真实确认更新；提交完成前请保持供电。\n\n曲谱限制\nMIDI 50–79（D3–G5）、最长 10 分钟、最多 1345 个导入事件（五槽共享）。同弦不能重叠，也不能过密。不符合要求会提示原因。图片、PDF 和 MP3 需先整理成音符事件。\n\n常见问题\n串口打不开：关闭其他占用串口的软件。BUSY：回主页/选曲页。NO_SPACE：新曲需要额外暂存空间。提交结果未知：先检查设备和实物，再处理记录，勿直接重传。\n\n导入曲仅保存在 RAM，断电、复位或重新配置后丢失。")
 
     def closeEvent(self, event):
         if self.busy:
@@ -621,6 +694,10 @@ class Window(QMainWindow):
                 self.message.setText("正在安全结束当前操作，随后关闭窗口…")
             event.ignore()
             return
+        self.preview.release()
+        if self.preview_temp:
+            self.preview_temp.cleanup()
+            self.preview_temp = None
         event.accept()
 
 

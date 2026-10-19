@@ -2,7 +2,8 @@
 
 - 用户另授权实现 Windows 曲谱上传软件；界面要求米白底、大幅淡吉他线稿覆盖页面底部、三步明确引导。当前分支接续实际 `experiment/p5-bluetooth-import`，不切回旧快照、不推进 BL616 刷写。
 - 入口 `tools/run_windows_score_uploader.py`，源码 `tools/windows_score_uploader/`，文档 `docs/WINDOWS_SCORE_UPLOADER.md`。复用并保持原 XG3 Client/事件校验/分弦器字节不变；支持 xgscore、BIN+JSON、CSV，附修订节奏情歌 CRC c3451bbc。COMMIT 前持久写记录，最终结果不明确则保留并阻止重传。
-- 便携包在 `build/releases/windows/FPGA_Guitar_Uploader_1.0.0.zip`，解压后运行 `FPGA_Guitar_Uploader/FPGA_Guitar_Uploader.exe`；无需安装 Python。验证与哈希见 `docs/windows_score_uploader_verification.json` 及 `build/windows_uploader/`。电脑模型/Qt 控件流程与冻结 EXE 检查不代表实物串口验收。
+- 用户追加授权电脑试听，当前便携包 `build/releases/windows/FPGA_Guitar_Uploader_1.1.0.zip`；旧1.0.0包/认证保留。1.1新增 `preview_audio.py` 有界缓冲参考合成与 `preview_panel.py` 播放/暂停/停止/跳转/音量，按实际事件时间生成48k/16bit WAV，不是FPGA音色的等价模型；选曲/CSV参数变化清缓存，开始上传停止播放。无需串口即可试听，不自动出声。
+- 解压运行 `FPGA_Guitar_Uploader/FPGA_Guitar_Uploader.exe`，无需Python。新认证 `docs/windows_score_uploader_preview_verification.json`，证据 `build/windows_uploader/preview_1_1/`，构建日志 `build/windows_uploader/pyinstaller/1.1.0/build.log`；真实Windows媒体引擎验证采用零音量，不代表扬声器声学验收。电脑模型/Qt控件/冻结EXE检查不代表实物串口验收。
 - 未打开实物 COM、未改 FPGA 源码/曲库/位流/约束/两个保护文件，不重复综合布线；未跟踪的 `tools/score_uploader_web.py`、`scores/user/` 为进入任务前已有文件，保持不动、不暂存。本批只本地提交，不 push/merge/烧录，交付后等用户实测反馈。
 
 # P5 手机蓝牙导谱最新接续点（2026-10-19）

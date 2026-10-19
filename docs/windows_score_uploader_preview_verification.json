@@ -1,0 +1,185 @@
+{
+  "schema": 1,
+  "software_version": "1.1.0",
+  "status": "PASS_PC_PREVIEW",
+  "artifact_scope": "Windows x64 uploader and computer reference audio only. No FPGA audio equivalence or physical UART/hardware certification.",
+  "platform": "Windows-11-10.0.26100-SP0",
+  "source_base": "9a387c2fbaf6521f00adf83952b60adeff9a5cb5",
+  "source_state": "base commit plus individually bound source_hashes",
+  "source_hashes": {
+    "docs/WINDOWS_SCORE_UPLOADER.md": "0fe94120784814173ab518eba73ba6e936334a4880a1ec97561b8a0123eface0",
+    "tools/build_windows_score_uploader.py": "956869fca65c1948817edb2306a5db172fd2bff4a53e4017c83516eb6daace18",
+    "tools/game_fingering.py": "351f55f7a7a4bc5223cae379b44a174819c94f937d73ef4c8226a0c332666fb7",
+    "tools/game_score_upload.py": "2621aaa6c8230a60ed474b42b4e77f834f7848a51c532fd672af8c9f386f5116",
+    "tools/game_score_v2.py": "d197c4165c7dc69753c1230ab0e9d6dccb1986dd5db30b22c13eaa3ba22938f7",
+    "tools/run_windows_score_uploader.py": "6f8c468bd44d78a828e49fc8b8d8ecc7ede80087cadd3a97c8a46eedc283f5ce",
+    "tools/test_windows_score_preview.py": "474365c47332e248792e9d22c2e81d3ba2dbfa6a27ddc5c69eee95e012f01a5f",
+    "tools/test_windows_score_uploader.py": "9d74492e0bd66ffa7a50c302a409ed7e85ad602d066ce642d22ca97acd1128e9",
+    "tools/windows_score_uploader/__init__.py": "14e7c4286122b59a9b2265a79c209a79e4f3aa0f1ecff8fc73ac55b3629c8e95",
+    "tools/windows_score_uploader/assets/down.png": "79214cbd5fe9ddbec3771eb85129d2e413e0f1a053ecc5512aed0787d326c0b6",
+    "tools/windows_score_uploader/assets/guitar.ico": "e5ea10e7ebf81f4cfd663b58573a663ba8d8ebae569b59b481cc3e02661f771b",
+    "tools/windows_score_uploader/assets/guitar.png": "3f6aa16a05438f221af0c7769654bd64fd4e629444fd001f4c554f37887b4737",
+    "tools/windows_score_uploader/assets/up.png": "f99566356a0ef77f60df52a4096df04f3b3519de2acf2b3d3a6771529d0f6384",
+    "tools/windows_score_uploader/core.py": "21158aef23cee49b7da2eb53e4906bedca987d780b1c0099c370db01e1dce41c",
+    "tools/windows_score_uploader/examples/CSV格式说明.txt": "7b27184bfde064f6ecec4701d65c8dcfde7385f9969edd7c3ee011aeb5cd2d4f",
+    "tools/windows_score_uploader/examples/入门示例.csv": "db31658e7f34bb665ad90bdf188fa884d711edf55f477c6915818d190dab70a4",
+    "tools/windows_score_uploader/examples/情歌_60BPM.xgscore": "0a023e0c75f6d58bdb2a97a2f8f38f8480924953acd784331b3a98fda57720d1",
+    "tools/windows_score_uploader/media_smoke.py": "d905868bce89089a35d64ef3a25df74f388a0224e088125329221d9b7a736386",
+    "tools/windows_score_uploader/preview_audio.py": "2460b8097d575e75622764e00589abdac3d23c0d1822a8fc6d0d9ef44fc87a9e",
+    "tools/windows_score_uploader/preview_panel.py": "d21f7e90e7a6616d4825c203362d6329f16372e7c99d36b65d0d66f060678e57",
+    "tools/windows_score_uploader/requirements-build.txt": "0fe64183cd3f0e8488cf58cd61f3c01384f48d6ce9664764667d5f7492c859f1",
+    "tools/windows_score_uploader/requirements.txt": "904a4416f8282a517dc1a82bd52137a235e0572800758b970a9f864cbbbb1dda",
+    "tools/windows_score_uploader/smoke.py": "cef1b0f20ee63d2bd8f2bd86d56f6fc3e4a5011336f39a8bed6406a6b8659558",
+    "tools/windows_score_uploader/THIRD_PARTY_NOTICES.txt": "62727e3dc36598d9ceb3b9e822f2d57a074964105f78fafd5eef3a738d049513",
+    "tools/windows_score_uploader/uploader.spec": "b6672f75441e930bf77c4746e655191047dc6e507cd00ce0d640f972a08a89ae",
+    "tools/windows_score_uploader/window.py": "2241e51f5473d5348c4b31e388ecc5fc43f9dbf6471636e1c545d8c4ec074016",
+    "tools/windows_score_uploader/开始使用.txt": "cc988dacb5d17de36c712d86187bc3715df8b7a36009a5509f0d7f88d8c6aa33"
+  },
+  "automated_tests": {
+    "preview_tests.log": 11,
+    "uploader_tests.log": 22,
+    "protocol_tests.log": 8
+  },
+  "total_tests": 41,
+  "frozen_runtime": {
+    "passed": true,
+    "bundle_files": 228,
+    "source_files": 27,
+    "preserved_files": 12,
+    "index_unchanged": true,
+    "zip_bytes": 42097079,
+    "zip_sha256": "cc1aa7ca1b46d950cd845d3643e3d327efca5a3a1270de41bedd3321934514d7",
+    "smokes": [
+      {
+        "scale": "1",
+        "result": {
+          "passed": true,
+          "frozen": true,
+          "events": 212,
+          "crc32": "c3451bbc",
+          "serial_version": "3.5",
+          "physical_com_opened": false,
+          "preview_samples": 384000,
+          "audio_device_opened": false,
+          "executable": "T:\\Documents\\AMD\\xinxian-fpga-guitar\\build\\windows_uploader\\preview_1_1\\独立解压\\FPGA_Guitar_Uploader\\FPGA_Guitar_Uploader.exe"
+        }
+      },
+      {
+        "scale": "1.25",
+        "result": {
+          "passed": true,
+          "frozen": true,
+          "events": 212,
+          "crc32": "c3451bbc",
+          "serial_version": "3.5",
+          "physical_com_opened": false,
+          "preview_samples": 384000,
+          "audio_device_opened": false,
+          "executable": "T:\\Documents\\AMD\\xinxian-fpga-guitar\\build\\windows_uploader\\preview_1_1\\独立解压\\FPGA_Guitar_Uploader\\FPGA_Guitar_Uploader.exe"
+        }
+      },
+      {
+        "scale": "1.5",
+        "result": {
+          "passed": true,
+          "frozen": true,
+          "events": 212,
+          "crc32": "c3451bbc",
+          "serial_version": "3.5",
+          "physical_com_opened": false,
+          "preview_samples": 384000,
+          "audio_device_opened": false,
+          "executable": "T:\\Documents\\AMD\\xinxian-fpga-guitar\\build\\windows_uploader\\preview_1_1\\独立解压\\FPGA_Guitar_Uploader\\FPGA_Guitar_Uploader.exe"
+        }
+      }
+    ]
+  },
+  "actual_windows_media_test": {
+    "volume": 0,
+    "physical_com_opened": false,
+    "backend": "Qt5 Windows media service",
+    "states": [
+      1,
+      2,
+      1,
+      0
+    ],
+    "positions": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      454,
+      454,
+      1200,
+      1220,
+      1238,
+      1269,
+      1301,
+      1332,
+      1359,
+      0
+    ],
+    "pause_requested": true,
+    "resumed_position": 1359,
+    "stopped": true,
+    "passed": true,
+    "error": null,
+    "exe_sha256": "d1a5c685ef3e12b6b55701e1b3b850625b2614602c9292efb93f7c111a141725"
+  },
+  "full_qing_ge_reference_render": {
+    "passed": true,
+    "events": 212,
+    "duration_seconds": 152.0,
+    "score_crc32": "c3451bbc",
+    "render_seconds": 6.562,
+    "wave": {
+      "frames": 7296000,
+      "rate": 48000,
+      "bits": 16,
+      "channels": 1
+    },
+    "wav_sha256": "ddeb6d0362eced215bdb45edaee8090523ece283a09f5c84bbeeb911cb701320",
+    "claim": "computer reference synthesis, not FPGA timbre equivalence"
+  },
+  "artifact_hashes": {
+    "build/releases/windows/FPGA_Guitar_Uploader_1.1.0.zip": "cc1aa7ca1b46d950cd845d3643e3d327efca5a3a1270de41bedd3321934514d7",
+    "build/releases/windows/FPGA_Guitar_Uploader_1.1.0/FPGA_Guitar_Uploader/FPGA_Guitar_Uploader.exe": "d1a5c685ef3e12b6b55701e1b3b850625b2614602c9292efb93f7c111a141725",
+    "build/releases/windows/FPGA_Guitar_Uploader_1.1.0/FPGA_Guitar_Uploader/manifest.json": "bf5ad6739254064c0f35f233900656b98fe7c14ab2c60c4d6e82827cd2586ecc",
+    "build/windows_uploader/preview_1_1/preview_tests.log": "e8589e3696a5971481ff3d91aa2b75c49a018b68091d37a3178af19ae67f9e18",
+    "build/windows_uploader/preview_1_1/uploader_tests.log": "6674eb742f32a9773148bd48709e0a171da34179535592ed98cedec15fb60dfc",
+    "build/windows_uploader/preview_1_1/protocol_tests.log": "054d6cc320ba7ad8410d4cf14578a41d4ce784a60436950a08d285dda9d72e4d",
+    "build/windows_uploader/preview_1_1/full_song_render.json": "5502d1d0c68995e036343e8ca495c3e448df3676bcb044ba305ebcf082bad18e",
+    "build/windows_uploader/preview_1_1/情歌_电脑参考音.wav": "ddeb6d0362eced215bdb45edaee8090523ece283a09f5c84bbeeb911cb701320",
+    "build/windows_uploader/preview_1_1/frozen_verification.json": "3bd6fd0f4dda06931adcdbb90107fb90047b8701bdc4ed894dfcc5dad9cdc08e",
+    "build/windows_uploader/preview_1_1/frozen_media_host/media_smoke.json": "851fddc1ee6d7b2e0d6cf82d1607c54350cf5ee825db74111789f2ca5fe2939d",
+    "build/windows_uploader/pyinstaller/1.1.0/build.log": "f0c6e6ca258ae9d6047a7c9b5dd45dc2af9d594ff413c74bd5c4b0a155cf7af4"
+  },
+  "preserved_files": {
+    "gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json": "60530d44791f2e9535a604da2d0c11ec2e37e148ac0af4fda62081f7c8ae6d85",
+    "docs/MPU6050_POSTURE_TIMBRE_DESIGN_PLAN.md": "0a3cb385ed875b546d9fce420a1ec84ea18d239db01427f07b837cb7e7204de4",
+    "tools/score_uploader_web.py": "2d09c6a6def2935db4ac24daee7295e3fb305297b8cfc14bf11d01268cf85250",
+    "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs": "cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30",
+    "build/releases/windows/FPGA_Guitar_Uploader_1.0.0.zip": "520d013f6a3c9e0690e4fafab2be570456cf5c27b9516d84397a1ecc07f232f4",
+    "tools/game_score_upload.py": "2621aaa6c8230a60ed474b42b4e77f834f7848a51c532fd672af8c9f386f5116",
+    "tools/game_score_v2.py": "d197c4165c7dc69753c1230ab0e9d6dccb1986dd5db30b22c13eaa3ba22938f7",
+    "tools/game_fingering.py": "351f55f7a7a4bc5223cae379b44a174819c94f937d73ef4c8226a0c332666fb7",
+    "scores\\user\\happy_birthday_60bpm.bin": "4bb16cd049af95d6f0c994f392b02a16f85ccd9fe5f6f7a91b3d13e42d94628c",
+    "scores\\user\\happy_birthday_60bpm.csv": "92a855bfb25af8983ecbb5a5716a66e2f138e08bd3e491ed42b7695e514b78cd",
+    "scores\\user\\happy_birthday_60bpm.json": "a3a129289d3625a254985f9e13cb9956f92b59de44f3d7ef13e8dd8118aedeb1",
+    "scores\\user\\happy_birthday_60bpm.mem": "21112f1cf12ba7a5aaab31ee2d8f0bd54db7921afa7bf070f1bc9ed58093e13b"
+  },
+  "original_index_unchanged_before_new_changes_staged": true,
+  "physical_com_opened": false,
+  "fpga_changed": false,
+  "fpga_rebuilt": false,
+  "acoustic_audition_performed": false,
+  "pushed": false,
+  "remaining_user_checks": [
+    "audible playback through the chosen Windows output device",
+    "real board UART import and on-board audition"
+  ]
+}

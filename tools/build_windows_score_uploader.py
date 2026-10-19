@@ -15,7 +15,8 @@ from windows_score_uploader import VERSION
 
 def sources():
     files = [Path('tools/run_windows_score_uploader.py'), Path('tools/build_windows_score_uploader.py'),
-             Path('tools/test_windows_score_uploader.py'), Path('docs/WINDOWS_SCORE_UPLOADER.md')]
+             Path('tools/test_windows_score_uploader.py'), Path('tools/test_windows_score_preview.py'),
+             Path('docs/WINDOWS_SCORE_UPLOADER.md')]
     files += [Path('tools')/name for name in ('game_score_upload.py', 'game_score_v2.py', 'game_fingering.py')]
     files += [p.relative_to(ROOT) for p in (ROOT/'tools/windows_score_uploader').rglob('*')
               if p.is_file() and '__pycache__' not in p.parts]
@@ -26,7 +27,7 @@ def main():
     if sys.platform != 'win32' or sys.maxsize < 2**32:
         raise SystemExit('Build on Windows x64 with the pinned build requirements.')
     out = ROOT/'build/releases/windows'/f'FPGA_Guitar_Uploader_{VERSION}'
-    work = ROOT/'build/windows_uploader/pyinstaller'
+    work = ROOT/'build/windows_uploader/pyinstaller'/VERSION
     out.mkdir(parents=True, exist_ok=True)
     work.mkdir(parents=True, exist_ok=True)
     with (work/'build.log').open('w', encoding='utf-8') as log:

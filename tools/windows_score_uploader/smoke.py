@@ -9,6 +9,8 @@ def run(output):
     from PyQt5.QtWidgets import QApplication
     from .window import Window, STYLE, configure_fonts
     from .core import load_score
+    from .preview_audio import render_preview
+    import wave
     import serial
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -33,11 +35,18 @@ def run(output):
                 assert score.crc32 == 'c3451bbc' and len(score.events) == 212
                 assert serial.VERSION == '3.5'
                 assert window.action.isVisible() and window.export.isEnabled()
+                assert window.preview.play.isEnabled() and window.preview.player is None
+                small=load_score(examples/'入门示例.csv')
+                audio=Path(temp)/'preview.wav'
+                render_preview(small,audio)
+                with wave.open(str(audio),'rb') as wav:
+                    assert (wav.getnframes(),wav.getframerate(),wav.getsampwidth())==(384000,48000,2)
                 assert window.grab().save(str(output/'frozen_ui.png'))
                 (output/'smoke.json').write_text(json.dumps(dict(
                     passed=True, frozen=bool(getattr(sys, 'frozen', False)),
                     events=len(score.events), crc32=score.crc32,
                     serial_version=serial.VERSION, physical_com_opened=False,
+                    preview_samples=384000, audio_device_opened=False,
                     executable=sys.executable), ensure_ascii=False, indent=2), encoding='utf-8')
             except Exception as exc:
                 (output/'smoke_error.txt').write_text(repr(exc), encoding='utf-8')
