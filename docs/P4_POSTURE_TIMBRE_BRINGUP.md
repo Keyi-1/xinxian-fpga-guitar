@@ -1,5 +1,7 @@
 # MPU-6050 姿态切音色与《情歌》节奏修订
 
+2026-10-19发布边界：当前原工程和同名`neo_guitar_touch_game_p4_posture.fs`已更新为[四弦力度校准版](VELOCITY_CALIBRATION.md)，以`velocity_calibration_verification.json`和新位流哈希为准。本文接线、姿态操作和已确认节奏继续适用；下文A2资源/哈希/认证为保存的历史P4快照，只对应`build/releases/touch_game/p4_posture_20261018/`内部旧FS。
+
 2026-10-18：用户已确认当前P3总体可用，并授权先推送保存、再做本批修改。P3提交 `7837a24` 已推送 `origin/master`；本批修改已在本地通过数字验证，不自动推送或代理烧录。旧P3位流/认证完整保留，新源码使用独立P4认证。
 
 ## 《情歌》第10、18小节
@@ -68,7 +70,7 @@ J8-2同为3V3、J8-4同为GND，但上表只指定一套接点。按板上排针
 
 A1综合已通过，但在布线时收到上述UI修改，故保留证据并主动停止，没有把A1当作最终交付。A2在同一原工程/impl中完成综合、完整P&R/STA，运行时源码提交`be88562`，目录`build/p4_posture/impl_a2_centered/`。Gowin PID18208自22:03:12启动，23:14:16完成；没有重复启动其他完整构建。严格最终校验PASS，新认证为`gowin/neo_guitar_touch_game/p4_posture_verification.json`，旧P3认证/归档保持。
 
-原工程可直接使用`gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs`；发布副本`build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs`，完整证据归档`build/releases/touch_game/p4_posture_20261018/`。位流SHA256为`34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c`；实际VG SHA256为`27ef25ca8683cc1881a74d9ce5eeeb9c26949c2ad93f428bd22649d0509507ee`。这些结果只绑定本批当前源码/ROM/VG/原工程P&R与位流，不借用旧日志认证新产物。
+历史A2位流保存于`build/releases/touch_game/p4_posture_20261018/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs`，完整证据仍在该固定归档。旧位流SHA256为`34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c`；旧实际VG SHA256为`27ef25ca8683cc1881a74d9ce5eeeb9c26949c2ad93f428bd22649d0509507ee`。这些结果只绑定A2快照，不认证后来更新的原impl或同名发布文件。
 
 | 完整实现，同器件/原工程口径 | 已验收P3 | 当前P4 A2 | 变化 |
 | --- | ---: | ---: | ---: |

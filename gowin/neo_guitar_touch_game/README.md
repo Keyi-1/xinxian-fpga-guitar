@@ -1,16 +1,22 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**当前P4数字发布（2026-10-18，实物待验收）：** 已纳入用户试听确认的《情歌》10/18小节节奏、MPU-6050校准/手动优先/空闲姿态切音色，以及主页底部字体居中。原32模态/全部音效/采样率与游戏/UART功能保持；上电默认MANUAL。
+**当前P4力度校准版（2026-10-19，实物待验收）：** 已按队友提供的实测四弦阈值启用峰值捕获/四档力度，真实拨弦使用已有112/160/208/256增益；完整三音色、音效、包络与采样率保持。捕获窗口纳入姿态待处理音符观察，防止起音前提前自动切换；试听固定力度2。保留用户确认的《情歌》10/18小节节奏、MPU-6050与居中UI，上电默认MANUAL。
 
 原工程可直接选择：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。使用用户原`.gprj`/原`impl`，`gw_sh`完整综合、P&R/STA；没有独立构建工程或伪造IDE完成状态。
-发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)，SHA256 `34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c`。
-[本批认证](p4_posture_verification.json)；[接线、操作、节奏、前后资源和验证范围](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。P3提交7837a24已按授权推送；新P4只作本地提交，不自动推送或烧录。
+发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)，按用户许可覆盖同名文件，新SHA256 `210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c`。
+[本批认证](velocity_calibration_verification.json)；[阈值、响度、完整对比与下板步骤](../../docs/VELOCITY_CALIBRATION.md)；[MPU接线与操作](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。证据目录`build/releases/touch_game/p4_velocity_calibration_20261019/`。本批仅本地提交，不自动推送或烧录。
+
+完整实现：Logic50570、Register20146、CLS28316/29952（94.54%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.089/13.638MHz，运行仍50/12.288。setup/hold/latch/未布通及已测deadline全部0。比保存P4减少269 CLS，增加56寄存器；系统55MHz余量目标仍未达到。
+
+16384组检测输入与真实SPI四弦四档、三音色×四档真实ADC到PCM/双数字口、8192冻结音频、判定/扩展音域/按键/姿态回归均PASS。当前VG的ADC前端及两个完整整机对照PASS：真实UART13397音频样本/16帧动态频谱和曲线，真实MPU生产256包校准12815样本/1773包/5次音色变化；33项PC按严格同源哈希复用。原工程完整P&R/STA与最终哈希绑定PASS，不重复构建。每弦四档实际手感、噪声/串弦、最终声压与长期稳定性待下板确认。
+
+下方均为**固定历史发布**；历史认证不认证当前原impl或已覆盖的同名发布文件。
+
+**保存的P4数字发布（2026-10-18，实物待验收）：** 已纳入用户试听确认的《情歌》10/18小节节奏、MPU-6050校准/手动优先/空闲姿态切音色，以及主页底部字体居中。保存标签`snapshot/p4-posture-before-velocity-20261018`（1bbab98），旧FS只从固定归档获取：[旧P4位流](../../build/releases/touch_game/p4_posture_20261018/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs)，SHA256 `34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c`。[旧P4认证](p4_posture_verification.json)只认证这个固定快照。
 
 完整实现：Logic50580、Register20090、CLS28585/29952（95.44%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.020/13.858MHz，运行仍50/12.288。setup/hold/latch/未布通及已测deadline全部0。旧P1余量目标中CLS≤95%、系统≥55MHz仍未达到；不能宣称余量目标全部完成。
 
 20项既有RTL、4项P3、8项姿态组件/整机、12场景1566720像素（限定UI区外等价）、两项完整ROM输入哈希的45210样本/状态RAM组件、33项PC及4个实际VG入口均PASS。实际VG姿态覆盖生产256包校准/12815音频样本/1773读包/5次音色变化；实际VG UART覆盖10次真实115200事务/四声部/13397样本/16帧动态频谱和曲线。只有居中渲染有限改动按明确范围复用已过功能回归，不使用旧VG日志认证新VG。电平/安装轴向/实物姿态阈值/新节奏板上试听与长期稳定性待用户确认；未打开COM或代理烧录。
-
-下方均为**固定历史发布**，这些认证不认证当前P4原impl产物。
 
 **历史P3数字发布（2026-10-18，用户总体反馈可用）：** 可写曲库/DEBUG-USB2 UART已接入，原创慢练移除，第二槽待导入；五槽共用1345条导入空间，完整接收/实际RAM读回CRC后原子发布。原32模态相位/衰减状态合存RAM，全部音色参数、模态、运算时钟及演奏行为保持。
 
@@ -24,14 +30,14 @@ P3发布时原工程位流为`impl/pnr/neo_guitar_touch_game.fs`；该路径现�
 
 **历史已下板基线M2：《情歌》用户谱38小节主旋律（2026-10-16发布，2026-10-18下板确认）**：触控第四行“情歌”，60BPM、152秒、212次起音、第二音色，游戏D3～G5。内容继续保留在P3；第10/18小节轻微节奏偏差仍按用户决定保留。
 
-M2发布时原工程位流为 `impl/pnr/neo_guitar_touch_game.fs`；当前该路径已更新为文首P3，请使用下面固定M2归档获取已验收版本。
+M2发布时原工程位流为 `impl/pnr/neo_guitar_touch_game.fs`；当前该路径已更新为文首P4力度校准版，请使用下面固定M2归档获取已验收版本。
 同哈希归档：[neo_guitar_touch_game_qing_ge_melody.fs](../../build/releases/touch_game/neo_guitar_touch_game_qing_ge_melody.fs)，SHA256 `c0a138912edbf2504f64143049066234c4f10ea381fd974b9c58f6b147bd3bf4`。
 本次使用 `gw_sh` 在同一 `.gprj` / 原 `impl` 完成综合和完整 P&R/STA。
 Logic **52286**、Register **23079**、CLS **28470/29952（95.052%）**、BSRAM **99/118**、DSP **115.5/118**；系统／音频 Fmax **55.334／13.143 MHz**。未布通、latch、setup／hold 及已测 deadline 为 0。
 CLS 为 95.052%；三项旧 P1 余量目标未全部达到，不能用本批合法实现宣称余量目标达成。实际运行时钟保持 50／12.288 MHz。
 
 20 项主旋律 RTL bench、20 屏标题像素对照、24 项曲谱／分弦 Python、冻结音频、完整 27/32 位扩展音域音频参考，以及本批实际 VG 的音乐、布局、10 帧／1,305,600 像素、4096 次双端口曲库读和 G5 持音／滑音／退出对照通过。
-[M2认证](p2_qing_ge_melody_verification.json)；[曲谱边界和历史下板步骤](../../docs/QING_GE_USER_MELODY.md)。用户已报告M2下板确认，现场文件哈希未另行采集；该认证只对应固定M2归档，当前原工程以文首P3认证为准。
+[M2认证](p2_qing_ge_melody_verification.json)；[曲谱边界和历史下板步骤](../../docs/QING_GE_USER_MELODY.md)。用户已报告M2下板确认，现场文件哈希未另行采集；该认证只对应固定M2归档，当前原工程以文首力度校准认证为准。
 
 **历史片段 P2 集成（2026-10-16）：** 原工程综合、完整 P&R/STA 和所需回归已通过；用户已反馈片段练习循环通过。
 原工程 `impl` 已由文首新主旋律构建更新；片段历史请使用固定发布副本。
@@ -66,7 +72,7 @@ SHA256 `e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86`。
 用户现要求以后改为直接使用本 `.gprj` 及其原 `impl` 目录构建，流程见下文。
 后续频带小实验收益不足，已停止并保留在 `experiment/radial-bands-resource-opt`，未合入本工程。
 
-**直接使用现成位流：** 文首原工程 P2 `.fs` 和同哈希发布副本均可在 Programmer 直接加载，无需重新综合 `.gprj`。P1 归档继续保留。
+**直接使用现成位流：** 文首原工程 P4力度校准版 `.fs` 和同哈希发布副本均可在 Programmer 直接加载，无需重新综合 `.gprj`。历史归档继续保留。
 在 Gowin Programmer 中扫描原 `GW5AT-60B`，双击设备的 Operation，
 选择 `SRAM Mode`／`SRAM Program`，在 `File name` 中选取该 `.fs`，保存后执行 Program/Configure。
 这是上电期间的临时配置；掉电保存需使用板上适用的 Flash 流程，不在此处修改 Flash 设置。

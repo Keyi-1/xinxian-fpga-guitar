@@ -105,12 +105,12 @@
     },
     "measurements": "No new quantitative acoustic or long-duration stability measurements"
   },
-  "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current P3 build",
+  "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current certified implementation",
   "current_original_project_bitstream": {
     "path": "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
-    "sha256": "34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c",
-    "verification": "gowin/neo_guitar_touch_game/p4_posture_verification.json",
-    "scope": "Current P4 A2 digital build, not yet board-confirmed; P3 archive remains fixed"
+    "sha256": "210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c",
+    "verification": "gowin/neo_guitar_touch_game/velocity_calibration_verification.json",
+    "scope": "Current P4 measured-velocity digital build; physical calibration and acoustic acceptance pending. Earlier immutable archives remain fixed."
   },
   "p3_writable_uart_import": {
     "date": "2026-10-18",
@@ -189,7 +189,7 @@
     "physical_com_opened": false,
     "publication_authorized": false,
     "bitstream_sha256": "34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c",
-    "archive": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive": "build/releases/touch_game/p4_posture_20261018/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
     "verification": "gowin/neo_guitar_touch_game/p4_posture_verification.json",
     "resources": {
       "Logic": 50580.0,
@@ -220,6 +220,127 @@
       "tested_posture_math_deadline": 0
     },
     "digital_scope": "20 existing RTL+4 P3+8 posture component/top+12-scene centred pixel proof+2 full current voice/RAM closure benches+33 PC tests+4 actual VG benches+384 bank Boolean cases+fresh full P&R/STA; renderer-only scoped reuse explicit",
-    "ui": "Visible-character centering in CALIBRATE/AUTO/status; right status rectangle; no new touch actions"
+    "ui": "Visible-character centering in CALIBRATE/AUTO/status; right status rectangle; no new touch actions",
+    "original_publication_path": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive_scope": "Saved original P4 snapshot; original_publication_path was explicitly authorized for replacement by the velocity-calibration release. Old verification certifies this immutable snapshot only."
+  },
+  "velocity_calibration_digital_release": {
+    "date": "2026-10-19",
+    "digital_result": "PASS",
+    "validated_source_commit": "e5680ef3510581f6a4ed487f90656495fddb1a45",
+    "implementation": "Original gprj and original impl, Gowin V1.9.12.03 Device B; synthesis PID39028 and same-netlist P&R PID24376 complete",
+    "bitstream_sha256": "210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c",
+    "bitstream": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "evidence_archive": "build/releases/touch_game/p4_velocity_calibration_20261019",
+    "verification": "gowin/neo_guitar_touch_game/velocity_calibration_verification.json",
+    "resources": {
+      "Logic": {
+        "used": 50570.0,
+        "available": 59904.0
+      },
+      "Register": {
+        "used": 20146.0,
+        "available": 60780.0
+      },
+      "CLS": {
+        "used": 28316.0,
+        "available": 29952.0
+      },
+      "BSRAM": {
+        "used": 113.0,
+        "available": 118.0
+      },
+      "DSP": {
+        "used": 115.5,
+        "available": 118.0
+      }
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 13.638
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 50.089
+      }
+    },
+    "margin_targets_met": false,
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_posture_deadline": 0
+    },
+    "calibration": {
+      "baseline_codes": [
+        2053,
+        2053,
+        2053,
+        2053
+      ],
+      "trigger": [
+        150,
+        100,
+        80,
+        100
+      ],
+      "rearm": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "bin_boundaries": [
+        [
+          280,
+          430,
+          620
+        ],
+        [
+          250,
+          400,
+          600
+        ],
+        [
+          150,
+          280,
+          400
+        ],
+        [
+          220,
+          380,
+          600
+        ]
+      ],
+      "capture_subsequent_channel_samples": 32,
+      "total_peak_observations": 33,
+      "dead_channel_samples": 400,
+      "settle_channel_samples": 80,
+      "fixed_velocity_default": false,
+      "existing_voice_gain_q8": [
+        112,
+        160,
+        208,
+        256
+      ],
+      "voice_envelope_unchanged": true,
+      "scope": "Measured per-string thresholds supplied by teammate; no independent raw ADC/acoustic measurement. Actual piano/bright/wah models,all FX/coefficients/sample clocks/master gain unchanged; game autoplay stays2."
+    },
+    "audio_scope": "Existing 112/160/208/256 gains and original synthesis equations, modes, envelope, effects and sample clocks preserved; real performance and game plucks now use captured velocity, preview remains fixed2",
+    "digital_scope": "16384 detector cases, physical SPI four strings by four levels, 3 timbres by 4 levels ADC-to-PCM/PT8211/I2S, frozen audio/judgement/extended-range/key/policy/top checks, current actual VG ADC and two full-top gate benches, 384 bank cases, exact-hash reuse of33 PC tests, fresh complete P&R/STA and artifact binding",
+    "same_name_overwrite_authorized": true,
+    "saved_previous_tag": "snapshot/p4-posture-before-velocity-20261018",
+    "saved_previous_archive": "build/releases/touch_game/p4_posture_20261018",
+    "hardware_status": "Pending user on-board four-level dynamics, per-string noise/crosstalk/retrigger, loudness and posture interplay checks; digital checks are not quantitative acoustic calibration",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "github_push_authorized": false,
+    "measurements": "No new physical ADC labelled traces, target sound pressure, amplifier gain or long-duration measurements",
+    "next_action_policy": "Stop after local delivery and wait for user board feedback and explicit further instructions; no automatic Bluetooth, Flash or new timbre work"
   }
 }

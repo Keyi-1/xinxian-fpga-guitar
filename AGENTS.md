@@ -139,3 +139,10 @@
 - 生产源码e5680ef：动态力度默认启用；基准2053，触发150/100/80/100，回落20，分界[280,430,620]/[250,400,600]/[150,280,400]/[220,380,600]。首样本+随后32通道样本取峰，400死区/80回落保持。当前voice_envelope与上传相同且不是主音源包络；所有主音源/音效/增益参数不动，用已有112/160/208/256增益。新增capture_pending接入姿态待处理音符观察，防止捕获期提前切音色。具体见`docs/VELOCITY_CALIBRATION.md`和`sim/reference/velocity_teammate/`原文/哈希。
 - 原工程综合PID39028已PASS结束，证据`build/velocity_calibration/synth_v1/`。Logic50199、FF20146、逻辑BSRAM108，DSP原语与P4相同。新实际VG SHA256 f64a6960a33513f73e2c60006b31a0fdf18970cce2fd0a23a128eb81e816e3c2。原工程P&R已接续同一VG，PID24376，日志route.stdout.log/route_process.json，不能重复启动；配置/保护文件字节和index保持。
 - 新RTL三项检测/实际SPI、三项真实音频/策略/顶层、四项冻结音频/判定/扩展音域/硬件按键回归均已PASS：velocity_detector_01、velocity_audio_02、velocity_legacy_01。真实音频12档每档1024样本，固定正确等级音源oracle逐PCM/数字口相同、声部能量递增、单声部干声无硬顶；01最后四弦测试oracle错设，失败留存，仅修正测试输入后通过。当前实际ADC VG四弦四档4739008时钟/32238转换PASS（velocity_adc_gate_01），384组曲库布尔连线审计也PASS。完整实际VG/UART和姿态整机正在velocity_full_gate_01/velocity_posture_gate_01运行，恢复先查验证记录和进程，已过测试不重跑。
+
+### 力度校准最终交付（2026-10-19，优先于上文运行中状态）
+
+- 综合PID39028、原工程同一VG的P&R PID24376及两个完整VG仿真均已结束PASS，禁止重复构建或重跑已完成测试。完整P&R于00:09:27完成：Logic50570、Register20146、CLS28316/29952（94.538%）、物理BSRAM113/118、DSP115.5/118，系统/音频Fmax50.089/13.638MHz，运行50/12.288不变；setup/hold/latch/未布通及已测deadline全部0。保留两条既有PR1014提示，STA计入实际布线；系统55MHz余量目标仍未达到。
+- 当前实际VG整机UART对照velocity_full_gate_01已PASS：10次真实115200事务、四声部、13397样本、16帧/5875200 LCD时钟采样，含动态频谱/曲线渐暗。姿态velocity_posture_gate_01已PASS：生产256包校准、真实MPU引脚/物理音色键/待命尾音/恢复，12815样本/1773包/5次音色变化/11226240有效期系统时钟LCD采样。采样数不是独立像素数；刺激边界见各bench记录。
+- 严格最终check_velocity_result.py已PASS，认证velocity_calibration_verification.json绑定本批源码/ROM/工具/输入/日志/当前VG/P&R/STA/FS。新FS SHA256为210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c，原impl可直接使用；按明确许可覆盖同名neo_guitar_touch_game_p4_posture.fs，完整证据归档build/releases/touch_game/p4_velocity_calibration_20261019/。旧P4原归档内部FS仍34f8a86e...，旧认证只认证该固定快照。两个用户文件字节/暂存对象保持。
+- 仅完成归档/本地提交后等待用户四档实物手感、噪声/串弦、实际声压与MPU联动反馈；不把数字能量测试当作独立声学标定。不自动推送、烧录、打开COM或开始蓝牙/Flash/新音色。
