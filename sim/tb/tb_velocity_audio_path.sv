@@ -69,7 +69,7 @@ module tb_velocity_audio_path;
           adc_values[11:0]=2053+n;
           wait(dut.pluck_valid[0]);#2;if(dut.velocity[1:0]!==g[1:0])$fatal(1,"FAIL: physical velocity");
           wait(dut.note_on[0]);repeat(2)@(negedge clk);
-          case(g)0:gain=64;1:gain=160;2:gain=208;3:gain=256;endcase
+          case(g)0:gain=64;1:gain=128;2:gain=192;3:gain=256;endcase
           if(dut.u_chain.g_piano.u_core.voice[0].u_voice.velocity_gain!==gain[8:0])$fatal(1,"FAIL: actual attack gain");
           samples=0;energy=0;voice_energy=0;peak=0;rails=0;measuring=1;
           wait(samples>=1024);@(negedge clk);measuring=0;

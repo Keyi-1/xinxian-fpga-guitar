@@ -27,7 +27,7 @@ module tb_velocity_adc_gate;
       case(ch)
         0:case(level)0:raw=2273;1:raw=2333;2:raw=2483;3:raw=2673;endcase
         1:case(level)0:raw=2153;1:raw=2303;2:raw=2453;3:raw=2653;endcase
-        2:case(level)0:raw=2133;1:raw=2203;2:raw=2333;3:raw=2453;endcase
+        2:case(level)0:raw=2113;1:raw=2203;2:raw=2333;3:raw=2453;endcase
         3:case(level)0:raw=2153;1:raw=2273;2:raw=2433;3:raw=2653;endcase
       endcase
     endfunction

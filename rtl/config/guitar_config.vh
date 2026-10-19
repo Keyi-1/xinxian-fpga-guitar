@@ -68,7 +68,7 @@
 // CH0..CH3 trigger at the measured absolute deviations below (inclusive).
 `define PLUCK_TRIGGER_THRESHOLD_CH0    12'd220
 `define PLUCK_TRIGGER_THRESHOLD_CH1    12'd100
-`define PLUCK_TRIGGER_THRESHOLD_CH2    12'd80
+`define PLUCK_TRIGGER_THRESHOLD_CH2    12'd60
 `define PLUCK_TRIGGER_THRESHOLD_CH3    12'd100
 
 // All four channels must settle at deviation <=20 before rearming.

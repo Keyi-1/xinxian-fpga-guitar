@@ -64,7 +64,7 @@ module tb_mcp3208_velocity_exhaustive;
             case(channel)
                 0:case(level)0:adc_value_for_level=2273;1:adc_value_for_level=2333;2:adc_value_for_level=2483;default:adc_value_for_level=2673;endcase
                 1:case(level)0:adc_value_for_level=2153;1:adc_value_for_level=2303;2:adc_value_for_level=2453;default:adc_value_for_level=2653;endcase
-                2:case(level)0:adc_value_for_level=2133;1:adc_value_for_level=2203;2:adc_value_for_level=2333;default:adc_value_for_level=2453;endcase
+                2:case(level)0:adc_value_for_level=2113;1:adc_value_for_level=2203;2:adc_value_for_level=2333;default:adc_value_for_level=2453;endcase
                 3:case(level)0:adc_value_for_level=2153;1:adc_value_for_level=2273;2:adc_value_for_level=2433;default:adc_value_for_level=2653;endcase
             endcase
         end
