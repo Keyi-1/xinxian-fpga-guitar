@@ -25,7 +25,9 @@
 
 原工程综合PID12236已结束并审查PASS：Logic50200=LUT39700+ALU10500、FF20139、逻辑BSRAM108，DSP原语不变。当前VG SHA256为`b5896b26820e9ff7d90c3e53d118a68f31fb6c8ca25682587b5bb2598c0e6769`；384组本批曲库连线审计PASS。另对四声部实际速度乘法器输入作128组完整布尔组合审计，证实演奏/游戏两种来源下所有四档真实DSP增益均为64/160/208/256，未选中的另一输入不影响结果，DSP输入/输出流水线参数与保存版相同。它补充两个整机门级轨迹使用试听固定力度2的覆盖边界，没有强制网表信号。
 
-实际ADC网表`dynamics_adc_gate_01`已PASS，生产SPI4/捕获32/死区400/稳定80、四弦×四档，4739008时钟/32238转换逐周期对照，含新CH0最低档边界。完整VG入口`dynamics_full_gate_01`/`dynamics_posture_gate_01`仍在运行，最终认证等待这两项结束。恢复先查`build/velocity_calibration/dynamics_v1/`与各仿真进程记录和日志，禁止重复启动。构建仅在用户原`.gprj`与原`impl`进行，受保护配置与方案文件的内容/暂存对象不变。
+实际ADC网表`dynamics_adc_gate_01`已PASS，生产SPI4/捕获32/死区400/稳定80、四弦×四档，4739008时钟/32238转换逐周期对照，含新CH0最低档边界。完整VG入口`dynamics_full_gate_01`/`dynamics_posture_gate_01`均已结束PASS：前者10次真实115200事务、实际RAM写/读回CRC/原子提交、四声部、13397音频样本/16帧/5875200 LCD时钟采样，含动态频谱与曲线渐暗；后者真实MPU GPIO/生产256包校准/物理音色键/尾音待命/退出/恢复、12815音频样本/1773读包/5次音色变化/11226240有效期系统时钟LCD采样。LCD时钟采样不是独立像素数，触控/计数/ADC事件加速边界沿用各bench的明确审计。231条厂商原语vopt-2697时序检查提示仅按已有精确白名单接受，无其他仿真警告或错误。33项PC按完整同源输入/工具/日志哈希复用。
+
+最终`tools/check_dynamics_result.py`已PASS，认证`gowin/neo_guitar_touch_game/dynamics_tuning_verification.json`严格绑定两个常数例外、新增冻结参考、全部当前输入/工具/日志/实际VG/P&R/STA和位流。构建仅在用户原`.gprj`与原`impl`进行，受保护配置与方案文件的内容/暂存对象不变。综合PID12236、P&R PID31412和全部仿真均已结束；禁止重复启动已通过的完整构建或测试。
 
 ## 完整实现结果
 
@@ -43,11 +45,11 @@
 
 运行仍为50/12.288MHz，未布通、setup、hold、latch及已测deadline违例均为0；两条既有PR1014通用时钟提示保留，STA已计入实际布线。旧余量目标中CLS≤95%和系统≥55MHz未达到，音频≥13.5MHz达到。物理打包/布线结果有变动，不能用寄存器减少宣称整机资源改善。本批是误触和响度修正，不宣称旧P1余量目标全部完成。
 
-新原工程FS SHA256为`e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213`；仍须两个完整VG对照及最终严格认证通过后才能覆盖同名发布副本，旧发布文件此时仍保留。
+新原工程FS SHA256为`e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213`，对应新完整证据归档`build/releases/touch_game/p4_dynamics_tuning_20261019/`，以`archive.json`核对每个文件。旧210877be...和更早34f8a86e...的固定完整归档及标签保留，旧认证只适用于各自归档内部FS。
 
 ## 实物比较
 
-最终认证通过后覆盖同名`neo_guitar_touch_game_p4_posture.fs`；旧固定归档保留。用Programmer直接选择新FS即可，无需重新综合布线。
+全部数字门槛通过后，按既有明确授权覆盖同名`build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs`，内容与原`gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs`相同。用Programmer直接选择新FS即可，无需重新综合布线。
 
 1. 先不拨第一弦，分别对其他三弦轻/重各拨20次，检查第一弦误触次数；再测试跨弦和四弦同时起音。
 2. 对第一弦轻拨20次，观察提高门槛后是否漏音；再逐弦试轻/中/重/最重，比较最低档与其余三档的层次。

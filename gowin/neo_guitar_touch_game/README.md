@@ -1,16 +1,22 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**当前P4力度校准版（2026-10-19，实物待验收）：** 已按队友提供的实测四弦阈值启用峰值捕获/四档力度，真实拨弦使用已有112/160/208/256增益；完整三音色、音效、包络与采样率保持。捕获窗口纳入姿态待处理音符观察，防止起音前提前自动切换；试听固定力度2。保留用户确认的《情歌》10/18小节节奏、MPU-6050与居中UI，上电默认MANUAL。
+**当前P4误触／响度修正版（2026-10-19，等待试板）：** 第一弦E4／CH0触发偏差150→220，最低档增益112→64（满力度振幅25%）；其余三弦阈值、增益160/208/256、力度分界、三音色/全部音效/包络/时钟不变。保留曲库/UART、已确认节奏、居中UI和姿态捕获期保护，上电MANUAL、试听固定力度2。
 
 原工程可直接选择：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。使用用户原`.gprj`/原`impl`，`gw_sh`完整综合、P&R/STA；没有独立构建工程或伪造IDE完成状态。
-发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)，按用户许可覆盖同名文件，新SHA256 `210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c`。
-[本批认证](velocity_calibration_verification.json)；[阈值、响度、完整对比与下板步骤](../../docs/VELOCITY_CALIBRATION.md)；[MPU接线与操作](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。证据目录`build/releases/touch_game/p4_velocity_calibration_20261019/`。本批仅本地提交，不自动推送或烧录。
+发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)，按用户许可覆盖同名文件，新SHA256 `e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213`。
+[本批认证](dynamics_tuning_verification.json)；[两项参数、完整对比与下板步骤](../../docs/DYNAMICS_TUNING.md)；[MPU接线与操作](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。完整证据目录`build/releases/touch_game/p4_dynamics_tuning_20261019/`。本批仅本地提交，等待用户试板，不自动推送或烧录。
+
+完整实现：Logic50570、Register20139、CLS28479/29952（95.08%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.043/13.619MHz，运行仍50/12.288，setup/hold/latch/未布通及已测deadline全部0。比上版增加163 CLS、减少7寄存器；旧CLS≤95%和系统55MHz余量目标未达，不宣称资源优化收益。
+
+16384组检测码/140组正负模拟串弦、真实SPI四弦四档、新旧冻结音源30024样本（档1～3相同，档0仅64/112缩放与舍入）、三音色×四档实际ADC至PCM/PT8211/I²S均PASS。8192演奏样本的冻结参考仅应用授权档0增益修改，9032扩展音域/判定/按键/姿态回归通过。当前实际VG的ADC、完整UART/四声部/16帧动态显示、生产256包MPU校准/切音色/尾音对照均PASS；另384组曲库与128组四声部DSP增益实际连线审计，33项PC严格同源复用通过。新SHA绑定源码/ROM/日志/当前网表/P&R/STA。实际误触减少程度、轻拨是否漏音和最低档听感仍待下板比较。
+
+下方均为**固定历史发布**；历史认证不认证当前原impl或已覆盖的同名发布文件。
+
+**保存的P4力度校准版（2026-10-19）：** 原CH0阈值150、最低增益112/256。标签`snapshot/p4-velocity-before-ch0-threshold-20261019`（df770fa）；[固定旧力度版FS](../../build/releases/touch_game/p4_velocity_calibration_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs)，SHA256 `210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c`。[旧认证](velocity_calibration_verification.json)与[原校准说明](../../docs/VELOCITY_CALIBRATION.md)只对应该固定快照。用户随后反馈第一弦串触和大小音量对比不足，已由文首修正版接续。
 
 完整实现：Logic50570、Register20146、CLS28316/29952（94.54%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.089/13.638MHz，运行仍50/12.288。setup/hold/latch/未布通及已测deadline全部0。比保存P4减少269 CLS，增加56寄存器；系统55MHz余量目标仍未达到。
 
 16384组检测输入与真实SPI四弦四档、三音色×四档真实ADC到PCM/双数字口、8192冻结音频、判定/扩展音域/按键/姿态回归均PASS。当前VG的ADC前端及两个完整整机对照PASS：真实UART13397音频样本/16帧动态频谱和曲线，真实MPU生产256包校准12815样本/1773包/5次音色变化；33项PC按严格同源哈希复用。原工程完整P&R/STA与最终哈希绑定PASS，不重复构建。每弦四档实际手感、噪声/串弦、最终声压与长期稳定性待下板确认。
-
-下方均为**固定历史发布**；历史认证不认证当前原impl或已覆盖的同名发布文件。
 
 **保存的P4数字发布（2026-10-18，实物待验收）：** 已纳入用户试听确认的《情歌》10/18小节节奏、MPU-6050校准/手动优先/空闲姿态切音色，以及主页底部字体居中。保存标签`snapshot/p4-posture-before-velocity-20261018`（1bbab98），旧FS只从固定归档获取：[旧P4位流](../../build/releases/touch_game/p4_posture_20261018/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs)，SHA256 `34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c`。[旧P4认证](p4_posture_verification.json)只认证这个固定快照。
 

@@ -108,9 +108,9 @@
   "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current certified implementation",
   "current_original_project_bitstream": {
     "path": "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
-    "sha256": "210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c",
-    "verification": "gowin/neo_guitar_touch_game/velocity_calibration_verification.json",
-    "scope": "Current P4 measured-velocity digital build; physical calibration and acoustic acceptance pending. Earlier immutable archives remain fixed."
+    "sha256": "e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213",
+    "verification": "gowin/neo_guitar_touch_game/dynamics_tuning_verification.json",
+    "scope": "Current CH0 trigger220 / level0 gain64 digital build. User board comparison pending; previous archives remain immutable."
   },
   "p3_writable_uart_import": {
     "date": "2026-10-18",
@@ -230,7 +230,7 @@
     "validated_source_commit": "e5680ef3510581f6a4ed487f90656495fddb1a45",
     "implementation": "Original gprj and original impl, Gowin V1.9.12.03 Device B; synthesis PID39028 and same-netlist P&R PID24376 complete",
     "bitstream_sha256": "210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c",
-    "bitstream": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "bitstream": "build/releases/touch_game/p4_velocity_calibration_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
     "evidence_archive": "build/releases/touch_game/p4_velocity_calibration_20261019",
     "verification": "gowin/neo_guitar_touch_game/velocity_calibration_verification.json",
     "resources": {
@@ -341,6 +341,90 @@
     "physical_com_opened": false,
     "github_push_authorized": false,
     "measurements": "No new physical ADC labelled traces, target sound pressure, amplifier gain or long-duration measurements",
-    "next_action_policy": "Stop after local delivery and wait for user board feedback and explicit further instructions; no automatic Bluetooth, Flash or new timbre work"
+    "next_action_policy": "Stop after local delivery and wait for user board feedback and explicit further instructions; no automatic Bluetooth, Flash or new timbre work",
+    "original_publication_path": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive_scope": "Saved initial velocity release only; original publication path is replaced by explicitly authorized dynamics tuning.",
+    "user_feedback": {
+      "date": "2026-10-19",
+      "scope": "User reports first-string notes triggered by other strings and insufficient contrast between low/high loudness. No installed-file hash or quantitative ADC/acoustic measurement captured."
+    }
+  },
+  "dynamics_tuning_digital_release": {
+    "date": "2026-10-19",
+    "digital_result": "PASS",
+    "validated_source_commit": "855e63d518784f7a9f07bec2eb1d4dc743a66c20",
+    "bitstream": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "bitstream_sha256": "e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213",
+    "verification": "gowin/neo_guitar_touch_game/dynamics_tuning_verification.json",
+    "evidence_archive": "build/releases/touch_game/p4_dynamics_tuning_20261019",
+    "implementation": "Original gprj/impl; synthesis PID12236 and same-netlist P&R PID31412 complete",
+    "resources": {
+      "Logic": {
+        "used": 50570.0,
+        "available": 59904.0
+      },
+      "Register": {
+        "used": 20139.0,
+        "available": 60780.0
+      },
+      "CLS": {
+        "used": 28479.0,
+        "available": 29952.0
+      },
+      "BSRAM": {
+        "used": 113.0,
+        "available": 118.0
+      },
+      "DSP": {
+        "used": 115.5,
+        "available": 118.0
+      }
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 13.619
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 50.043
+      }
+    },
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_posture_deadline": 0
+    },
+    "margin_targets_met": false,
+    "authorized_changes": {
+      "CH0_E4_trigger": [
+        150,
+        220
+      ],
+      "all_strings_level0_gain_q8": [
+        112,
+        64
+      ],
+      "other_gains_unchanged": [
+        160,
+        208,
+        256
+      ]
+    },
+    "preservation_scope": "Exactly two literal edits from saved df770fa: CH0 trigger150->220 and level0 voice gain112->64; every other runtime/ROM/score/display/MPU/pin/clock/route setting unchanged",
+    "frozen_audio_scope": "Independent saved voice proves levels1..3 exact PCM and level0 64/112 scaling within integer rounding. 8192-sample master oracle permits exactly the user-authorized level0 gain literal only; never claim level0 still equals unmodified historical PCM.",
+    "digital_scope": "12 RTL benches; 30024 saved-voice samples; actual SPI x16 grades; physical ADC to three timbres/four gains; fresh VG ADC+UART/16-frame dynamic display+production256 MPU/tail/manual; 384 bank and128 four-voice DSP gain Boolean cases;33 exact-source PC tests reused; full P&R/STA and final artifact binding PASS",
+    "same_name_overwrite_authorized": true,
+    "saved_previous_tag": "snapshot/p4-velocity-before-ch0-threshold-20261019",
+    "hardware_status": "Awaiting user comparison of CH0 false/missed triggers and lowest-level loudness; threshold220 is a first trial based on reported behavior, not a newly measured hardware calibration.",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "github_push_authorized": false,
+    "next_action_policy": "Stop after local delivery; wait for board feedback, no automatic new feature work"
   }
 }
