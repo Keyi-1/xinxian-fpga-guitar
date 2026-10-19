@@ -1,3 +1,10 @@
+# Windows UART 桌面上传软件（2026-10-19）
+
+- 用户另授权实现 Windows 曲谱上传软件；界面要求米白底、大幅淡吉他线稿覆盖页面底部、三步明确引导。当前分支接续实际 `experiment/p5-bluetooth-import`，不切回旧快照、不推进 BL616 刷写。
+- 入口 `tools/run_windows_score_uploader.py`，源码 `tools/windows_score_uploader/`，文档 `docs/WINDOWS_SCORE_UPLOADER.md`。复用并保持原 XG3 Client/事件校验/分弦器字节不变；支持 xgscore、BIN+JSON、CSV，附修订节奏情歌 CRC c3451bbc。COMMIT 前持久写记录，最终结果不明确则保留并阻止重传。
+- 便携包在 `build/releases/windows/FPGA_Guitar_Uploader_1.0.0.zip`，解压后运行 `FPGA_Guitar_Uploader/FPGA_Guitar_Uploader.exe`；无需安装 Python。验证与哈希见 `docs/windows_score_uploader_verification.json` 及 `build/windows_uploader/`。电脑模型/Qt 控件流程与冻结 EXE 检查不代表实物串口验收。
+- 未打开实物 COM、未改 FPGA 源码/曲库/位流/约束/两个保护文件，不重复综合布线；未跟踪的 `tools/score_uploader_web.py`、`scores/user/` 为进入任务前已有文件，保持不动、不暂存。本批只本地提交，不 push/merge/烧录，交付后等用户实测反馈。
+
 # P5 手机蓝牙导谱最新接续点（2026-10-19）
 
 - 用户本轮明确授权在独立分支研究板载BL616，覆盖下文P4结束后等待决定；分支 `experiment/p5-bluetooth-import`，起点与实时远端master均为e0b2ff2。用户确认31005底板、首版同时兼容Android/iPhone，天线/调试器固件版本未知；比赛限制辅助MCU，不能保证合规或宣传FPGA独立实现BLE栈。
