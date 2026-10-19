@@ -92,7 +92,7 @@ def evidence():
     result[rel(pc)]=digest(pc);result.update(d['log_sha256'])
     audit=RUN/'bank_write_audit.json';d=load(audit)
     assert d['result']=='PASS' and d['boolean_cases']==384 and d['netlist_sha256']==digest(PROJECT/'impl/gwsynthesis'/f'{NAME}.vg')
-    assert d['tool_sha256']==digest(ROOT/'tools/audit_velocity_bank.py')
+    assert d['tool_sha256']==digest(ROOT/'tools/audit_dynamics_bank.py')
     result[rel(audit)]=digest(audit)
     return result
 
@@ -166,7 +166,7 @@ def main():
     pc_inputs=load(ROOT/'build/p4_posture/pc_checks_a1/verification.json')['source_sha256']
     artifacts+=[ROOT/p for p in pc_inputs]
     tools=[Path(__file__)]+[ROOT/'tools'/n for n in ['archive_dynamics.py','run_dynamics_checks.ps1','run_dynamics_legacy.ps1','review_dynamics_synthesis.py','run_velocity_gate.ps1',
-        'prepare_velocity_gate.py','prepare_posture_gate.py','prepare_game_p3_gate.py','compare_synth_graph.py','audit_velocity_bank.py',
+        'prepare_velocity_gate.py','prepare_posture_gate.py','prepare_game_p3_gate.py','compare_synth_graph.py','audit_dynamics_bank.py',
         'start_original_dynamics_synthesis.ps1','route_original_velocity.ps1','run_touch_game_checks.ps1']]
     route=load(RUN/'route_process.json');route.update(status='COMPLETE_VERIFICATION_PASS',verified_at=datetime.now().astimezone().isoformat())
     (RUN/'route_process.json').write_text(json.dumps(route,indent=2)+'\n',encoding='utf-8')
