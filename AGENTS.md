@@ -146,3 +146,9 @@
 - 当前实际VG整机UART对照velocity_full_gate_01已PASS：10次真实115200事务、四声部、13397样本、16帧/5875200 LCD时钟采样，含动态频谱/曲线渐暗。姿态velocity_posture_gate_01已PASS：生产256包校准、真实MPU引脚/物理音色键/待命尾音/恢复，12815样本/1773包/5次音色变化/11226240有效期系统时钟LCD采样。采样数不是独立像素数；刺激边界见各bench记录。
 - 严格最终check_velocity_result.py已PASS，认证velocity_calibration_verification.json绑定本批源码/ROM/工具/输入/日志/当前VG/P&R/STA/FS。新FS SHA256为210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c，原impl可直接使用；按明确许可覆盖同名neo_guitar_touch_game_p4_posture.fs，完整证据归档build/releases/touch_game/p4_velocity_calibration_20261019/。旧P4原归档内部FS仍34f8a86e...，旧认证只认证该固定快照。两个用户文件字节/暂存对象保持。
 - 仅完成归档/本地提交后等待用户四档实物手感、噪声/串弦、实际声压与MPU联动反馈；不把数字能量测试当作独立声学标定。不自动推送、烧录、打开COM或开始蓝牙/Flash/新音色。
+
+## 第一弦与最低档响度新授权（2026-10-19）
+
+- 用户报告弹其他弦易触发第一弦，并要求最小音量更低；新授权覆盖上节等待决定。本批只改CH0/E4触发150→220和主音源最低档增益112→64，其余三弦触发、四弦力度分界/回落/捕获、增益160/208/256、音源模态/包络/音效/时钟/接线不变。旧力度版已保留标签snapshot/p4-velocity-before-ch0-threshold-20261019（df770fa）与完整固定归档p4_velocity_calibration_20261019，内部FS哈希210877be...不能覆盖。最终通过后继续按既有许可覆盖同名发布FS；不push/烧录/打开COM。
+- 生产源码855e63d。四项检测/真实SPI回归dynamics_detector_01已PASS，16384码/132峰值，另140组150～219正负模拟串弦在新CH0抑制、旧150触发，其他三弦逐周期一致，220边界真实起音保持最低档。四项dynamics_audio_01已PASS：独立冻结上版主音源30024样本（档1～3的8694样本完全相同，档0的21330样本只作64/112缩放和整数舍入）、三音色×四档真实ADC到双音频口及姿态策略/整机。四项dynamics_legacy_01已PASS：8192冻结音频参考仅接受已授权的档0增益112→64这一处有限修改，不能声称档0也等于旧未改PCM；9032扩展音域/判定/按键通过，退出1452样本。旧参考和旧校验器保持。
+- 原工程综合PID12236已启动，证据build/velocity_calibration/dynamics_v1/，恢复先查process.json/build.stdout.log，禁止重复启动。需要新实际VG/ADC/两项整机验证、同一VG完整P&R/STA和新认证dynamics_tuning_verification.json后才可发布；旧力度版认证不认证新产物。入口start_original_dynamics_synthesis.ps1、review_dynamics_synthesis.py、route_original_velocity.ps1 -RunName dynamics_v1、check_dynamics_result.py、archive_dynamics.py。两个用户文件字节/index继续保护。详细范围见docs/DYNAMICS_TUNING.md。
