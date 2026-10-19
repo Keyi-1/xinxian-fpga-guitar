@@ -1,6 +1,6 @@
 # MPU-6050 姿态切音色与《情歌》节奏修订
 
-2026-10-19发布边界：当前原工程和同名`neo_guitar_touch_game_p4_posture.fs`已更新为[第一弦误触／最低档响度修正版](DYNAMICS_TUNING.md)，以`dynamics_tuning_verification.json`和新位流哈希为准。本文接线、姿态操作和已确认节奏继续适用；下文A2资源/哈希/认证为保存的历史P4快照，只对应`build/releases/touch_game/p4_posture_20261018/`内部旧FS。
+2026-10-19发布边界：当前原工程和同名`neo_guitar_touch_game_p4_posture.fs`已更新为[第三弦与四等分力度版](QUARTER_DYNAMICS.md)，以`quarter_dynamics_verification.json`和新位流哈希为准。本文接线、姿态操作和已确认节奏继续适用；下文A2资源/哈希/认证为保存的历史P4快照，只对应`build/releases/touch_game/p4_posture_20261018/`内部旧FS。
 
 2026-10-18：用户已确认当前P3总体可用，并授权先推送保存、再做本批修改。P3提交 `7837a24` 已推送 `origin/master`；本批修改已在本地通过数字验证，不自动推送或代理烧录。旧P3位流/认证完整保留，新源码使用独立P4认证。
 

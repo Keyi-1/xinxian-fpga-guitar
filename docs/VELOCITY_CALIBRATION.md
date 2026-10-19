@@ -1,6 +1,6 @@
 # P4 四弦力度校准
 
-2026-10-19后续边界：用户反馈第一弦易串触、最低音量对比不足，已由[误触／响度修正](DYNAMICS_TUNING.md)接续。当前原impl与同名发布FS采用CH0触发220、最低增益64，认证为`dynamics_tuning_verification.json`。本文150/112参数及210877be...哈希为保存的初次力度校准快照，只对应`p4_velocity_calibration_20261019/`内部FS，不认证此后同名发布文件。
+2026-10-19后续边界：第一弦易串触与最低响度先由[第一版修正](DYNAMICS_TUNING.md)接续；当前原impl和同名FS已为[四等分力度版](QUARTER_DYNAMICS.md)，CH0/CH2触发220/60，四档64/128/192/256，认证`quarter_dynamics_verification.json`。本文150/112参数及210877be...哈希为保存的初次力度校准快照，只对应`p4_velocity_calibration_20261019/`内部FS，不认证此后同名发布文件。
 
 2026-10-18用户提供三份队友测试代码，授权基于已保存的P4接入力度并综合仿真，随后允许生成新位流时覆盖同名`neo_guitar_touch_game_p4_posture.fs`。没有新推送或代理烧录授权。
 

@@ -1,5 +1,7 @@
 # 第一弦误触与最低档响度调整
 
+后续边界：用户已要求第三弦更灵敏、中间两档改为50%/75%，当前原impl和同名发布FS由[四等分力度版](QUARTER_DYNAMICS.md)接续，认证为`quarter_dynamics_verification.json`。本文CH2=80、64/160/208/256及e97afee4...仅适用于`p4_dynamics_tuning_20261019/`内部固定旧FS，不认证此后的同名发布文件。
+
 2026-10-19：用户反馈弹其他弦时第一根弦易误触，随后要求最低档音量更小、扩大强弱对比。基于已验证力度版`df770fa`仅作两个生产常数修改；其余演奏、游戏、曲谱、显示、UART、姿态及接线保持。旧版标签`snapshot/p4-velocity-before-ch0-threshold-20261019`及固定归档`build/releases/touch_game/p4_velocity_calibration_20261019/`保留，旧位流SHA256为`210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c`。
 
 ## 参数与行为

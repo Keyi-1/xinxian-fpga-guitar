@@ -24,7 +24,9 @@
 
 综合PID23460已结束并审查PASS：Logic50053=LUT39553+ALU10500、Register20139、逻辑BSRAM108，DSP原语计数与保存版相同；最终以完整实现物理值为准。当前VG SHA256 `543d2db4977ee1b141c179ac17ebb4d948d40fbf13fd6d82f441580547d72107`。实际曲库384组布尔连线与四声部128组速度DSP操作数/原流水线参数审计PASS，实证两种模式下全部四档为64/128/192/256，而非只检查试听固定档2。
 
-同一已审查VG的原工程P&R PID38532于14:37:34结束，STA审查通过；证据`build/velocity_calibration/quarters_v1/`。实际ADC VG `quarters_adc_gate_01`已PASS，两个完整VG `quarters_full_gate_01`、`quarters_posture_gate_01`仍待检查最终结果。恢复先检查各验证记录、现有进程和日志，不重复运行已通过测试。最终严格认证通过前不覆盖发布位流。
+同一已审查VG的原工程P&R PID38532于14:37:34结束，STA审查通过；证据`build/velocity_calibration/quarters_v1/`。实际ADC VG `quarters_adc_gate_01`已PASS：四弦×四档真实SPI，4739008时钟/32238转换逐周期相同。两个完整VG均已结束PASS：`quarters_full_gate_01`有10次真实115200事务、实际RAM写/读回CRC/原子提交、四声部、13397音频样本/16帧/5875200 LCD时钟采样，含动态频谱和曲线渐暗；`quarters_posture_gate_01`有真实MPU GPIO、生产256包校准、物理音色键/尾音/退出/恢复、12815音频样本/1773包/5次变化/11226240有效期系统时钟LCD采样。LCD采样不是独立像素数；注册触控/计数/ADC刺激边界见bench审计。两项各231条厂商原语vopt-2697提示只按原精确白名单接受，没有其他警告或错误；33项PC按全部同源输入/工具/日志哈希复用。
+
+最终`tools/check_quarter_result.py`已PASS，新认证`gowin/neo_guitar_touch_game/quarter_dynamics_verification.json`绑定本批源码/ROM/独立冻结参考/工具/日志/当前VG/P&R/STA/位流，严格只准两个文件的三个常数变化。综合、布局布线及全部仿真均已结束，不再重跑已通过构建或测试。
 
 ## 完整物理实现
 
@@ -40,10 +42,10 @@
 
 运行仍50/12.288MHz，未布通、setup、hold、latch及已测deadline违例0，CST/SDC/路由配置保持，两条既有PR1014通用时钟提示保留并计入STA。以上为完整实现口径，逻辑数减少没有转化为CLS减少，不能只用局部综合数声称面积改善。旧CLS≤95%和系统≥55MHz余量目标未达，音频≥13.5MHz达到。
 
-新原工程FS SHA256为`cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30`，发布路径仍保留旧e97afee4...，等待两个完整VG及最终认证通过后再覆盖。
+新原工程FS SHA256为`cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30`。完整证据归档`build/releases/touch_game/p4_quarter_dynamics_20261019/`以`archive.json`核对；旧e97afee4...及更早固定归档/标签保持，旧认证只对应各自归档内部FS。
 
 ## 试板重点
 
-最终通过后按既有许可覆盖同名`neo_guitar_touch_game_p4_posture.fs`，用户可在Programmer直接加载。先检查第三弦轻拨是否更易发音、静置与弹其他弦是否新增误触；再比较四档层次和三音色、试听/游戏、延音与姿态联动。实物噪声/串弦/声压及长期稳定性待用户确认。
+全部数字门槛通过后，按既有许可覆盖同名`build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs`，与原`gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs`相同，用户可在Programmer直接加载，无需重新综合布线。先检查第三弦轻拨是否更易发音、静置与弹其他弦是否新增误触；再比较四档层次和三音色、试听/游戏、延音与姿态联动。实物噪声/串弦/声压及长期稳定性待用户确认。
 
 本批完成后等待下板反馈，不push、代理烧录、打开COM或自动开始新功能。

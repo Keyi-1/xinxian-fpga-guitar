@@ -108,9 +108,9 @@
   "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current certified implementation",
   "current_original_project_bitstream": {
     "path": "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
-    "sha256": "e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213",
-    "verification": "gowin/neo_guitar_touch_game/dynamics_tuning_verification.json",
-    "scope": "Current CH0 trigger220 / level0 gain64 digital build. User board comparison pending; previous archives remain immutable."
+    "sha256": "cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30",
+    "verification": "gowin/neo_guitar_touch_game/quarter_dynamics_verification.json",
+    "scope": "Current CH2 threshold60 and quarter-step64/128/192/256 gain build; original project complete. Hardware comparison pending."
   },
   "p3_writable_uart_import": {
     "date": "2026-10-18",
@@ -353,7 +353,7 @@
     "date": "2026-10-19",
     "digital_result": "PASS",
     "validated_source_commit": "855e63d518784f7a9f07bec2eb1d4dc743a66c20",
-    "bitstream": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "bitstream": "build/releases/touch_game/p4_dynamics_tuning_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
     "bitstream_sha256": "e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213",
     "verification": "gowin/neo_guitar_touch_game/dynamics_tuning_verification.json",
     "evidence_archive": "build/releases/touch_game/p4_dynamics_tuning_20261019",
@@ -425,6 +425,95 @@
     "agent_programmed_hardware": false,
     "physical_com_opened": false,
     "github_push_authorized": false,
-    "next_action_policy": "Stop after local delivery; wait for board feedback, no automatic new feature work"
+    "next_action_policy": "Stop after local delivery; wait for board feedback, no automatic new feature work",
+    "original_publication_path": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive_scope": "Saved CH0/minimum-gain release; original publication path is replaced by explicitly requested quarter-step tuning. Historical verification applies to fixed internal archived FS only."
+  },
+  "quarter_dynamics_digital_release": {
+    "date": "2026-10-19",
+    "digital_result": "PASS",
+    "validated_source_commit": "152a7645d1aa1829b4d3b2e60b2f07f8b2a0d5fe",
+    "bitstream": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "bitstream_sha256": "cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30",
+    "verification": "gowin/neo_guitar_touch_game/quarter_dynamics_verification.json",
+    "evidence_archive": "build/releases/touch_game/p4_quarter_dynamics_20261019",
+    "implementation": "Original gprj/impl; synthesis PID23460 and same-netlist P&R PID38532 complete",
+    "resources": {
+      "Logic": {
+        "used": 50432.0,
+        "available": 59904.0
+      },
+      "Register": {
+        "used": 20139.0,
+        "available": 60780.0
+      },
+      "CLS": {
+        "used": 28650.0,
+        "available": 29952.0
+      },
+      "BSRAM": {
+        "used": 113.0,
+        "available": 118.0
+      },
+      "DSP": {
+        "used": 115.5,
+        "available": 118.0
+      }
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 14.051
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 53.171
+      }
+    },
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_posture_deadline": 0
+    },
+    "margin_targets_met": false,
+    "authorized_changes": {
+      "CH2_G3_trigger": [
+        80,
+        60
+      ],
+      "middle_gains_q8": {
+        "level1": [
+          160,
+          128
+        ],
+        "level2": [
+          208,
+          192
+        ]
+      },
+      "CH0_remains": 220,
+      "all_four_gains_q8": [
+        64,
+        128,
+        192,
+        256
+      ]
+    },
+    "preservation_scope": "Exactly three literal edits in two runtime files from saved d0b57a4: CH2 trigger80->60 and class1/2 gains160/208->128/192. All other runtime/ROM/score/display/MPU/pin/clock/route settings unchanged.",
+    "physical_velocity_behavior": "Real ADC captured peak selects one of four gains per attack, as already enabled in prior release; this is parameter tuning. Preview still fixed grade2 and now uses75 percent gain.",
+    "frozen_audio_scope": "48456 prior-voice samples: levels0/3 exact5796 samples; levels1/2 scaled42660 samples within integer rounding. 8192 master-reference samples use only the exact previously/currently authorized gain literal edits112/160/208->64/128/192; do not claim all altered classes equal the untouched old PCM.",
+    "digital_scope": "13 RTL benches,16384 detector cases,40 newly admitted CH2 light strikes and140 retained CH0 rejection cases; physical SPI four grades per string; ADC-to-three-timbre/four-grade audio; fresh actual VG ADC+full UART/display+production256 MPU gate checks;384 bank/128 gain truth combinations;33 PC exact-source reuse; complete P&R/STA and final hash binding PASS",
+    "same_name_overwrite_authorized": true,
+    "saved_previous_tag": "snapshot/p4-before-quarter-gains-20261019",
+    "hardware_status": "User board comparison pending for CH2 light strikes/noise/crosstalk and quarter-step loudness. Trial threshold60 was selected from request, not newly measured physical ADC data.",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "github_push_authorized": false,
+    "next_action_policy": "After local digital delivery wait for user board feedback; no automatic new functionality."
   }
 }
