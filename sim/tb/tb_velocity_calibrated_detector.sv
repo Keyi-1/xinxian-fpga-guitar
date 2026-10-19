@@ -12,7 +12,7 @@ module tb_velocity_calibrated_detector;
         .sample_string(sample_string),.sample_data(sample_data),.pluck_valid(fixed_pluck),
         .velocity_level(fixed_velocity),.raw_adc(),.peak_adc(),.event_timestamp(),.capture_pending(fixed_pending));
     function integer trigger(input integer c);
-        case(c)0:trigger=150;1:trigger=100;2:trigger=80;default:trigger=100;endcase
+        case(c)0:trigger=220;1:trigger=100;2:trigger=80;default:trigger=100;endcase
     endfunction
     function integer grade(input integer c,m);
         case(c)

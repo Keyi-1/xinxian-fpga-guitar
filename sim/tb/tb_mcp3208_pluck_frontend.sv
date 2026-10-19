@@ -158,7 +158,7 @@ module tb_mcp3208_pluck_frontend;
         clk                 = 1'b0;
         rst_n               = 1'b0;
         adc_miso            = 1'b0;
-        adc_value0          = 12'd2203;
+        adc_value0          = 12'd2273;
         adc_value1          = 12'd2303;
         adc_value2          = 12'd2333;
         adc_value3          = 12'd2653;
@@ -189,7 +189,7 @@ module tb_mcp3208_pluck_frontend;
                      velocity2_at_event, velocity3_at_event);
             $finish;
         end
-        if ((raw_adc[11:0] !== 12'd2203) ||
+        if ((raw_adc[11:0] !== 12'd2273) ||
             (raw_adc[23:12] !== 12'd2303) ||
             (raw_adc[35:24] !== 12'd2333) ||
             (raw_adc[47:36] !== 12'd2653)) begin

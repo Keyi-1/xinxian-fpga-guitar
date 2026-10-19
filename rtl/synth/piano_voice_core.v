@@ -211,7 +211,7 @@ module piano_voice_core #(
         input [1:0] level;
         begin
             case(level)
-                0: gain_for_velocity=9'd112;
+                0: gain_for_velocity=9'd64;
                 1: gain_for_velocity=9'd160;
                 2: gain_for_velocity=9'd208;
                 default: gain_for_velocity=9'd256;
