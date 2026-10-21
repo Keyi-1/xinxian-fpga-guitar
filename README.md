@@ -33,6 +33,178 @@
 
 项目最终目标日期为 **2026-11-01**，计划以 Apache License 2.0 公开源码。
 
+## 蓝牙与手机曲谱传输（BL616）
+
+2026-10-21 已加入 Android 手机客户端和 BL616 BLE↔UART 二级固件源码。该功能复用 FPGA
+现有的 P3 XG3 UART 曲谱导入协议，不改变 FPGA 的实时音频生成主链路。手机传输的是曲谱、
+槽位查询和应答数据，不是实时蓝牙音频；正常演奏和音频输出仍完全由 FPGA RTL 完成。
+
+> 当前状态：BL616 固件已经使用 BouffaloSDK 编译并生成正式二级镜像，Android 客户端源码已完成；
+> 尚未把二级镜像烧入实物，也尚未完成手机→BLE→BL616→UART→FPGA 的实物闭环验证。
+> 下文将“已实现的软件”与“仍待下板验证的项目”分开说明。
+
+### 系统分工与数据链路
+
+```mermaid
+flowchart LR
+    A[Android 手机 App] <-->|BLE GATT / NUS| B[BL616 BLE-UART 透明桥]
+    B <-->|UART 115200 / 8N1| C[高云 FPGA]
+    C --> D[XG3 协议解析]
+    D --> E[曲谱暂存、CRC 与 BSRAM 读回校验]
+    E --> F[五槽曲库原子更新]
+```
+
+- **Android App**：扫描和连接 BLE 设备、选择 `.bin` 曲谱、进行本地格式检查、发送 XG3
+  命令，并显示上传进度和 FPGA 应答。
+- **BL616**：只负责 BLE 字节流与 UART 字节流的双向透明转发，不解析、不修改 XG3 帧，
+  也不参与音色合成。
+- **FPGA**：负责 XG3 帧解析、会话与序号检查、曲谱约束检查、CRC32、实际 BSRAM 读回校验，
+  以及曲目目录的跨时钟域原子提交。
+
+BL616 与 FPGA 使用 NEO Dock 已有 UART 网络连接：
+
+| 数据方向 | BL616 端 | FPGA 端 | 行为 |
+| --- | --- | --- | --- |
+| 手机 → FPGA | UART1 TX，GPIO28 | RX，V14 | 手机写 BLE RX，BL616 原样从 UART 发给 FPGA |
+| FPGA → 手机 | UART1 RX，GPIO27 | TX，U15 | FPGA 应答进入 BL616，再以 BLE Notify 发给手机 |
+
+UART 固定为 `115200 / 8N1`、无校验、无硬件流控。BL616 两个方向各使用 2048 字节
+FreeRTOS Stream Buffer，避免 BLE 分包与 UART 连续字节流的时序差异导致丢包。BLE 分包边界
+不是 XG3 帧边界；手机端会连续收集通知字节、搜索 XG3 帧头并重组固定 32 字节帧。
+
+### BLE 服务
+
+BL616 广播名称为 `XINXIAN-BL616`，使用 Nordic UART Service（NUS）兼容 UUID：
+
+| 用途 | UUID | 属性与方向 |
+| --- | --- | --- |
+| Service | `6E400001-B5A3-F393-E0A9-E50E24DCCA9E` | BLE 串口主服务 |
+| RX | `6E400002-B5A3-F393-E0A9-E50E24DCCA9E` | 手机 Write / Write Without Response → BL616 |
+| TX | `6E400003-B5A3-F393-E0A9-E50E24DCCA9E` | BL616 Notify → 手机 |
+
+手机连接后请求 MTU 247；实际 BLE 负载按协商后的 `MTU-3` 分块，单次通知最大 244 字节。
+如果仍使用默认 MTU 23，程序会自动退回 20 字节分块。断开连接后 BL616 会重新广播。
+手机端必须先成功订阅 TX Notify，才会进入 XG3 握手。
+
+### 手机连接与 XG3 握手
+
+1. App 申请附近设备/蓝牙权限并扫描附近 BLE 设备。
+2. 用户选择 `XINXIAN-BL616`，App 建立 GATT 连接并发现 NUS 服务。
+3. App 请求 MTU 247，找到 RX/TX 特征并写入 CCC 描述符以订阅 TX Notify。
+4. BLE 串口就绪后，App 自动发送 XG3 `HELLO`。
+5. BL616 把完整字节流原样转发给 FPGA；FPGA 返回能力信息。
+6. App 确认事件格式为 v2、槽数为 5、帧长为 32、采样时间基准为 48 kHz，握手成功后
+   才开放槽位查询和曲谱上传按钮。
+
+Android 客户端支持 Android 8.0（API 26）及以上。工程当前使用 JDK 17、`compileSdk=35`、
+`targetSdk=35`；API 37 手机可以运行该应用，但构建机仍应安装项目指定的 Android SDK 35。
+
+### 曲谱检查与可靠上传流程
+
+App 选择由现有编谱工具生成的 `.bin` 后，会先在手机本地检查：
+
+- 文件必须由完整的 16 字节 v2 事件组成，总事件数不得超过 2048；
+- MIDI 范围为 50～79，轨道为 0～3，力度为 0～3；
+- 起音时间必须升序，同轨事件不得重叠；
+- 同轨相邻起音和滑动窗口事件密度必须满足 FPGA 的实时播放约束；
+- 单个事件时长非零，整曲不得超过 10 分钟；
+- 计算与 Python `zlib.crc32` 一致的整曲 CRC32。
+
+上传使用固定 32 字节 XG3 帧和停等 ACK：
+
+```mermaid
+flowchart TD
+    A[选择并本地校验 .bin] --> B[HELLO 握手]
+    B --> C[BEGIN: 槽号/音色/事件数/时长/CRC]
+    C --> D{FPGA 接受 BEGIN?}
+    D -- 否 --> X[显示 FPGA 错误并停止]
+    D -- 是 --> E[发送一条 DATA 事件]
+    E --> F{收到成功 ACK?}
+    F -- 否且未到上限 --> E
+    F -- 连续失败 --> G[尝试 ABORT 并报告失败]
+    F -- 是 --> H{还有事件?}
+    H -- 是 --> E
+    H -- 否 --> I[发送 COMMIT]
+    I --> J[FPGA 检查整曲 CRC]
+    J --> K[从实际 BSRAM 逐条读回并重算 CRC]
+    K --> L{两次校验均通过?}
+    L -- 否 --> X
+    L -- 是 --> M[原子发布新目录并返回 ACK]
+    M --> N[App 再发 LIST 查询槽位]
+    N --> O[显示经 FPGA RAM 读回校验，上传完成]
+```
+
+每条请求最多发送 4 次，失败重试保持相同会话号、序号和帧内容。FPGA 对上一条成功请求保存
+幂等响应，因此 ACK 丢失后的重发不会重复写入或重复提交。只有收到成功响应才推进序号。
+DATA 期间出现异常时 App 会尝试发送 `ABORT`。如果 `COMMIT` 已执行但最终 ACK 连续丢失，
+App 会明确显示“提交结果未知”，要求重新连接后用 `LIST` 查询，不能错误宣称已经回滚。
+
+导入曲谱当前位于 FPGA 运行时 RAM；断电、FPGA 复位或重新配置位流后，RAM 导入曲目会丢失，
+内置曲目不受影响。完整 XG3 格式、错误码、CRC 和 FPGA 侧验证见
+[P3 可写曲库与 UART 导入说明](docs/P3_WRITABLE_SONG_IMPORT.md)。
+
+### Android 工程
+
+手机源码位于 [`mobile/android`](mobile/android/README.md)，核心文件包括：
+
+- `BleUartClient.java`：BLE 扫描、GATT 连接、MTU、NUS 服务和双向分包；
+- `Xg3Protocol.java`：32 字节帧、CRC32、曲谱本地约束检查与槽位描述符；
+- `Xg3Client.java`：HELLO/LIST/BEGIN/DATA/COMMIT/ABORT、停等 ACK 与重试；
+- `MainActivity.java`：设备选择、文件选择、槽位/音色选择、进度和日志界面。
+
+用 Android Studio 打开 `mobile/android`，选择 JDK 17 并安装 Android SDK 35，可直接运行 `app`
+到手机或使用 **Build → Build APK(s)** 生成 APK。应用只依赖 Android 系统 API，没有第三方运行库。
+
+### BL616 固件、镜像与编译
+
+BL616 工程位于 [`firmware/bl616_ble_uart_bridge`](firmware/bl616_ble_uart_bridge/README.md)，包含
+BLE NUS 服务、UART1 驱动、两个方向的 FreeRTOS 转发任务、构建脚本和只写二级区的 DevCube
+配置审核模板。仓库不提交 SDK 中间构建目录。
+
+在已安装 BouffaloSDK 与 T-Head RISC-V 工具链的 Windows PowerShell 中运行：
+
+```powershell
+cd firmware/bl616_ble_uart_bridge
+./build_firmware.ps1
+```
+
+脚本只编译，不执行烧录、串口访问或 DevCube。当前正式镜像为：
+
+| 项目 | 值 |
+| --- | --- |
+| 文件 | `firmware/bl616_ble_uart_bridge/release/xinxian_ble_uart_bl616_secondary_0x40000.bin` |
+| 大小 | 281,968 字节（`0x44D70`） |
+| SHA-256 | `753dc6f96b7a64e75d547262f4d821e7dbc7371ac50d191a8b5830d6b84d6001` |
+| 计划写入地址 | `0x40000` |
+| 计划占用范围 | `0x40000`～`0x84D6F` |
+
+BouffaloSDK 会把编译日期和时间写入镜像中的 `BLFBVER` 字符串，因此以后从相同源码重新编译的
+文件级 SHA-256 可能不同。本表哈希用于唯一标识仓库提交的正式发布镜像；本次复编成功，复编文件
+与发布镜像等长，二进制差异仅为两处内嵌构建时间字符串的 11 个字节。
+
+### 烧录安全边界与未完成验证
+
+BL616 固件采用二级镜像方案：NEO Dock 官方调试器固件保留在低地址区域，BLE-UART 镜像计划只写
+`0x40000`。仓库中的 `flash_secondary_only.template.ini` 是供人工审核的模板，不是自动烧录脚本。
+
+首次操作前必须确认：
+
+1. 实物 BL616 调试器固件版本支持 `0x40000` 二级启动；
+2. 已保存并核对 NEO Dock 官方 BL616 恢复固件；
+3. DevCube 仅使用 Single Download 写正式二级 `.bin` 到 `0x40000`；
+4. 使用分段擦除，不使用整片擦除；
+5. 不使用 SDK 自动生成的多镜像 `build/flash_prog_cfg.ini`，也不烧录 `helloworld_bl616.bin`。
+
+当前二级固件没有实现 Sipeed USB-JTAG 或 USB 串口复合设备功能。地址上保留官方一级固件，
+不代表两个固件能够同时运行；一级固件何时跳转二级固件，以及 BLE 运行时 USB-JTAG/USB 串口是否
+继续枚举，都必须通过实物验证。若最终要求 BLE、USB-JTAG 和 USB 串口同时工作，需要进一步移植
+相应 USB 功能，当前代码尚不包含这一部分。
+
+实物验收应依次记录：原 USB 枚举和 FPGA 下载状态、只写 `0x40000` 后的启动情况、手机扫描、
+NUS 订阅、XG3 HELLO、32 字节请求/ACK 一致性、完整曲谱上传、连续双向传输、断线重连、
+仅供电与连接 USB 两种启动方式，以及必要时使用官方恢复镜像恢复 `0x0`。在完成这些步骤前，
+本仓库只能声明“源码完成、BL616 镜像编译通过”，不能声明蓝牙已下板验收。
+
 ## 0. 当前实际进度与待验收项目
 
 当前主工程包含触控模式菜单、《茉莉花》单旋律及全宽四轨舞台。顶部计分，蓝／绿／橙／红四轨保留渐变尾迹和实际判定反馈；演奏模式复用原音源、音效与环形显示。
@@ -597,6 +769,10 @@ xinxian-fpga-guitar/
 │  ├─ FULL_PIANO_EFFECTS.md
 │  ├─ FULL_EFFECTS_V2.md
 │  └─ evidence/
+├─ firmware/
+│  └─ bl616_ble_uart_bridge/     # BL616 BLE↔UART 二级固件、发布镜像与安全烧录模板
+├─ mobile/
+│  └─ android/                   # Android BLE 客户端与 XG3 曲谱上传界面
 ├─ gowin/
 │  ├─ neo_guitar_touch_game/      # 当前入口：触控＋全宽四轨游戏＋完整演奏模式
 │  ├─ neo_guitar_i2s/             # 已验收的双音频输出／环形显示基线
