@@ -154,6 +154,7 @@ module neo_guitar_touch_game_top #(
     wire [399:0] visual_snapshot;
     wire final_pcm_valid;
     wire signed [23:0] final_pcm;
+    // 声音和游戏控制主入口
     guitar_touch_game_audio #(.MATRIX_CLK_DIV(MATRIX_CLK_DIV),.MATRIX_SETTLE_CYCLES(MATRIX_SETTLE_CYCLES),
         .MATRIX_DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES),.ADC_SPI_CLK_DIV(ADC_SPI_CLK_DIV),
         .PLUCK_DEAD_SAMPLES(PLUCK_DEAD_SAMPLES),.PLUCK_SETTLE_SAMPLES(PLUCK_SETTLE_SAMPLES),
@@ -172,6 +173,7 @@ module neo_guitar_touch_game_top #(
         .posture_sample_tick(posture_sample_tick),.posture_performance(posture_performance),
         .posture_pipeline_idle(posture_pipeline_idle),.posture_timbre_busy(posture_timbre_busy),
         .posture_voice_active(posture_voice_active),.posture_note_guard(posture_note_guard));
+    // 显示主入口
     guitar_touch_game_display #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.USE_P2(USE_P2),.WRITABLE(WRITABLE),.IMU_ENABLE(ENABLE_IMU)) u_display(
         .imu_status(imu_status),
         .overlay_valid(system_catalog_valid),.overlay_data(system_catalog_data),.frame_begin(frame_begin),
