@@ -1,0 +1,133 @@
+{
+  "result": "PASS",
+  "created_utc": "2026-10-22T16:03:16.567540+00:00",
+  "artifact_scope": "Independent minimal LCD/MPU6050/MPU6500 diagnostic only; not guitar firmware or hardware acceptance",
+  "source_head": "2d7920be9c01fa276bbd5805da1f55ec56b6bb83",
+  "source_state": "new local uncommitted diagnostic files; existing tracked sources/index unchanged",
+  "tool": "Gowin V1.9.12.03",
+  "device": "GW5AT-LV60PG484AC1/I0, Device B",
+  "clock": {
+    "required_mhz": 50,
+    "fmax_mhz": 75.524
+  },
+  "resources": {
+    "Logic": {
+      "used": 2243.0,
+      "total": 59904.0
+    },
+    "Register": {
+      "used": 1011.0,
+      "total": 60780.0
+    },
+    "CLS": {
+      "used": 1566.0,
+      "total": 29952.0
+    },
+    "BSRAM": {
+      "used": 2.0,
+      "total": 118.0
+    },
+    "DSP": {
+      "used": 0.5,
+      "total": 118.0
+    }
+  },
+  "violations": {
+    "setup": 0,
+    "hold": 0,
+    "latch": 0,
+    "unrouted": 0
+  },
+  "tests": {
+    "tb_mpu_lcd_diag.log": "PASS: LCD diagnostic reader absent/6050/6500/both addresses/unknown ID/NACK/config/stale/stuck/recovery, 49 full packets",
+    "tb_mpu_diag_screen.log": "PASS: signed min/max BCD, frame snapshot, six-clock renderer and 130560 pixels",
+    "tb_mpu_diag_top.log": "PASS: pin-level MPU plus real LCD scan, 130560 active pixels, 120ns DCLK, sampling continues during frame",
+    "tb_mpu_diag_gate.log": "PASS: actual VG equals RTL, MPU6500 ID70/config2, real startup/reset waits, 4047360 active pixels, 20 packets, dynamic signed axes"
+  },
+  "netlist_scope": "Actual unmodified synthesis VG versus RTL, real production startup waits, ID70 MPU6500 profile including 1D readback, I2C pins and LCD outputs, dynamic signed data; no SDF back-annotation",
+  "rtl_fault_scope": "ID68/ID70 at both bus addresses, absent/unknown ID, NACK stages, configuration mismatch, stale data, SCL/SDA stuck and recovery; wait-only parameters shortened in fault and RTL top benches",
+  "user_hardware_observation": "Previous strict diagnostic: 68 ACK1 ID70 ERR0, 69 ACK0 ID-- ERR1, identity-fault counter retries. New compatible image has not yet been tested on hardware.",
+  "warnings": [
+    "WARN  (EX3791) : Expression size 5 truncated to fit in target size 4(\"T:\\Documents\\AMD\\xinxian-fpga-guitar\\rtl\\diagnostics\\mpu_lcd_diag_screen.v\":43)",
+    "WARN  (EX3791) : Expression size 31 truncated to fit in target size 3(\"T:\\Documents\\AMD\\xinxian-fpga-guitar\\rtl\\diagnostics\\mpu_lcd_diag_screen.v\":275)",
+    "WARN  (EX3791) : Expression size 31 truncated to fit in target size 3(\"T:\\Documents\\AMD\\xinxian-fpga-guitar\\rtl\\diagnostics\\mpu_lcd_diag_screen.v\":275)",
+    "WARN  (PR1014) : Generic routing resource will be used to clock signal 'sys_clk_50m_d' by the specified constraint. And then it may lead to the excessive delay or skew"
+  ],
+  "warning_review": "EX3791: intentional bounded BCD and font-coordinate truncation, checked at signed boundaries and every active LCD pixel. PR1014: existing board-clock routing constraint, actual route delay included in passing STA.",
+  "hardware_status": "Not programmed or measured by this task. Actual module ID, tilt response, power/pullups, connection quality and long-term operation require user test.",
+  "constraints_scope": "50MHz internal STA, asynchronous I2C input false paths; original LCD scan timing retained, external LCD delay not measured here",
+  "original_guitar_files_preserved": true,
+  "original_guitar_fs_sha256": "cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30",
+  "inputs_sha256": {
+    "gowin/neo_mpu6050_lcd_diagnostic/neo_mpu6050_lcd_diagnostic.gprj": "eb62aeb9f15091053f4f1ec4c004a4a327f611d957e873b83cf84ed4152c57e1",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/neo_mpu6050_lcd_diagnostic_process_config.json": "fe83ad038350e25991791b570976392292f0e5d547e6dbb2ecea5ef24bccb947",
+    "rtl/diagnostics/neo_mpu6050_lcd_diagnostic_top.v": "41d6272167a959d88692525361c8c1598c4172ce9f6de88e15462847a9e7f486",
+    "rtl/diagnostics/mpu_lcd_diag_reader.v": "cc3083ff742828ece1c1397c0c10cd758d6434c61917c002809499c14c9ee43a",
+    "rtl/diagnostics/mpu_diag_i2c_master.v": "bcd15f87707f45a442f68d0bd6506ac6b955f0d126cf13314356d45eeb89b3b4",
+    "rtl/diagnostics/mpu_lcd_diag_screen.v": "f0a718e785cc0b1c106045f56d540811464af5c92d8bc58472db95c0c785a10d",
+    "rtl/control/reset_sync.v": "41601a9f34be279f5246c456ef67d96d6243ae4fc8f0083e156c1854351d5230",
+    "rtl/display/lcd_rgb_scan_480x272.v": "f0ab1ad7ed6b86144c59c0297568a69782833848c7964db100a7f1fcc721e7e0",
+    "constraints/neo_mpu6050_lcd_diagnostic.cst": "34f722d3ac36bf36c3b3be3e1e839d2143c30db5c1de76be577a362ba424e9b8",
+    "constraints/neo_mpu6050_lcd_diagnostic.sdc": "68251ecc74f5407b4eee2b256e6896f2a20c66f15ae1f27dcb4b65fe4658a15a"
+  },
+  "netlist_sha256": "9bf97bab09ea6d25decf0a19fe4c8d15953ba4820cc616384e6f6ce69938d403",
+  "bitstream_sha256": "2ebe99040970a04a1ce1d19c5b659fa4bf3f571155898479d55464df4c1ff26c",
+  "artifacts_sha256": {
+    "build/mpu_lcd_diagnostic/impl_6500_01/build.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build/mpu_lcd_diagnostic/impl_6500_01/build.stdout.log": "8dea207eebbe113b8865e0f950de32f1a199d8f261fa6119306eca59704407c9",
+    "build/mpu_lcd_diagnostic/impl_6500_01/build.tcl": "23cde38d4b3292768728382f1ae964a7af2a75fc50be8b8d477a7a8b1c5628a7",
+    "build/mpu_lcd_diagnostic/impl_6500_01/completion.json": "2e0774eb5a231b01ee8bd8a2ce2b20266729cc6249e669448f68c04677ee0efd",
+    "build/mpu_lcd_diagnostic/impl_6500_01/process.json": "1390162b3a1508121e67de36b6e392334216bc58b344d0e90e29957155e02a88",
+    "build/mpu_lcd_diagnostic/impl_6500_01/process_config.before.json": "fe83ad038350e25991791b570976392292f0e5d547e6dbb2ecea5ef24bccb947",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/compile.log": "06b3ee6c7c1651419e40cf3851468657fb9d2b3c272c8509f2fdc8e06a1280af",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/lcd_diag_expected.png": "e1a3b91c6fc9cb2ce82f262af9ce537abc36a5cdfb73ca7c188f87bef857df04",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/lcd_diag_top.png": "e1a3b91c6fc9cb2ce82f262af9ce537abc36a5cdfb73ca7c188f87bef857df04",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/lcd_top_snapshot.txt": "c5d4cd30d7aa25759170ab6ac61c2359dc8cdaf7e8c0165770e1720bb952cb1e",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/pixels.json": "87d865e7a74cdfda2e1fb00a2d2bf0ff89e3b56ac3bec653c8bdfa13d0365285",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/run.json": "c300054becb9c2baf4f095b1f1cafe42aaaf79b967810d952d871d7e8c7ca9e8",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/tb_mpu_diag_screen.console.log": "7c6a2d922d4d9f7b0e0e3f4dc43588015d5fd71bf21a77d18eab7863728d0f40",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/tb_mpu_diag_screen.log": "49974a0777757b963cd13842970adfcb2c4ec48a34822a00644e1e6823fb629f",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/tb_mpu_diag_top.console.log": "57eff5875ff3303f8ea05fef7b5b1f2f8d34f9abc4df8fca28d160a8e1f9c365",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/tb_mpu_diag_top.log": "78de0d4a7ef3b48c7cde6a6b1eb1c77de0cd90d9fdb54dc7405edd989891862a",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/tb_mpu_lcd_diag.console.log": "563b4ae308d0d0f043980f0e1255a64d642e5641150414598a88150056ec4826",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/tb_mpu_lcd_diag.log": "062c42d2fe70142aea0ff5a536fb3b6ba75e9013d1ec849b6a79c50948a3a168",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/verification.json": "a19b8c217a5b44131bc105a971ae8e7011d81601c10c1308a50a67f61de550fd",
+    "build/mpu_lcd_diagnostic/rtl_6500_01/vlib.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build/mpu_lcd_diagnostic/gate_6500_01/compile.log": "0c71de42fef8b0726fd2b0e81c063997f0face99b3876e34875e04237f6f127b",
+    "build/mpu_lcd_diagnostic/gate_6500_01/run.json": "45670c2a7348e1196b2a17fdf2a1a27fcec6bd46cd1ea307023e8bd219b56d1c",
+    "build/mpu_lcd_diagnostic/gate_6500_01/tb_mpu_diag_gate.console.log": "91988ec25b98059aa219364dae831c589d29c1d872dd08fb416802718fb1c8aa",
+    "build/mpu_lcd_diagnostic/gate_6500_01/tb_mpu_diag_gate.log": "f1722bb2820466af397ff7e6fad9945a80219fd252cf908aab56f762d5859905",
+    "build/mpu_lcd_diagnostic/gate_6500_01/verification.json": "52fb1d7328a8ea9a0c5054398a3e048bac875085b4274ad7b81597a17a110f7d",
+    "build/mpu_lcd_diagnostic/gate_6500_01/vlib.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/gwsynthesis/neo_mpu6050_lcd_diagnostic.vg": "9bf97bab09ea6d25decf0a19fe4c8d15953ba4820cc616384e6f6ce69938d403",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/gwsynthesis/neo_mpu6050_lcd_diagnostic_syn.rpt.html": "8ef4d76749f069d7db0728725aeffc909d1d0aff908fe8a1974813e1cad9e382",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/gwsynthesis/neo_mpu6050_lcd_diagnostic_syn_resource.html": "f8ffc687b3699eeea60b0e9e67f4e68843fd255df9e78803944584aada5091f4",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/gwsynthesis/neo_mpu6050_lcd_diagnostic.log": "f6f36c2b958b1985c8402a6305003028bc359a76299b5a74868710c247e35ec0",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.fs": "2ebe99040970a04a1ce1d19c5b659fa4bf3f571155898479d55464df4c1ff26c",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.pin.html": "8d60864ba7a5ee7d69a085f5cf665aaec4c1b541b703d668efa340ed6a72e9c9",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.power.html": "95ff78c82448980cc3670d7cc1b3df90570715e88e5482735dc95e5a2aac0d73",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.rpt.html": "0e082f738759fe1a18fa01eb67823a053e156ed4023539295e994f25f35dc34b",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.tr.html": "02af978a6623104999a778d02e665df0bce71e8e28386a9287a2a5bc394ded79",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic_tr_cata.html": "724a44087a70b29886c881e037c9a87113bf40095cb53251d5da1a271b0b7811",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic_tr_content.html": "e2a5892212f467524494126c050a6717f78a89eb0f15d223eb69c167411c41bf",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.rpt.txt": "ad625fe355fee194e0b970205a6eb5a93a99237f1ba4208ff252f957b7762200",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/pnr/neo_mpu6050_lcd_diagnostic.log": "31313889609707988fef17e1a531313e4cf513ec06147ba5113acc5f0816b148",
+    "gowin/neo_mpu6050_lcd_diagnostic/impl/neo_mpu6050_lcd_diagnostic_process_config.json": "fe83ad038350e25991791b570976392292f0e5d547e6dbb2ecea5ef24bccb947",
+    "rtl/diagnostics/mpu_diag_i2c_master.v": "bcd15f87707f45a442f68d0bd6506ac6b955f0d126cf13314356d45eeb89b3b4",
+    "rtl/diagnostics/mpu_lcd_diag_reader.v": "cc3083ff742828ece1c1397c0c10cd758d6434c61917c002809499c14c9ee43a",
+    "rtl/diagnostics/mpu_lcd_diag_screen.v": "f0a718e785cc0b1c106045f56d540811464af5c92d8bc58472db95c0c785a10d",
+    "rtl/diagnostics/neo_mpu6050_lcd_diagnostic_top.v": "41d6272167a959d88692525361c8c1598c4172ce9f6de88e15462847a9e7f486",
+    "sim/diagnostics/mpu_lcd/mpu_diag_slave.sv": "66319ba24f8f83d8cc11cced43aa8bc6d5a2e972cb7a0700303c5c5a1d1ec0b4",
+    "sim/diagnostics/mpu_lcd/tb_mpu_diag_gate.sv": "12f153c678aa01e04c4daa5b70790443804db08908e7d07f67a64f03e8cf3c54",
+    "sim/diagnostics/mpu_lcd/tb_mpu_diag_screen.sv": "7d0fe84e88d0ae1d161a09395e88dc777dc355818645381b75e9141c36ed7946",
+    "sim/diagnostics/mpu_lcd/tb_mpu_diag_top.sv": "6e24703438a26e3d770d818b2eef16e1ea2aeadafa9befa14c8c371e532ef39d",
+    "sim/diagnostics/mpu_lcd/tb_mpu_lcd_diag.sv": "133313bdaf5f9d9bd70a25f4228602fc05c9fcd10e84d1e1a1ee12e24a49b5e6",
+    "gowin/neo_mpu6050_lcd_diagnostic/README.md": "238d5a0d31d1b225bed4fee9d5500d602bd6ec016e25232535b59c8b823edb84",
+    "tools/generate_mpu_diag_screen.py": "aa14d6fbdaf546ff5debfb6ac7ca7c437f518da967801a94227b176d6d6a96f9",
+    "tools/check_mpu_diag_pixels.py": "61e761c22baa11f67532f76bd18cc5213da50c2e83b4e921c38e4b3bedbb6767",
+    "tools/run_mpu_lcd_diag_checks.ps1": "7077112b3c59651b99fddedee1e6af228366473be96ecc1e69b523cedc41d276",
+    "tools/start_mpu_lcd_diag_build.ps1": "8ea2ec4ad1174e5611d8c92169f3dd5f80c2372c72eddb3716d4ca77f74482b7",
+    "tools/archive_mpu_lcd_diag.py": "4cafb983e3c1d14037aa3394c23b7cf8404f88aefbe97fbf75e84f1066c2c49b"
+  },
+  "baseline_receipt_sha256": "e27ec96a8bd21d8a100c6ff890d1234079f4e7de579345592694a18344132499"
+}

@@ -1,6 +1,12 @@
 `timescale 1ns/1ps
 // Pin-level I2C slave; no DUT internal state drives returned bytes.
-module mpu6050_test_slave(input wire scl,rst_n,nak,bad_id,bad_config,data_ready,
+module mpu6050_test_slave #(
+    parameter [7:0] WHO_AM_I=8'h68,
+    parameter [7:0] BAD_WHO_AM_I=8'h71,
+    parameter [6:0] ADDRESS=7'h68,
+    parameter [7:0] BAD_CONFIG_REGISTER=8'h1c,
+    parameter [7:0] BAD_CONFIG_VALUE=8'h10
+)(input wire scl,rst_n,nak,bad_id,bad_config,data_ready,
     input wire [111:0] packet,inout wire sda,output reg [31:0] writes=0,bursts=0);
     reg low=0;assign sda=low ? 1'b0 : 1'bz;
     reg [7:0] registers[0:127];
@@ -9,10 +15,10 @@ module mpu6050_test_slave(input wire scl,rst_n,nak,bad_id,bad_config,data_ready,
     integer state=0,next_state=0,bits=0,index=0,i;
     initial for(i=0;i<128;i=i+1)registers[i]=0;
     function [7:0] memory(input [7:0] address);
-        if(address==8'h75)memory=bad_id ? 8'h70 : 8'h68;
-        else if(address==8'h3a)memory={7'd0,data_ready};
+        if(address==8'h75)memory=bad_id ? BAD_WHO_AM_I : WHO_AM_I;
+        else if(address==8'h3a)memory={7'd0,data_ready && (WHO_AM_I!=8'h70 || registers[8'h1d]==3)};
         else if(address>=8'h3b && address<=8'h48)memory=held_packet[111-(address-8'h3b)*8-:8];
-        else if(address==8'h1c && bad_config)memory=8'h10;
+        else if(address==BAD_CONFIG_REGISTER && bad_config)memory=BAD_CONFIG_VALUE;
         else memory=registers[address[6:0]];
     endfunction
     always @(negedge sda)if(scl===1 && rst_n)begin state=1;bits=0;received=0;index=0;end
@@ -24,7 +30,7 @@ module mpu6050_test_slave(input wire scl,rst_n,nak,bad_id,bad_config,data_ready,
             if(bits==8)begin
                 next_state=1;
                 if(index==0)begin
-                    if(received[7:1]!=7'h68 || nak)next_state=0;
+                    if(received[7:1]!=ADDRESS || nak)next_state=0;
                     else if(received[0])begin
                         next_state=4;
                         if(pointer==8'h3b)begin held_packet=packet;bursts=bursts+1;end

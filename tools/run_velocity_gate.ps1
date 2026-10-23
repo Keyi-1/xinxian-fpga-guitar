@@ -1,6 +1,7 @@
 param([Parameter(Mandatory=$true)][string]$RunName,
       [string]$Bench='tb_game_p3_full_gate',
       [string]$ImplementationRun='synth_v1',
+      [ValidateSet('build/velocity_calibration','build/imu_id70')][string]$EvidenceRoot='build/velocity_calibration',
       [string]$ModelSimBin='S:\BaiduNetdiskDownload\modelsim\win64')
 $ErrorActionPreference='Stop'
 if($RunName -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Simple name required'}
@@ -26,10 +27,10 @@ foreach($path in @("sim/tb/$Bench.sv",'sim/tb/game_p3_uart_host.vh','sim/tb/pian
 }
 $vg=Join-Path $repoDir 'gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.vg'
 if($ImplementationRun -notmatch '^[a-zA-Z0-9_-]+$'){throw 'Simple implementation name required'}
-$review=Get-Content -Raw (Join-Path $repoDir "build/velocity_calibration/$ImplementationRun/synthesis_review.json") | ConvertFrom-Json
+$review=Get-Content -Raw (Join-Path $repoDir "$EvidenceRoot/$ImplementationRun/synthesis_review.json") | ConvertFrom-Json
 if((Get-FileHash $vg).Hash.ToLower() -ne $review.netlist_sha256){throw 'Inspect current netlist before testing'}
 Copy-Item $vg (Join-Path $runDir 'compiled.vg')
-$record=[ordered]@{status='running';pid=$PID;started=(Get-Date).ToString('o');source_sha256=$hashes;netlist_sha256=$review.netlist_sha256;scope='Complete actual calibrated-velocity production VG versus full RTL; explicit counter waiting/registered touch-ADC stimuli only for posture bench, original timing for UART bench; no ROM/DDS/audio injection'}
+$record=[ordered]@{status='running';pid=$PID;bench=$Bench;started=(Get-Date).ToString('o');source_sha256=$hashes;netlist_sha256=$review.netlist_sha256;scope='Complete actual calibrated-velocity production VG versus full RTL; explicit counter waiting/registered touch-ADC stimuli only for posture bench, original timing for UART bench; no ROM/DDS/audio injection'}
 $record | ConvertTo-Json -Depth 6 | Set-Content (Join-Path $runDir 'run.json') -Encoding utf8
 Push-Location $runDir
 try{

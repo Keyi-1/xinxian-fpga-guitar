@@ -24,6 +24,7 @@ if($VoiceReference){
 }
 $relative+='tools/run_quarter_checks.ps1'
 if($Benches -contains 'tb_quarter_voice_preservation'){$relative+='sim/reference/velocity_teammate/piano_voice_before_quarters.v'}
+if($Benches -contains 'tb_mpu_id70_compat'){$relative+='sim/reference/imu_id70/mpu6050_reader_before_id70.v'}
 $relative+=@($Benches | ForEach-Object {"sim/tb/$_.sv"})
 $hashes=@{}
 foreach($asset in Get-ChildItem (Join-Path $repoDir 'mem') -File){

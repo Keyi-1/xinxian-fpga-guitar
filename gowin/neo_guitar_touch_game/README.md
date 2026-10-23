@@ -1,16 +1,39 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
-**当前P4四档25/50/75/100%版（2026-10-19，等待试板）：** 第三弦G3／CH2触发偏差80→60，第一弦CH0保持220；档1/2增益160/208→128/192，四档为64/128/192/256。原本已按真实拨弦峰值自动分档，本批只调参数；力度分界、捕获/回落、音色/包络/音效/时钟、曲库/UART/节奏/UI/姿态保护保持。上电MANUAL，试听仍固定编码2、增益随本批变为75%。
+**当前 P4 ID70 兼容完整版（2026-10-23，用户已确认 IMU 正常及 Flash 断电启动）：** 接入独立诊断已验证的 ID70 配置，明确兼容 ID68／ID70，地址仍为 0x68、AD0 接地。ID70 增加 ACCEL_CONFIG2=0x03 的写入／读回及 50 ms 唤醒等待，原 ID68 配置保持。当前仍按真实峰值自动分为四档，增益为 64／128／192／256（25%／50%／75%／100%），第一弦触发 220、第三弦 60；音源、音效、曲谱、显示、接线和实际时钟保持。
 
-原工程可直接选择：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。使用用户原`.gprj`/原`impl`，`gw_sh`完整综合、P&R/STA；没有独立构建工程或伪造IDE完成状态。
-发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)，按用户许可覆盖同名文件，新SHA256 `cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30`。
-[本批认证](quarter_dynamics_verification.json)；[参数、验证范围、前后对比与试板步骤](../../docs/QUARTER_DYNAMICS.md)；[MPU接线与操作](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。完整证据目录`build/releases/touch_game/p4_quarter_dynamics_20261019/`。本批仅本地提交，等待用户试板，不自动推送或烧录。
+原工程可直接选择：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。使用原 `.gprj`／原 `impl` 完成综合及完整 P&R／STA；无需为下载再综合。
+同名发布副本：[neo_guitar_touch_game_p4_posture.fs](../../build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs)；[固定新版归档](../../build/releases/touch_game/p4_imu_id70_20261023/README.md)。三份位流 SHA256 均为 `967e52a35f81a3eb03aa21a621ea47d668f02485b34bb41dec0bfb56c43ba917`。
+[当前数字认证](imu_id70_verification.json)；[ID70 兼容及验证说明](../../docs/IMU_ID70_COMPATIBILITY.md)；[MPU 接线与操作](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。
+
+**实物反馈（2026-10-23）：** 用户确认当前完整吉他固件中的重力传感器正常工作，写入外部 Flash 后断电再上电可重新使用。此反馈不扩称为姿态精度、声压、全部操作组合或长期稳定性的定量验收，现场烧录文件哈希未另行采集。构建认证保留生成时的原始记录，本次只补充 README 中的后续实物反馈。
+
+**旧版与新版资源／时序同时保留：** 两次均为 Gowin V1.9.12.03、GW5AT-LV60PG484AC1/I0 Device B，使用原工程完整 P&R／STA 报告，运行时钟保持 50／12.288 MHz。
+
+| 项目 | 旧版 P4 四档力度（2026-10-19） | 新版 P4 ID70 兼容（2026-10-23） |
+| --- | --- | --- |
+| Logic | 50432/59904（84.19%） | 50605/59904（84.48%） |
+| Register | 20139/60780（33.13%） | 20140/60780（33.14%） |
+| CLS | 28650/29952（95.65%） | 28295/29952（94.47%） |
+| BSRAM | 113/118（95.76%） | 113/118（95.76%） |
+| DSP | 115.5/118（97.88%） | 115.5/118（97.88%） |
+| 系统 Fmax（运行 50 MHz） | 53.171 MHz | 50.072 MHz |
+| 音频 Fmax（运行 12.288 MHz） | 14.051 MHz | 13.687 MHz |
+| Setup / Hold / 未布通 / latch | 0 / 0 / 0 / 0 | 0 / 0 / 0 / 0 |
+| 已测试运算 deadline 违例 | 0 | 0 |
+
+新版比旧版减少 355 CLS，Logic 增加 173、Register 增加 1，BSRAM／DSP 不变；系统／音频 Fmax 分别降低 3.099／0.364 MHz。新版满足实际时钟，CLS 已低于 95%，但系统 Fmax 尚未达到 55 MHz 余量目标。两次均保留既有 2 条 PR1014 时钟通用布线提示，由 STA 按实际布线计入。
+
+本批 ID70／ID68 读取器、生产 256 包校准、姿态策略／CDC／触控、冻结音频及扩展音域回归通过；当前实际 VG 的 ADC、UART／游戏／四声部／动态 LCD 和 ID70 姿态整机对照通过。实际 VG 姿态覆盖 12838 音频样本、1773 MPU 读包、5 次音色变化和 11246883 LCD 时钟样本；UART 整机覆盖 10 次真实 115200 事务、13397 音频样本、16 帧／5875200 LCD 时钟样本。LCD 时钟样本不是独立有效像素数；无 SDF 回标，布局布线时序由独立 STA 检查。完整源码／ROM／网表／日志／P&R／STA／位流哈希绑定见当前认证。
+
+下方均为**固定历史发布**；历史认证不认证当前原 `impl` 或已覆盖的同名发布文件。
+
+**保存的 P4 四档 25/50/75/100% 版（2026-10-19，ID70 修复前）：** 第三弦 G3／CH2 触发偏差 80→60、第一弦 CH0 保持 220，四档增益 64／128／192／256。[固定旧 FS](../../build/releases/touch_game/p4_quarter_dynamics_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs)，SHA256 `cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30`。
+[旧版认证](quarter_dynamics_verification.json)；[参数与验证范围](../../docs/QUARTER_DYNAMICS.md)。原工程和同名发布副本现已更新为文首 ID70 兼容版，旧版只从固定归档获取。
 
 完整实现：Logic50432、Register20139、CLS28650/29952（95.65%）、BSRAM113/118、DSP115.5/118；系统/音频Fmax53.171/14.051MHz，运行50/12.288不变，setup/hold/latch/未布通及已测deadline全部0。比上版Logic减少138、CLS增加171，系统/音频Fmax增加3.128/0.432MHz；旧CLS≤95%/系统55MHz余量目标未达，不以综合或局部数值宣称面积改善。
 
 本批13项RTL、16384组检测码/140组CH0抑制/40组CH2新增轻拨、真实SPI四弦四档通过；新旧音源48456样本（档0/3相同，档1/2仅授权缩放和舍入）、三音色×四档实际ADC到PCM/PT8211/I²S、8192有限增益例外冻结链/9032扩展音域/判定/按键/姿态均PASS。当前实际VG的ADC、完整UART/四声部/16帧动态显示及生产256包MPU校准/切音色/尾音通过；另384组曲库和128组四声部实际DSP增益审计、33项PC严格同源复用通过。新SHA完整绑定源码/ROM/工具/日志/当前VG/P&R/STA。第三弦轻拨与误触、四档听感及长期稳定性待实物比较。
-
-下方均为**固定历史发布**；历史认证不认证当前原impl或已覆盖的同名发布文件。
 
 **保存的P4第一弦／最低档修正版（2026-10-19）：** CH0触发220、CH2触发80，四档64/160/208/256。标签`snapshot/p4-before-quarter-gains-20261019`（d0b57a4），[固定旧FS](../../build/releases/touch_game/p4_dynamics_tuning_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs)，SHA256 `e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213`；[旧认证](dynamics_tuning_verification.json)和[旧说明](../../docs/DYNAMICS_TUNING.md)只对应该快照。完整实现Logic50570、FF20139、CLS28479（95.08%）、BSRAM113、DSP115.5、系统/音频Fmax50.043/13.619MHz，全部数字门槛通过。
 
@@ -80,11 +103,19 @@ SHA256 `e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86`。
 用户现要求以后改为直接使用本 `.gprj` 及其原 `impl` 目录构建，流程见下文。
 后续频带小实验收益不足，已停止并保留在 `experiment/radial-bands-resource-opt`，未合入本工程。
 
-**直接使用现成位流：** 文首原工程 P4力度校准版 `.fs` 和同哈希发布副本均可在 Programmer 直接加载，无需重新综合 `.gprj`。历史归档继续保留。
-在 Gowin Programmer 中扫描原 `GW5AT-60B`，双击设备的 Operation，
-选择 `SRAM Mode`／`SRAM Program`，在 `File name` 中选取该 `.fs`，保存后执行 Program/Configure。
-这是上电期间的临时配置；掉电保存需使用板上适用的 Flash 流程，不在此处修改 Flash 设置。
-菜单步骤参考 [Gowin Programmer 官方指南](https://cdn.gowinsemi.com.cn/SUG502E.pdf)。
+## 位流下载与断电启动
+
+文首 ID70 完整版原工程 `.fs` 和同哈希发布副本可直接加载，无需重新综合 `.gprj`。用户已确认外部 Flash 烧录及断电重启可用。
+
+1. 在 Gowin Programmer 扫描 `GW5AT-60B`，双击设备行的 Operation。
+2. Access Mode 选择 `External Flash Mode Arora V`，Operation 选择 `exFlash Erase,Program thru GAO-Bridge Arora V`；如需写后校验，可用同名带 Verify 的选项。
+3. File name 选择文首完整 `.fs`；Flash 类型可保留 `Generic Flash`，Start Address 为 `0x000000`。
+4. Save 后执行 Program/Configure，等待成功。完全断电再上电，确认不再下载也能自动进入吉他界面。
+5. 以后修改程序并生成新 `.fs` 后，用同样流程擦除并重新写入即可。临时调试可选择 `SRAM Mode`／`SRAM Program`，断电后将恢复 Flash 中保存的固件。
+
+步骤参考 [Sipeed Mega 60K 官方说明](https://wiki.sipeed.com/hardware/en/tang/tang-mega-60k/mega-60k.html) 和 [Gowin Programmer 官方指南](https://cdn.gowinsemi.com.cn/SUG502E.pdf)。
+
+Flash 保存固件和内置曲目；UART 导入曲谱仍在运行时 RAM，断电后恢复默认曲库，IMU 校准与 AUTO 状态也不持久保存。上电 `AUTO OFF` 为正常默认状态：将模块正 Z 向上水平静置，点一次 `CALIBRATE`，待 `CAL...`／`SETTLING` 结束后再手动开启 AUTO。校准要求连续 256 份合格样本；一直显示 `CAL...` 时，检查水平朝向、静止和原始数据，避免重复点击重启计数。
 
 以下全宽舞台数据是已验收的历史基线，和独立 P1 产物分别留存。
 
@@ -138,8 +169,10 @@ LCD J5 的 37～40 脚与触控控制 GPIO 在底板有共用网络：电容屏�
 
 - 开机显示“模式选择”；手指抬起时确认点击。
 - “演奏模式”保留已验收的左侧四弦渐变、150×150 莉萨如与环形频谱；三键音色/音效、松品续音和曲线渐暗保留。
-- “游戏模式”进入五个曲目槽。前四项为《茉莉花》、原创慢练、SEVEN NATION ARMY 短 riff 和“情歌前奏”；第五项诊断槽不可启动。
-- 选择曲目后，“开始”和“试听”都会加载该曲推荐音色：茉莉花用钢琴、慢练和情歌前奏用第二音色、riff 用哇音；原音色按键仍可手动切换。
+- “游戏模式”进入五个曲目槽。初始第一／三／四行为《茉莉花》、SEVEN NATION ARMY 短 riff 和“情歌”完整主旋律；第二行原创慢练已删除、等待导入，第五行初始诊断槽不可启动，导入后开放。
+- 选择曲目后，“开始”和“试听”都会加载推荐音色：茉莉花用钢琴、情歌用第二音色、riff 用哇音；导入曲目使用上传元数据中的音色，原音色按键仍可手动切换。
+- 主页底部 `CALIBRATE` 用于 IMU 校准，成功后可点击 `AUTO OFF` 开启自动姿态切音色；仅演奏模式空闲时执行，游戏保持曲目推荐／手动音色。
+- DEBUG-USB2 支持 115200／8N1 UART 导谱；五槽共享 1345 条导入空间，成功提交后显示 USER／RAM，详见 [可写曲库说明](../../docs/P3_WRITABLE_SONG_IMPORT.md)。
 - 曲目准备页的“开始”进入 2 秒倒计时，然后按移动色块拨对应弦；“试听”是显式自动演奏预览，不能取得游戏得分。
 - 四轨从上到下对应第一～第四弦：蓝、绿、橙、红。色块从右向左移动，**中心到达 x=96 的竖线时拨弦**。
 - 演奏模式、倒计时或游戏中，同一区域短按两次退出至主页：每次按住不超过 180 ms，
@@ -161,7 +194,7 @@ NAK、时钟拉伸超时和总线异常均有退出路径。SDA 卡低时发九�
 ## 曲谱和音频行为
 
 P2 使用静态多曲目录与 64 事件有界窗口，时间／得分为 32 位，计数为 16 位；曲谱容量为 2048 事件。
-新增慢练内容均按 60 BPM 编排；范围和生成来源见 [P2 集成说明](../../docs/P2_STATIC_SONG_INTEGRATION.md)。
+当前《情歌》为 60 BPM、38 小节／212 次起音／152 秒完整主旋律，第 10／18 小节使用用户试听确认的修订节奏；原创慢练已从初始曲库删除。历史片段范围见 [P2 集成说明](../../docs/P2_STATIC_SONG_INTEGRATION.md)，当前实现见 [节奏和姿态集成](../../docs/P4_POSTURE_TIMBRE_BRINGUP.md)。
 
 保留的《茉莉花》为常见单旋律编配：96 BPM、67 个音符、33.75 秒，27 小节 2/4，移调到 D3～G4，
 无歌词、伴奏或录音回放。不是对某份完整出版曲谱的逐音转录。

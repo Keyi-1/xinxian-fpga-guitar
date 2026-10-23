@@ -1,10 +1,11 @@
-// Independent MPU bus bring-up. No shared GT911 bus or board pins assumed.
+// Independent MPU-6050/6500 bus. Identity selects an explicit register profile.
 // Signed six-axis packets publish only after a successful 14-byte burst.
 module mpu6050_reader #(
     parameter integer CLK_HZ=50000000,
     parameter integer I2C_QUARTER=125,
     parameter [6:0] ADDRESS=7'h68,
     parameter integer POWER_WAIT_MS=100,RESET_WAIT_MS=100,WAKE_WAIT_MS=30,
+    parameter integer WAKE_WAIT_6500_MS=50,
     parameter integer POLL_MS=5,STALE_MS=100,RETRY_MS=1000
 )(input wire clk,rst_n,tick_ms,inout wire scl,sda,
   output reg ready,sample_valid,
@@ -19,6 +20,7 @@ module mpu6050_reader #(
     reg [4:0] state;
     reg [3:0] config_index;
     reg [15:0] timer,age_ms;
+    reg mpu6500;
     reg bus_start,bus_read;
     reg [15:0] bus_register;
     reg [4:0] bus_length;
@@ -32,14 +34,15 @@ module mpu6050_reader #(
             2:config_register=8'h1a;3:config_register=8'h19;
             4:config_register=8'h1b;5:config_register=8'h1c;
             6:config_register=8'h23;7:config_register=8'h6a;
-            8:config_register=8'h37;default:config_register=8'h38;
+            8:config_register=8'h37;9:config_register=8'h38;
+            default:config_register=8'h1d;
         endcase
     endfunction
     function [7:0] config_value;
         input [3:0] index;
         case(index)
             0,9:config_value=8'h01;
-            2:config_value=8'h03;3:config_value=8'h09;
+            2,10:config_value=8'h03;3:config_value=8'h09;
             5:config_value=8'h08;
             default:config_value=0;
         endcase
@@ -60,7 +63,7 @@ module mpu6050_reader #(
     endtask
     always @(posedge clk)begin
         if(!rst_n)begin
-            state<=BOOT;config_index<=0;timer<=0;age_ms<=0;
+            state<=BOOT;config_index<=0;timer<=0;age_ms<=0;mpu6500<=0;
             ready<=0;sample_valid<=0;sample_sequence<=0;
             ax<=0;ay<=0;az<=0;gx<=0;gy<=0;gz<=0;
             fault_count<=0;fault_code<=0;bus_start<=0;bus_read<=1;
@@ -87,8 +90,8 @@ module mpu6050_reader #(
                 end
                 ID_DONE:if(done)begin
                     if(error)fault(1);
-                    else if(data[7:0]!=8'h68)fault(2);
-                    else begin config_index<=0;state<=WRITE_START;end
+                    else if(data[7:0]!=8'h68 && data[7:0]!=8'h70)fault(2);
+                    else begin mpu6500<=data[7:0]==8'h70;config_index<=0;state<=WRITE_START;end
                 end
                 WRITE_START:if(!busy)begin
                     bus_register<={8'd0,config_register(config_index)};
@@ -105,11 +108,12 @@ module mpu6050_reader #(
                     if(error)fault(1);
                     else if(data[7:0]!=config_value(config_index))fault(3);
                     else if(config_index==0)begin state<=WAKE_WAIT;timer<=0;end
-                    else if(config_index==9)begin
+                    // 6500 adds ACCEL_CONFIG2=03; 6050 never accesses 1D.
+                    else if(config_index==10 || (config_index==9 && !mpu6500))begin
                         ready<=1;fault_code<=0;age_ms<=0;timer<=0;state<=POLL_WAIT;
                     end else begin config_index<=config_index+1'b1;state<=WRITE_START;end
                 end
-                WAKE_WAIT:if(timer>=WAKE_WAIT_MS)begin config_index<=1;state<=WRITE_START;end
+                WAKE_WAIT:if(timer>=(mpu6500 ? WAKE_WAIT_6500_MS : WAKE_WAIT_MS))begin config_index<=1;state<=WRITE_START;end
                 POLL_WAIT:if(timer>=POLL_MS)begin state<=STATUS_START;timer<=0;end
                 STATUS_START:if(!busy)begin
                     bus_register<=16'h003a;bus_length<=1;bus_read<=1;
