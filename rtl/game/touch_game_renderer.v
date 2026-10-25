@@ -127,7 +127,8 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     reg [3:0] lane_age;
     reg [6:0] local_y;
     reg [79:0] relative_x;
-    reg [7:0] note_valid,tail_hits;
+    reg [7:0] note_valid;
+    reg [71:0] tail_lengths;
     reg signed [9:0] dx_work;
     reg [8:0] centre;
     reg [4:0] slot;
@@ -225,7 +226,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
             3:begin lane_origin=208;lane_judgement=judgement_value[9+:3];lane_age=feedback_age[15:12];end
         endcase
         local_y=y-lane_origin;
-        relative_x=0;note_valid=0;tail_hits=0;centre=0;dx_work=0;slot=0;
+        relative_x=0;note_valid=0;tail_lengths=0;centre=0;dx_work=0;slot=0;
         // Keep the backdrop steady. The former modulo-32 sparkles looked
         // like a flashing dot matrix on the physical panel.
         case(display_page)
@@ -321,8 +322,7 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
                         dx_work=$signed({1'b0,x})-$signed({1'b0,centre});
                         relative_x[k*10+:10]=dx_work;
                         note_valid[k]=valid_blocks[slot] && x>=64;
-                        tail_hits[k]=note_valid[k] && dx_work>=14 &&
-                            dx_work<$signed(10'd14+{1'b0,tails[slot*9+:9]}) && local_y>=15 && local_y<27;
+                        tail_lengths[k*9+:9]=tails[slot*9+:9];
                     end
                 end
                 if(y>=60 && y<254)begin
@@ -384,7 +384,20 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     reg [1:0] lane1,lane2,tint1,tint2,tint3;
     reg [6:0] local1;
     reg [79:0] dx1;
-    reg [7:0] valid1,tails1;
+    reg [7:0] valid1;
+    reg [71:0] tail_lengths1;
+    wire [7:0] tails1;
+    // The existing second stage receives the same geometry as the original
+    // registered tail flag. Moving only this predicate across those registers
+    // preserves every output clock, while separating lane mux/subtract from
+    // tail-length add/compare. No additional pixel pipeline stage is added.
+    genvar tail_index;
+    generate for(tail_index=0;tail_index<8;tail_index=tail_index+1)begin:tail_compare
+        assign tails1[tail_index]=valid1[tail_index] &&
+            $signed(dx1[tail_index*10+:10])>=14 &&
+            $signed(dx1[tail_index*10+:10])<$signed(10'd14+{1'b0,tail_lengths1[tail_index*9+:9]}) &&
+            local1>=15 && local1<27;
+    end endgenerate
     reg [2:0] effect2,effect_next;
     reg [7:0] head_mask,shine_mask,shade_mask,halo_mask,tail_bright,tail_mid,tail_soft;
     reg signed [9:0] shape_x;
@@ -412,13 +425,13 @@ module touch_game_renderer #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,USE_P2=0
     always @(posedge clk)begin
         if(!rst_n)begin rgb<=0;glyph1<=0;numeric1<=0;row1<=0;col1<=0;col2<=0;
             en1<=0;en2<=0;en3<=0;ink3<=0;bg1<=0;bg2<=0;bg3<=0;
-            lane1<=0;lane2<=0;tint1<=0;tint2<=0;tint3<=0;local1<=0;dx1<=0;valid1<=0;tails1<=0;effect2<=0;end
+            lane1<=0;lane2<=0;tint1<=0;tint2<=0;tint3<=0;local1<=0;dx1<=0;valid1<=0;tail_lengths1<=0;effect2<=0;end
         else begin
             glyph1<=glyph;numeric1<=numeric_glyph;row1<=font_row;col1<=font_col;col2<=col1;
             en1<=text_enable;en2<=en1;en3<=en2;ink3<=font_bits[15-col2];
             bg1<=background;bg2<=bg1;bg3<=bg2;lane1<=lane;lane2<=lane1;
             tint1<=text_tint;tint2<=tint1;tint3<=tint2;
-            dx1<=relative_x;valid1<=note_valid;local1<=local_y;tails1<=tail_hits;effect2<=effect_next;
+            dx1<=relative_x;valid1<=note_valid;local1<=local_y;tail_lengths1<=tail_lengths;effect2<=effect_next;
             case({lane2,effect2})
                 5'b00001:bg3<={6'd6,6'd12,6'd21};5'b00010:bg3<={6'd7,6'd17,6'd29};
                 5'b00011:bg3<={6'd10,6'd22,6'd37};5'b00111:bg3<={6'd12,6'd28,6'd47};

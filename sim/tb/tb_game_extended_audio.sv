@@ -22,9 +22,9 @@ module tb_game_extended_audio;
     .dac_bclk(pins_``x[0]),.dac_lrck(pins_``x[1]),.dac_din(pins_``x[2]), \
     .i2s_bclk(pins_``x[3]),.i2s_ws(pins_``x[4]),.i2s_data(pins_``x[5])
     four_string_board_audio_chain #(.EXTERNAL_CONTROL_ENABLE(1),.I2S_ENABLE(1),.USE_PIANO(1),
-        .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1),.CONTROL_PHASE_VALUE_BITS(27)) dut(.control_pipeline_idle(),.control_timbre_busy(),`ARGS,`OUTS(a));
+        .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1),.CONTROL_PHASE_VALUE_BITS(27)) dut(.external_vibrato_enable(4'd0),.control_pipeline_idle(),.control_timbre_busy(),`ARGS,`OUTS(a));
     four_string_board_audio_chain #(.EXTERNAL_CONTROL_ENABLE(1),.I2S_ENABLE(1),.USE_PIANO(1),
-        .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1),.CONTROL_PHASE_VALUE_BITS(32)) full32(.control_pipeline_idle(),.control_timbre_busy(),`ARGS,`OUTS(b));
+        .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1),.CONTROL_PHASE_VALUE_BITS(32)) full32(.external_vibrato_enable(4'd0),.control_pipeline_idle(),.control_timbre_busy(),`ARGS,`OUTS(b));
 `undef ARGS
 `undef OUTS
     function automatic [31:0] increment(input integer midi);

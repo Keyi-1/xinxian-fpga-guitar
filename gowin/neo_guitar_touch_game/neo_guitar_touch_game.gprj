@@ -21,6 +21,8 @@
         <File path="../../rtl/control/guitar_play_control.v" type="file.verilog" enable="1" />
         <File path="../../rtl/control/note_phase_table.v" type="file.verilog" enable="1" />
         <File path="../../rtl/control/phase_slide_smoother.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/control/performance_vibrato_gesture.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/control/four_string_vibrato_serial.v" type="file.verilog" enable="1" />
         <File path="../../rtl/control/voice_envelope.v" type="file.verilog" enable="1" />
         <File path="../../rtl/control/timbre_blend_smoother.v" type="file.verilog" enable="1" />
         <File path="../../rtl/synth/sine_nco.v" type="file.verilog" enable="1" />

@@ -7,6 +7,7 @@ module guitar_touch_game_audio #(
     parameter integer PLUCK_DEAD_SAMPLES=`RETRIGGER_DEAD_SAMPLES,
     parameter integer PLUCK_SETTLE_SAMPLES=`PLUCK_SETTLE_SAMPLES,
     parameter integer FIXED_VELOCITY_ENABLE=`BOARD_FIXED_VELOCITY_ENABLE,
+    parameter integer PERFORMANCE_VIBRATO_ENABLE=1,
     parameter integer ALLOW_AUTOPLAY_PREVIEW=1,ENABLE_MISS_CUE=1,USE_P2=0,WRITABLE=0
 )(input wire clk,rst_n,command_valid,input wire [1:0] command_mode,
   output wire command_ack,input wire [7:0] fret_col_in_n,
@@ -37,6 +38,7 @@ module guitar_touch_game_audio #(
     wire switching,miss_event;
     wire [127:0] target_phase,audible_phase;
     wire [95:0] voice_pcm;
+    wire [3:0] performance_vibrato;
     reg [3:0] note_activity;
     assign posture_sample_tick=sample_tick;
     assign posture_performance=mode==1 && !switching;
@@ -76,7 +78,15 @@ module guitar_touch_game_audio #(
         .miss_event(miss_event));
     assign display_data=0;assign timbre_load=0;assign timbre_code=0;assign storage_idle=mode==0 && !switching;
     end endgenerate
+    generate if(PERFORMANCE_VIBRATO_ENABLE!=0)begin:vibrato_gesture
+        performance_vibrato_gesture gesture(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
+            .enable(mode==1 && !switching),.stable_valid(stable_valid),.stable_fret_id(fret_id),
+            .pluck_valid(pluck_valid),.note_on(note_on),.voice_active(active),.vibrato_enable(performance_vibrato));
+    end else begin:no_vibrato_gesture
+        assign performance_vibrato=0;
+    end endgenerate
     four_string_board_audio_chain #(.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(ENABLE_MISS_CUE),.I2S_ENABLE(1),.USE_PIANO(1),
+        .VIBRATO_ENABLE(PERFORMANCE_VIBRATO_ENABLE),
         .CONTROL_PHASE_VALUE_BITS(USE_P2 ? 27 : `NOTE_PHASE_VALUE_BITS),
         .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1)) u_chain(
         .clk_audio_ref(clk),.rst_n(rst_n),.stable_valid(1'b0),.stable_fret_id(16'd0),.pluck_valid(4'd0),
@@ -85,6 +95,7 @@ module guitar_touch_game_audio #(
         .sample_tick(sample_tick),.pcm_mix_valid(final_pcm_valid),.pcm_mix(final_pcm),.voice_active(active),.voice_pcm(voice_pcm),
         .display_phase_inc(audible_phase),.display_note_on(),.display_voice_sample_valid(voice_valid),
         .external_note_on(note_on),.external_note_off(note_off),.external_force_release(force_release),.external_phase_inc(target_phase),
+        .external_vibrato_enable(performance_vibrato),
         .game_cue_enable(mode==2 && !switching),.game_miss_event(miss_event),
         .control_pipeline_idle(posture_pipeline_idle),.control_timbre_busy(posture_timbre_busy),
         .dac_bclk(dac_bclk),.dac_lrck(dac_lrck),.dac_din(dac_din),.i2s_bclk(i2s_bclk),.i2s_ws(i2s_ws),.i2s_data(i2s_data));

@@ -6,7 +6,7 @@ module lcd_rgb_scan_480x272 (
     input wire rst_n,
     input wire [17:0] pixel_rgb,
     output wire [8:0] pixel_x,
-    output wire [8:0] pixel_y,
+    output reg [8:0] pixel_y,
     output wire pixel_active,
     output reg frame_start,
     output reg lcd_pclk,
@@ -23,12 +23,15 @@ module lcd_rgb_scan_480x272 (
     assign pixel_active = h_count >= 43 && h_count < 523
                        && v_count >= 12 && v_count < 284;
     assign pixel_x = h_count[8:0] - 9'd43;
-    assign pixel_y = v_count - 9'd12;
+    // Maintain the exact (v_count-12) modulo512 value alongside v_count.
+    // This removes a carry chain before every UI y decode, without delaying
+    // coordinates or changing the six-clock pixel/output schedule.
     always @(posedge clk) begin
         if (!rst_n) begin
             phase <= 0;
             h_count <= 0;
             v_count <= 0;
+            pixel_y <= 9'd500;
             frame_start <= 0;
             lcd_pclk <= 0;
             lcd_hsync <= 1;
@@ -51,6 +54,7 @@ module lcd_rgb_scan_480x272 (
                 if (h_count == 530) begin
                     h_count <= 0;
                     v_count <= v_count == 291 ? 9'd0 : v_count + 1'b1;
+                    pixel_y <= v_count == 291 ? 9'd500 : pixel_y + 1'b1;
                 end else h_count <= h_count + 1'b1;
             end else phase <= phase + 1'b1;
         end

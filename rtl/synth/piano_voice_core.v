@@ -37,6 +37,7 @@ module piano_voice_core #(
     reg [4:0] mode_index;
     reg [16:0] age;
     reg [16:0] frame_age;
+    reg short_piano_note;
     reg releasing;
     reg forced_releasing;
     reg [23:0] release_level;
@@ -92,6 +93,17 @@ module piano_voice_core #(
         (phase_inc < 32'd26276679) ? 2'd0 :
         (phase_inc < 32'd32164062) ? 2'd1 : 2'd2;
 
+    // Choose once at the strike so a timbre crossfade cannot jump the
+    // envelope clock. Pure piano plays its measured body at twice the rate;
+    // oscillator phase and the procedural hammer keep their original time.
+    wire strike_is_piano=CONTROL_ENABLE==0 ||
+        (timbre_blend==0 && (ROCK_ENABLE==0 || rock_blend==0));
+    // Natural-end gating bounds a short note to age<=65535, including
+    // inactive frames. Thus the doubled age cannot overflow 17 bits.
+    wire [16:0] envelope_age=short_piano_note ?
+        {frame_age[15:0],1'b0} : frame_age;
+    wire natural_end=short_piano_note ? age>=(MAX_SAMPLES+1)/2-1 : age>=MAX_SAMPLES-1;
+
     wire signed [17:0] hammer_operand_a;
     wire signed [16:0] hammer_operand_b;
     wire signed [15:0] procedural_hammer_value;
@@ -117,7 +129,7 @@ module piano_voice_core #(
         assign hammer_operand_a=0;assign hammer_operand_b=0;assign procedural_hammer_value=0;
     end endgenerate
 
-    wire [7:0] frame = frame_age[16:9];
+    wire [7:0] frame = envelope_age[16:9];
     wire [7:0] next_frame = (frame == 255) ? 8'd255 : frame + 1'b1;
     wire harmony_mode = CONTROL_ENABLE!=0 && MODES==32 && harmony_latched && mode_index>=16;
     wire [4:0] local_mode = harmony_mode ? mode_index-5'd16 : mode_index;
@@ -172,7 +184,7 @@ module piano_voice_core #(
     // 1.9.12.03 mapped the former signed (b-a)*fraction into a DSP pre-adder
     // with an incorrect sign extension after narrowing the envelope ROM.
     // These two explicit products retain the same floor-rounded samples.
-    wire [9:0] envelope_fraction = {1'b0,frame_age[8:0]};
+    wire [9:0] envelope_fraction = {1'b0,envelope_age[8:0]};
     wire [9:0] envelope_inverse = 10'd512-envelope_fraction;
     wire [26:0] envelope_sum = {1'b0,envelope_weight_a}+{1'b0,envelope_weight_b};
     wire [15:0] measured_amplitude = local_mode<8 ? envelope_sum[24:9] : 16'd0;
@@ -230,6 +242,7 @@ module piano_voice_core #(
     always @(posedge clk) begin
         if(!rst_n) begin
             state<=IDLE; mode_index<=0; age<=0; frame_age<=0;
+            short_piano_note<=0;
             active<=0; busy<=0; deadline_miss<=0; sample_valid<=0; pcm_out<=0;
             profile<=0; releasing<=0; forced_releasing<=0; release_level<=0; velocity_gain<=0;
             increment_latched<=0; frame_active<=0; ratio<=0; env_a<=0; env_b<=0;env_read<=0;
@@ -289,6 +302,7 @@ module piano_voice_core #(
                         sustain_age_phase<=0;bright_decay_phase<=0;frame_bright_decay<=1;
                         harmony_latched<=CONTROL_ENABLE!=0 && MODES==32 && harmony_enable;
                         profile<=selected_profile; age<=0; frame_age<=0;
+                        short_piano_note<=strike_is_piano;
                         // Preserve waveform continuity on rapid re-strikes.
                         continuity<=pcm_out;
                         initialize_harmony<=harmony_enable;
@@ -306,7 +320,7 @@ module piano_voice_core #(
                                 releasing<=1;
                                 damping_shift<=RELEASE_SHIFT;
                             end
-                            if(age >= MAX_SAMPLES-1 || (releasing && release_level<=256)) begin
+                            if(natural_end || (releasing && release_level<=256)) begin
                                 active<=0; release_level<=0; continuity<=0;
                             end else begin
                                 if(CONTROL_ENABLE==0 || !sustain_enable || age<2048 || sustain_age_phase==3)

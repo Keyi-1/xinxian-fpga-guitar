@@ -9,6 +9,7 @@ module four_string_board_audio_chain #(
     parameter integer I2S_ENABLE = 0,
     parameter integer EXTERNAL_CONTROL_ENABLE = 0,
     parameter integer GAME_CUE_ENABLE = 0,
+    parameter integer VIBRATO_ENABLE = 0,
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
     parameter integer CONTROL_PHASE_VALUE_BITS = `NOTE_PHASE_VALUE_BITS,
     parameter integer USE_HARMONIC = 0,
@@ -46,11 +47,12 @@ module four_string_board_audio_chain #(
     output wire i2s_bclk, i2s_ws, i2s_data,
     input wire [3:0] external_note_on,external_note_off,external_force_release,
     input wire [127:0] external_phase_inc,
+    input wire [3:0] external_vibrato_enable,
     input wire game_cue_enable,game_miss_event,
     output wire control_pipeline_idle,control_timbre_busy
 );
     wire [3:0] note_on, note_off, slide_busy;
-    wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc;
+    wire [127:0] target_phase_inc, smoothed_phase_inc, phase_inc, unmodulated_phase_inc;
     wire voice_sample_valid;
     assign display_phase_inc=phase_inc;
     assign display_note_on=note_on;
@@ -85,8 +87,19 @@ module four_string_board_audio_chain #(
             .target_phase_inc(target_phase_inc[g*32 +: 32]),
             .phase_inc(smoothed_phase_inc[g*32 +: 32]), .busy(slide_busy[g])
         );
-        assign phase_inc[g*32 +: 32] = note_on[g] ?
+        assign unmodulated_phase_inc[g*32 +: 32] = note_on[g] ?
             target_phase_inc[g*32 +: 32] : smoothed_phase_inc[g*32 +: 32];
+    end endgenerate
+
+    generate if(VIBRATO_ENABLE!=0)begin:performance_vibrato
+        wire [3:0] enabled=external_vibrato_enable & voice_active & ~slide_busy & ~note_on &
+            (EXTERNAL_CONTROL_ENABLE!=0 ? ~external_force_release : 4'hf);
+        wire busy,deadline_miss;
+        four_string_vibrato_serial modulator(.clk(clk_audio_ref),.rst_n(rst_n),
+            .sample_tick(sample_tick),.enable(enabled),.base_phase_inc(unmodulated_phase_inc),
+            .phase_inc(phase_inc),.busy(busy),.deadline_miss(deadline_miss));
+    end else begin:no_vibrato
+        assign phase_inc=unmodulated_phase_inc;
     end endgenerate
 
     generate if (USE_PIANO != 0) begin : g_piano

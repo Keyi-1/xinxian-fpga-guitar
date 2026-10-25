@@ -1,7 +1,6 @@
 // Single-clock playing policy for the dual-PCB validation project.
-// Only real plucks start a voice. Frets select pitch, including fret zero:
-// releasing the last contact slides to the open string without shortening
-// or restarting the voice's natural envelope.
+// Only real plucks start a voice. Releasing a fret retains the last pitch
+// and natural envelope. A new pluck with no contact starts an open string.
 module guitar_play_control (
     input wire clk,
     input wire rst_n,
@@ -60,10 +59,12 @@ module guitar_play_control (
             end
 
             for (i = 0; i < 4; i = i + 1) begin
-                // Store every stable pitch, whether sounding or silent.
+                // Store fretted pitches, whether sounding or silent. A
+                // release alone holds the pitch; a real open-string pluck
+                // still replaces it with fret zero at the attack boundary.
                 // Only note_on reaches the envelope; a pitch update cannot
                 // synthesize a hammer-on or resurrect a finished voice.
-                if (stable_valid || note_on[i]) begin
+                if ((stable_valid && stable_fret_id[i*4 +: 4]!=0) || note_on[i]) begin
                     held_target[i*32 +: 32] <= selected_phase[i*32 +: 32];
                 end
             end

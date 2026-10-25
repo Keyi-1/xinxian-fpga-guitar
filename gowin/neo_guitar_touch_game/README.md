@@ -1,5 +1,9 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
+> 2026-10-25：钢琴短包络与松品保持音高已通过原工程综合、P&R/STA及当前实际网表整机验证，三次松按颤音保留。当前 `impl/pnr/neo_guitar_touch_game.fs` 为本轮位流（SHA256 `16d1137fb6871eaaf3e25a4dc0e7df7d34c4ea777bfef05ce21443bafdb39b4e`）；系统／音频 Fmax 51.657／17.396 MHz，setup／hold为0。独立发布 `../../build/releases/touch_game/neo_guitar_touch_game_piano_short_hold.fs`；下板听感待确认。详见 [本轮说明](../../docs/PIANO_SHORT_HOLD.md)。
+
+> 演奏颤音 V6 已完成原工程综合、P&R/STA、RTL 与实际综合网表整机验证。独立位流为 `../../build/releases/touch_game/neo_guitar_touch_game_vibrato.fs`，SHA256 `997baf9cfa57e3e6fd65250a3ab0452cde10802f53405043b50a3b748269566b`；系统 Fmax 50.003 MHz，达标但余量极窄，硬件手感仍待下板确认。下文已验收 ID70 固定发布继续保留以便回退。详见 [颤音说明](../../docs/PERFORMANCE_VIBRATO.md)。
+
 **当前 P4 ID70 兼容完整版（2026-10-23，用户已确认 IMU 正常及 Flash 断电启动）：** 接入独立诊断已验证的 ID70 配置，明确兼容 ID68／ID70，地址仍为 0x68、AD0 接地。ID70 增加 ACCEL_CONFIG2=0x03 的写入／读回及 50 ms 唤醒等待，原 ID68 配置保持。当前仍按真实峰值自动分为四档，增益为 64／128／192／256（25%／50%／75%／100%），第一弦触发 220、第三弦 60；音源、音效、曲谱、显示、接线和实际时钟保持。
 
 原工程可直接选择：[impl/pnr/neo_guitar_touch_game.fs](impl/pnr/neo_guitar_touch_game.fs)。使用原 `.gprj`／原 `impl` 完成综合及完整 P&R／STA；无需为下载再综合。

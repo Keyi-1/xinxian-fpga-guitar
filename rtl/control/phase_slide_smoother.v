@@ -57,6 +57,23 @@ module phase_slide_smoother #(
                                      PHASE_VALUE_BITS : N_BITS) + 1;
     localparam integer COUNT_BITS = (N_BITS < 1) ? 1 : N_BITS;
     localparam [ROUND_BITS-DIV_POW2_SHIFT-1:0] DIV_ODD_VALUE = DIV_ODD;
+
+    // Exact unsigned /15 for5..33-bit inputs. The geometric reciprocal
+    // underestimates the quotient by at most one; its remainder is0..29.
+    // Only the low5 remainder bits are needed, with no DSP or new latency.
+    function automatic [ROUND_BITS-DIV_POW2_SHIFT-1:0] divide15_exact;
+        input [ROUND_BITS-DIV_POW2_SHIFT-1:0] dividend;
+        reg [ROUND_BITS-DIV_POW2_SHIFT-1:0] q;
+        reg [4:0] remainder;
+        begin
+            q=(dividend>>1)+(dividend>>5);
+            q=q+(q>>8);
+            q=q+(q>>16);
+            q=q>>3;
+            remainder=dividend[4:0]+q[4:0]-{q[0],4'b0};
+            divide15_exact=q+(remainder>=5'd15);
+        end
+    endfunction
     // Width constrains the value range, not the DDS resolution. The board
     // uses all 26 meaningful bits of its exact 32-bit ROM increments.
     wire [PHASE_VALUE_BITS-1:0] target_value = target_phase_inc[PHASE_VALUE_BITS-1:0];
@@ -86,7 +103,8 @@ module phase_slide_smoother #(
         if (difference != 0) begin
             rounded_difference = difference + SLIDE_SAMPLES - 1;
             reduced_difference = rounded_difference[ROUND_BITS-1:DIV_POW2_SHIFT];
-            step_size = reduced_difference / DIV_ODD_VALUE;
+            if(DIV_ODD==15)step_size=divide15_exact(reduced_difference);
+            else step_size = reduced_difference / DIV_ODD_VALUE;
             if (step_size == 0)
                 step_size = 33'd1;
         end
