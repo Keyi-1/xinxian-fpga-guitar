@@ -2,9 +2,10 @@
 // release. The same synthesis/effects instance serves all four modes.
 module audio_mode_router #(
     parameter integer COUNTDOWN_SAMPLES=96000,
-    parameter integer ALLOW_AUTOPLAY_PREVIEW=1
+    parameter integer ALLOW_AUTOPLAY_PREVIEW=1,EARLY_RELEASE_ENABLE=0
 )(input wire clk,rst_n,sample_tick,command_valid,input wire [1:0] command_mode,
   input wire stable_valid,input wire [15:0] fret_id,
+  input wire [3:0] fret_release,
   input wire [3:0] pluck_valid,voice_active,input wire [7:0] velocity,
   input wire [127:0] audible_phase,
   output reg command_ack,output reg [1:0] mode,output reg switching,
@@ -24,8 +25,8 @@ module audio_mode_router #(
     wire [11:0] judgement;
     wire [7:0] judgement_epoch;
     wire [127:0] consumed;
-    guitar_play_control u_performance(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
-        .stable_valid(stable_valid),.stable_fret_id(fret_id),
+    guitar_play_control #(.EARLY_RELEASE_ENABLE(EARLY_RELEASE_ENABLE)) u_performance(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
+        .stable_valid(stable_valid),.stable_fret_id(fret_id),.fret_release(fret_release),
         .pluck_valid(pluck_valid & {4{mode==1 && !switching}}),.voice_active(voice_active),
         .smoothed_phase_inc(audible_phase),.note_on(play_on),.note_off(play_off),.target_phase_inc(play_phase));
     game_note_controller #(.COUNTDOWN_SAMPLES(COUNTDOWN_SAMPLES)) u_game(

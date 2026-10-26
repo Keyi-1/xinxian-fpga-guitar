@@ -1,5 +1,14 @@
 # Windows UART 桌面上传软件（2026-10-19）
 
+## 最新恢复点：演奏尾音锁定（2026-10-25，优先于下文旧构建进度）
+
+- 用户要求先推送再修改：短钢琴包络/颤音/松品续音版本已提交并成功推送 `origin/master`，基线 `380312970eab0b455df1f8d80f055d47fdbc5324`。本轮尾音锁定改动只在本地；不要再次推送、烧录或访问实物 COM。
+- 每弦松品锁住旧尾音；后续按品只准备下一拨，真实拨弦解除锁定并采用当前品位/空弦，持续接触换品仍滑音；同品三次松按颤音及原取消条件、钢琴已完成半时长保留。只有7个运行时文件变化；piano/ROM/约束/工程/其余源码171份哈希保留，两个用户保护文件字节/index仍保护。
+- 原五帧全矩阵去抖会合并1～4ms短松开；新增每弦连续两次空行观察，不改变原row/raw/stable输出。测试≥2ms覆盖通过，单空样本拒绝，亚毫秒未扫描到的松开不保证。详见 `docs/TAIL_PITCH_LOCK.md`。
+- 已完成且禁止重跑：基线矩阵诊断 `tail_lock_matrix_baseline_01`；`tail_lock_controls_01`（30策略+原33颤音+4079712时钟冻结矩阵）；`tail_lock_audio_02`、当前实际VG `tail_lock_audio_gate_02`（各28297样本/28296独立PCM检查/5组真实拨弦）。01失败仅测试参考模式退出/复制器include修正，证据保留。无关UI/UART/MPU不重复仿真，仅源字节复用；除ADC外不宣称新旧原语图相等，原图审计REVIEW_REQUIRED如实保留。
+- 原工程/原impl构建 `build/vibrato/tail_lock_v1` 综合及完整P&R/STA均结束通过：Logic51049、FF20987、CLS28441/29952、BSRAM113/118、DSP115.5/118；系统/音频Fmax50.057/17.771MHz，实际50/12.288不变，setup/hold/latch/未布通0。系统余量窄，不为追求额外余量重建。原FS SHA256 `f847745f236c3c904394a1866dbd1fba239e8d58d0c4c5c3f813221790ceb7d9`。
+- 最终入口 `tools/check_tail_lock_result.py publish`，独立本地发布 `neo_guitar_touch_game_tail_lock.fs`、固定证据 `tail_lock_20261025`、认证 `tail_lock_verification.json`。旧短包络FS哈希16d1137f...及V6/ID70发布保留。交付后等待用户实体松品/听感反馈，不自动开始下一功能。
+
 - 用户另授权实现 Windows 曲谱上传软件；界面要求米白底、大幅淡吉他线稿覆盖页面底部、三步明确引导。当前分支接续实际 `experiment/p5-bluetooth-import`，不切回旧快照、不推进 BL616 刷写。
 - 入口 `tools/run_windows_score_uploader.py`，源码 `tools/windows_score_uploader/`，文档 `docs/WINDOWS_SCORE_UPLOADER.md`。复用并保持原 XG3 Client/事件校验/分弦器字节不变；支持 xgscore、BIN+JSON、CSV，附修订节奏情歌 CRC c3451bbc。COMMIT 前持久写记录，最终结果不明确则保留并阻止重传。
 - 用户追加授权电脑试听，当前便携包 `build/releases/windows/FPGA_Guitar_Uploader_1.1.0.zip`；旧1.0.0包/认证保留。1.1新增 `preview_audio.py` 有界缓冲参考合成与 `preview_panel.py` 播放/暂停/停止/跳转/音量，按实际事件时间生成48k/16bit WAV，不是FPGA音色的等价模型；选曲/CSV参数变化清缓存，开始上传停止播放。无需串口即可试听，不自动出声。

@@ -23,7 +23,8 @@ module matrix_scanner #(
 
     output reg         stable_valid,
     output reg [31:0]  stable_fret_mask,
-    output reg [15:0]  stable_fret_id
+    output reg [15:0]  stable_fret_id,
+    output reg [3:0]   release_event
 );
 
     reg [31:0] work_mask;
@@ -32,6 +33,8 @@ module matrix_scanner #(
     reg [31:0] settle_count;
     reg [31:0] candidate_mask;
     reg [31:0] candidate_count;
+    reg [3:0] empty_seen,release_reported;
+    integer s;
 
     wire [7:0] col_pressed;
     assign col_pressed = ~col_in_n;
@@ -90,10 +93,12 @@ module matrix_scanner #(
             stable_valid <= 1'b0;
             stable_fret_mask <= 32'd0;
             stable_fret_id <= 16'd0;
+            release_event <= 0;empty_seen <= 0;release_reported <= 0;
         end
         else begin
             frame_valid <= 1'b0;
             stable_valid <= 1'b0;
+            release_event <= 0;
 
             if (div_count < CLK_DIV - 1) begin
                 div_count <= div_count + 1;
@@ -106,6 +111,24 @@ module matrix_scanner #(
                 end
                 else begin
                     settle_count <= 32'd0;
+
+                    // Separate per-string release observations leave the
+                    // five-frame stable mask used by the game unchanged.
+                    // Two empty samples one frame apart reject one dropout
+                    // while retaining gaps shorter than full debounce.
+                    for(s=0;s<4;s=s+1)begin
+                        if(row_index==s)begin
+                            if(col_pressed==0)begin
+                                empty_seen[s]<=1;
+                                if(empty_seen[s] && !release_reported[s] &&
+                                   stable_fret_id[s*4+:4]!=0)begin
+                                    release_event[s]<=1;release_reported[s]<=1;
+                                end
+                            end else begin
+                                empty_seen[s]<=0;release_reported[s]<=0;
+                            end
+                        end
+                    end
 
                     case (row_index)
                         2'd0: begin

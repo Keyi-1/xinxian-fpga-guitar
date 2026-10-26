@@ -12,11 +12,19 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "0.1.0"
+        resValue("string", "app_name", "弦心吉他")
 
         testInstrumentationRunner = "android.test.InstrumentationTestRunner"
     }
 
     buildTypes {
+        create("scanCheck") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".scancheck"
+            versionNameSuffix = "-scancheck"
+            resValue("string", "app_name", "弦心吉他·扫描诊断")
+            matchingFallbacks += listOf("debug")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")

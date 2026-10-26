@@ -1,6 +1,8 @@
 param(
     [string]$SdkRoot = 'E:\BL616\bouffalo_sdk',
     [string]$ToolchainRoot = 'E:\BL616\toolchain_gcc_t-head_windows',
+    [string]$PythonExe = 'python',
+    [switch]$UseSubst,
     [ValidatePattern('^[A-Z]$')]
     [string]$BuildDrive = 'R'
 )
@@ -26,23 +28,27 @@ foreach ($required in @(
     }
 }
 
-if (Test-Path -LiteralPath $driveRoot) {
+if ($UseSubst -and (Test-Path -LiteralPath $driveRoot)) {
     throw "$driveName is already in use. Pass another free letter with -BuildDrive."
 }
 
 try {
-    & subst.exe $driveName $projectRoot
-    if ($LASTEXITCODE -ne 0) {
-        throw "Could not create temporary $driveName mapping."
+    $buildRoot = $projectRoot
+    if ($UseSubst) {
+        & subst.exe $driveName $projectRoot
+        if ($LASTEXITCODE -ne 0) {
+            throw "Could not create temporary $driveName mapping."
+        }
+        $mappedHere = $true
+        $buildRoot = $driveRoot
     }
-    $mappedHere = $true
 
-    $env:BL_SDK_BASE = $SdkRoot
+    $env:BL_SDK_BASE = $SdkRoot.Replace('\', '/')
     $env:PATH = "$toolchainBin;$($SdkRoot)\tools\make;$cmakeBin;$env:PATH"
 
-    Push-Location $driveRoot
+    Push-Location $buildRoot
     try {
-        & $makeExe CHIP=bl616 BOARD=bl616dk
+        & $makeExe CHIP=bl616 BOARD=bl616dk "PYTHON=$PythonExe"
         if ($LASTEXITCODE -ne 0) {
             throw "BouffaloSDK build failed with exit code $LASTEXITCODE."
         }

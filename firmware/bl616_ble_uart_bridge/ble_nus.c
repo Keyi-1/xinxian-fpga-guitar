@@ -110,10 +110,14 @@ static struct bt_conn_cb s_connection_callbacks = {
     .disconnected = ble_disconnected,
 };
 
-void ble_nus_init(void)
+int ble_nus_init(void)
 {
+    int error = bt_gatt_service_register(&s_nus_service);
+    if (error != 0) {
+        return error;
+    }
     bt_conn_cb_register(&s_connection_callbacks);
-    bt_gatt_service_register(&s_nus_service);
+    return 0;
 }
 
 int ble_nus_start_advertising(void)

@@ -1,9 +1,10 @@
 // Sample-aligned release handshake; one unchanged synthesis/effects chain.
 module game_p2_mode_router #(
-    parameter integer COUNTDOWN_SAMPLES=96000,ALLOW_AUTOPLAY_PREVIEW=1,WRITABLE=0
+    parameter integer COUNTDOWN_SAMPLES=96000,ALLOW_AUTOPLAY_PREVIEW=1,WRITABLE=0,EARLY_RELEASE_ENABLE=0
 )(input wire clk,rst_n,sample_tick,command_valid,input wire [1:0] command_mode,
   input wire [2:0] command_slot,
   input wire stable_valid,input wire [15:0] fret_id,
+  input wire [3:0] fret_release,
   input wire [3:0] pluck_valid,voice_active,input wire [7:0] velocity,
   input wire [127:0] audible_phase,
   input wire display_clk,display_read,input wire [10:0] display_address,
@@ -37,8 +38,8 @@ module game_p2_mode_router #(
     end else begin:static_catalog
     game_p2_catalog catalog(.slot(selected_slot),.valid(),.playable(),.test_only(),.base(),.event_count(),.duration(),.timbre(song_timbre));
     end endgenerate
-    guitar_play_control performance(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
-        .stable_valid(stable_valid),.stable_fret_id(fret_id),
+    guitar_play_control #(.EARLY_RELEASE_ENABLE(EARLY_RELEASE_ENABLE)) performance(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
+        .stable_valid(stable_valid),.stable_fret_id(fret_id),.fret_release(fret_release),
         .pluck_valid(pluck_valid & {4{mode==1 && !switching}}),.voice_active(voice_active),
         .smoothed_phase_inc(audible_phase),.note_on(play_on),.note_off(play_off),.target_phase_inc(play_phase));
     game_p2_static_engine #(.COUNTDOWN_SAMPLES(COUNTDOWN_SAMPLES),.WRITABLE(WRITABLE)) engine(

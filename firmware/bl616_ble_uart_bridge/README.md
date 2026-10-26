@@ -1,5 +1,24 @@
 # BL616 BLE ↔ FPGA UART 二级固件
 
+## 2026-10-25：NEO Dock 31005 的 26MHz 修正版
+
+本轮用户实测：旧二级镜像写入 `0x40000` 后，12V 独立供电，项目 Android App
+可以扫描其他设备，但扫描不到吉他。用户确认一级固件已支持二级启动（最低版本
+`2025030317`）；本轮无需重刷 `0x0`。
+
+**这次请使用 `release/neo31005_ble_26m_20261025/` 中的新 bin。**
+旧的 `release/xinxian_ble_uart_bl616_secondary_0x40000.bin` 保留用于追溯，不能混选。
+
+已确认并修正的缺陷：通用 `bl616dk/board.c` 把本板 Y2 的26MHz晶振按40MHz配置，
+RF初始化又从该BSP读取晶振频率；通用控制台还会把本板CW2015的GPIO21/22配置成UART0。
+构建现在生成26MHz的BSP及显式26MHz镜像头，排除原两份SDK编译单元，不修改安装的SDK。
+同时检查GATT服务注册和BLE主机初始化的返回值。NUS UUID、广播名及115200 UART28/27保持。
+
+已完成真实T-Head编译、SDK镜像后处理、镜像头及CRC校验和ELF时钟指令检查。
+这是待下板测试的修复候选，不代表已验证实物广播、配对或曲谱传输。
+操作和判断步骤见新包内 `README_烧录与测试.md`；源码检查报告见
+`../../docs/BL616_NEO31005_SCAN_FIX.md`。
+
 这个工程把手机 BLE 字节流与 FPGA 的现有 UART 字节流透明互转，不解析或修改 XG3 帧。
 
 ## 已固定的接口
@@ -29,9 +48,12 @@ UART 固定为 `115200 / 8N1`，无流控。两个方向各有 2048 字节缓冲
 .\build_firmware.ps1
 ```
 
-脚本只执行编译，不包含 `flash`、串口访问或 DevCube 调用。临时盘符用于绕过旧工具链不支持中文工程路径的问题，结束时会自动移除。
+脚本只执行编译，不包含 `flash`、串口访问或 DevCube 调用。路径含中文时可加
+`-UseSubst` 使用临时盘符，结束时自动移除。用 `-SdkRoot` / `-ToolchainRoot`
+指定实际路径，`-PythonExe` 指定Make配置工具的Python；SDK后处理还需要PATH中有可用的`python3`。
+本次实际使用SDK提交 `41bf338a57be53919d99f6c6715a96100428c97d` 和T-Head GCC 10.2.0。
 
-## 正式镜像
+## 历史镜像（40MHz通用BSP，已由上方26MHz候选替代）
 
 - 文件：`release\xinxian_ble_uart_bl616_secondary_0x40000.bin`
 - 大小：281,968 字节（`0x44D70`）

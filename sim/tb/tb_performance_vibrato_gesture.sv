@@ -9,9 +9,9 @@ module tb_performance_vibrato_gesture;
     integer attacks=0,checks=0;
     performance_vibrato_gesture #(.MIN_RELEASE_SAMPLES(2),.MAX_RELEASE_SAMPLES(6),
         .WINDOW_SAMPLES(32)) dut(.clk(clk),.rst_n(rst_n),.sample_tick(tick),.enable(enable),
-        .stable_valid(stable_valid),.stable_fret_id(frets),.pluck_valid(pluck),
+        .stable_valid(stable_valid),.stable_fret_id(frets),.pluck_valid(pluck),.fret_release(4'd0),
         .note_on(note_on),.voice_active(active),.vibrato_enable(vibrato));
-    guitar_play_control policy(.clk(clk),.rst_n(rst_n),.sample_tick(tick),
+    guitar_play_control policy(.clk(clk),.rst_n(rst_n),.sample_tick(tick),.fret_release(4'd0),
         .stable_valid(stable_valid),.stable_fret_id(frets),.pluck_valid(pluck),
         .voice_active(active),.smoothed_phase_inc(128'd0),.note_on(note_on),
         .note_off(note_off),.target_phase_inc(target));

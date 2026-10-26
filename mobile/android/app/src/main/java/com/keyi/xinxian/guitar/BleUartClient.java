@@ -200,15 +200,18 @@ public final class BleUartClient {
     private final ScanCallback scanCallback = new ScanCallback() {
         @Override public void onScanResult(int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
-            String name = safeName(device);
+            // The device cache can still be unnamed (or retain an old firmware
+            // name). Prefer the name carried by this advertisement.
+            String name = result.getScanRecord() == null
+                    ? null : result.getScanRecord().getDeviceName();
+            if (name == null || name.trim().isEmpty()) name = safeName(device);
             boolean nus = result.getScanRecord() != null
                     && result.getScanRecord().getServiceUuids() != null
                     && result.getScanRecord().getServiceUuids().stream()
                     .anyMatch(uuid -> SERVICE_UUID.equals(uuid.getUuid()));
-            if (nus || !"未命名设备".equals(name)) {
-                listener.onDeviceFound(device, name + "  " + device.getAddress()
-                        + (nus ? "  [BLE 串口]" : ""));
-            }
+            // Keep unnamed/non-NUS devices visible during board diagnosis.
+            listener.onDeviceFound(device, name + "  " + device.getAddress()
+                    + (nus ? "  [BLE 串口]" : ""));
         }
 
         @Override public void onScanFailed(int errorCode) {

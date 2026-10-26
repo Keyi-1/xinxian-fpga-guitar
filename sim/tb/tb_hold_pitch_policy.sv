@@ -8,7 +8,7 @@ module tb_hold_pitch_policy;
     wire [127:0] target;
     localparam [127:0] OPEN={32'h00c879a3,32'h010b9a2b,32'h0151285d,32'h01c20d2f};
     reg [127:0] expected;
-    guitar_play_control dut(.clk(clk),.rst_n(rst_n),.sample_tick(tick),
+    guitar_play_control dut(.clk(clk),.rst_n(rst_n),.sample_tick(tick),.fret_release(4'd0),
         .stable_valid(stable),.stable_fret_id(fret),.pluck_valid(pluck),
         .voice_active(4'hf),.smoothed_phase_inc(128'd0),.note_on(on),.note_off(off),.target_phase_inc(target));
     task select(input [15:0] value);

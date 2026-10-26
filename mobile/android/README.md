@@ -1,5 +1,18 @@
 # 弦心 FPGA 吉他 Android 客户端
 
+## 2026-10-25 扫描显示修复
+
+旧扫描回调只读取BluetoothDevice缓存名称，并隐藏无缓存名称且无NUS服务的设备。
+诊断固件不广播NUS，因此可能被旧App隐藏。现在优先读取ScanRecord.getDeviceName，
+回退到系统缓存名称，并保留未命名设备。此改动不能证明板端已正常广播。
+
+新增 `scanCheck` 构建类型，包名后缀`.scancheck`，显示名“弦心吉他·扫描诊断”，可与原App并存。
+本机已用现有SDK aapt2/javac/D8/zipalign/apksigner直接完成APK编译和签名验证；
+Gradle离线构建因Kotlin依赖缓存不全失败，不能称Gradle构建通过。
+独立APK与验证记录在 `build/releases/android/scancheck_20261025/`（相对仓库根目录）。
+它只用于当前扫描定位，连接/导谱可靠性问题仍见 `docs/BL616_BLE_SECOND_REVIEW.md`，
+本轮未实机安装、未进行BLE扫描或上传。
+
 这个目录是现有 P3 UART 导入协议的 Android BLE 客户端。它不修改 FPGA RTL，手机端与 BL616 之间使用 BLE，BL616 再把收到的原始字节透明转发到 FPGA UART。
 
 ## 先说明：天线不是蓝牙固件

@@ -1,0 +1,12 @@
+{
+  "image": "xinxian_ble_diag_v2_manual_start_0x40000.bin",
+  "image_sha256": "c2da5b45762fb347685e496a10d59a2ee786c21ae50eda078820545de51b8b61",
+  "image_size_bytes": 298576,
+  "intended_flash_address": "0x40000",
+  "manual_ble_start": true,
+  "compile_status": "passed",
+  "image_crc": "passed",
+  "hardware_tested": false,
+  "flash_performed": false,
+  "main_sha256": "71050bfe2768c82cd9daaf586caea415b6ffae83f0d8fe64c871b87c3f9d9239"
+}

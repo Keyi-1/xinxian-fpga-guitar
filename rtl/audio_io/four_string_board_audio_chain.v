@@ -67,6 +67,7 @@ module four_string_board_audio_chain #(
 
     generate if(EXTERNAL_CONTROL_ENABLE==0)begin : performance_control
     guitar_play_control u_play_control (
+        .fret_release(4'd0),
         .clk(clk_audio_ref), .rst_n(rst_n), .sample_tick(sample_tick),
         .stable_valid(stable_valid), .stable_fret_id(stable_fret_id),
         .pluck_valid(pluck_valid), .voice_active(voice_active),

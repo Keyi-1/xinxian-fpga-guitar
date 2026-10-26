@@ -39,6 +39,7 @@ module guitar_touch_game_audio #(
     wire [127:0] target_phase,audible_phase;
     wire [95:0] voice_pcm;
     wire [3:0] performance_vibrato;
+    wire [3:0] fret_release;
     reg [3:0] note_activity;
     assign posture_sample_tick=sample_tick;
     assign posture_performance=mode==1 && !switching;
@@ -52,36 +53,36 @@ module guitar_touch_game_audio #(
     matrix_scanner #(.CLK_DIV(MATRIX_CLK_DIV),.SETTLE_CYCLES(MATRIX_SETTLE_CYCLES),
         .DEBOUNCE_FRAMES(MATRIX_DEBOUNCE_FRAMES)) u_matrix(
         .clk(clk),.rst_n(rst_n),.col_in_n(col_sync),.row_oe(fret_row_oe),.row_drive_n(fret_row_drive_n),
-        .frame_valid(),.fret_mask(),.fret_id(),.stable_valid(stable_valid),.stable_fret_mask(),.stable_fret_id(fret_id));
+        .frame_valid(),.fret_mask(),.fret_id(),.stable_valid(stable_valid),.stable_fret_mask(),.stable_fret_id(fret_id),.release_event(fret_release));
     mcp3208_pluck_frontend #(.SPI_CLK_DIV(ADC_SPI_CLK_DIV),.DEAD_SAMPLES(PLUCK_DEAD_SAMPLES),
         .SETTLE_SAMPLES(PLUCK_SETTLE_SAMPLES),.FIXED_VELOCITY_ENABLE(FIXED_VELOCITY_ENABLE)) u_adc(
         .clk(clk),.rst_n(rst_n),.adc_cs_n(adc_cs_n),.adc_sclk(adc_sclk),.adc_mosi(adc_mosi),.adc_miso(adc_miso),
         .pluck_valid(pluck_valid),.velocity_level(velocity),.raw_adc(),.peak_adc(),.event_timestamp(),.capture_pending(capture_pending));
     generate if(USE_P2)begin:p2
-    game_p2_mode_router #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.WRITABLE(WRITABLE)) u_router(
+    game_p2_mode_router #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.WRITABLE(WRITABLE),.EARLY_RELEASE_ENABLE(1)) u_router(
         .clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
         .command_slot(command_slot),.display_clk(display_clk),.display_read(display_read),
         .display_address(display_address),.display_data(display_data),.timbre_load(timbre_load),.timbre_code(timbre_code),
         .overlay_valid(overlay_valid),.overlay_data(overlay_data),.write_enable(write_enable),.write_address(write_address),.write_data(write_data),.storage_idle(storage_idle),
         .command_valid(command_valid),.command_mode(command_mode),.command_ack(command_ack),.mode(mode),.switching(switching),
-        .stable_valid(stable_valid),.fret_id(fret_id),.pluck_valid(pluck_valid),.velocity(velocity),
+        .stable_valid(stable_valid),.fret_id(fret_id),.fret_release(fret_release),.pluck_valid(pluck_valid),.velocity(velocity),
         .voice_active(active),.audible_phase(audible_phase),.note_on(note_on),.note_off(note_off),
         .force_release(force_release),.target_phase(target_phase),.note_velocity(note_velocity),.game_snapshot(game_snapshot),
         .miss_event(miss_event));
     end else begin:p1
-    audio_mode_router #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW)) u_router(
+    audio_mode_router #(.ALLOW_AUTOPLAY_PREVIEW(ALLOW_AUTOPLAY_PREVIEW),.EARLY_RELEASE_ENABLE(1)) u_router(
         .clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
         .command_valid(command_valid),.command_mode(command_mode),.command_ack(command_ack),.mode(mode),.switching(switching),
-        .stable_valid(stable_valid),.fret_id(fret_id),.pluck_valid(pluck_valid),.velocity(velocity),
+        .stable_valid(stable_valid),.fret_id(fret_id),.fret_release(fret_release),.pluck_valid(pluck_valid),.velocity(velocity),
         .voice_active(active),.audible_phase(audible_phase),.note_on(note_on),.note_off(note_off),
         .force_release(force_release),.target_phase(target_phase),.note_velocity(note_velocity),.game_snapshot(game_snapshot),
         .miss_event(miss_event));
     assign display_data=0;assign timbre_load=0;assign timbre_code=0;assign storage_idle=mode==0 && !switching;
     end endgenerate
     generate if(PERFORMANCE_VIBRATO_ENABLE!=0)begin:vibrato_gesture
-        performance_vibrato_gesture gesture(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
+        performance_vibrato_gesture #(.EARLY_RELEASE_ENABLE(1)) gesture(.clk(clk),.rst_n(rst_n),.sample_tick(sample_tick),
             .enable(mode==1 && !switching),.stable_valid(stable_valid),.stable_fret_id(fret_id),
-            .pluck_valid(pluck_valid),.note_on(note_on),.voice_active(active),.vibrato_enable(performance_vibrato));
+            .pluck_valid(pluck_valid),.note_on(note_on),.voice_active(active),.fret_release(fret_release),.vibrato_enable(performance_vibrato));
     end else begin:no_vibrato_gesture
         assign performance_vibrato=0;
     end endgenerate

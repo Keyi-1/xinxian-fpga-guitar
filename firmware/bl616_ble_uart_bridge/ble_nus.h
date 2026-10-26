@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void ble_nus_init(void);
+int ble_nus_init(void);
 int ble_nus_start_advertising(void);
 bool ble_nus_can_notify(void);
 size_t ble_nus_notify_limit(void);

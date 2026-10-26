@@ -2,15 +2,17 @@
 
 // Observe fret contacts without delaying or replacing the playing policy.
 // Three qualified releases/re-presses on one sounding string enable vibrato.
-// A release still selects the open string immediately in guitar_play_control.
+// Pitch/envelope policy remains in guitar_play_control.
 module performance_vibrato_gesture #(
     parameter integer TAP_COUNT=`VIBRATO_TAP_COUNT,
     parameter integer MIN_RELEASE_SAMPLES=`VIBRATO_MIN_TAP_SAMPLES,
     parameter integer MAX_RELEASE_SAMPLES=`VIBRATO_MAX_TAP_SAMPLES,
-    parameter integer WINDOW_SAMPLES=`VIBRATO_WINDOW_SAMPLES
+    parameter integer WINDOW_SAMPLES=`VIBRATO_WINDOW_SAMPLES,
+    parameter integer EARLY_RELEASE_ENABLE=0
 )(input wire clk,rst_n,sample_tick,enable,stable_valid,
   input wire [15:0] stable_fret_id,
   input wire [3:0] pluck_valid,note_on,voice_active,
+  input wire [3:0] fret_release,
   output reg [3:0] vibrato_enable);
     function integer bits_needed;
         input integer maximum;
@@ -75,6 +77,9 @@ module performance_vibrato_gesture #(
                             vibrato_enable[i]<=0;pending[i]<=0;window_active[i]<=0;taps[i]<=0;
                         end
                     end
+                    // Short releases cancel modulation but do not become
+                    // qualified taps; original stable tap timing is retained.
+                    if(EARLY_RELEASE_ENABLE!=0 && fret_release[i])vibrato_enable[i]<=0;
                 end
             end
         end
