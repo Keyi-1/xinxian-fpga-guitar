@@ -54,6 +54,12 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/disconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="断开蓝牙" />
+
+        <Button
             android:id="@+id/query"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -112,6 +118,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:max="100" />
+
+        <Button
+            android:id="@+id/clearPending"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:text="已核对上次提交，解除上传限制" />
 
         <TextView
             android:id="@+id/log"

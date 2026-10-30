@@ -14,7 +14,7 @@ module neo_guitar_touch_game_top #(
     parameter integer TOUCH_SWAP_AXES=-1,TOUCH_MIRROR_X=0,TOUCH_MIRROR_Y=0,
     // Training defaults; set both to zero for a player-triggered-only build.
     parameter integer ALLOW_AUTOPLAY_PREVIEW=1,ENABLE_MISS_CUE=1,USE_P2=1,WRITABLE=1,
-    parameter integer UART_CLKS_PER_BIT=434,ENABLE_IMU=1,IMU_I2C_QUARTER=125,
+    parameter integer UART_CLKS_PER_BIT=5208,ENABLE_IMU=1,IMU_I2C_QUARTER=125,
     parameter integer IMU_CALIBRATION_LOG2=8,IMU_HEALTH_MS=1000,IMU_STABLE_MS=500,IMU_COOLDOWN_MS=1000
 )(input wire audio_clk_12m288,sys_clk_50m,
   input wire USER_BUTTON1_n,USER_BUTTON2_n,USER_BUTTON3_n,

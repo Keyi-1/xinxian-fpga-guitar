@@ -139,11 +139,11 @@ IO_PORT "ctp_sda" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
 IO_LOC "ctp_scl" W16;
 IO_PORT "ctp_scl" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=4;
 
-# NEO Dock 31005 DEBUG-USB2 / BL616 UART: J2-50 TX, J2-54 RX.
-# Verified against both 60K SOM schematics and the 31005 dock, not 31002 Y14.
-IO_LOC "song_uart_tx" U15;
+# JDY-23 dedicated UART: J8-9 / PMOD1_IO2 TX, J8-10 / PMOD1_IO3 RX.
+# 31005 J2-9 -> 60K AB21; J2-7 -> AB22. 9600 8N1, independent of BL616.
+IO_LOC "song_uart_tx" AB21;
 IO_PORT "song_uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
-IO_LOC "song_uart_rx" V14;
+IO_LOC "song_uart_rx" AB22;
 IO_PORT "song_uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;
 
 # MPU-6050 independent open-drain GPIO bus. 31005 J8, unused by J8-5..8 ADC.

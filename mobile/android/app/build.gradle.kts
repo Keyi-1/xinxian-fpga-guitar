@@ -18,6 +18,13 @@ android {
     }
 
     buildTypes {
+        create("jdy23") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".jdy23"
+            versionNameSuffix = "-jdy23"
+            resValue("string", "app_name", "弦心吉他·JDY23")
+            matchingFallbacks += listOf("debug")
+        }
         create("scanCheck") {
             initWith(getByName("debug"))
             applicationIdSuffix = ".scancheck"

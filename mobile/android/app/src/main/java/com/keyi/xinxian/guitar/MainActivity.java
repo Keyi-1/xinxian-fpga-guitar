@@ -2,8 +2,10 @@ package com.keyi.xinxian.guitar;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -41,6 +43,10 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
     private volatile Xg3Client client;
     private Xg3Protocol.Song song;
     private boolean protocolReady;
+    private boolean busy;
+    private boolean pickingFile;
+    private volatile boolean needsReview;
+    private SharedPreferences commitJournal;
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
@@ -66,11 +72,25 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
         timbreSpinner.setSelection(1);
 
         ble = new BleUartClient(this, this);
+        commitJournal = getSharedPreferences("jdy23_commit_journal", MODE_PRIVATE);
+        needsReview = commitJournal.contains("pending");
+        if (needsReview) append("上次提交结果待核对：" + commitJournal.getString("pending", ""));
         findViewById(R.id.scan).setOnClickListener(v -> ensurePermissionAndScan());
         findViewById(R.id.connect).setOnClickListener(v -> connectSelected());
         findViewById(R.id.pickFile).setOnClickListener(v -> pickSong());
         queryButton.setOnClickListener(v -> querySlots());
         uploadButton.setOnClickListener(v -> uploadSong());
+        findViewById(R.id.disconnect).setOnClickListener(v -> ble.disconnect());
+        findViewById(R.id.clearPending).setOnClickListener(v -> new AlertDialog.Builder(this)
+                .setTitle("确认已核对曲目")
+                .setMessage("请先读取槽位并在开发板试听。目录条数一致不能证明内容相同。确认后解除重传限制。")
+                .setNegativeButton("继续核对", null)
+                .setPositiveButton("我已核对", (dialog, which) -> {
+                    if (commitJournal.edit().remove("pending").commit()) {
+                        needsReview = false; append("已人工核对并清除待确认标记"); refreshActions();
+                    } else toast("未能保存核对结果，请重试");
+                }).show());
+        refreshActions();
     }
 
     private void ensurePermissionAndScan() {
@@ -87,7 +107,7 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
         }
         devices.clear();
         deviceAdapter.clear();
-        append("开始扫描；优先选择名称含 XINXIAN 或标有 [BLE 串口] 的设备。");
+        append("开始扫描；选择 JDY-23 或 XINXIAN-JDY23。未改名的模块也可以连接。");
         ble.startScan();
     }
 
@@ -118,11 +138,13 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("application/octet-stream");
         intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"application/octet-stream", "*/*"});
+        pickingFile = true;
         startActivityForResult(intent, PICK_SONG);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_SONG) pickingFile = false;
         if (requestCode != PICK_SONG || resultCode != RESULT_OK || data == null || data.getData() == null) return;
         Uri uri = data.getData();
         worker.execute(() -> {
@@ -180,7 +202,7 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
     private void uploadSong() {
         Xg3Client active = client;
         Xg3Protocol.Song selectedSong = song;
-        if (!protocolReady || active == null || selectedSong == null) return;
+        if (!protocolReady || active == null || selectedSong == null || needsReview || busy) return;
         int slot = slotSpinner.getSelectedItemPosition();
         int timbre = timbreSpinner.getSelectedItemPosition();
         setBusy(true);
@@ -189,11 +211,26 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
         worker.execute(() -> {
             try {
                 Xg3Protocol.SlotDescriptor result = active.upload(slot, timbre, selectedSong,
-                        (done, total) -> runOnUiThread(() -> progress.setProgress(done * 100 / total)));
+                        (done, total) -> runOnUiThread(() -> progress.setProgress(done * 100 / total)),
+                        new Xg3Client.CommitJournal() {
+                            @Override public void beforeCommit(int target, Xg3Protocol.Song value) throws Exception {
+                                String record = String.format("USER %d，%d条，CRC32 %08X", target + 1, value.events.size(), value.crc32);
+                                needsReview = true;
+                                if (!commitJournal.edit().putString("pending", record).commit())
+                                    throw new IllegalStateException("未能保存提交标记，尚未发送 COMMIT");
+                            }
+                            @Override public void confirmed() throws Exception {
+                                if (!commitJournal.edit().remove("pending").commit())
+                                    throw new IllegalStateException("无法清除提交标记");
+                                needsReview = false;
+                            }
+                        });
                 appendFromWorker("上传完成并经 FPGA RAM 读回校验：USER " + (result.slot + 1)
                         + "，" + result.eventCount + " 条事件。");
             } catch (Xg3Client.CommitUnknown unknown) {
                 appendFromWorker("警告：" + unknown.getMessage());
+            } catch (Xg3Client.CommitConfirmed confirmed) {
+                appendFromWorker(confirmed.getMessage());
             } catch (Exception error) {
                 appendFromWorker("上传失败：" + message(error));
             } finally {
@@ -203,9 +240,8 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
     }
 
     private void setBusy(boolean busy) {
-        queryButton.setEnabled(protocolReady && !busy);
-        uploadButton.setEnabled(protocolReady && song != null && !busy);
-        findViewById(R.id.pickFile).setEnabled(!busy);
+        this.busy = busy;
+        refreshActions();
     }
 
     private void setProtocolReady(boolean value) {
@@ -214,8 +250,12 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
     }
 
     private void refreshActions() {
-        queryButton.setEnabled(protocolReady);
-        uploadButton.setEnabled(protocolReady && song != null);
+        queryButton.setEnabled(protocolReady && !busy);
+        uploadButton.setEnabled(protocolReady && song != null && !busy && !needsReview);
+        findViewById(R.id.pickFile).setEnabled(!busy);
+        findViewById(R.id.scan).setEnabled(!busy && !ble.isReady());
+        findViewById(R.id.connect).setEnabled(!busy && !ble.isReady());
+        findViewById(R.id.clearPending).setEnabled(needsReview && !busy);
     }
 
     private String displayName(Uri uri) {
@@ -243,6 +283,7 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
             append(text);
             setProtocolReady(false);
             if (ready) beginProtocolSession();
+            else client = null;
         });
     }
 
@@ -254,7 +295,7 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
                 Xg3Client.Capabilities caps = next.hello();
                 appendFromWorker("XG3 握手成功：" + caps.slots + " 槽，容量 " + caps.capacity
                         + "，MIDI " + caps.midiMin + "–" + caps.midiMax + "。");
-                runOnUiThread(() -> setProtocolReady(true));
+                runOnUiThread(() -> { if (client == next && ble.isReady()) setProtocolReady(true); });
             } catch (Exception error) {
                 appendFromWorker("BLE 已连接，但 XG3 握手失败：" + message(error));
             }
@@ -285,5 +326,10 @@ public final class MainActivity extends Activity implements BleUartClient.Listen
         ble.disconnect();
         worker.shutdownNow();
         super.onDestroy();
+    }
+    @Override protected void onStop() {
+        super.onStop();
+        // Keep a system file picker usable; other background exits disconnect.
+        if (!isChangingConfigurations() && !pickingFile) ble.disconnect();
     }
 }

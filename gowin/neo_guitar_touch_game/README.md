@@ -1,5 +1,7 @@
 # 触控四轨游戏：neo_guitar_touch_game
 
+> **当前最新：JDY-23 外置蓝牙模块适配版**（构建 2026-10-27，本次提交 2026-10-30）。[完整发布包](../../firmware/jdy23/release/jdy23_20261027.zip)和[接线/操作说明](../../firmware/jdy23/README.md)。当前原 `impl/pnr/neo_guitar_touch_game.fs` 的 SHA256 为 `78056f8c3bdde32bbbc12e1c7cc234e76beaa002562fb134fc6807a3c3452604`；上传 UART 为 9600/8N1、TX=J8-9/AB21、RX=J8-10/AB22。系统/音频 Fmax 50.033/17.840 MHz，setup/hold 为0，系统余量较窄。已有数字验证通过，未代理烧录或完成实物蓝牙验收；下方历史位流、报告和固定发布继续保留。
+
 > 2026-10-25：旧短包络版本已先推送为 `3803129`。演奏尾音锁定已通过受影响 RTL/音频、当前实际音频网表和原工程完整 P&R/STA；[原工程位流](impl/pnr/neo_guitar_touch_game.fs) 可用，独立发布为 [neo_guitar_touch_game_tail_lock.fs](../../build/releases/touch_game/neo_guitar_touch_game_tail_lock.fs)，SHA256 `f847745f236c3c904394a1866dbd1fba239e8d58d0c4c5c3f813221790ceb7d9`。系统／音频 Fmax 50.057／17.771 MHz，setup／hold为0；系统余量较窄。见 [尾音锁定说明](../../docs/TAIL_PITCH_LOCK.md) 和 [本轮认证](tail_lock_verification.json)。下方旧固定发布保留，本轮新改动未推送、未烧录。
 
 > 2026-10-25：钢琴短包络与松品保持音高已通过原工程综合、P&R/STA及当前实际网表整机验证，三次松按颤音保留。当前 `impl/pnr/neo_guitar_touch_game.fs` 为本轮位流（SHA256 `16d1137fb6871eaaf3e25a4dc0e7df7d34c4ea777bfef05ce21443bafdb39b4e`）；系统／音频 Fmax 51.657／17.396 MHz，setup／hold为0。独立发布 `../../build/releases/touch_game/neo_guitar_touch_game_piano_short_hold.fs`；下板听感待确认。详见 [本轮说明](../../docs/PIANO_SHORT_HOLD.md)。

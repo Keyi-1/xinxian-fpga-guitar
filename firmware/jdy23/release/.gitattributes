@@ -1,0 +1,3 @@
+# Preserve the original certificate bytes, including its Windows line endings.
+verification.json -text whitespace=cr-at-eol
+jdy23_20261027.zip -text

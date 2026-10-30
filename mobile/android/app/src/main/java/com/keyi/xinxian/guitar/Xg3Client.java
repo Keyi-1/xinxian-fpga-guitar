@@ -9,6 +9,10 @@ import java.util.concurrent.TimeUnit;
 /** Stop-and-wait XG3 client. All public request methods must run off the UI thread. */
 public final class Xg3Client {
     public interface Progress { void onProgress(int completed, int total); }
+    public interface CommitJournal {
+        void beforeCommit(int slot, Xg3Protocol.Song song) throws Exception;
+        void confirmed() throws Exception;
+    }
 
     private static final Map<Integer, String> ERRORS = new HashMap<>();
     static {
@@ -22,6 +26,7 @@ public final class Xg3Client {
     }
 
     private final BleUartClient transport;
+    private final int connectionGeneration;
     private final int session = new SecureRandom().nextInt(0xffff) + 1;
     private final Object requestLock = new Object();
     private byte[] rxBuffer = new byte[0];
@@ -29,7 +34,10 @@ public final class Xg3Client {
     private int pendingOpcode = -1, pendingSequence = -1;
     private byte[] pendingReply;
 
-    public Xg3Client(BleUartClient transport) { this.transport = transport; }
+    public Xg3Client(BleUartClient transport) {
+        this.transport = transport;
+        this.connectionGeneration = transport.connectionGeneration();
+    }
 
     public void accept(byte[] bytes) {
         synchronized (this) {
@@ -84,7 +92,7 @@ public final class Xg3Client {
     }
 
     public Xg3Protocol.SlotDescriptor upload(int slot, int timbre, Xg3Protocol.Song song,
-                                              Progress progress) throws Exception {
+                                              Progress progress, CommitJournal journal) throws Exception {
         request(Xg3Protocol.BEGIN, Xg3Protocol.beginPayload(slot, timbre, song));
         try {
             for (int i = 0; i < song.events.size(); i++) {
@@ -95,29 +103,45 @@ public final class Xg3Client {
             try { request(Xg3Protocol.ABORT, new byte[0]); } catch (Exception ignored) {}
             throw dataError;
         }
+        // Durable record must succeed before the first possible COMMIT write.
+        journal.beforeCommit(slot, song);
         try {
             request(Xg3Protocol.COMMIT, new byte[0]);
-        } catch (RequestTimeout timeout) {
-            throw new CommitUnknown("COMMIT 的确认包多次丢失，提交结果未知；请重新连接并查询槽位，不能假定已经回滚。", timeout);
+        } catch (Exception error) {
+            throw new CommitUnknown("COMMIT 未获得明确成功确认，提交结果待核对；请先核对板上曲目，不要直接重传。", error);
         }
-        return listSlot(slot);
+        try { journal.confirmed(); }
+        catch (Exception error) { throw new CommitConfirmed("FPGA 已确认提交，但本机待核对标记未能清除。", error); }
+        try {
+            Xg3Protocol.SlotDescriptor result = listSlot(slot);
+            if (result.slot != slot || !result.playable || result.eventCount != song.events.size()
+                    || result.durationSamples != song.durationSamples || result.timbre != timbre)
+                throw new IllegalStateException("提交后目录与本次曲谱不一致，设备可能已复位");
+            return result;
+        } catch (Exception error) { throw new CommitConfirmed("FPGA 已确认提交，但目录刷新未能核对，请读取槽位并试听。", error); }
     }
 
     private byte[] request(int opcode, byte[] payload) throws Exception {
         synchronized (requestLock) {
             byte[] wire = Xg3Protocol.frame(opcode, session, sequence, payload);
             for (int attempt = 0; attempt < 4; attempt++) {
+                if (!transport.isReady() || transport.connectionGeneration() != connectionGeneration)
+                    throw new IllegalStateException("本次 XG3 会话所属蓝牙连接已结束，请重新握手");
                 synchronized (this) {
                     pendingOpcode = opcode;
                     pendingSequence = sequence;
                     pendingReply = null;
                 }
-                transport.write(wire).get(3, TimeUnit.SECONDS);
+                try { transport.write(wire).get(3, TimeUnit.SECONDS); }
+                catch (Exception error) {
+                    synchronized (this) { pendingOpcode = pendingSequence = -1; pendingReply = null; }
+                    throw error;
+                }
                 byte[] reply;
                 synchronized (this) {
-                    long deadline = System.currentTimeMillis() + 1800;
+                    long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(1800);
                     while (pendingReply == null) {
-                        long remaining = deadline - System.currentTimeMillis();
+                        long remaining = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime());
                         if (remaining <= 0) break;
                         wait(remaining);
                     }
@@ -160,6 +184,10 @@ public final class Xg3Client {
     public static final class CommitUnknown extends Exception {
         private static final long serialVersionUID = 1L;
         CommitUnknown(String message, Throwable cause) { super(message, cause); }
+    }
+    public static final class CommitConfirmed extends Exception {
+        private static final long serialVersionUID = 1L;
+        CommitConfirmed(String message, Throwable cause) { super(message, cause); }
     }
     public static final class DeviceRejected extends Exception {
         private static final long serialVersionUID = 1L;

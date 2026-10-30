@@ -1,3 +1,14 @@
+# JDY-23 蓝牙替换已交付（2026-10-27，优先于下文BL616探索）
+
+- 2026-10-30 用户明确授权提交并推送本节 JDY-23 版本至 `origin/master`，覆盖本节旧“不推送”约定；本次仅核对已有证据哈希、提交源码/说明/现有发布包，不重跑构建/仿真、不烧录或开 COM。GitHub 可下载包保存于 `firmware/jdy23/release/`，根 README 标明最新版本。尚未完成的 BL616 诊断文件保留在本地，不混入本次提交。
+
+- 用户明确放弃板载BL616蓝牙，采用带排针的3V3 JDY-23；确认J8-9/10实物空闲。原工程上传串口改为9600/8N1（50MHz/5208），TX=AB21/J8-9/PMOD1_IO2、RX=AB22/J8-10/PMOD1_IO3。J8-1/2为3V3，3/4为GND，可用公共地分线。其余176份运行时/曲库/音频/触控/姿态源文件与尾音锁定发布保持；两个保护文件字节/index保持。
+- Android新增FFE0/FFE1、20+12字节/35ms停等传输、旧连接回调隔离、连接/写入超时、稳定失败Future、连接代次绑定；COMMIT前持久标记，失败未知阻止重传，确认提交和目录刷新失败分开报告。签名APK包名com.keyi.xinxian.guitar.jdy23，可与旧App并存，未安装/实测。
+- 已完成，不重复：build/jdy23/v1/sim_9600_02（实际9600 UART与XG3/BSRAM/CRC/跨时钟提交，含重复DATA/COMMIT）；android_test（实际Java类+系统模型）；config_verification.json（只提取配置函数执行，没有开真实COM）；uart_rx_gate（当前实际VG接收，所有输入连接、未强制内部RX，13个刻意不用输出引起的14条模型警告逐条核对，不重跑已成功仿真）。sim_9600首轮仅缺测试头文件，日志保留。
+- 原gprj/impl综合PID1404及P&R PID25148均已结束exit0，不重启；原工程FS SHA256=78056f8c3bdde32bbbc12e1c7cc234e76beaa002562fb134fc6807a3c3452604，系统/音频Fmax50.033/17.840MHz，实际50/12.288不变，setup/hold/latch/未布通0。原有两条PR1014保持，时序检查已使用本次实际布线报告。不要为了余量重复布线。
+- 交付build/releases/touch_game/jdy23_20261027.zip，内有唯一新FS、JDY23 APK、接线/供电/共地/配置/下载README、只在用户电脑运行的configure_jdy23.ps1、原212事件情歌BIN和可选原始clock_restore V2 BIN。后者保持用户验证文件哈希79ac33d1...，用于退出旧自动BLE诊断并保留MS5351时钟，不是JDY固件。JDY无需BL616蓝牙BIN。
+- 入口tools/check_jdy23_result.py，证据build/jdy23/v1及build/p5_bluetooth/jdy23/v1/android。新测试/构建/打包已通过，等待用户实物广播、握手、传谱、试听反馈；不自动烧录/开COM/推送或继续BL616故障探索。用户要求无错误等待综合布线时不要连续发进度消息，节省token。
+
 # Windows UART 桌面上传软件（2026-10-19）
 
 ## 最新恢复点：演奏尾音锁定（2026-10-25，优先于下文旧构建进度）
