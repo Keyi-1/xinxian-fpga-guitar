@@ -2,7 +2,7 @@
 // Solve the reference sine for each row, evaluate actual voice DDS at those
 // times, connect successive crossings, and add a faint older-phase ghost.
 // Two scanline buffers replace a framebuffer. Arithmetic is shared by voices.
-module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
+module guitar_radial_curve_renderer #(parameter integer ROTATE_180=0)(input wire clk,rst_n,frame_start,
     input wire [399:0] snapshot,input wire [3:0] curve_active,input wire [8:0] pixel_x,pixel_y,
     input wire pixel_active,output reg initialized,output wire [11:0] mask,
     output reg [43:0] display_hz,output reg [15:0] display_fret,display_level,
@@ -51,7 +51,11 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
     wire signed [17:0] scaled=(extended_sine<<<7)+(extended_sine<<<4)+(extended_sine<<<2)+extended_sine;
     reg signed [15:0] point,left_edge,right_edge;
     reg signed [15:0] first_point,last_point;
-    wire line_condition=!pixel_active && pixel_x==469 && (pixel_y==511 || pixel_y<272);
+    // The scanline starts in the physical left porch in either orientation.
+    // Pre-render the next physical row in the corresponding logical order.
+    wire line_condition=!pixel_active &&
+        (ROTATE_180 ? pixel_x==10 && pixel_y<=272 :
+                      pixel_x==469 && (pixel_y==511 || pixel_y<272));
     reg previous_line_condition;
     reg [8:0] last_line_y;
     // pixel_x wraps again at h=512 in vertical blanking; tag the row so
@@ -118,7 +122,8 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
                 WAIT: if(frame_start)begin settle_count<=0;state<=SETTLE;end
                       else if(line_start)begin
                           if(ready)begin front_bank<=~front_bank;ready<=0;end
-                          row_y<=pixel_y+1'b1;clear_addr<=0;state<=CLEAR;
+                          row_y<=ROTATE_180 ? pixel_y-1'b1 : pixel_y+1'b1;
+                          clear_addr<=0;state<=CLEAR;
                       end
                 SETTLE: if(settle_count==31)begin
                     visual_update<=1;history<=pending;pending<=snapshot;previous_valid<=0;
@@ -191,3 +196,4 @@ module guitar_radial_curve_renderer(input wire clk,rst_n,frame_start,
         end
     end
 endmodule
+

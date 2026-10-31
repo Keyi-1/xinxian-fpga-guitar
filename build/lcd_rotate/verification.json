@@ -1,0 +1,890 @@
+{
+  "status": "PASS",
+  "baseline_commit": "d5d85997ceee2db2b3120eedafb643955524e712",
+  "project": "gowin/neo_guitar_touch_game/neo_guitar_touch_game.gprj",
+  "build_directory": "E:/嵌入式/xinxian-fpga-guitar-lcd-rotate",
+  "build_mode": "Gowin gw_sh, open_project then run all; existing project and process configuration",
+  "tool": "Gowin V1.9.12.03 (64-bit)",
+  "device": "GW5AT-LV60PG484AC1/I0, Device B",
+  "completed_local": "2026-10-31T23:05:09+08:00",
+  "setup_violations": 0,
+  "hold_violations": 0,
+  "unrouted_nets": 0,
+  "latches": 0,
+  "fmax_mhz": {
+    "sys_clk_50m": 50.078,
+    "audio_clk_12m288": 18.291
+  },
+  "operating_mhz": {
+    "sys_clk_50m": 50,
+    "audio_clk_12m288": 12.288
+  },
+  "resources": {
+    "logic": 51037,
+    "register": 20987,
+    "cls": 28588,
+    "bsram": 113,
+    "dsp": 115.5
+  },
+  "warnings": [
+    "Two existing PR1014 generic clock-routing warnings; final STA includes actual routing."
+  ],
+  "artifacts": {
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs": {
+      "bytes": 20777659,
+      "sha256": "32bc37c33ccea5395239684743c6d394bb13bde2aa59d9c5d7b4d365afc9367d"
+    },
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.bin": {
+      "bytes": 2589655,
+      "sha256": "e961dc096555e9c8a99f5b883b75b44a3746bbc17d3ac5e7afa862534aa396f7"
+    },
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.log": {
+      "bytes": 2003,
+      "sha256": "aef981983058983f4ee1767ec92cfb4c54f00d35cec459e09808cc7efabf4ab2"
+    },
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.rpt.txt": {
+      "bytes": 114225,
+      "sha256": "8d24fddc9729bcc38e8252f0bcd37e93951489a044fd3e79a5e4c2b331689593"
+    },
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game_tr_content.html": {
+      "bytes": 528259,
+      "sha256": "116fa17cddc64945b55dfb504bebde8f3ecf36f8ad9e01d0819548df1eba7ef2"
+    },
+    "gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.vg": {
+      "bytes": 17062147,
+      "sha256": "8e7af213c537f9476be3c587baa5824ed3425cb4932933f7568f5ccba91d5c90"
+    },
+    "gowin/neo_guitar_touch_game/impl/gwsynthesis/neo_guitar_touch_game.log": {
+      "bytes": 57186,
+      "sha256": "933ce9eb35bcc9c81bd1e431c09fdecc560b5096438664915919af013b9cb0c5"
+    },
+    "gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json": {
+      "bytes": 3170,
+      "sha256": "a0240ea8cdd1528141e2ff517eb7cb350aea7b1941b551a5ac8765f4331fd542"
+    }
+  },
+  "input_audit": {
+    "inputs": [
+      {
+        "path": "constraints/neo_guitar_touch_game.cst",
+        "sha256": "59acfb28da1f701daa2d1797f5d23ec89d22e7a5de924059ceaedc0b8a755f19",
+        "baseline_blob": "207191b2dbaa2b733f395a6871f4a37df3b4664a",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "constraints/neo_guitar_touch_game.sdc",
+        "sha256": "f2f4b412ecd680f61c0a2cedaba75c662b859953d7ce98282ace18d1095afe01",
+        "baseline_blob": "9064137fcc9d635175c7398be2b6f03355d9d9fe",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "gowin/neo_guitar_touch_game/impl/neo_guitar_touch_game_process_config.json",
+        "sha256": "a0240ea8cdd1528141e2ff517eb7cb350aea7b1941b551a5ac8765f4331fd542",
+        "baseline_blob": "a76b3eff37d04dd75cbd49fdfc3b84401ae11759",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "gowin/neo_guitar_touch_game/neo_guitar_touch_game.gprj",
+        "sha256": "68a8faf5b23a16fdf58ed2884e3916448ad8bf96e24b54d8b605fb2915dd3d06",
+        "baseline_blob": "7a86844878d011c7d5a10cd4a71031a6216663a3",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/fft1024_cos_q15.mem",
+        "sha256": "f35d90fd21da1907059f1a9c65aec31d57cb9ce87a4d9765cbc20054e78b5e1d",
+        "baseline_blob": "3d9ba741a34298182e2489ca1446df706e7c3b39",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/fft1024_sin_q15.mem",
+        "sha256": "9debc448b66b0acd3069b16e8920b447c04bf961d3247d5b03241081bcf071e3",
+        "baseline_blob": "29594fa7f4f526412f64dd3030056f2472def01c",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/game_font_16.mem",
+        "sha256": "528738fbe6312528a5a51da2bc464a42a71d2ba116f3d9cf76f86cf49f081d91",
+        "baseline_blob": "9d3f41a540cd4aeee58768c6604f34f675a690d3",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/game_message_index.mem",
+        "sha256": "f2f697349954fa188474c2ed9d35012930f42b4a61bbb1cf08c8bfefd09f82ab",
+        "baseline_blob": "8f2e1a71b2c2439f14752a60d4e9b08b7bce871d",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/game_p2_static.mem",
+        "sha256": "ed10b483ec8f42e9652228bc8798514af77b2a96103d2d1f64d5e708fdb3c298",
+        "baseline_blob": "b19e3da91da153de313c23dad2da1b5c93dfe53e",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/game_p3_initial.mem",
+        "sha256": "2b20032774615f0be7963b3110aa922c26c73f36a8cf5462a32fe2e956ae9870",
+        "baseline_blob": "1c939a6a2160e3869d4f7a4390e2ef035289adb5",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/hann1024_q15.mem",
+        "sha256": "1b1455a5ebe761b0ca7216cfe55b7746be26fad90019a312ea5fd95ef1ea5a88",
+        "baseline_blob": "9a773f25a58e771edae1e16cfad722a03ee6db71",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/harmonic_decay_default.mem",
+        "sha256": "171fc4809033c315addbadd70bfa9f87f267608492c61336ac93e8beb705675a",
+        "baseline_blob": "e4f77a5a8d39965f005d0abf8818891cb151c2e3",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/harmonic_decay_rock.mem",
+        "sha256": "92db1595af86148c6bbd7ca10d10bc3e3cd17910bdd2690096a2fbd0d17e25d3",
+        "baseline_blob": "2d1db845e4587f701562be44a87ae79e8f79513e",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/harmonic_gain_default.mem",
+        "sha256": "ecf8ac14c58ed386cf8da72499a021440f929ccc0a072f93fefd437955a36cf6",
+        "baseline_blob": "1491a8bff701d5ed9c1ba77d0414844829126f9a",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/harmonic_gain_rock.mem",
+        "sha256": "520caacf4aef073d2606705ac147a76c1638d3cf2aebac75e0c32dd6ba8f5e3c",
+        "baseline_blob": "b2da6dfca630f06884b62f15e5c3839527178523",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/jasmine_game.mem",
+        "sha256": "51da144e0aebbf1dcd33f0f0ba7b3f9af11dee83a07720500f194b7b8d07a996",
+        "baseline_blob": "8236d0e9de5f4e30918bd22ae5236d87e39ececb",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/note_phase_inc.mem",
+        "sha256": "89b4668bdd38b0ad2bd567bb5623772e37a7ecfbcbf64f43fbb2bcd19bf8deea",
+        "baseline_blob": "4d7acdec413aba7b893195e020bb178dc449dfa4",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/piano_bright_gain.mem",
+        "sha256": "9ff72f63482b74a55b05e2244502bdcc1daf146a2d5e740644fa6317b54dc26b",
+        "baseline_blob": "b5f779768265b992f5032ac27da425d712d7e52b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/piano_envelope.mem",
+        "sha256": "1093e27efd248fbb2e99339313f3286d6d9e09e7e19dbf6e6901ee4c7ecb37c4",
+        "baseline_blob": "19b088838c2b18c96a73f177505f319843d1d615",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/piano_phase.mem",
+        "sha256": "0afed4f5d40367b9858453882ea130cd2512611de02c4f844045473c42431381",
+        "baseline_blob": "5136ddadc4cd6559edfc7e66fb474efa1ced74a6",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/piano_ratio.mem",
+        "sha256": "54ce52d4928eb1f441baa430474e20bb8188187b8d40242bcfaf0ac94fad973d",
+        "baseline_blob": "3904b390dcf698e350608d2fda7a7f5de62724d7",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/rock_envelope.mem",
+        "sha256": "63a06ed4a7f8766ad121300184130a0c851d34362f24b4ec29da1a34d8efe2b4",
+        "baseline_blob": "1ac8272bdc71759ac3405e80b0561ffb8c1f747d",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "mem/sine_lut.mem",
+        "sha256": "724e6c238199637bd9e8e1b07704a1583c351355fa3784f39df92c4118dcc528",
+        "baseline_blob": "72cfe6ca38f1221c10108e06202890585487ecda",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/four_string_board_audio_chain.v",
+        "sha256": "b91429c7ff1397b57ea0995e43484b6301908e451952879d87328eb3c045c8c5",
+        "baseline_blob": "5a88b3b5d61295cf434e2f9495c7fe8c795b56c8",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/four_voice_antibeat_allocator.v",
+        "sha256": "d9e66ce7cefd0b984fa9dc52806e4635469b588b4c337ae2b8059a0e1f6c4349",
+        "baseline_blob": "a354d4755ec241dcb3110e290493d442a27d577b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/four_voice_audio_core.v",
+        "sha256": "a2ff1b7f3978f08c346e2a3353143995c67a76b2a4312d77adcebe026235abbe",
+        "baseline_blob": "8fbb1b1367292ddb8120e84112103bc8c8f366f2",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/four_voice_harmonic_audio_core.v",
+        "sha256": "a1fcbfabf6b7005ecab579d9b489a99b92896e96d1c6ea9b442970783ba7bb03",
+        "baseline_blob": "77042b0afb37b9b98afe985d8c85a5f70429f856",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/four_voice_piano_audio_core.v",
+        "sha256": "23b355a81f77f03a17740fe4349846b0beb22b82a8b22f0ed870839a7256f05a",
+        "baseline_blob": "24876a450b0c4aad4db70e1918f09daef4c58485",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/i2s_tx.v",
+        "sha256": "d06e4a92205adebe109424bbbbe115017114a08fac2ce63f85ad09b554c2cc3e",
+        "baseline_blob": "93170808100a129141e60484d888bf377ce943ae",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/pcm24_chorus.v",
+        "sha256": "b46dbd5c7c2624c826bd412c19aa920f3cb8ecbf115ff69682b765de0b65a56f",
+        "baseline_blob": "2ab91f66df7346693a88ca5e95d437d59f260b37",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/pcm24_mixer.v",
+        "sha256": "4959d80cd67499d77bb143da4decf2cb7618995659e3d2cdc5f7e7527b913fe1",
+        "baseline_blob": "0c26b404c43519db42aaa829ef3d547084dedeb2",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/pcm24_reverb.v",
+        "sha256": "a0834a9f31c9af6909e462c278ad4bdd7e21a9fe8d0f89f41a6607d79a43456d",
+        "baseline_blob": "ec3398efe8426284dae582508deab9a0dfebc369",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/pcm24_rock_soft_clip.v",
+        "sha256": "169ac79fbceb444602ddd414897c75d64225b875f5fa03ada334f288a1801ad5",
+        "baseline_blob": "4f7308f7545777869910a9c37a33f2f1e421f85f",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/pcm24_to_16.v",
+        "sha256": "64eeb4cfd9760d9ff140d0a428d44e5ae222d727f7e01f50ac1ef35e4c2f8377",
+        "baseline_blob": "0324e05cd9fef4002d554cb59073d2a99369c47e",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/piano_stereo_chorus.v",
+        "sha256": "13d86d74d68b3b9dcb475a0e19b431001bac12db7ff4770c91cd1a67f958e42c",
+        "baseline_blob": "859d51dae91322978723d68f872fd9b790ff0fb0",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/piano_stereo_effects.v",
+        "sha256": "1d1eef7b2b994d820eb8f9c466109a8d693182a690f9e416243dc0b20e9b8c3f",
+        "baseline_blob": "7731a4e6180cf3dc0e7c54a7d7beb5f9576e551c",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/piano_stereo_room.v",
+        "sha256": "ab38c07a1caab2183ac42842e692a446223dd2d0ef02f28dff158822695a2c39",
+        "baseline_blob": "45535cf55d6d4d312050aff4cc2bdd7ea855513d",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/pt8211_tx.v",
+        "sha256": "a8cd577d89275a07800b6473a6c7453c6dfa7e44a8f99dd966cd40539f348039",
+        "baseline_blob": "af76aa7d7b8fc602513711235d8951f2fbb79092",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/sample_tick_gen.v",
+        "sha256": "0e75d7f0f60e056f820afdd0e87d90d2bd84a0d19eff166817b178cae292a740",
+        "baseline_blob": "cbb6852930cfd3436d6494128145620adcee02d7",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/stereo_audio_effects.v",
+        "sha256": "36863c0d5b52371a791a48bd778117111f906e25a297d62bbe31c53f66c7c1ab",
+        "baseline_blob": "b26f351a74255c53df999fc27b31cc23e5185482",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/audio_io/voice_audio_core.v",
+        "sha256": "74f874b5245f23eec97a2e7a3087670429df5a6d8afe0a8ecff5e5b6c250451d",
+        "baseline_blob": "21409effd7a79b07ec99acc3b85fc81f962d8579",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_p2_bsram_init.vh",
+        "sha256": "b8903aa7dcb138ae0398320e2b1c70ff88b885904ec8e8e048534a885a9c367d",
+        "baseline_blob": "9186bba9b81c8302e497278c5f5185a339191ed5",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_p2_catalog.vh",
+        "sha256": "4dc737aebd21d610b9d5cfa8cc475a55cc521d5d85521fc57d6ed8a960ba78f1",
+        "baseline_blob": "03b3debf8aceeda223378330bba4ff5e2a899156",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_p2_phase.vh",
+        "sha256": "8aa8b01de3b8d51632522f237ba850102c57cf4f1221a0d78e107c07b4bdd2be",
+        "baseline_blob": "2e02e98b57b3a13787b40f3ca20bc2ff4f969316",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_p2_progress.vh",
+        "sha256": "b01f4209b4bdee181aa3d9d9b7057444451e1f9192a5878e907748b84c0f6e2f",
+        "baseline_blob": "d3a1cd247701b590c5cffc92658f4778acc6c495",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_p3_bsram_init.vh",
+        "sha256": "d186a19f69ec38c54ddf61ff42ba92d8d9f8177e32e8fc82bc3dd3ddb4fbb539",
+        "baseline_blob": "8001796030726f1bea5109670b92e400d7a0f2c0",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_score_config.vh",
+        "sha256": "360b1c9a6449660b9e9099f5075bf1fb55b3242d3058756913777778e3b2d17f",
+        "baseline_blob": "3bd6d076296e6e88966f402ff41b9bcb8b4fee1b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/game_ui_messages.vh",
+        "sha256": "be8991c36b934412277bbda3af70eb170c0c7bd37003e50d6ec6a1c09b5e70bd",
+        "baseline_blob": "59cb64ca2215263feeeb5406fad387809cfb3ece",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/guitar_config.vh",
+        "sha256": "7ff8fe2d52f1a6cf88c753805fb14e26e118a9366bb84f6bea2980ff29ccc6fb",
+        "baseline_blob": "61cf1d043eb0f45f82ce2a8fc132304cf5e764ca",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/piano_bright_coeffs.vh",
+        "sha256": "a78c79dff5c82d3a527b119643030ef68978fda0d566375ffb0a3b56274ae279",
+        "baseline_blob": "a1fab54a5ae663a1ac9bf5197bae52ba0f91ac41",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/piano_hammer_coeffs.vh",
+        "sha256": "3653ad0db6a4ee174ebb029f40f774b1ec0c0bede985d1b0bb1156af13c59f7b",
+        "baseline_blob": "c14d9df0379ab3118e60d37d4add3fad6019d936",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/piano_rock_gain_init.vh",
+        "sha256": "e591689c1f943a75cbe45bdca53edbe3dfa7becac8e17a51839df1fcda6ffd74",
+        "baseline_blob": "2a9b79850757d054da5e8ea12900999169273f6b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/config/rock_coeffs.vh",
+        "sha256": "303e827c6b0b19094ca6219a3b12793e54c8750e147330bd5583b2396cfa9ae5",
+        "baseline_blob": "260337235cb44fa191c5f0235a4d31b70db4b7e0",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/debounced_toggle.v",
+        "sha256": "9195315a3061a5a64f52edc71c01cadd2afce4e7ebc4a7cedcbb77198587a98e",
+        "baseline_blob": "f050b9ba1457f76eafd0c638eaf2f8241aa8f37d",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/four_string_vibrato_serial.v",
+        "sha256": "91b51c98a891bf4f998efac83c3d7a66f72782198a77d23ce2fc36d735964056",
+        "baseline_blob": "448bae19c491e2164c2942c17cb9f67d55a252eb",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/guitar_effect_buttons.v",
+        "sha256": "8427a9cb102a280f3a56eaa3168a10c0f91811ce1bb1a49db44a79233a93448e",
+        "baseline_blob": "8e7e6e70139693a1ff96556bfc7e9f5258d580e9",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/guitar_play_control.v",
+        "sha256": "79fcf3a0d87111596ae6e9a66ef3270759e5fe03b03900310541a4069b9f0439",
+        "baseline_blob": "226628089b715e0d1e0be1715e4d1f544c47a6b4",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/note_phase_table.v",
+        "sha256": "6a2bca9dabd40b7026df5009228db3a5a56180a9b8febcb56b092a7dee5bf968",
+        "baseline_blob": "3aeafeca225f8f35eeea3b04b5a0248ab87ec614",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/performance_vibrato_gesture.v",
+        "sha256": "a717d693bc5541caecb78da5b71809de6ecaf48756d84c9f296de6fe318b6623",
+        "baseline_blob": "1d27aa32cc130905c3d2d1df7e7b15880f4e5dd8",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/phase_slide_smoother.v",
+        "sha256": "950ec47e515d2a195964ed1a4923ca30ff2aaab9ebe1786a000012e7bb88417f",
+        "baseline_blob": "26d64de2e8b704e972e35a8b1557afa5f73e2585",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/posture_timbre_policy.v",
+        "sha256": "206e072012228f8752c6f96ff6aad4f6387774f943183e1eab281ca80694d88e",
+        "baseline_blob": "66a8af2890780422ba6faf9e32a7922a9dc4f0e2",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/posture_touch_controls.v",
+        "sha256": "33a1f47d795225dd2122ce2fc02b272807f5aec297be23f429b004bb5a70b4d0",
+        "baseline_blob": "36137a9515bf3e302c59be4702c30392dde30357",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/reset_sync.v",
+        "sha256": "7a458f3bcb884c7053e8cf859ec65252b984ac496e8a2e7cbb1efe11bf97e2f3",
+        "baseline_blob": "5d2b913c7604b22efcbb9d0c8d1e49658026e683",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/timbre_blend_smoother.v",
+        "sha256": "7b1d81bead5429b9dafed176496d30a342ecd55bbdaa73a05861b71b800f8ae8",
+        "baseline_blob": "1f1a0a36d921f7628284c1dedec68e82a2d2227b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/control/voice_envelope.v",
+        "sha256": "72068caa53b75ec6405b7493022acfd6675f89ec43442b8d4a2a044445e5fa3a",
+        "baseline_blob": "54d8c9e6720fcdb23252df94c99cb403da0e6d4f",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/gowin_dpb_ram.v",
+        "sha256": "c800b381a8ea97118f24ecf007b9211b42843067087490aacc4469e0106af608",
+        "baseline_blob": "5bf9474f2c008ae43c58f333100b7d5b59d3efd3",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_curve_envelope.v",
+        "sha256": "b5396de522f2ab488bf01abfa4902d3114cb71e129a5d3cd829ef4f4da05e795",
+        "baseline_blob": "46aca5a41c84857a28ff3ccd3b8eaf245a1d465e",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_hz_bcd.v",
+        "sha256": "c0373f0d939b75b17dddf7e8ff1d615545bb3650417bba878aeb432ad9c83ec7",
+        "baseline_blob": "b8515a149d5ad9b24de5cc4d6a9d555903f9bca2",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_lissajous_arcsine.v",
+        "sha256": "520d331114d4c188dec2464019e90b76d8deb6f365486177a99768e6627025ef",
+        "baseline_blob": "274d876cceee0311b5a890eb077fad7c4b793328",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_lissajous_display.v",
+        "sha256": "742a4a7e2d43935c2d9d9ad0b461baaf736036cf8a6148094d2a13ab6d5ef799",
+        "baseline_blob": "bc0405527a04ce1cc1351f4703ba7a89632600f9",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_lissajous_palette.v",
+        "sha256": "29a3fc4a3f6c4aaa58f973a981446a37d34bb7d98d27a9e0b01984b726a4c3c3",
+        "baseline_blob": "eeb23ac65fe9895092954d94fac3dd1d942bf83a",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_lissajous_renderer.v",
+        "sha256": "4b53a69a83842702072f9cc9fa33f14345d9d2ad069d2f3564b6fb65aea8b7be",
+        "baseline_blob": "ddbc6a8a36c2fdfe6245815fc1af1081a3841089",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_lissajous_sine.v",
+        "sha256": "c66351de6724930945da73ab23acb634ffbe62b1d7d5962af604597d071eacb3",
+        "baseline_blob": "992da35a8e9f10438235298a1bbcaf5758a0596f",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_pcm_cdc.v",
+        "sha256": "db2799b14e784e520f8e83c2685f13cdab40ebb9821f95847c8194f1060bc809",
+        "baseline_blob": "3fee51cba11f711df640caafde0d64b37ed9e8b1",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_radial_arcsine.v",
+        "sha256": "0b5722236e832ea4aa4e0ee36fccbe5c0433b446afa3bf6779073938672a0383",
+        "baseline_blob": "2b41d240b02e045a9bdfb46ecd94b733aa415d66",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_radial_bands.v",
+        "sha256": "05b839ca7aa80e381ec6de1ce04331f16cb79f5f60f3f033d993878c713869bf",
+        "baseline_blob": "0ae21762e88c6768498375375287c691dafcb5f3",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_radial_curve_renderer.v",
+        "sha256": "feaec7f609152cce90cec0616f3f15ecbffdb371bf8b99f2c37424a05f9f0fb1",
+        "baseline_blob": "4b5d96642b39ca7fc9d686ee567a41f60f7aff9b",
+        "baseline_match": "modified"
+      },
+      {
+        "path": "rtl/display/guitar_radial_display.v",
+        "sha256": "13b18f420642b78224d53b296131b22cb150ffe1b8dc1aae7ce7ed09b4824d82",
+        "baseline_blob": "fde06f5eeb3246d0188ab95661d61db2b93a9845",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_radial_fft.v",
+        "sha256": "cc8cb3cf1cf848f69fdbbe9c4abafd3caaaf2502f1d57d9293311e0841ba9a32",
+        "baseline_blob": "643d0926a181af18c0c987fc9ef81c5994ab2f0c",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_radial_palette.v",
+        "sha256": "3ee25e982d5b07f0ee097b5331df02c47c42bfd6b41372021060d131ee19e134",
+        "baseline_blob": "a3506797436102a9458003efa1d63fa9f76f0912",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_radial_twiddle.v",
+        "sha256": "b9f547449da335ea973618adde55ac8708afcb4088f54c04bf945473e6a33813",
+        "baseline_blob": "14041416c84f2619b06dc83f6d9f73afe83c94be",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_scanline_ram.v",
+        "sha256": "caf0676963a789b41ab848cf6cc9a5d7e3df2619c7e811c0191c40fb1163b5d5",
+        "baseline_blob": "e660694beed5c792b8f211d252e80e706f6ed335",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_visual_cdc.v",
+        "sha256": "8dae3b1277b37906cb8ba56f06f6b47c0bb971e32e188be61d6d829f7ed65c76",
+        "baseline_blob": "0d086dd60e5be62f0a79dd9a2b83bb70fc28ff51",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/guitar_visual_telemetry.v",
+        "sha256": "55f68598fd5900d03948d511cf7c08f4efee6b1aaee32dcfefbd54c40ed64289",
+        "baseline_blob": "c71ca11e308707382f9497d4c793382e464bb881",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/display/lcd_rgb_scan_480x272.v",
+        "sha256": "81918a442de8a76d2e84b3125c39c639cdc51ac6ce3e952461edac44a35d428e",
+        "baseline_blob": "4331555c2a9cae5e01b40c6a084cff29efd52ac4",
+        "baseline_match": "modified"
+      },
+      {
+        "path": "rtl/game/audio_mode_router.v",
+        "sha256": "741c5054cb5a7b448596ea59e33597a23c6a82cf80259d68f6d0e804955403f1",
+        "baseline_blob": "35162ab6b20570149a7d16d47dd4b033af48240b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_chart_layout.v",
+        "sha256": "c4469e00efa216b9e687d69b2fd5f432aac1ef14a9c6872bd2b9bb007ba11080",
+        "baseline_blob": "84549df6d70c98d8094e39ca770aa50232e28fec",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_font_rom.v",
+        "sha256": "5baca1615bc5213b7b878e51cb34a9ed7ecdb9f190f400212887b2f178a33b76",
+        "baseline_blob": "04dee8c32373edf252ce976ae372c88c03f54e6a",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_message_rom.v",
+        "sha256": "8361d2d1cefa120045a077557ea1243ccc16dc083fbac92d43f60f9732d3a0ad",
+        "baseline_blob": "f5d7fc78fc277d8ed1138d66d96bb9a678202df6",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_miss_audio_cue.v",
+        "sha256": "6e4893e33ac667305c92fa26545c61b40dc869e5f72a19c1931d68a02dd207eb",
+        "baseline_blob": "09ca536ced3c3f531ff7d23b4ec2e94ec88f8bf4",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_note_controller.v",
+        "sha256": "a91f7a22ba1241ffc00bddc5726f12fe270ac1c911574a261502537b18f69b68",
+        "baseline_blob": "f3a1524ab04743d46e4d5ceb1f7b9c50b5f373ed",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p2_catalog.v",
+        "sha256": "56958d2efc7a2b96ec3035400e1ee8634349537a899524b3e7df0fbf5525a848",
+        "baseline_blob": "4bb5059750146801e33802b27d737b87599e69ae",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p2_chart_layout.v",
+        "sha256": "df3e6b4822bfdf89d48dca2174e186b446070252ecb89a167f690bfdafdea58b",
+        "baseline_blob": "7573ebf6f37ada0b6c1ed728aca6db53bcdf93d5",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p2_mode_router.v",
+        "sha256": "a32b835580ea3c20af139bd8d6f6230bb012aa0015662ae65c7c6b779040ccd9",
+        "baseline_blob": "c73466d407c1265ad873c7a0c66874e6cccd4898",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p2_score_bank.v",
+        "sha256": "1c913fa9ec1e055cf9f360fc2f92b620b98ca744f2619e3cdcd2cad865c50d96",
+        "baseline_blob": "60511314c1bab9c7b1c5dbeca49d97ec790fcfea",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p2_static_engine.v",
+        "sha256": "3973100b986c78c058a672333cbdc04eedaf2c0878dadf7ecafc4bcfc8ade5b3",
+        "baseline_blob": "90feff7d480669507755ad9f282420fd0c9fe96f",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p2_window_controller.v",
+        "sha256": "056dfab0487dd38025fcf9a9fb91489aa452e603de684d8f5689e3f90882faf0",
+        "baseline_blob": "f443105c1dec8356477dbb844b24a5ae156b1e89",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_catalog.v",
+        "sha256": "4698cc4f8ce635b885c0a306a15dc3092f90c7b02fe581aaea8af90b20446b7d",
+        "baseline_blob": "fefda3cd46c5cae7b194b612153cf3ab90a56597",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_catalog_cdc.v",
+        "sha256": "527bf9c76688365e7644cc8aa17b20e9b818991cb3f34b47d36a9074513a0efd",
+        "baseline_blob": "f938437dc296f42e13e33fee1de7d80e4906bb76",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_default_catalog.v",
+        "sha256": "b772bad7dedf9a05dbaeb14482becf42ebb38e5ba111c62c4f2fbbcc81bf4ce8",
+        "baseline_blob": "b1d95da2b7359c22219a8ecb1db938234aac4f87",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_import.v",
+        "sha256": "bbfd3ef5cedf0dabe9e511798d92710e0016bc9fe3f0f9786defeee728c171a6",
+        "baseline_blob": "3fe910131c245fa3f32314e2c89b382f7ceb585c",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_protocol.v",
+        "sha256": "38824cbe2f632a5da0b9353a7e249f1275706e8a5cfa77de108415c2fd42aa24",
+        "baseline_blob": "08ab68d0d512cdbfe2e7f7d2d98d0930ecea3e12",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_score_bank.v",
+        "sha256": "3047e689dde56301ec9671c9948b89662805fc19b3644981f12cbd7ebb42ff30",
+        "baseline_blob": "1a3c5b3a62cadd8de4237f3a6467a2aefbe3204b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_service.v",
+        "sha256": "083aa60733c420dc2dde39c5f6df79e9245692b51ae2194990811b33dc469d64",
+        "baseline_blob": "644d65d12a3e167131ee37bce4b177919dd89617",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_p3_uart.v",
+        "sha256": "aef334aa2ac039970728a7faa56b885c1e4d45fab25b886f03ead830ba79546d",
+        "baseline_blob": "ec0a18d83160f83b73e2045b47d21ec6e88873d2",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_score_rom.v",
+        "sha256": "4538dfbcf2ab2cf33b6ad754b1f8d64523712ada2284fe49c1aaf6a1c6389a99",
+        "baseline_blob": "ac8ab4b2977aa14b10b3d17103795b0dc14bf80c",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/game_snapshot_cdc.v",
+        "sha256": "6e38ba4fb4d5e575e268d4d08ea342c58e4011e4d8e734d481be2462ef7a8926",
+        "baseline_blob": "45dc341425e3c3c3ab7ec72160ad59bfb48ecf39",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/guitar_touch_game_audio.v",
+        "sha256": "1e2a7f398932cd328ef166be776169382b73d660acc655b098af1d6abbd672ad",
+        "baseline_blob": "281741ea7e75b473460c949a52300d20ea65c94b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/guitar_touch_game_display.v",
+        "sha256": "8fa602c90d3c05bdb552760cc6e49f2d061ec4d71d9269aad9fab6c070b63b2e",
+        "baseline_blob": "56beb51bdfd5bceb68c63d9a57ccd22fc6465add",
+        "baseline_match": "modified"
+      },
+      {
+        "path": "rtl/game/mode_command_cdc.v",
+        "sha256": "69815a1aadc48a5eeb218ecb4a50f54bc14c3ca65f932d165713167d3273cbdd",
+        "baseline_blob": "ad7fb9ae1d16b60a09efeb79072117200275f198",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/posture_timbre_cdc.v",
+        "sha256": "8169ab4e058d63ba0a659084669a061ea6203857ba1998aa255ffeda8271c39c",
+        "baseline_blob": "a51d51897c58fbb46b6031121c4abb3cfd8048be",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/touch_game_renderer.v",
+        "sha256": "73cc1d89b3c998c3b2391cd6366fd6603b99c3e0e52b2c2d9edd5bdfc7f8e3bf",
+        "baseline_blob": "bb301d8f03379ca5cbd106567560a23a21704204",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/game/touch_game_ui.v",
+        "sha256": "9f77377bcfb9df71e9a27ce57219dea11d8feb74559f71b9672bc883be286592",
+        "baseline_blob": "ba392774d49f7875f9272de64e111adc2b44efcf",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/four_string_pluck_detector.v",
+        "sha256": "61ed7f6189608ba352efdafc3c6f906cb8a5d168ea06330b62f8080be983f4de",
+        "baseline_blob": "d11e09ab97efdfdfabf4dc65fe05fb93816ab35d",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/gt911_touch.v",
+        "sha256": "9271351929f4d86a42c10aeb5604ce74aedf6dbc7e66e869cdbd475ee5ee0fa1",
+        "baseline_blob": "63308748d58b04a48f3aa5da94a50b03decec331",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/i2c_register_master.v",
+        "sha256": "adcb9d9dc17ea4cd094668827c565b0c7f7e0b95560ab82be9398ae3a3a810e2",
+        "baseline_blob": "afda6ce336d9174782cb908f8dd243f51bb661eb",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/imu_posture_classifier.v",
+        "sha256": "4214ca619790e61bbaabd08d17c6ce64a20e78d4aa387baca694a7ac72d1c49b",
+        "baseline_blob": "aa86a9e8ce7f5c8f6b470a995e7075d09940e33b",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/imu_serial_multiplier.v",
+        "sha256": "806676cf2259e8963fcb52b15ea634d16dd646def051ee5bd49212dbb55446dd",
+        "baseline_blob": "677f2cf040e1026c89bd8a567e5718f63a195c29",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/matrix_scanner.v",
+        "sha256": "6e28f69943cf99e4eaf249c8ced74db81fab61f581646bb03127fabf0017c2c6",
+        "baseline_blob": "d5f2602486163ff7cfbace8042f66b75abbbdba0",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/mcp3208_four_channel_reader.v",
+        "sha256": "aede78c4967e9a7ed8093c46305621ad5f48721de9ec5715d037c7a6c44e78b8",
+        "baseline_blob": "f6286777d1423cfab95550c81385a6f6987e845f",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/mcp3208_pluck_frontend.v",
+        "sha256": "83db238d6b4847a215b03b677ef6f0485345bce037f59f82b6c685f1c76367dc",
+        "baseline_blob": "6eed42170231cdc666897c26d599ac7321bf08c4",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/mcp3208_spi.v",
+        "sha256": "2a19108c2dc6d439858b3a2afaa8e08a615f02308697a0deb1bc9449937a482e",
+        "baseline_blob": "26ee36105a7da139ac21293cddf0442a527fd576",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/mpu6050_posture.v",
+        "sha256": "5ca319380c91ce8ca1f57b7cca60a63d259942b4fca2a92be3774697d6f44e8c",
+        "baseline_blob": "f8d3ad78c4274af7bfaa350ea33fb9cc9e43dd84",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/mpu6050_reader.v",
+        "sha256": "1c54fa38969aec59666516f283cba9fbd100af479a4bb4d13519bb91f6f7be10",
+        "baseline_blob": "a646bc9cdb00c608832cc069738ec8f4c8fc472e",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/touch_coordinate_mapper.v",
+        "sha256": "2c2e47097103a7bb777253bbbc58f04b1f725ed20ebb7a8f472f2f1c0b3ddd31",
+        "baseline_blob": "6dcb1892a4d2dc4eec032f7d0ad81b461a206c1f",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/input/touch_gesture.v",
+        "sha256": "50a22545d24001d417665e4728a4c9bf71f143412ffa19a10f94ca8804d5a07f",
+        "baseline_blob": "7c9b7f0308dbdf1cd3812d26b01df2bc27bc1dd9",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/synth/harmonic_voice_core.v",
+        "sha256": "915a48f07e1bacfbe72185af220e597d9648785c747f336772f8a731acebfc56",
+        "baseline_blob": "7b97c93b94c7cd41d1bcf79e21b5e71710f04fd6",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/synth/piano_hammer_model.v",
+        "sha256": "8e5016bec79bf63d21b0582cf3a64772dedbf2a7577047b2a8361c6050d94fc4",
+        "baseline_blob": "222889b7872ecb15613457e009f8b4036d97bd72",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/synth/piano_mode_state_ram.v",
+        "sha256": "f9b0267da48e4255069c154aca3ea1d4c389c57eb621680f7e82793b51c6bf7e",
+        "baseline_blob": "2b2c61d233e889a27228f0cd1e7db6f94475975e",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/synth/piano_rock_gain_rom.v",
+        "sha256": "5e6b073c06fed526623b8fa30091edbb82be4b43e5a5970f139e8b7344f4d793",
+        "baseline_blob": "6ad0cc4cd583524510b890c69df34a0c7acec5d8",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/synth/piano_voice_core.v",
+        "sha256": "a93f9d89c86fdbdd781bae03880b9aec18ade88ee6247a3dfe68def4eda57709",
+        "baseline_blob": "01bf650dbb290cd07a46ecd07ed688998be2f634",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/synth/sine_nco.v",
+        "sha256": "3287f72b2e45037d358931a226708c6ed7206505da0ae77d2910de60ddda11a5",
+        "baseline_blob": "12757e7a96236235d7684dd096f03f9315a575df",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/top/guitar_audio_top.v",
+        "sha256": "493a5985f1204352340faa6de3020fc2e462523a5b9e91c7588ef438a7333f10",
+        "baseline_blob": "49733c103d3dadc2cfd57a685762420a62756ffb",
+        "baseline_match": "one extra trailing LF"
+      },
+      {
+        "path": "rtl/top/neo_guitar_touch_game_top.v",
+        "sha256": "64b4f0065a80eea8f68321320cd1ee7ca707553c43e13a1614802766a44e84f8",
+        "baseline_blob": "d2c138eb5b351efb2715b967fd23c1d2fb5f7bb2",
+        "baseline_match": "one extra trailing LF"
+      }
+    ],
+    "counts": {
+      "total": 134,
+      "exact": 0,
+      "newline": 131,
+      "modified": [
+        "rtl/display/guitar_radial_curve_renderer.v",
+        "rtl/display/lcd_rgb_scan_480x272.v",
+        "rtl/game/guitar_touch_game_display.v"
+      ]
+    }
+  },
+  "functional_validation_file": "functional_validation.json",
+  "limitations": [
+    "No hardware programming or panel test performed.",
+    "Functional validation covers the scanner and reverse-row curve renderer; no new full-system gate simulation is claimed.",
+    "The API-restored build checkout has one additional trailing LF on 131 otherwise identical input files; only the three LCD files are functionally modified."
+  ]
+}

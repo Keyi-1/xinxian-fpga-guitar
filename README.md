@@ -1,6 +1,8 @@
 # 芯弦 FPGA 电子吉他
 
-> **当前最新：JDY-23 外置蓝牙模块适配版**（构建 2026-10-27，本次提交 2026-10-30）。[下载完整发布包](firmware/jdy23/release/jdy23_20261027.zip)（FPGA 位流、Android APK、接线/配置说明及示例曲谱），[使用说明](firmware/jdy23/README.md)，[版本与校验信息](firmware/jdy23/release/README.md)。原上传串口改为 J8-9/10、9600/8N1；尾音锁定、滑音、颤音和钢琴半时长保留。已有数字验证和原工程 P&R/STA 通过，实物蓝牙广播、连接与传谱尚待验收。以下旧版说明和固定发布保留。
+> **当前最新：LCD 整屏 180° 旋转版**（2026-10-31，基于下述 JDY-23 版本）。上方对应 D、下方对应 A。[下载位流与验证报告](build/releases/touch_game/lcd_rotate_20261031.zip)，[修改与使用说明](docs/LCD_ROTATION_180.md)。Gowin 综合、布局布线与时序检查通过，实物显示待烧录确认。
+
+> **2026-10-27：JDY-23 外置蓝牙模块适配版**（构建 2026-10-27，本次提交 2026-10-30）。[下载完整发布包](firmware/jdy23/release/jdy23_20261027.zip)（FPGA 位流、Android APK、接线/配置说明及示例曲谱），[使用说明](firmware/jdy23/README.md)，[版本与校验信息](firmware/jdy23/release/README.md)。原上传串口改为 J8-9/10、9600/8N1；尾音锁定、滑音、颤音和钢琴半时长保留。已有数字验证和原工程 P&R/STA 通过，实物蓝牙广播、连接与传谱尚待验收。以下旧版说明和固定发布保留。
 
 > 2026-10-25：旧短包络版本已先推送为 `3803129`。演奏尾音锁定已通过受影响 RTL/音频、当前实际音频网表和原工程完整 P&R/STA；原 `impl/pnr/neo_guitar_touch_game.fs` 为当前版本，独立发布为 [neo_guitar_touch_game_tail_lock.fs](build/releases/touch_game/neo_guitar_touch_game_tail_lock.fs)。松品后的旧尾音不再被下一次按品改音高，连续滑音、空弦重拨、三次松按颤音和钢琴半时长保留。系统／音频 Fmax 50.057／17.771 MHz，setup／hold为0；系统余量较窄。见 [尾音锁定说明](docs/TAIL_PITCH_LOCK.md)。旧固定发布保留，本轮新改动未推送、未烧录。
 
@@ -1009,3 +1011,4 @@ CLS 为 28295／29952（94.47%），BSRAM 为 113／118，DSP 为 115.5／118；
 当前进度更新：2026-10-23，`neo_guitar_touch_game` 为整机入口，已包含完整主旋律、UART 可写曲库、真实四档力度及 ID70 姿态兼容；旧／新资源与时序同时保留
 
 状态：用户已确认完整固件的重力传感器正常工作、外部 Flash 烧录与断电重启可用；串扰／声压／延迟／长期稳定性定量测试和蓝牙实物闭环仍需补充
+

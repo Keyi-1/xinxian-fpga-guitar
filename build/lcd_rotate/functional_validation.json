@@ -1,0 +1,38 @@
+{
+  "status": "FUNCTIONAL_VALIDATION_PASSED",
+  "baseline_commit": "d5d85997ceee2db2b3120eedafb643955524e712",
+  "runtime_changes": [
+    "rtl/display/lcd_rgb_scan_480x272.v",
+    "rtl/display/guitar_radial_curve_renderer.v",
+    "rtl/game/guitar_touch_game_display.v"
+  ],
+  "source_sha256": {
+    "rtl/display/lcd_rgb_scan_480x272.v": "81918a442de8a76d2e84b3125c39c639cdc51ac6ce3e952461edac44a35d428e",
+    "rtl/display/guitar_radial_curve_renderer.v": "feaec7f609152cce90cec0616f3f15ecbffdb371bf8b99f2c37424a05f9f0fb1",
+    "rtl/game/guitar_touch_game_display.v": "8fa602c90d3c05bdb552760cc6e49f2d061ec4d71d9269aad9fab6c070b63b2e",
+    "sim/tb_lcd_rotation.sv": "cc3faf3c0e5722382955621bb936b2675b945960560209c5a886034072f2e0ea",
+    "sim/tb_lcd_rotation_curves.sv": "9430c9678c9b13ac1cb0ad48b1df623811db3ce85e1875e67ce363438af1af50"
+  },
+  "scanner_simulation": {
+    "status": "PASS",
+    "vvp_exit": 0,
+    "frames": 2,
+    "active_pixels": 261120,
+    "checks": ["active coordinates equal (479-x,271-y)", "unchanged sync, DCLK, DE and frame timing", "correct rotated RGB sampling"]
+  },
+  "curve_simulation": {
+    "status": "PASS",
+    "vvp_exit": 0,
+    "frames": 8,
+    "scanlines": 2176,
+    "worst_render_clocks": 2266,
+    "line_budget_clocks": 3186,
+    "checks": ["descending logical rows", "analytic sine crossings within two pixels", "curve bounds and coverage", "inactive and fading voices", "duplicate porch triggers ignored", "no deadline miss"]
+  },
+  "simulator_note": "Icarus 12.0 devel driver exited with -1073741819 after generating the VVP program. Both generated VVP programs ran successfully with vvp exit 0. Gowin performs the production synthesis separately.",
+  "hardware_tested": false,
+  "attempts_before_current": [
+    "combinational coordinate transform: routed, but setup timing failed (47.791 MHz system Fmax, 74 setup endpoints); not released",
+    "separate registered reverse coordinates: P&R failed with 93 unrouted nets; not released"
+  ]
+}

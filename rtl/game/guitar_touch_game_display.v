@@ -40,13 +40,16 @@ module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,US
         .bin_valid(bin_valid),.bin_index(bin_index),.bin_magnitude(bin_magnitude),.frame_done(fft_done),.busy(fft_busy));
     guitar_radial_bands u_bands(.clk(clk),.rst_n(rst_n),.bin_valid(bin_valid),.bin_index(bin_index),
         .bin_magnitude(bin_magnitude),.frame_done(fft_done),.targets(targets),.update(bands_update));
-    lcd_rgb_scan_480x272 u_scan(.clk(clk),.rst_n(rst_n && initialized),
-        .pixel_rgb(display_page==1 && !(IMU_ENABLE && y>=256 && x>=384) && (touch_ready || y<252 || x<320) ? radial_rgb : ui_rgb),
-        .pixel_x(x),.pixel_y(y),.pixel_active(active),.frame_start(frame_start),
+    lcd_rgb_scan_480x272 #(.ROTATE_180(1)) u_scan(.clk(clk),.rst_n(rst_n && initialized),
+        .pixel_rgb(display_page==1 && !(IMU_ENABLE && y>=256 && x>=384) &&
+            (touch_ready || y<252 || x<320) ? radial_rgb : ui_rgb),
+        .pixel_x(x),.pixel_y(y),
+        .pixel_active(active),.frame_start(frame_start),
         .lcd_pclk(lcd_pclk),.lcd_hsync(lcd_hsync),.lcd_vsync(lcd_vsync),.lcd_de(lcd_de),
         .lcd_r(lcd_r),.lcd_g(lcd_g),.lcd_b(lcd_b));
-    guitar_radial_curve_renderer u_renderer(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),
-        .snapshot(snapshot),.curve_active(curve_active),.pixel_x(x),.pixel_y(y),.pixel_active(active),.initialized(initialized),
+    guitar_radial_curve_renderer #(.ROTATE_180(1)) u_renderer(.clk(clk),.rst_n(rst_n),.frame_start(frame_start),
+        .snapshot(snapshot),.curve_active(curve_active),.pixel_x(x),.pixel_y(y),
+        .pixel_active(active),.initialized(initialized),
         .mask(mask),.display_hz(hz),.display_fret(fret),.display_level(level),
         .display_active(display_active),.display_flash(display_flash),.deadline_miss(renderer_deadline_miss),
         .display_strikes(strikes),.visual_update(visual_update));
@@ -75,3 +78,4 @@ module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,US
         .valid_blocks(valid_blocks),.game_snapshot(chart_snapshot),.rgb(ui_rgb),.display_page(display_page));
     assign lcd_backlight=rst_n && initialized;
 endmodule
+
