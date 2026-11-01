@@ -1,0 +1,19 @@
+{
+  "sha": "42f9c1fb73ba1e2260f889d4ba14fbfab07fc318",
+  "url": "https://github.com/Keyi-1/xinxian-fpga-guitar/commit/42f9c1fb73ba1e2260f889d4ba14fbfab07fc318",
+  "message": "fix(lcd): rotate complete display by 180 degrees\n\nReverse the logical pixel coordinates and scanline rendering order so D is\nat the top and A at the bottom. Enable rotation only in the main touch-game\ndisplay; preserve LCD timing, audio, touch input and project constraints.\n\nGowin V1.9.12.03 synthesis and full P&R/STA passed on GW5AT-60 Device B:\nsystem/audio Fmax 50.078/18.291 MHz, setup/hold/unrouted/latch counts zero.\nInclude two focused LCD simulations, build receipts and the verified FS\nrelease package. Hardware panel validation remains pending.",
+  "blob_sha1": {
+  "rtl/display/guitar_radial_curve_renderer.v": "c70dd2567eed05867ea3c8bede0d59cc4434e49b",
+  "rtl/display/lcd_rgb_scan_480x272.v": "66c9cee23cb475371183dbcebcaee10c66085674",
+  "rtl/game/guitar_touch_game_display.v": "c0d55a6826afd4e4b7ab62db0cdefb56b550f4f8",
+  "sim/tb_lcd_rotation.sv": "daa73f70f59473c3b432bf2c60e98eeb5e6c8cd0",
+  "sim/tb_lcd_rotation_curves.sv": "761b06ca5ccbdc28a7fab30e821e1474959b904c"
+},
+  "paths": [
+    "rtl/display/guitar_radial_curve_renderer.v",
+    "rtl/display/lcd_rgb_scan_480x272.v",
+    "rtl/game/guitar_touch_game_display.v",
+    "sim/tb_lcd_rotation.sv",
+    "sim/tb_lcd_rotation_curves.sv"
+  ]
+}

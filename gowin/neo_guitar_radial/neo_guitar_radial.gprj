@@ -25,6 +25,9 @@
         <File path="../../rtl/control/timbre_blend_smoother.v" type="file.verilog" enable="1" />
         <File path="../../rtl/synth/sine_nco.v" type="file.verilog" enable="1" />
         <File path="../../rtl/synth/harmonic_voice_core.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/synth/ks_compute_pll.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/synth/ks_tdm_bank.v" type="file.verilog" enable="1" />
+        <File path="../../rtl/synth/karplus_strong_voice.v" type="file.verilog" enable="1" />
         <File path="../../rtl/synth/piano_voice_core.v" type="file.verilog" enable="1" />
         <File path="../../rtl/audio_io/four_voice_piano_audio_core.v" type="file.verilog" enable="1" />
         <File path="../../rtl/audio_io/piano_stereo_chorus.v" type="file.verilog" enable="1" />

@@ -196,4 +196,3 @@ module guitar_radial_curve_renderer #(parameter integer ROTATE_180=0)(input wire
         end
     end
 endmodule
-

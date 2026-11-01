@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "archive_sha256": "2f6b402edbf48a3c34a0ee5d18f5594977680a1ac51cacbb87a77621f10231a8",
+  "archive_bytes": 3160460,
+  "bitstream_sha256": "48239256e8c700b0d2e147046880e9ffef06c023b7f536d2cdb20ae5c12b44ab",
+  "all_archived_files_and_certificate_artifacts": "hash-matched",
+  "zip_crc": "PASS"
+}

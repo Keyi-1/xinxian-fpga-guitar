@@ -65,4 +65,3 @@ module lcd_rgb_scan_480x272 #(parameter integer ROTATE_180=0) (
         end
     end
 endmodule
-

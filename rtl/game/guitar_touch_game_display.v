@@ -78,4 +78,3 @@ module guitar_touch_game_display #(parameter integer ALLOW_AUTOPLAY_PREVIEW=1,US
         .valid_blocks(valid_blocks),.game_snapshot(chart_snapshot),.rgb(ui_rgb),.display_page(display_page));
     assign lcd_backlight=rst_n && initialized;
 endmodule
-

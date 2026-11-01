@@ -1,3 +1,45 @@
+# KS 加 LCD180 发布授权（2026-11-01）
+
+- 用户明确授权“请帮我整理、提交、推送”，覆盖本节之前的“不提交/不推送”状态。仅整理KS源码/工程约束/测试/文档及已验证发布包，接续远端master翻屏提交42f9c1f后普通推送；不强推，不重跑已完成的综合布线/仿真，不烧录或开COM。
+- BL616旧诊断文件及新出现的技术文档草稿/配图留在本地；两个保护文件字节及暂存对象不变。只按明确清单暂存，不使用git add .或git add -A。操作前源/索引快照及发布进度在`build/publish_ks_lcd180/`；合并后重新核对实际构建输入及位流哈希。
+- 固定发布ZIP及原认证不改写，Git整理只变更提交关系/发布说明。原始最终检查器保留构建时基线和哈希保护，不能通过改写旧认证或放宽检查来适应新HEAD；发布时独立校验构建输入和归档。主工程已完成完整验证，其他六个工程仅补依赖，未新增全量构建认证。
+
+# LCD 180° 加 KS V2 正式构建（2026-11-01，用户已要求生成新位流）
+
+- 新授权：“你试着编译布线看看呢，能不能成功布线，生成新的位流”。已完成原gprj/原impl正式综合、P&R/STA及当前实际VG验证，不重复构建/已通过测试。旧KS V2位流和证书另保存在`build/lcd_rotate_ks/formal_before/`，固定KS发布不覆盖。维持原50/12.288/100MHz及保护配置，未烧录/开COM/提交/推送。
+- `lcd_rotate_synth_01`、`lcd_rotate_route_01`均退出0，新严格入口`tools/check_lcd_rotation_ks_result.py` PASS。Logic50348、FF22902、CLS28279/29952、BSRAM118/118、DSP106.5/118；sys/audio/KS Fmax52.586/18.847/109.240MHz；setup/hold/latch/未布通/已测deadline全0。综合无新增警告，保留原两条PR1014并按实际STA验收，不为余量重建。
+- `lcd_rotate_full_gate_01`已PASS（3346帧/3345PCM/1471406 LCD时钟/7组起音，五度ON1684帧、OFF1662帧，238条厂商警告已按源位置核对、错误0）。被测VG/综合快照/当前impl VG字节相同，SHA256=90e87e563d58e43a155a4752884681f470981aaf0419feb41fa55ee0f07755d7。当前网表覆盖LCD、四声部及五度开关；触控/ADC/按钮寄存和声命令仅作登记输入，不强制音频/频率/note结果。已有未变KS单元试听/TDM按源字节及旧认证复用，不重复运行。
+- 当前原工程FS SHA256=523659582b19be709e70d8544cfd0db4920dc2708b36ac481df2d08c7ad63760，认证`build/lcd_rotate_ks/verification.json`；独立发布`build/releases/touch_game/ks_fifth_v2_lcd180_20261101/`及同名ZIP。无运行任务。只改三份显示RTL，音色/四独立声部32状态/触控映射/时钟/保护配置和index保持。等待板上显示、音频、触控与启动验收；旧KS最终检查器/固定证书/固定发布保持。
+
+- 用户新请求：读取远端屏幕180°更新，在保持当前音色的基础上修改代码。已通过GitHub连接读取远端master `42f9c1fb73ba1e2260f889d4ba14fbfab07fc318`，未pull/merge、更改本地HEAD/index或回退用户未提交KS代码。
+- 仅三份生产源改变：`rtl/display/lcd_rgb_scan_480x272.v`、`rtl/display/guitar_radial_curve_renderer.v`、`rtl/game/guitar_touch_game_display.v`。三个生产源及两个移植测试只清理CRLF/末尾空行，与远端逻辑完全一致；原始远端副本Git blob身份校验，保存`build/lcd_rotate_ks/remote_source/`。扫描器和曲线渲染器默认ROTATE_180=0，主显示两处启用1；未改触控映射（与远端一致）、音频、频带模块、ROM、gprj、约束或保护文件/index。
+- 已完成，不重复：最终`build/lcd_rotate_ks/rtl_clean_01`（当前全RTL编译；两帧261120有效像素映射/同步/RGB；8场景2176曲线扫描行解析交点/尾迹/重复触发，最慢2266/3186时钟，错误/警告0）。`rtl_01`为清理EOF前的已通过记录，仅保留。入口`tools/check_lcd_rotation_ks.py`，远端身份/移植前源清单/保护收据在`build/lcd_rotate_ks/`。音频及其他构建输入与此前成功KS V2逐字节相同。
+- 上一阶段仅完成源码及显示专项测试；用户后续授权后，新组合正式构建已完成（见本节顶部）。原未翻转KS V2固定发布仍SHA256=48239256e8c700b0d2e147046880e9ffef06c023b7f536d2cdb20ae5c12b44ab，保留回退；原impl现为新组合，不能用旧证书认证。说明`docs/LCD_ROTATION_180_KS.md`。
+
+# KS 五度优化正式构建（2026-11-01，用户已确认推荐版）
+
+- 用户已回复“我觉得推荐版可以”，听感门槛已满足，授权按推荐V2（五度主系数80，源SHA256=30bd6704a113577063d462b1e1ef3f7dcfd903ed9578e34d80eb1968c09c4c8b）继续原gprj/原impl正式综合、P&R、当前网表验证和独立发布。下文“确认前不构建”仅为历史门槛，当前不再阻止构建；不重复询问。
+- 原impl生成产物可由本轮实际工具更新；固定旧发布、回退FS及旧认证不可覆盖。不放宽50/12.288/100MHz或用户保护的配置，不推送、不烧录、不开COM。正式进度以`build/ks_fifth/CURRENT_STATE.json`及对应process.json为准，恢复先核对进程/日志。
+- 正式综合`build/karplus_strong/fifth_synth_01`和原impl P&R `fifth_route_01`均已退出0，严格新入口`tools/check_ks_fifth_result.py` PASS。不重复构建/已通过仿真。Logic51007、FF22902、CLS28624/29952、BSRAM118/118、DSP106.5/118；sys/audio/KS Fmax50.641/19.371/103.143MHz，实际50/12.288/100不变；setup/hold/latch/未布通/已测deadline全0。综合警告仅行号变化、无新增；原两条PR1014保持并纳入本次实际STA。没有为余量重建。
+- `fifth_full_gate_01`已PASS（3346帧/3345PCM/1471406 LCD时钟/7组起音，五度开启1684帧、关闭1662帧，238条厂商模型警告按源位置核对，无错误）。实际被测VG、综合快照和当前原impl VG字节相同，SHA256=ab8e76f4d196704695e726692473510415c22f8b18734319ceaa6f5f3b52295b。显式注入按钮寄存和声命令，不冒称模拟物理按钮一秒长按；触控/ADC同样仅登记输入刺激，不强制音频/频率/note结果。
+- 当前原工程FS SHA256=48239256e8c700b0d2e147046880e9ffef06c023b7f536d2cdb20ae5c12b44ab，正式认证`build/ks_fifth/verification.json`，独立发布`build/releases/touch_game/ks_fifth_v2_20261101/`及同名ZIP。全部任务结束，未烧录/开COM/推送，等待板上验收。旧`tools/check_ks_result.py`、旧证书/固定发布、独立回退FS均保留；旧证书不认证当前五度源。
+
+- 授权需求：每声部现有8模型重分配，加入独立约1.5倍频低频模型、改善五度混音；4独立声部/共32状态保持。用户要求先试听、确认效果后正式构建；该门槛已满足，推荐V2已完成正式构建。
+- 下节此前成功位流仍为回退版，固定旧发布不覆盖；SHA256=2d4700d60754a51d8e4c5fe19ddc50fb233ca0848c410352b01dd92555913c41。另存`build/ks_fifth/before/known_good_ks32.fs`，完整成功源快照在`build/ks_fifth/before/source/`。原impl现由实际工具生成本轮五度V2，不由旧证书认证。
+- 只改生产`rtl/synth/karplus_strong_voice.v`：关闭五度沿用旧频率/容量/增益；开启五度用根音[1,2,5,7]和原五度源[1,3,4,5]，频率比约[1.4983,4.4949,5.9932,7.4915]。每声部容量[336,168,68,50,224,76,56,46]共1024字，首五度模型从112扩为224，不增块RAM。两级增益流水借用已有store稳定窗口；布局改变自动重激励，独立声部不互相影响。
+- V1已通过`build/ks_fifth/audition_v1`（288256关闭五度PCM逐值等于成功源、混合恒等式、8模型地址/频率/模式切换；maxbusy176）和`build/karplus_strong/fifth_tdm_v1`（实际PLL100MHz四声部55996PCM、无deadline）。V1五度主系数96，冻结副本/试听保留。当前生产V2主系数80，根音保持128；当前源SHA256=30bd6704a113577063d462b1e1ef3f7dcfd903ed9578e34d80eb1968c09c4c8b，不以V1证书认证V2。
+- V2全部已结束PASS，不重复：`build/ks_fifth/audition_v2`（288256关闭五度PCM逐值等于成功源、混合恒等式、8模型地址/频率/非静音、四次无strike布局切换；maxbusy176，应用错误/警告0）；`build/karplus_strong/fifth_tdm_v2`（实际PLL100MHz，四声部55996PCM与四独立参考逐值/延迟相同，deadline0；仅4条已知厂商PLL警告）。V1→V2根音/关闭五度288000样本逐值不变；20～300ms五度/根音RMS为D3−4.362、A3−2.249、A4−3.318、G5−1.209dB。新bench/tools：`sim/tb/tb_ks_fifth_audition.sv`、`tools/check_ks_fifth_audition.py`。最终证据`build/ks_fifth/preservation_check.json`，两个保护文件字节/index和三份成功FS哈希均核对不变。
+- 已确认的推荐试听`build/ks_fifth/audition_v2/root_fifth_together.wav`，另保留V1和声突出版；同一pluck年龄/种子的D3、A3、A4、G5，每音“根音1.5s→五度1.5s→合奏1.5s”，间隔0.2s，无分段归一化/软件合成。WAV取真实KS干声，含主链五度0.75增益，不含完整包络/效果/DAC录音。详细说明`docs/KS_FIFTH_AUDITION.md`。
+
+# 明亮弦音 KS 已完成（2026-11-01，优先于旧进度）
+
+- 基线/当前 HEAD 仍为 `d5d8599`；本轮只在当前工作区修改，未提交/推送、烧录或开 COM。四独立声部必须；32 为总物理模型状态目标，最终为每声部8个、共32个；实际硬件是两条并行KS滤波通路+共享II=1调音流水线，不是32套同周期通路。48kHz输出/12.288MHz音频域保持，新增50→100MHz内部PLLA。
+- 实现 `rtl/synth/karplus_strong_voice.v`、`ks_tdm_bank.v`、`ks_compute_pll.v`；32独立延迟/低通/DC状态，各55bit有效载荷经4字DPB保存；四声部年龄与五LFSR线性基精确重建原控制/激励。滑音用扩展差值与距离饱和比较，保留冻结行为；没有修改被用户拒绝的频带模块。两个保护文件字节与index保持。
+- 已完成，不重复：`rtl_shared_ram_01`（32模型各144000更新，576000PCM与此前KS逐值相同，最长175计算时钟/声部）、`tdm_shared_ram_01`（实际PLL100MHz，55996声部PCM，四独立参考逐样本/延迟一致）、`slide_distance_01`（240000冻结步骤及21/22/27位除15穷举）、`full_gate_distance_01`（当前实际VG vs完整RTL，2502帧/2501PCM/1102851 LCD时钟采样/5组起音；真实PLL/I2S/矩阵/物理键，只有登记触摸/ADC输出刺激；238厂商警告已按源位置核对）。旧`integration_final_01`仅复用源字节未变的纯钢琴/哇音32000PCM，不以旧KS哈希认证新内核。
+- 原工程/原impl `synth_distance_01`与`route_distance_01`均EXIT0结束，最终严格`tools/check_ks_result.py` PASS：Logic50688、FF22808、CLS28426/29952、BSRAM118/118、DSP106.5/118；sys/audio/KS Fmax53.574/19.993/114.836MHz，实际50/12.288/100不变；setup/hold/latch/未布通/已测deadline全0。现有PR1014两条保留并计入实际STA。不得为额外余量重建。
+- 当前原工程FS SHA256=`2d4700d60754a51d8e4c5fe19ddc50fb233ca0848c410352b01dd92555913c41`。固定发布`build/releases/touch_game/ks_tdm_32_20261101/`及同名ZIP；认证`build/karplus_strong/verification.json`，说明`docs/BRIGHT_KARPLUS_STRONG.md`。原JDY和更早固定发布保持。新位流数字验证完成，板上音色/启动尚待用户验收。
+- 全部当前构建/仿真已结束；不要重复。旧失败候选保留，不能发布：32宏复制资源超限；route_timing剩196未通、route_compact剩114、route_wide剩1591；route_shared虽然布通但48.903/94.882MHz不达标。实际DeviceB工具拒绝SSRAM（RP0007），不要再次尝试。其他六个工程只补源文件依赖，未做完整构建认证；旧BL616未跟踪诊断文件保持。
+
 # JDY-23 蓝牙替换已交付（2026-10-27，优先于下文BL616探索）
 
 - 2026-10-30 用户明确授权提交并推送本节 JDY-23 版本至 `origin/master`，覆盖本节旧“不推送”约定；本次仅核对已有证据哈希、提交源码/说明/现有发布包，不重跑构建/仿真、不烧录或开 COM。GitHub 可下载包保存于 `firmware/jdy23/release/`，根 README 标明最新版本。尚未完成的 BL616 诊断文件保留在本地，不混入本次提交。

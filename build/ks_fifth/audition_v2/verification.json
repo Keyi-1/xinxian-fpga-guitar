@@ -1,0 +1,90 @@
+{
+  "result": "PASS_AWAITING_LISTENING_CONFIRMATION",
+  "source_sha256": {
+    "rtl/synth/karplus_strong_voice.v": "30bd6704a113577063d462b1e1ef3f7dcfd903ed9578e34d80eb1968c09c4c8b",
+    "rtl/config/ks_reciprocal.vh": "ed4be6dbf316fdba16c07be14d0eb8816cebcba62765ae053df2873e277a3671",
+    "sim/tb/tb_ks_fifth_audition.sv": "e41d981a811c09adc2024c0f461c30d21ef4529d1da7a2eeac45be034b563044"
+  },
+  "reference_kernel_sha256": "6d7eec6e67095b0f3070962db86f10243d3c26d9cb037bb987f19c07abd26355",
+  "sample_rate_hz": 48000,
+  "rtl_off_exact_samples": 288256,
+  "rtl_mix_identity_samples": 288256,
+  "notes": {
+    "D3": {
+      "root": {
+        "frequency_hz": 146.81239341180486,
+        "fft_magnitude": 58583.16305074895
+      },
+      "fifth": {
+        "frequency_hz": 219.97538038968517,
+        "fft_magnitude": 31879.993224793165
+      },
+      "target_root_hz": 146.83238044381142,
+      "target_fifth_hz": 220.0000137090683,
+      "fifth_pitch_error_cents": -0.19385648322237856,
+      "mix_fifth_to_root_db": -5.286875239643802,
+      "mixed_peak_pcm16": 11012.94140625,
+      "root_body_rms": 430.6555627328884,
+      "fifth_body_rms": 260.62531376068034
+    },
+    "A3": {
+      "root": {
+        "frequency_hz": 219.99086283433965,
+        "fft_magnitude": 197062.10913499867
+      },
+      "fifth": {
+        "frequency_hz": 329.62103389449163,
+        "fft_magnitude": 215143.7430496661
+      },
+      "target_root_hz": 220.0000025331974,
+      "target_fifth_hz": 329.6275846660137,
+      "fifth_pitch_error_cents": -0.034405589599293386,
+      "mix_fifth_to_root_db": 0.7626681410207294,
+      "mixed_peak_pcm16": 10255.8984375,
+      "root_body_rms": 335.46986419668855,
+      "fifth_body_rms": 258.9443684293939
+    },
+    "A4": {
+      "root": {
+        "frequency_hz": 440.0166451697876,
+        "fft_magnitude": 40150.12550626094
+      },
+      "fifth": {
+        "frequency_hz": 659.2614020366269,
+        "fft_magnitude": 378357.6945875866
+      },
+      "target_root_hz": 440.0000050663948,
+      "target_fifth_hz": 659.2551805078983,
+      "fifth_pitch_error_cents": 0.016337939946762463,
+      "mix_fifth_to_root_db": 19.48323558885941,
+      "mixed_peak_pcm16": 10202.44921875,
+      "root_body_rms": 232.17734046035778,
+      "fifth_body_rms": 158.45879359880905
+    },
+    "G5": {
+      "root": {
+        "frequency_hz": 784.0105932720618,
+        "fft_magnitude": 440462.9264546288
+      },
+      "fifth": {
+        "frequency_hz": 1174.716460785747,
+        "fft_magnitude": 348226.00217813905
+      },
+      "target_root_hz": 783.9908748865128,
+      "target_fifth_hz": 1174.659188836813,
+      "fifth_pitch_error_cents": 0.08440638097719844,
+      "mix_fifth_to_root_db": -2.0408139521579556,
+      "mixed_peak_pcm16": 9551.58984375,
+      "root_body_rms": 140.9876988246759,
+      "fifth_body_rms": 122.66094172731157
+    }
+  },
+  "range_report_sha256": "d8c6fc3471b52bb7300f18b52223509f1ca2fdf2986dffb79a3a006a72ba3b46",
+  "audition": "Each note: root-only1.5s,0.2s gap,fifth-only1.5s,0.2s gap,together1.5s,0.2s gap. Identical pluck age and seed across the three sections.",
+  "gain": "Production KS gains roots128,48,8,4;fifths80,16,8,4; existing main harmony gain(>>1)+(>>2) executed in RTL. WAV conversion /256 only, same fixed gain for all sections.",
+  "scope": "Production KS dry output, not full envelope/effects/DAC recording. No FPGA synthesis/P&R/programming performed; original known-good FS retained.",
+  "wav_sha256": {
+    "off_vs_new_mix.wav": "f02e504647c3fb0fd881a0e4085d6327a93daf1ea4c9f93dc00653ee2a29563f",
+    "root_fifth_together.wav": "a835a75795fb473ae823c9fd25a529286686c0e487656ee3aa28b07f34158dbf"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "result": "PASS",
+  "production_changes_since_successful_release": [
+    "rtl/synth/karplus_strong_voice.v"
+  ],
+  "current_candidate_sha256": "30bd6704a113577063d462b1e1ef3f7dcfd903ed9578e34d80eb1968c09c4c8b",
+  "protected_bytes_and_index": "unchanged",
+  "rollback_sha256": {
+    "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs": "2d4700d60754a51d8e4c5fe19ddc50fb233ca0848c410352b01dd92555913c41",
+    "build/releases/touch_game/ks_tdm_32_20261101/neo_guitar_touch_game_ks_tdm_32.fs": "2d4700d60754a51d8e4c5fe19ddc50fb233ca0848c410352b01dd92555913c41",
+    "build/ks_fifth/before/known_good_ks32.fs": "2d4700d60754a51d8e4c5fe19ddc50fb233ca0848c410352b01dd92555913c41"
+  },
+  "v1_to_v2_off_and_root_raw_pcm_exact": 288000,
+  "fifth_to_root_body_rms_db_20_to_300_ms": {
+    "D3": -4.362,
+    "A3": -2.249,
+    "A4": -3.318,
+    "G5": -1.209
+  },
+  "audition_verification_sha256": "e17865463d804f711a49f3c37ac540591e0ab33ae2c83d07081056f5b4d0c147",
+  "tdm_verification_sha256": "3b4655fc3e7bf3032dbfabd357c15716dfece80e5e5ab9ce9513f3c375c103d4",
+  "tdm_bench_sha256": "f7e0006c3f2aef101f7b14f032aaa8dfe888a97ee4a49caf473728e18f25e49f",
+  "audition_simulation_log_sha256": "f4e73af68f9f897b74d578500f4369cc753b9ef41dcfc9659a3290eec7e52841",
+  "tdm_simulation_log_sha256": "204e7d73fb5179a0bf2bd44b8377ec9ea22e00e77a9e2eccc9d886202f6bb26d"
+}

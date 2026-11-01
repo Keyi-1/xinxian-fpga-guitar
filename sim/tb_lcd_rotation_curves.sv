@@ -94,4 +94,3 @@ module tb_lcd_rotation_curves;
     end
     initial begin #60000000;$fatal(1,"FAIL: renderer timeout");end
 endmodule
-

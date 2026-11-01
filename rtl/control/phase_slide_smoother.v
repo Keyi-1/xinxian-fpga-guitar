@@ -6,7 +6,8 @@
 // monotonically over SLIDE_SAMPLES sample enables.
 module phase_slide_smoother #(
     parameter integer SLIDE_SAMPLES = `SLIDE_SAMPLES,
-    parameter integer PHASE_VALUE_BITS = 32
+    parameter integer PHASE_VALUE_BITS = 32,
+    parameter integer RESOURCE_SHARED = 0
 ) (
     input  wire        clk,
     input  wire        rst_n,
@@ -79,10 +80,15 @@ module phase_slide_smoother #(
     wire [PHASE_VALUE_BITS-1:0] target_value = target_phase_inc[PHASE_VALUE_BITS-1:0];
     wire [PHASE_VALUE_BITS-1:0] current_phase = phase_inc[PHASE_VALUE_BITS-1:0];
 
+    // One extended subtraction provides both direction and magnitude. For
+    // valid step<=2^W-1, C+step>=T (or C<=T+step) is exactly step>=abs(T-C).
+    // Reuse that distance for saturation instead of separate sum/compare paths.
+    wire [PHASE_VALUE_BITS:0] target_delta={1'b0,target_value}-{1'b0,current_phase};
     reg [PHASE_VALUE_BITS-1:0] difference;
     reg [ROUND_BITS-1:0] rounded_difference;
     reg [ROUND_BITS-DIV_POW2_SHIFT-1:0] reduced_difference;
     reg [PHASE_VALUE_BITS:0] step_size;
+    reg [PHASE_VALUE_BITS:0] selected_step;
     reg [PHASE_VALUE_BITS:0] next_phase_calc;
     reg [PHASE_VALUE_BITS:0] next_phase_latched;
     reg [COUNT_BITS-1:0] slide_count;
@@ -95,7 +101,9 @@ module phase_slide_smoother #(
         reduced_difference = 0;
         step_size  = 33'd1;
 
-        if (target_value >= current_phase)
+        if(RESOURCE_SHARED!=0)
+            difference=target_delta[PHASE_VALUE_BITS] ? -target_delta[PHASE_VALUE_BITS-1:0] : target_delta[PHASE_VALUE_BITS-1:0];
+        else if (target_value >= current_phase)
             difference = target_value - current_phase;
         else
             difference = current_phase - target_value;
@@ -109,22 +117,30 @@ module phase_slide_smoother #(
                 step_size = 33'd1;
         end
 
-        if (target_value > current_phase) begin
-            if ({1'b0, current_phase} + step_size >= {1'b0, target_value})
+        selected_step=RESOURCE_SHARED!=0 && busy && slide_target==target_value ? slide_step : step_size;
+        if(RESOURCE_SHARED!=0)begin
+            if(selected_step>={1'b0,difference})next_phase_calc={1'b0,target_value};
+            else if(!target_delta[PHASE_VALUE_BITS])next_phase_calc={1'b0,current_phase}+selected_step;
+            else next_phase_calc={1'b0,current_phase}-selected_step;
+        end
+        else if (target_value > current_phase) begin
+            if ({1'b0, current_phase} + selected_step >= {1'b0, target_value})
                 next_phase_calc = {1'b0, target_value};
             else
-                next_phase_calc = {1'b0, current_phase} + step_size;
+                next_phase_calc = {1'b0, current_phase} + selected_step;
         end
         else if (target_value < current_phase) begin
-            if ({1'b0, current_phase} <= {1'b0, target_value} + step_size)
+            if ({1'b0, current_phase} <= {1'b0, target_value} + selected_step)
                 next_phase_calc = {1'b0, target_value};
             else
-                next_phase_calc = {1'b0, current_phase} - step_size;
+                next_phase_calc = {1'b0, current_phase} - selected_step;
         end
         else begin
             next_phase_calc = {1'b0, current_phase};
         end
 
+        if(RESOURCE_SHARED!=0)next_phase_latched=next_phase_calc;
+        else begin
         if (target_value > current_phase) begin
             if ({1'b0, current_phase} + slide_step >= {1'b0, target_value})
                 next_phase_latched = {1'b0, target_value};
@@ -140,6 +156,7 @@ module phase_slide_smoother #(
         else begin
             next_phase_latched = {1'b0, current_phase};
         end
+            end
     end
 
     always @(posedge clk) begin

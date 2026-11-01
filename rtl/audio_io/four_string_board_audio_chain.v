@@ -4,6 +4,7 @@
 // Legacy stereo effects are independent; piano uses a shared room.
 // FFT receives the average of the final stereo channels.
 module four_string_board_audio_chain #(
+    parameter integer KS_TDM_ENABLE = 0,
     parameter integer SAMPLE_DIV = `AUDIO_SAMPLE_DIV,
     parameter integer REF_DIV = `PT8211_REF_DIV,
     parameter integer I2S_ENABLE = 0,
@@ -29,7 +30,7 @@ module four_string_board_audio_chain #(
     parameter integer PLUCK_RELEASE_SHIFT = 10,
     parameter integer PLUCK_IDLE_LEVEL = 64
 ) (
-    input wire clk_audio_ref, rst_n, stable_valid,
+    input wire clk_audio_ref, rst_n, stable_valid,clk_synth_ref,
     input wire [15:0] stable_fret_id,
     input wire [3:0] pluck_valid,
     input wire [7:0] velocity_level,
@@ -81,7 +82,7 @@ module four_string_board_audio_chain #(
     end endgenerate
     genvar g;
     generate for (g = 0; g < 4; g = g + 1) begin : string_slide
-        phase_slide_smoother #(.SLIDE_SAMPLES(SLIDE_SAMPLES),
+        phase_slide_smoother #(.RESOURCE_SHARED(KS_TDM_ENABLE),.SLIDE_SAMPLES(SLIDE_SAMPLES),
             .PHASE_VALUE_BITS(CONTROL_PHASE_VALUE_BITS)) u_smoother (
             .clk(clk_audio_ref), .rst_n(rst_n), .sample_ce(sample_tick),
             .note_on(note_on[g]), .voice_active(voice_active[g]),
@@ -104,11 +105,11 @@ module four_string_board_audio_chain #(
     end endgenerate
 
     generate if (USE_PIANO != 0) begin : g_piano
-        four_voice_piano_audio_core #(.SAMPLE_DIV(SAMPLE_DIV),
+        four_voice_piano_audio_core #(.KS_TDM_ENABLE(KS_TDM_ENABLE),.SAMPLE_DIV(SAMPLE_DIV),
             .HAMMER_ENABLE(PIANO_HAMMER_ENABLE),.MODES(PIANO_MODES),
             .CONTROL_ENABLE(PIANO_CONTROL_ENABLE),.ROCK_ENABLE(PIANO_ROCK_ENABLE),
             .FORCE_RELEASE_ENABLE(EXTERNAL_CONTROL_ENABLE)) u_core (
-            .clk_audio_ref(clk_audio_ref),.rst_n(rst_n),.note_on(note_on),.note_off(note_off),
+            .clk_audio_ref(clk_audio_ref),.clk_synth_ref(clk_synth_ref),.rst_n(rst_n),.note_on(note_on),.note_off(note_off),
             .velocity_level(velocity_level),.phase_inc(phase_inc),.sample_tick(sample_tick),
             .timbre_select(timbre_select),.rock_select(rock_select),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),
             .force_release(external_force_release),

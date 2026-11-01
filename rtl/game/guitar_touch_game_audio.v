@@ -1,5 +1,6 @@
 `include "../config/guitar_config.vh"
 module guitar_touch_game_audio #(
+    parameter integer KS_TDM_ENABLE=0,
     parameter integer MATRIX_CLK_DIV=`MATRIX_CLK_DIV,
     parameter integer MATRIX_SETTLE_CYCLES=`MATRIX_SETTLE_CYCLES,
     parameter integer MATRIX_DEBOUNCE_FRAMES=`DEBOUNCE_SCANS,
@@ -86,11 +87,11 @@ module guitar_touch_game_audio #(
     end else begin:no_vibrato_gesture
         assign performance_vibrato=0;
     end endgenerate
-    four_string_board_audio_chain #(.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(ENABLE_MISS_CUE),.I2S_ENABLE(1),.USE_PIANO(1),
+    four_string_board_audio_chain #(.KS_TDM_ENABLE(KS_TDM_ENABLE),.EXTERNAL_CONTROL_ENABLE(1),.GAME_CUE_ENABLE(ENABLE_MISS_CUE),.I2S_ENABLE(1),.USE_PIANO(1),
         .VIBRATO_ENABLE(PERFORMANCE_VIBRATO_ENABLE),
         .CONTROL_PHASE_VALUE_BITS(USE_P2 ? 27 : `NOTE_PHASE_VALUE_BITS),
         .PIANO_MODES(32),.PIANO_CONTROL_ENABLE(1),.PIANO_ROCK_ENABLE(1)) u_chain(
-        .clk_audio_ref(clk),.rst_n(rst_n),.stable_valid(1'b0),.stable_fret_id(16'd0),.pluck_valid(4'd0),
+        .clk_audio_ref(clk),.clk_synth_ref(display_clk),.rst_n(rst_n),.stable_valid(1'b0),.stable_fret_id(16'd0),.pluck_valid(4'd0),
         .velocity_level(note_velocity),.timbre_select(timbre_select),.rock_select(rock_select),
         .chorus_enable(chorus_enable),.sustain_enable(sustain_enable),.harmony_enable(harmony_enable),.reverb_enable(reverb_enable),
         .sample_tick(sample_tick),.pcm_mix_valid(final_pcm_valid),.pcm_mix(final_pcm),.voice_active(active),.voice_pcm(voice_pcm),

@@ -1,0 +1,234 @@
+{
+  "sample_rate": 48000,
+  "ratio_q20": 1571089,
+  "ratio": 1.498307228088379,
+  "root_increment_bounds": [
+    12985978,
+    70966315
+  ],
+  "coverage": "D3..G5 plus conservative full +/-380/32768 vibrato; every reciprocal quantization bin intersecting every model frequency interval",
+  "delay_bsrams_before": 4,
+  "delay_bsrams_after": 4,
+  "context_bsrams_before": 1,
+  "context_bsrams_after": 1,
+  "off": {
+    "words_per_voice": 1020,
+    "unused_words": 4,
+    "models": [
+      {
+        "model": 0,
+        "base": 0,
+        "capacity": 336,
+        "minimum_required_capacity": 332,
+        "maximum_delay_integer": 330,
+        "minimum_delay_integer": 60,
+        "frequency_hz": [
+          145.12961357831955,
+          793.1103743612766
+        ],
+        "reciprocal_bins_checked": 41115
+      },
+      {
+        "model": 1,
+        "base": 336,
+        "capacity": 168,
+        "minimum_required_capacity": 166,
+        "maximum_delay_integer": 164,
+        "minimum_delay_integer": 29,
+        "frequency_hz": [
+          290.2592271566391,
+          1586.2207487225533
+        ],
+        "reciprocal_bins_checked": 41115
+      },
+      {
+        "model": 2,
+        "base": 504,
+        "capacity": 112,
+        "minimum_required_capacity": 111,
+        "maximum_delay_integer": 109,
+        "minimum_delay_integer": 19,
+        "frequency_hz": [
+          435.38884073495865,
+          2379.33112308383
+        ],
+        "reciprocal_bins_checked": 39735
+      },
+      {
+        "model": 3,
+        "base": 616,
+        "capacity": 84,
+        "minimum_required_capacity": 84,
+        "maximum_delay_integer": 82,
+        "minimum_delay_integer": 14,
+        "frequency_hz": [
+          580.5184543132782,
+          3172.4414974451065
+        ],
+        "reciprocal_bins_checked": 41115
+      },
+      {
+        "model": 4,
+        "base": 700,
+        "capacity": 112,
+        "minimum_required_capacity": 111,
+        "maximum_delay_integer": 109,
+        "minimum_delay_integer": 19,
+        "frequency_hz": [
+          435.38884073495865,
+          2379.33112308383
+        ],
+        "reciprocal_bins_checked": 39735
+      },
+      {
+        "model": 5,
+        "base": 812,
+        "capacity": 84,
+        "minimum_required_capacity": 84,
+        "maximum_delay_integer": 82,
+        "minimum_delay_integer": 14,
+        "frequency_hz": [
+          580.5184543132782,
+          3172.4414974451065
+        ],
+        "reciprocal_bins_checked": 41115
+      },
+      {
+        "model": 6,
+        "base": 896,
+        "capacity": 68,
+        "minimum_required_capacity": 67,
+        "maximum_delay_integer": 65,
+        "minimum_delay_integer": 11,
+        "frequency_hz": [
+          725.6480678915977,
+          3965.551871806383
+        ],
+        "reciprocal_bins_checked": 39106
+      },
+      {
+        "model": 7,
+        "base": 964,
+        "capacity": 56,
+        "minimum_required_capacity": 56,
+        "maximum_delay_integer": 54,
+        "minimum_delay_integer": 9,
+        "frequency_hz": [
+          870.7776814699173,
+          4758.66224616766
+        ],
+        "reciprocal_bins_checked": 39735
+      }
+    ]
+  },
+  "on": {
+    "words_per_voice": 1024,
+    "unused_words": 0,
+    "models": [
+      {
+        "model": 0,
+        "base": 0,
+        "capacity": 336,
+        "minimum_required_capacity": 332,
+        "maximum_delay_integer": 330,
+        "minimum_delay_integer": 60,
+        "frequency_hz": [
+          145.12961357831955,
+          793.1103743612766
+        ],
+        "reciprocal_bins_checked": 41115
+      },
+      {
+        "model": 1,
+        "base": 336,
+        "capacity": 168,
+        "minimum_required_capacity": 166,
+        "maximum_delay_integer": 164,
+        "minimum_delay_integer": 29,
+        "frequency_hz": [
+          290.2592271566391,
+          1586.2207487225533
+        ],
+        "reciprocal_bins_checked": 41115
+      },
+      {
+        "model": 2,
+        "base": 504,
+        "capacity": 68,
+        "minimum_required_capacity": 67,
+        "maximum_delay_integer": 65,
+        "minimum_delay_integer": 11,
+        "frequency_hz": [
+          725.6480678915977,
+          3965.551871806383
+        ],
+        "reciprocal_bins_checked": 39106
+      },
+      {
+        "model": 3,
+        "base": 572,
+        "capacity": 50,
+        "minimum_required_capacity": 48,
+        "maximum_delay_integer": 46,
+        "minimum_delay_integer": 8,
+        "frequency_hz": [
+          1015.9072950482368,
+          5551.772620528936
+        ],
+        "reciprocal_bins_checked": 40897
+      },
+      {
+        "model": 4,
+        "base": 622,
+        "capacity": 224,
+        "minimum_required_capacity": 222,
+        "maximum_delay_integer": 220,
+        "minimum_delay_integer": 39,
+        "frequency_hz": [
+          217.44874119758606,
+          1188.3229985833168
+        ],
+        "reciprocal_bins_checked": 39728
+      },
+      {
+        "model": 5,
+        "base": 846,
+        "capacity": 76,
+        "minimum_required_capacity": 75,
+        "maximum_delay_integer": 73,
+        "minimum_delay_integer": 12,
+        "frequency_hz": [
+          652.3462235927582,
+          3564.9689957499504
+        ],
+        "reciprocal_bins_checked": 40121
+      },
+      {
+        "model": 6,
+        "base": 922,
+        "capacity": 56,
+        "minimum_required_capacity": 56,
+        "maximum_delay_integer": 54,
+        "minimum_delay_integer": 9,
+        "frequency_hz": [
+          869.7949647903442,
+          4753.291994333267
+        ],
+        "reciprocal_bins_checked": 39728
+      },
+      {
+        "model": 7,
+        "base": 978,
+        "capacity": 46,
+        "minimum_required_capacity": 45,
+        "maximum_delay_integer": 43,
+        "minimum_delay_integer": 7,
+        "frequency_hz": [
+          1087.2437059879303,
+          5941.614992916584
+        ],
+        "reciprocal_bins_checked": 41467
+      }
+    ]
+  }
+}
