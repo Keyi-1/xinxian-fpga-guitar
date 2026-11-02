@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "branch": "feat/companion-ui",
+  "android_apk": "T:\\Documents\\AMD\\xinxian-companion-ui\\build\\releases\\android\\xinxian_jdy23_0.3.0\\xinxian_jdy23_0.3.0.apk",
+  "android_sha256": "9f685e9bb056fefa3e6428698f7bf85f3ddcc173306d43e5b395c6e9aed7f974",
+  "android_api35_checks": 195,
+  "android_scenarios": [
+    "normal",
+    "compact",
+    "large_font",
+    "landscape",
+    "cutout"
+  ],
+  "android_same_signer_as_previous": true,
+  "windows_zip": "T:\\Documents\\AMD\\xinxian-companion-ui\\build\\releases\\windows\\FPGA_Guitar_Uploader_1.2.0.zip",
+  "windows_sha256": "6410a8ca7dc1b3f2a980dfe69185711e249beca9711b3bc64b15df6a4605437e",
+  "windows_regression_cases": 34,
+  "windows_frozen_smoke": true,
+  "package_files_and_source_hashes_verified": true,
+  "fpga_sources_unchanged": true,
+  "physical_hardware_tested": false,
+  "committed": false,
+  "pushed": false
+}

@@ -10,9 +10,9 @@ android {
         applicationId = "com.keyi.xinxian.guitar"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
-        resValue("string", "app_name", "弦心吉他")
+        versionCode = 3
+        versionName = "0.3.0"
+        resValue("string", "app_name", "弦心")
 
         testInstrumentationRunner = "android.test.InstrumentationTestRunner"
     }
@@ -22,7 +22,7 @@ android {
             initWith(getByName("debug"))
             applicationIdSuffix = ".jdy23"
             versionNameSuffix = "-jdy23"
-            resValue("string", "app_name", "弦心吉他·JDY23")
+            resValue("string", "app_name", "弦心")
             matchingFallbacks += listOf("debug")
         }
         create("scanCheck") {

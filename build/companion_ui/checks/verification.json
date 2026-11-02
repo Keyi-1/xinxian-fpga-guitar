@@ -1,0 +1,25 @@
+{
+  "result": "PASS",
+  "source_sha256": {
+    "mobile/android/app/src/main/AndroidManifest.xml": "da7f05b606a0104d6960a5728ee14b1eb3cf839485ea2dbb47a7584884b3470f",
+    "mobile/android/app/src/main/assets/scores/city_of_stars_100bpm_poly_v2.bin": "a1eb88cb90838b894a9a574dd9dbb02c3c2e47c3a54f242e0169fd6298b9085b",
+    "mobile/android/app/src/main/assets/scores/happy_birthday_60bpm.bin": "4bb16cd049af95d6f0c994f392b02a16f85ccd9fe5f6f7a91b3d13e42d94628c",
+    "mobile/android/app/src/main/assets/scores/wo_bu_nan_guo_64bpm_v2.bin": "5364c48c4c147ee1f0c1f44e4ff9ae818129b4f596fdaacb0a8d45c545fa823e",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/BleSerialProfile.java": "c668b6c6311e7ba93c11f898ec866c1295974aa6ffe2479a9ccc83093b2fcb7a",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/BleUartClient.java": "b8e5c9ae57785a8f3ce7267c41e8d5a54537d77e9b5d989f0fa182540e38925c",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/CompanionUi.java": "d5388d777800aeb94788f97b4b2d08cbddced1af0c118fe1c2a015db4267710d",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/MainActivity.java": "048f63415e3235708a479e585a9e57e00b14c35f45fa266c6e2026eca2c771b4",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/MusicBackdropView.java": "d429eb41314a71189111727096fba305fd66091b8e360e226f65f12f9fd2f386",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/ScoreLibrary.java": "76231ee8112242f4748f370567a6056e592fd90d2db3b0750c59e3915663fbab",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/Xg3Client.java": "c8b917e0a6a774d2d44ea8f976a87865216ecf18b79c9ac4fdf58ac21efc90e9",
+    "mobile/android/app/src/main/java/com/keyi/xinxian/guitar/Xg3Protocol.java": "9664efb6f84247e2899f25f5b2e070cd8de1eb08ea0e377e667de7276d93eae8",
+    "mobile/android/app/src/main/res/drawable/ic_launcher_background.xml": "9be0c9e3bb2f115d4b0880010fa0728db9540308d895c73af5001eac768bc041",
+    "mobile/android/app/src/main/res/drawable/ic_launcher_foreground.xml": "c7662decddf02f1da796b6a464ab33339e6cbbe2a03903a3b84acb335849a9e2",
+    "mobile/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml": "96e457b9c18d021a276b3fad3d84248f90d2d6460f48299536fc8d3d371ca054",
+    "mobile/android/app/src/main/res/mipmap-anydpi-v33/ic_launcher.xml": "52d6ae8c2815afa7a6fe6ce2544ac6a6026804741451a5f1756abea233560efb",
+    "mobile/android/app/src/main/res/values/styles.xml": "3756ccba591b9f5fb84e7e23837858ee7c1257a4b53757be162d71cb571ff761"
+  },
+  "backend_unchanged": true,
+  "hardware_sources_unchanged": true,
+  "android_os_tested": false
+}
