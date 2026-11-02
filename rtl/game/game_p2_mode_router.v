@@ -75,7 +75,8 @@ module game_p2_mode_router #(
             if(!command_valid)seen<=0;
             if(command_valid && !seen && !switching)begin
                 seen<=1;switching<=1;stop_sent<=0;aborting<=0;selected_slot<=command_slot;
-                requested_mode<=(command_mode>=2 && (command_slot>=5 || (command_slot==4 && !(WRITABLE && overlay_valid[4])))) ||
+                requested_mode<=(command_mode>=2 && (command_slot>=5 ||
+                    (WRITABLE ? command_slot>=3 && !overlay_valid[command_slot] : command_slot==4))) ||
                     (command_mode==3 && !ALLOW_AUTOPLAY_PREVIEW) ? 2'd0 : command_mode;
                 stop_phase<=audible_phase;
             end else if(mode>=2 && fault && !start_song && !switching)begin

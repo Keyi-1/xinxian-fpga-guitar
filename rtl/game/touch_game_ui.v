@@ -11,7 +11,7 @@ module touch_game_ui #(
   input wire display_fault,output reg [2:0] page,output reg flush_gesture,output wire transition);
     wire [1:0] active_mode=USE_P2 ? game_snapshot[229:228] : game_snapshot[233:232];
     wire [2:0] clicked_slot=click_y<92 ? 0 : click_y<136 ? 1 : click_y<180 ? 2 : click_y<224 ? 3 : 4;
-    wire row_playable=WRITABLE ? ((5'b01101>>clicked_slot)&1'b1) || overlay_valid[clicked_slot] : clicked_slot<(USE_P2 ? 4 : 1);
+    wire row_playable=WRITABLE ? ((5'b00111>>clicked_slot)&1'b1) || overlay_valid[clicked_slot] : clicked_slot<(USE_P2 ? 4 : 1);
     wire finished=USE_P2 ? game_snapshot[231] : game_snapshot[235];
     wire countdown=USE_P2 ? game_snapshot[230] : game_snapshot[234];
     // Layout faults clear with the new blank's generation. The countdown

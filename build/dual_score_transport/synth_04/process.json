@@ -1,0 +1,9 @@
+{
+  "status": "EXITED",
+  "stage": "syn",
+  "started": "2026-11-02T17:06:01.296207+08:00",
+  "project": "T:/Documents/AMD/xinxian-fpga-guitar/gowin/neo_guitar_touch_game/neo_guitar_touch_game.gprj",
+  "pid": 19784,
+  "exit_code": 0,
+  "finished": "2026-11-02T17:15:12.650515+08:00"
+}

@@ -8,6 +8,7 @@ module game_p3_catalog(input wire [2:0] slot,
     wire sv,sp,st;wire [10:0] sb;wire [11:0] sc;
     wire [31:0] sd;wire [1:0] si;
     `include "../config/game_p2_progress.vh"
+    `include "../config/game_p3_slot_map.vh"
     game_p3_default_catalog frozen(.slot(slot),.valid(sv),.playable(sp),.test_only(st),
         .base(sb),.event_count(sc),.duration(sd),.timbre(si));
     wire imported=slot<5 && overlay_valid[slot];
@@ -23,5 +24,5 @@ module game_p3_catalog(input wire [2:0] slot,
     assign event_count=imported ? d[54:43] : sc;
     assign duration=imported ? d[86:55] : sd;
     assign timbre=imported ? d[88:87] : si;
-    assign progress_step=imported ? d[31:0] : game_p2_progress_step(slot);
+    assign progress_step=imported ? d[31:0] : sv ? game_p2_progress_step(game_p3_legacy_slot(slot)) : 32'd0;
 endmodule

@@ -1,4 +1,5 @@
 `include "../config/guitar_config.vh"
+`include "../config/display_orientation.vh"
 // P2 keeps the accepted audio, effects and radial renderers. Touch
 // RST/INT/SDA/SCL use the native six-pin J6 connector; see the project CST.
 module neo_guitar_touch_game_top #(
@@ -27,6 +28,7 @@ module neo_guitar_touch_game_top #(
   output wire i2s_bclk,i2s_ws,i2s_data,
   inout wire ctp_scl,ctp_sda,ctp_int,output wire ctp_rst_n,
   input wire song_uart_rx,output wire song_uart_tx,
+  input wire usb_song_uart_rx,output wire usb_song_uart_tx,
   inout wire imu_scl,imu_sda);
     reg [7:0] startup_count=0;
     always @(posedge audio_clk_12m288)if(startup_count!=255)startup_count<=startup_count+1'b1;
@@ -59,10 +61,14 @@ module neo_guitar_touch_game_top #(
         .ctp_rst_n(ctp_rst_n),.ready(touch_ready),.frame_valid(raw_valid),.touch_count(raw_count),.touch_id(raw_id),
         .raw_x(raw_x),.raw_y(raw_y),.max_x(max_x),.max_y(max_y),.product_id(product_id),.firmware(firmware),
         .fault_count(fault_count),.selected_address());
+    // Keep the divider's original mapping. Rotate its pixel-sized outputs
+    // separately, after installation swap/scaling/mirror calibration.
     touch_coordinate_mapper #(.SWAP_AXES(TOUCH_SWAP_AXES),.MIRROR_X(TOUCH_MIRROR_X),.MIRROR_Y(TOUCH_MIRROR_Y)) u_coordinates(
         .clk(sys_clk_50m),.rst_n(lcd_rst_n),.frame_valid(raw_valid),.count(raw_count),.track_id(raw_id),
         .raw_x(raw_x),.raw_y(raw_y),.max_x(max_x),.max_y(max_y),
         .valid(mapped_valid),.mapped_count(mapped_count),.mapped_id(mapped_id),.x(touch_x),.y(touch_y));
+    wire [8:0] logical_touch_x=`GUITAR_DISPLAY_ROTATE_180 ? 9'd479-touch_x : touch_x;
+    wire [8:0] logical_touch_y=`GUITAR_DISPLAY_ROTATE_180 ? 9'd271-touch_y : touch_y;
     reg [15:0] millisecond_count;
     wire tick_ms=millisecond_count==49999;
     always @(posedge sys_clk_50m)begin
@@ -70,7 +76,7 @@ module neo_guitar_touch_game_top #(
         else millisecond_count<=millisecond_count+1'b1;
     end
     touch_gesture u_gesture(.clk(sys_clk_50m),.rst_n(lcd_rst_n),.tick_ms(tick_ms),.flush(gesture_flush),
-        .frame_valid(mapped_valid),.count(mapped_count),.track_id(mapped_id),.x(touch_x),.y(touch_y),
+        .frame_valid(mapped_valid),.count(mapped_count),.track_id(mapped_id),.x(logical_touch_x),.y(logical_touch_y),
         .click(click),.double_click(double_click),.click_x(click_x),.click_y(click_y));
     wire command_send,command_busy,command_done,dst_command_valid,dst_command_ack,transition;
     wire [1:0] command_mode,dst_command_mode;
@@ -128,15 +134,16 @@ module neo_guitar_touch_game_top #(
         assign imu_status=0;assign auto_timbre_load=0;assign auto_timbre_code=0;
     end endgenerate
     generate if(USE_P2 && WRITABLE)begin:p3
-    game_p3_service #(.UART_CLKS_PER_BIT(UART_CLKS_PER_BIT)) service(
+    game_p3_dual_service #(.BLE_CLKS_PER_BIT(UART_CLKS_PER_BIT)) service(
         .clk(sys_clk_50m),.rst_n(lcd_rst_n),.audio_clk(audio_clk_12m288),.audio_rst_n(audio_rst_n),
-        .rx(song_uart_rx),.tx(song_uart_tx),.audio_idle(storage_idle),.frame_begin(frame_begin),
+        .ble_rx(song_uart_rx),.ble_tx(song_uart_tx),.usb_rx(usb_song_uart_rx),.usb_tx(usb_song_uart_tx),
+        .audio_idle(storage_idle),.frame_begin(frame_begin),
         .menu_idle((page==0 || page==2) && !transition && touch_ready && (import_locked || (!command_send && !click && !double_click))),
         .locked(import_locked),.write_enable(score_write),.write_address(score_write_address),.write_data(score_write_data),
         .verify_read(verify_read),.verify_address(verify_address),.verify_data(display_data),
         .system_valid(system_catalog_valid),.system_data(system_catalog_data),.audio_valid(audio_catalog_valid),.audio_data(audio_catalog_data));
     end else begin:no_import
-    assign song_uart_tx=1;assign import_locked=0;assign score_write=0;assign score_write_address=0;assign score_write_data=0;
+    assign song_uart_tx=1;assign usb_song_uart_tx=1;assign import_locked=0;assign score_write=0;assign score_write_address=0;assign score_write_data=0;
     assign verify_read=0;assign verify_address=0;
     assign system_catalog_valid=0;assign audio_catalog_valid=0;assign system_catalog_data=0;assign audio_catalog_data=0;
     end endgenerate

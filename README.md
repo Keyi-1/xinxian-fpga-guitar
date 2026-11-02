@@ -1,5 +1,9 @@
 # 芯弦 FPGA 电子吉他
 
+> **当前版本：Windows USB 与手机蓝牙双入口传谱（2026-11-02）。** Windows 1.2.0 使用 DEBUG-USB2 / 115200，安卓 0.3.0 使用 JDY-23 / 9600；可同时连接，上传事务互斥。保留四声部／32 个 KS 模型状态、已确认音色、显示及触控 180°、MPU6050 姿态修复；默认曲谱位于 1/2/3 槽，4/5 均显示“待导入”。[版本、构建与校验说明](docs/RELEASE_20261102.md)，[接口与接线](docs/DUAL_SCORE_TRANSPORT.md)，[安卓及 Windows 界面说明](docs/COMPANION_UI_20261102.md)。
+
+> [下载最终 FPGA 位流与报告](build/releases/touch_game/ks_fifth_v2_lcd180_slots123_dual_uart_20261102.zip)；[下载对应 140 文件纯源码包](build/exports/neo_guitar_touch_game_ks_fifth_v2_lcd180_slots123_dual_uart_code_only_20261102.zip)。原工程综合、完整 P&R/STA、RTL 和实际网表验证通过；系统／音频／KS Fmax 为 52.375／18.044／109.368 MHz，setup／hold／未布通为 0。安卓 API35 五场景 195 项检查及 Windows 34 项回归通过；实体双接口传输尚待下板验收。以下为历史版本记录。
+
 > **当前版本：KS 五度 V2 + 整屏180°翻转（2026-11-01）。** [下载已验证位流与报告](build/releases/touch_game/ks_fifth_v2_lcd180_20261101.zip)，解压后选择 `neo_guitar_touch_game_ks_fifth_v2_lcd180.fs`。保留已确认的KS音色，接续远端 `42f9c1f` 翻屏改动；四独立声部、32模型状态、两条并行KS通路配合TDM，48kHz输出/100MHz内部计算。原工程综合、完整P&R/STA及实际网表验证通过，sys/audio/KS Fmax为52.586/18.847/109.240MHz，setup/hold/未布通0，BSRAM118/118。[设计与验证](docs/LCD_ROTATION_180_KS.md)。旧固定发布保留；未烧录，板上验收待进行。
 
 > **此前成功版本：未翻转的 KS 五度和声推荐版 V2。** 用户已确认真实RTL试听；独立约1.5倍频模型、224字五度延迟区、根音/五度主系数128/80，保持四声部共32模型状态、不增加BSRAM。此前Fmax为50.641/19.371/103.143MHz，原impl现为上方组合版本。[旧固定发布包](build/releases/touch_game/ks_fifth_v2_20261101.zip)保留回退，[此前设计与验证](docs/KS_FIFTH_AUDITION.md)。

@@ -262,6 +262,9 @@ module ks_string_lane #(parameter [31:0] SEED=32'h12345678, parameter integer SL
     reg [31:0] random_state;
     reg run_frame,hold_frame;
     reg [16:0] period_q8;
+    wire [8:0] period_integer=period_q8[16:8]-{8'd0,!period_q8[7]};
+    wire [8:0] capacity_last=current_capacity-9'd1;
+    wire period_too_long=current_capacity!=0 && (period_q8<17'd128 || period_integer>=capacity_last);
     reg signed [17:0] first,interpolated,previous,filtered,feedback,write_value;
     // Noise lies in [-65536,65534]; convex interpolation, averaging and loss
     // cannot enlarge it. DC tracks write_data*1024 monotonically from zero,
@@ -278,7 +281,8 @@ module ks_string_lane #(parameter [31:0] SEED=32'h12345678, parameter integer SL
     reg [17:0] difference_abs;
     reg interpolation_negative;
     wire [17:0] difference_magnitude=difference[18] ? -difference : difference;
-    wire signed [18:0] filter_sum=$signed(interpolated)+$signed(previous);
+    reg signed [18:0] filter_base,filter_total;
+    wire signed [18:0] filter_sum=filter_total;
     wire signed [17:0] noise_now=$signed({random_state[15:0],2'b0})>>>1;
     wire exciting=age<={1'b0,delay_integer}+10'd1;
     assign address=stage==13 ? current_base+{3'd0,pointer} :
@@ -296,7 +300,7 @@ module ks_string_lane #(parameter [31:0] SEED=32'h12345678, parameter integer SL
             stage<=0;pointer<=0;age<=0;audio<=0;dc_q12<=0;run_frame<=0;hold_frame<=0;
             random_state<=SEED | 32'd1;previous<=0;first<=0;difference<=0;
             interpolated<=0;filtered<=0;feedback<=0;write_value<=0;interpolation_product<=0;interpolation_negative<=0;difference_abs<=0;
-            period_q8<=0;
+            period_q8<=0;filter_base<=0;filter_total<=0;
             delay_integer<=0;fraction<=0;
         end else begin
             case(stage)
@@ -321,8 +325,8 @@ module ks_string_lane #(parameter [31:0] SEED=32'h12345678, parameter integer SL
                 end
                 5: begin
                     // Two-point averaging loop filter contributes exactly half a sample.
-                    delay_integer<=(period_q8-17'd128)>>8;
-                    if(((period_q8-17'd128)>>8)>=current_capacity-1)run_frame<=0;
+                    delay_integer<=period_integer;
+                    if(period_too_long)run_frame<=0;
                     fraction<=period_q8[7:0]-8'd128;stage<=16;
                 end
                 16:begin raw_offset<={1'b0,pointer}+{1'b0,current_capacity}-{1'b0,delay_integer};stage<=17;end
@@ -334,12 +338,12 @@ module ks_string_lane #(parameter [31:0] SEED=32'h12345678, parameter integer SL
                 end
                 6: stage<=7;
                 7: begin first<=$signed(read_data);stage<=8;end
-                8: begin difference<=$signed(read_data)-$signed(first);stage<=28;end
+                8: begin difference<=$signed(read_data)-$signed(first);filter_base<=$signed(first)+$signed(previous);stage<=28;end
                 28:begin difference_abs<=difference_magnitude;interpolation_negative<=difference[18];stage<=9;end
                 9: begin interpolation_product<=difference_abs*fraction;stage<=20;end
                 20:begin interpolation_delta<=interpolation_negative ?
                     -$signed({1'b0,interpolation_product[25:8]}) : $signed({1'b0,interpolation_product[25:8]});stage<=10;end
-                10:begin interpolated<=first+interpolation_delta;stage<=11;end
+                10:begin interpolated<=first+interpolation_delta;filter_total<=filter_base+interpolation_delta;stage<=11;end
                 11:begin
                     filtered<=($signed(filter_sum)+$signed({18'd0,filter_sum[18]}))>>>1;
                     previous<=exciting || !run_frame ? 18'sd0 : interpolated;stage<=21;

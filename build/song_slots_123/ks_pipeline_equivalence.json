@@ -1,0 +1,42 @@
+{
+  "result": "PASS",
+  "old_source_sha256": "30bd6704a113577063d462b1e1ef3f7dcfd903ed9578e34d80eb1968c09c4c8b",
+  "new_source_sha256": "638c3c4ae498a031ed2ae24fb1bbed3a3342e73235755f2b3325aea141be7656",
+  "finite_edits": [
+    [
+      "wire signed [18:0] filter_sum=$signed(interpolated)+$signed(previous);",
+      "reg signed [18:0] filter_base,filter_total;\n    wire signed [18:0] filter_sum=filter_total;"
+    ],
+    [
+      "period_q8<=0;",
+      "period_q8<=0;filter_base<=0;filter_total<=0;"
+    ],
+    [
+      "8: begin difference<=$signed(read_data)-$signed(first);stage<=28;end",
+      "8: begin difference<=$signed(read_data)-$signed(first);filter_base<=$signed(first)+$signed(previous);stage<=28;end"
+    ],
+    [
+      "10:begin interpolated<=first+interpolation_delta;stage<=11;end",
+      "10:begin interpolated<=first+interpolation_delta;filter_total<=filter_base+interpolation_delta;stage<=11;end"
+    ],
+    [
+      "reg [16:0] period_q8;",
+      "reg [16:0] period_q8;\n    wire [8:0] period_integer=period_q8[16:8]-{8'd0,!period_q8[7]};\n    wire [8:0] capacity_last=current_capacity-9'd1;\n    wire period_too_long=current_capacity!=0 && (period_q8<17'd128 || period_integer>=capacity_last);"
+    ],
+    [
+      "delay_integer<=(period_q8-17'd128)>>8;",
+      "delay_integer<=period_integer;"
+    ],
+    [
+      "if(((period_q8-17'd128)>>8)>=current_capacity-1)run_frame<=0;",
+      "if(period_too_long)run_frame<=0;"
+    ]
+  ],
+  "exact_pcm_updates": 32768,
+  "model_states": 32,
+  "max_busy_cycles": 176,
+  "period_capacity_cases": 67108864,
+  "integer_period_cases": 131072,
+  "probe_verification_sha256": "48ccafb7d05b07d94f295f5a71a929665cc8383aa786fe5d38259e55b8f5ade7",
+  "scope": "Same states and cycle count. Convex interpolation stays in signed18 bits, so reassociating first+delta+previous in signed19 bits is exact; rounding/loss/DC/gains/delays/state layout remain unchanged. Period arithmetic includes all zero/underflow inputs."
+}

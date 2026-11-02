@@ -1,0 +1,359 @@
+Reading S:/BaiduNetdiskDownload/modelsim/tcl/vsim/pref.tcl
+
+# 10.6d
+
+# vsim -c -onfinish stop work.tb_dual_uart_gate_accelerated -do "run -all; quit -code 0 -f" 
+# Start time: 17:20:35 on Nov 02,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16253): (vopt-13162) Assignment to 'real_duty0' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16484): (vopt-13162) Assignment to 'real_duty1' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16579): (vopt-13162) Assignment to 'real_duty2' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16674): (vopt-13162) Assignment to 'real_duty3' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16769): (vopt-13162) Assignment to 'real_duty4' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16855): (vopt-13162) Assignment to 'real_duty5' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16941): (vopt-13162) Assignment to 'real_duty6' within the always block cannot trigger the same always block.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1868): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1893): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1868): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1893): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1864): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1868): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1888): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1893): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1860): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1864): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1868): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1884): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1888): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1893): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3313): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3317): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.
+# //  ModelSim SE-64 10.6d Feb 24 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  ModelSim SE-64 and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.tb_dual_uart_gate_accelerated(fast)
+# Loading work.guitar_effect_buttons(fast)
+# Loading work.gt911_touch(fast)
+# Loading work.touch_coordinate_mapper(fast)
+# Loading work.touch_gesture(fast)
+# Loading work.posture_touch_controls(fast)
+# Loading work.mpu6050_posture(fast)
+# Loading work.imu_posture_classifier(fast)
+# Loading work.imu_serial_multiplier(fast)
+# Loading work.posture_timbre_cdc(fast)
+# Loading work.posture_timbre_policy(fast)
+# Loading work.game_p3_dual_service(fast)
+# Loading work.game_p3_uart(fast)
+# Loading work.DFFRE(fast__1)
+# Loading work.game_p3_frame_rx(fast)
+# Loading work.game_p3_uart_0(fast)
+# Loading work.game_p3_frame_rx_0(fast)
+# Loading work.game_p3_protocol(fast)
+# Loading work.game_p3_import(fast)
+# Loading work.SDPB(fast)
+# Loading work.game_p3_catalog_cdc(fast)
+# Loading work.touch_game_ui(fast)
+# Loading work.mode_command_cdc_0(fast)
+# Loading work.guitar_touch_game_audio(fast)
+# Loading work.matrix_scanner(fast)
+# Loading work.mcp3208_pluck_frontend(fast)
+# Loading work.game_p2_mode_router(fast)
+# Loading work.DPB(fast)
+# Loading work.DPB(fast__1)
+# Loading work.game_p2_window_controller(fast)
+# Loading work.performance_vibrato_gesture(fast)
+# Loading work.four_string_board_audio_chain(fast)
+# Loading work.phase_slide_smoother(fast)
+# Loading work.phase_slide_smoother_0(fast)
+# Loading work.phase_slide_smoother_1(fast)
+# Loading work.phase_slide_smoother_2(fast)
+# Loading work.four_string_vibrato_serial(fast)
+# Loading work.four_voice_piano_audio_core(fast)
+# Loading work.PLLA(fast)
+# Loading work.karplus_strong_voice(fast)
+# Loading work.DPX9B(fast)
+# Loading work.ks_period_pipeline(fast)
+# Loading work.ks_string_lane(fast)
+# Loading work.ks_string_lane_0(fast)
+# Loading work.piano_voice_core(fast)
+# Loading work.MULT27X36(fast)
+# Loading work.MULT27X36(fast__1)
+# Loading work.MULTALU27X18(fast__2)
+# Loading work.MULTALU27X18(fast__3)
+# Loading work.MULTALU27X18(fast__4)
+# Loading work.MULTALU27X18(fast__5)
+# Loading work.MULTALU27X18(fast__6)
+# Loading work.piano_hammer_model(fast)
+# Loading work.piano_mode_state_ram(fast)
+# Loading work.piano_rock_gain_rom(fast)
+# Loading work.piano_voice_core_0(fast)
+# Loading work.piano_hammer_model_0(fast)
+# Loading work.piano_mode_state_ram_0(fast)
+# Loading work.piano_rock_gain_rom_0(fast)
+# Loading work.piano_voice_core_1(fast)
+# Loading work.piano_hammer_model_1(fast)
+# Loading work.piano_mode_state_ram_1(fast)
+# Loading work.piano_rock_gain_rom_1(fast)
+# Loading work.piano_voice_core_2(fast)
+# Loading work.piano_hammer_model_2(fast)
+# Loading work.piano_mode_state_ram_2(fast)
+# Loading work.piano_rock_gain_rom_2(fast)
+# Loading work.piano_stereo_effects(fast)
+# Loading work.SDPB(fast__1)
+# Loading work.SDPB(fast__2)
+# Loading work.game_miss_audio_cue(fast)
+# Loading work.pcm24_to_16(fast)
+# Loading work.pcm24_to_16_0(fast)
+# Loading work.pt8211_tx(fast)
+# Loading work.i2s_tx(fast)
+# Loading work.guitar_visual_telemetry(fast)
+# Loading work.guitar_touch_game_display(fast)
+# Loading work.guitar_radial_twiddle(fast)
+# Loading work.guitar_radial_bands(fast)
+# Loading work.guitar_radial_curve_renderer(fast)
+# Loading work.guitar_radial_arcsine(fast)
+# Loading work.guitar_lissajous_sine(fast)
+# Loading work.guitar_scanline_ram(fast)
+# Loading work.guitar_scanline_ram_0(fast)
+# Loading work.guitar_radial_palette(fast)
+# Loading work.MULTADDALU12X12(fast)
+# Loading work.guitar_curve_envelope(fast)
+# Loading work.guitar_hz_bcd(fast)
+# Loading work.game_p2_chart_layout(fast)
+# Loading work.touch_game_renderer(fast)
+# Loading work.game_font_rom(fast)
+# run -all
+# PASS: complete actual VG vs RTL; 15 UART frames with audited timer-Q acceleration, USB and BLE imports, cross-query, foreign abort BUSY, duplicate DATA/COMMIT, actual BSRAM CRC/group and CDC; touch readiness and counter high bits are explicit stimuli; real-baud RTL tested separately
+# ** Note: $finish    : tb_dual_uart_gate_accelerated.sv(111)
+#    Time: 38350880 ns  Iteration: 1  Instance: /tb_dual_uart_gate_accelerated
+# Break at tb_dual_uart_gate_accelerated.sv line 111
+# Stopped at tb_dual_uart_gate_accelerated.sv line 111
+#  quit -code 0 -f
+# End time: 17:32:43 on Nov 02,2026, Elapsed time: 0:12:08
+# Errors: 0, Warnings: 238

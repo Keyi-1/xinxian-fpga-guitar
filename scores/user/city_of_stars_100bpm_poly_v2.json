@@ -1,0 +1,49 @@
+{
+  "format_version": 2,
+  "event_bytes": 16,
+  "sample_rate_hz": 48000,
+  "pitch_profile": "game_extended",
+  "event_count": 491,
+  "duration_samples": 6451200,
+  "bpm": 100,
+  "recommended_timbre": 1,
+  "crc32": "1dd77241",
+  "source_csv_sha256": "52323cb0a02ae32be1752335966bd86eb26fbb4a63666b6011a49bd1289847cf",
+  "title": "City of Stars（100BPM四声部修订版）",
+  "arrangement": "up_to_four_polyphonic_voices",
+  "transcription_status": "rechecked_revision",
+  "bar_count": 56,
+  "source_bar_count": 39,
+  "coverage": {
+    "normal_noteheads_expanded": 534,
+    "equal_pitch_ties_merged": 39,
+    "simultaneous_unisons_merged": 2,
+    "emitted_attacks": 491,
+    "normal_noteheads_dropped": 2,
+    "small_grace_noteheads_omitted": 1,
+    "maximum_simultaneous_notes": 3,
+    "four_lane_reductions": [
+      {
+        "order": "17",
+        "bar": "14",
+        "group": "1",
+        "pitch": "60",
+        "start": "64",
+        "end": "66",
+        "action": "omit_inner_chord_attack"
+      },
+      {
+        "order": "31",
+        "bar": "14",
+        "group": "1",
+        "pitch": "60",
+        "start": "120",
+        "end": "122",
+        "action": "omit_inner_chord_attack"
+      }
+    ],
+    "reduction": "m14 inner C4 attack omitted on each pass (2 total); m37 B3 released at5/3 instead of2 beats; AH uses nominal B4, not B5; see four_lane_reductions"
+  },
+  "form": "1x4,2-15,2-15,16-39; m15->m2 repeat supplied explicitly by the user",
+  "pdf_sha256": "3090187123c1b9934d4a9640fdff4ddcfd89274decc4088efb96867c326978fa"
+}

@@ -1,0 +1,517 @@
+Model Technology ModelSim SE-64 vlog 10.6d Compiler 2018.02 Feb 24 2018
+Start time: 17:20:25 on Nov 02,2026
+vlog -sv "+incdir+T:/Documents/AMD/xinxian-fpga-guitar/build/dual_score_transport/uart_gate_04/sources+T:/Documents/AMD/xinxian-fpga-guitar/build/dual_score_transport/uart_gate_04" S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v actual.vg T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\audio_mode_router.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\debounced_toggle.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_string_audio_chain.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_string_board_audio_chain.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_string_harmonic_audio_chain.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_string_pluck_detector.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_string_vibrato_serial.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_string_voice_control.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_voice_antibeat_allocator.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_voice_audio_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_voice_audio_output.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_voice_harmonic_audio_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_voice_harmonic_audio_output.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\four_voice_piano_audio_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\fret_note_event.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\full_guitar_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_chart_layout.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_font_rom.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_message_rom.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_miss_audio_cue.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_note_controller.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p2_catalog.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p2_chart_layout.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p2_mode_router.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p2_score_bank.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p2_static_engine.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p2_window_controller.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_catalog.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_catalog_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_default_catalog.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_dual_service.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_import.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_protocol.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_score_bank.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_service.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_p3_uart.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_score_rom.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\game_snapshot_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\gowin_dpb_ram.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\gt911_touch.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_audio_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_curve_envelope.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_effect_buttons.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_hz_bcd.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_lissajous_arcsine.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_lissajous_display.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_lissajous_palette.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_lissajous_renderer.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_lissajous_sine.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_pcm_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_play_control.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_arcsine.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_bands.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_curve_renderer.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_display.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_fft.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_palette.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_radial_twiddle.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_scanline_ram.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_touch_game_audio.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_touch_game_display.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_visual_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\guitar_visual_telemetry.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\harmonic_voice_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\i2c_register_master.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\i2s_tx.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\imu_posture_classifier.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\imu_serial_multiplier.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\karplus_strong_voice.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\ks_compute_pll.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\ks_tdm_bank.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\lcd_lissajous_ram.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\lcd_lissajous_renderer.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\lcd_lissajous_sine.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\lcd_neon_palette.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\lcd_rgb_scan_480x272.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\matrix_scanner.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mcp3208_four_channel_reader.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mcp3208_pluck_frontend.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mcp3208_spi.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\minimal_audio_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\minimal_audio_output.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\minimal_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mode_command_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mpu6050_posture.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mpu6050_reader.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mpu_diag_i2c_master.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mpu_lcd_diag_reader.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\mpu_lcd_diag_screen.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_four_string_matrix_audio_test_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_full_guitar_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_guitar_audio_full_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_guitar_i2s_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_guitar_lissajous_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_guitar_main_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_guitar_radial_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_guitar_touch_game_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_lcd_lissajous_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_minimal_audio_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_mpu6050_lcd_diagnostic_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\neo_row0_led_test.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\note_phase_rom.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\note_phase_table.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pcm24_chorus.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pcm24_mixer.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pcm24_reverb.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pcm24_rock_soft_clip.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pcm24_to_16.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\performance_vibrato_gesture.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\phase_slide_smoother.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\phase_vibrato_modulator.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_hammer_model.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_mode_state_ram.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_rock_gain_rom.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_stereo_chorus.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_stereo_effects.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_stereo_room.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\piano_voice_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pluck_event_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\posture_timbre_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\posture_timbre_policy.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\posture_touch_controls.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\pt8211_tx.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\reset_sync.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\rgb_spectrum_timing.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\sample_tick_gen.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\sine_nco.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\spectrum_bars32.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\spectrum_bar_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\spectrum_display_top.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\spectrum_fft1024.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\stable_fret_cdc.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\stereo_audio_effects.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\test_tone_trigger.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\timbre_blend_smoother.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\touch_coordinate_mapper.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\touch_game_renderer.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\touch_game_ui.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\touch_gesture.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\voice_audio_core.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\voice_envelope.v T:\Documents\AMD\xinxian-fpga-guitar\build\dual_score_transport\uart_gate_04\sources\xinxian_top.v tb_dual_uart_gate_accelerated.sv 
+-- Compiling UDP mux2
+-- Compiling module MUX2
+-- Compiling module MUX2_LUT5
+-- Compiling module MUX2_LUT6
+-- Compiling module MUX2_LUT7
+-- Compiling module MUX2_LUT8
+-- Compiling module MUX2_MUX8
+-- Compiling module MUX2_MUX16
+-- Compiling module MUX2_MUX32
+-- Compiling module MUX4
+-- Compiling module MUX8
+-- Compiling module MUX16
+-- Compiling module MUX32
+-- Compiling module LUT1
+-- Compiling module LUT2
+-- Compiling module LUT3
+-- Compiling module LUT4
+-- Compiling module LUT5
+-- Compiling module LUT6
+-- Compiling module LUT7
+-- Compiling module LUT8
+-- Compiling module ALU
+-- Compiling module DFFSE
+-- Compiling module DFFRE
+-- Compiling module DFFPE
+-- Compiling module DFFCE
+-- Compiling module DLCE
+-- Compiling module DLPE
+-- Compiling module RAM16S1
+-- Compiling module RAM16S2
+-- Compiling module RAM16S4
+-- Compiling module RAM16SDP1
+-- Compiling module RAM16SDP2
+-- Compiling module RAM16SDP4
+-- Compiling module ROM16
+-- Compiling module INV
+-- Compiling module GND
+-- Compiling module VCC
+-- Compiling module GSR
+-- Compiling module IBUF
+-- Compiling module OBUF
+-- Compiling module TBUF
+-- Compiling module IOBUF
+-- Compiling module TLVDS_IBUF
+-- Compiling module TLVDS_OBUF
+-- Compiling module TLVDS_TBUF
+-- Compiling module TLVDS_IOBUF
+-- Compiling module ELVDS_OBUF
+-- Compiling module ELVDS_TBUF
+-- Compiling module ELVDS_IOBUF
+-- Compiling module MIPI_IBUF
+-- Compiling module MIPI_OBUF_A
+-- Compiling module MIPI_OBUF_LP
+-- Compiling module IOBUF_LP
+-- Compiling module ELVDS_IOBUF_R
+-- Compiling module I3C_IOBUF
+-- Compiling module TLVDS_IBUF_ADC
+-- Compiling module SP
+-- Compiling module SPX9
+-- Compiling module SDPB
+-- Compiling module SDPX9B
+-- Compiling module DPB
+-- Compiling module DPX9B
+-- Compiling module pROM
+-- Compiling module pROMX9
+-- Compiling module SDP36KE
+-- Compiling module SDP136K
+-- Compiling module MULTADDALU12X12
+-- Compiling module MULTALU27X18
+-- Compiling module MULT12X12
+-- Compiling module MULT27X36
+-- Compiling module MULTACC
+-- Compiling module IDDR
+-- Compiling module IDDRC
+-- Compiling module IDDR_MEM
+-- Compiling module ODDR
+-- Compiling module ODDRC
+-- Compiling module ODDR_MEM
+-- Compiling module IDES4
+-- Compiling module IDES8
+-- Compiling module IDES10
+-- Compiling module IDES16
+-- Compiling module IDES4_MEM
+-- Compiling module IVIDEO
+-- Compiling module IDES8_MEM
+-- Compiling module IDES14
+-- Compiling module IDES32
+-- Compiling module OSER4
+-- Compiling module OSER4_MEM
+-- Compiling module OVIDEO
+-- Compiling module OSER8
+-- Compiling module OSER8_MEM
+-- Compiling module OSER10
+-- Compiling module OSER14
+-- Compiling module OSER16
+-- Compiling module IODELAY
+-- Compiling module OSIDES32
+-- Compiling module OSIDES64
+-- Compiling module DCE
+-- Compiling module DCS
+-- Compiling module DDRDLL
+-- Compiling module DLLDLY
+-- Compiling module CLKDIV
+-- Compiling module CLKDIV2
+-- Compiling module DHCE
+-- Compiling module OSC
+-- Compiling module OSCA
+-- Compiling module OSCB
+-- Compiling module PLL
+-- Compiling module PLLA
+-- Compiling module AE350_SOC
+-- Compiling module AE350_RAM
+-- Compiling module SAMB
+-- Compiling module OTP
+-- Compiling module CMSER
+-- Compiling module CMSERA
+-- Compiling module CMSERB
+-- Compiling module SAMBA
+-- Compiling module ADCLRC
+-- Compiling module ADCULC
+-- Compiling module ADC
+-- Compiling module ADC_SAR
+-- Compiling module ADCA
+-- Compiling module LICD
+-- Compiling module MIPI_DPHY_RX
+-- Compiling module MIPI_DPHY
+-- Compiling module MIPI_DPHYA
+-- Compiling module MIPI_CPHY
+-- Compiling module GTR12_QUAD
+-- Compiling module GTR12_UPAR
+-- Compiling module GTR12_PMAC
+-- Compiling module GTR12_QUADA
+-- Compiling module GTR12_UPARA
+-- Compiling module GTR12_PMACA
+-- Compiling module GTR12_QUADB
+-- Compiling module reset_sync
+-- Compiling module reset_sync_0
+-- Compiling module debounced_toggle
+-- Compiling module debounced_toggle_0
+-- Compiling module guitar_effect_buttons
+-- Compiling module i2c_register_master
+-- Compiling module gt911_touch
+-- Compiling module touch_coordinate_mapper
+-- Compiling module touch_gesture
+-- Compiling module posture_touch_controls
+-- Compiling module i2c_register_master_0
+-- Compiling module mpu6050_reader
+-- Compiling module imu_serial_multiplier
+-- Compiling module imu_posture_classifier
+-- Compiling module mpu6050_posture
+-- Compiling module mode_command_cdc
+-- Compiling module posture_timbre_cdc
+-- Compiling module posture_timbre_policy
+-- Compiling module game_p3_uart
+-- Compiling module game_p3_frame_rx
+-- Compiling module game_p3_uart_0
+-- Compiling module game_p3_frame_rx_0
+-- Compiling module game_p3_catalog
+-- Compiling module game_p3_protocol
+-- Compiling module game_p3_import
+-- Compiling module game_p3_catalog_cdc
+-- Compiling module game_p3_dual_service
+-- Compiling module touch_game_ui
+-- Compiling module mode_command_cdc_0
+-- Compiling module matrix_scanner
+-- Compiling module mcp3208_spi
+-- Compiling module mcp3208_four_channel_reader
+-- Compiling module four_string_pluck_detector
+-- Compiling module mcp3208_pluck_frontend
+-- Compiling module game_p3_catalog_0
+-- Compiling module note_phase_table
+-- Compiling module note_phase_table_0
+-- Compiling module note_phase_table_1
+-- Compiling module note_phase_table_2
+-- Compiling module guitar_play_control
+-- Compiling module game_p3_catalog_1
+-- Compiling module game_p3_score_bank
+-- Compiling module game_p2_window_controller
+-- Compiling module game_p2_static_engine
+-- Compiling module game_p2_mode_router
+-- Compiling module performance_vibrato_gesture
+-- Compiling module phase_slide_smoother
+-- Compiling module phase_slide_smoother_0
+-- Compiling module phase_slide_smoother_1
+-- Compiling module phase_slide_smoother_2
+-- Compiling module four_string_vibrato_serial
+-- Compiling module ks_compute_pll
+-- Compiling module reset_sync_1
+-- Compiling module ks_period_pipeline
+-- Compiling module ks_string_lane
+-- Compiling module ks_string_lane_0
+-- Compiling module karplus_strong_voice
+-- Compiling module ks_tdm_bank
+-- Compiling module sample_tick_gen
+-- Compiling module timbre_blend_smoother
+-- Compiling module timbre_blend_smoother_0
+-- Compiling module piano_hammer_model
+-- Compiling module piano_mode_state_ram
+-- Compiling module piano_rock_gain_rom
+-- Compiling module piano_voice_core
+-- Compiling module piano_hammer_model_0
+-- Compiling module piano_mode_state_ram_0
+-- Compiling module piano_rock_gain_rom_0
+-- Compiling module piano_voice_core_0
+-- Compiling module piano_hammer_model_1
+-- Compiling module piano_mode_state_ram_1
+-- Compiling module piano_rock_gain_rom_1
+-- Compiling module piano_voice_core_1
+-- Compiling module piano_hammer_model_2
+-- Compiling module piano_mode_state_ram_2
+-- Compiling module piano_rock_gain_rom_2
+-- Compiling module piano_voice_core_2
+-- Compiling module four_voice_piano_audio_core
+-- Compiling module pcm24_rock_soft_clip
+-- Compiling module pcm24_rock_soft_clip_0
+-- Compiling module piano_stereo_chorus
+-- Compiling module piano_stereo_room
+-- Compiling module piano_stereo_effects
+-- Compiling module game_miss_audio_cue
+-- Compiling module pcm24_to_16
+-- Compiling module pcm24_to_16_0
+-- Compiling module pt8211_tx
+-- Compiling module i2s_tx
+-- Compiling module four_string_board_audio_chain
+-- Compiling module guitar_visual_telemetry
+-- Compiling module guitar_touch_game_audio
+-- Compiling module guitar_visual_cdc
+-- Compiling module game_snapshot_cdc
+-- Compiling module guitar_pcm_cdc
+-- Compiling module guitar_radial_twiddle
+-- Compiling module gowin_dpb_ram
+-- Compiling module gowin_dpb_ram_0
+-- Compiling module guitar_radial_fft
+-- Compiling module guitar_radial_bands
+-- Compiling module lcd_rgb_scan_480x272
+-- Compiling module guitar_radial_arcsine
+-- Compiling module guitar_lissajous_sine
+-- Compiling module guitar_scanline_ram
+-- Compiling module guitar_scanline_ram_0
+-- Compiling module guitar_radial_curve_renderer
+-- Compiling module guitar_curve_envelope
+-- Compiling module guitar_hz_bcd
+-- Compiling module guitar_radial_palette
+-- Compiling module game_p3_catalog_2
+-- Compiling module game_p2_chart_layout
+-- Compiling module game_message_rom
+-- Compiling module game_font_rom
+-- Compiling module touch_game_renderer
+-- Compiling module guitar_touch_game_display
+-- Compiling module neo_guitar_touch_game_top
+-- Compiling module rtlref_audio_mode_router
+-- Compiling module rtlref_debounced_toggle
+-- Compiling module rtlref_four_string_audio_chain
+-- Compiling module rtlref_four_string_board_audio_chain
+-- Compiling module rtlref_four_string_harmonic_audio_chain
+-- Compiling module rtlref_four_string_pluck_detector
+-- Compiling module rtlref_four_string_vibrato_serial
+-- Compiling module rtlref_four_string_voice_control
+-- Compiling module rtlref_four_voice_antibeat_allocator
+-- Compiling module rtlref_four_voice_audio_core
+-- Compiling module rtlref_four_voice_audio_output
+-- Compiling module rtlref_four_voice_harmonic_audio_core
+-- Compiling module rtlref_four_voice_harmonic_audio_output
+-- Compiling module rtlref_four_voice_piano_audio_core
+-- Compiling module rtlref_fret_note_event
+-- Compiling module rtlref_full_guitar_top
+-- Compiling module rtlref_game_chart_layout
+-- Compiling module rtlref_game_font_rom
+-- Compiling module rtlref_game_message_rom
+-- Compiling module rtlref_game_miss_audio_cue
+-- Compiling module rtlref_game_note_controller
+-- Compiling module rtlref_game_p2_catalog
+-- Compiling module rtlref_game_p2_chart_layout
+-- Compiling module rtlref_game_p2_mode_router
+-- Compiling module rtlref_game_p2_score_bank
+-- Compiling module rtlref_game_p2_static_engine
+-- Compiling module rtlref_game_p2_window_controller
+-- Compiling module rtlref_game_p3_catalog
+-- Compiling module rtlref_game_p3_catalog_cdc
+-- Compiling module rtlref_game_p3_default_catalog
+-- Compiling module rtlref_game_p3_dual_service
+-- Compiling module rtlref_game_p3_frame_rx
+-- Compiling module rtlref_game_p3_import
+-- Compiling module rtlref_game_p3_protocol
+-- Compiling module rtlref_game_p3_score_bank
+-- Compiling module rtlref_game_p3_service
+-- Compiling module rtlref_game_p3_uart
+-- Compiling module rtlref_game_score_rom
+-- Compiling module rtlref_game_snapshot_cdc
+-- Compiling module rtlref_gowin_dpb_ram
+-- Compiling module rtlref_gt911_touch
+-- Compiling module rtlref_guitar_audio_top
+-- Compiling module rtlref_guitar_curve_envelope
+-- Compiling module rtlref_guitar_effect_buttons
+-- Compiling module rtlref_guitar_hz_bcd
+-- Compiling module rtlref_guitar_lissajous_arcsine
+-- Compiling module rtlref_guitar_lissajous_display
+-- Compiling module rtlref_guitar_lissajous_palette
+-- Compiling module rtlref_guitar_lissajous_renderer
+-- Compiling module rtlref_guitar_lissajous_sine
+-- Compiling module rtlref_guitar_pcm_cdc
+-- Compiling module rtlref_guitar_play_control
+-- Compiling module rtlref_guitar_radial_arcsine
+-- Compiling module rtlref_guitar_radial_bands
+-- Compiling module rtlref_guitar_radial_curve_renderer
+-- Compiling module rtlref_guitar_radial_display
+-- Compiling module rtlref_guitar_radial_fft
+-- Compiling module rtlref_guitar_radial_palette
+-- Compiling module rtlref_guitar_radial_twiddle
+-- Compiling module rtlref_guitar_scanline_ram
+-- Compiling module rtlref_guitar_touch_game_audio
+-- Compiling module rtlref_guitar_touch_game_display
+-- Compiling module rtlref_guitar_visual_cdc
+-- Compiling module rtlref_guitar_visual_telemetry
+-- Compiling module rtlref_harmonic_voice_core
+-- Compiling module rtlref_i2c_register_master
+-- Compiling module rtlref_i2s_tx
+-- Compiling module rtlref_imu_posture_classifier
+-- Compiling module rtlref_imu_serial_multiplier
+-- Compiling module rtlref_karplus_strong_voice
+-- Compiling module rtlref_ks_string_lane
+-- Compiling module rtlref_ks_period_pipeline
+-- Compiling module rtlref_ks_compute_pll
+-- Compiling module rtlref_ks_tdm_bank
+-- Compiling module rtlref_lcd_lissajous_ram
+-- Compiling module rtlref_lcd_lissajous_renderer
+-- Compiling module rtlref_lcd_lissajous_sine
+-- Compiling module rtlref_lcd_neon_palette
+-- Compiling module rtlref_lcd_rgb_scan_480x272
+-- Compiling module rtlref_matrix_scanner
+-- Compiling module rtlref_mcp3208_four_channel_reader
+-- Compiling module rtlref_mcp3208_pluck_frontend
+-- Compiling module rtlref_mcp3208_spi
+-- Compiling module rtlref_minimal_audio_core
+-- Compiling module rtlref_minimal_audio_output
+-- Compiling module rtlref_minimal_top
+-- Compiling module rtlref_mode_command_cdc
+-- Compiling module rtlref_mpu6050_posture
+-- Compiling module rtlref_mpu6050_reader
+-- Compiling module rtlref_mpu_diag_i2c_master
+-- Compiling module rtlref_mpu_lcd_diag_reader
+-- Compiling module rtlref_mpu_lcd_diag_screen
+-- Compiling module rtlref_neo_four_string_matrix_audio_test_top
+-- Compiling module rtlref_neo_full_guitar_top
+-- Compiling module rtlref_neo_guitar_audio_full_top
+-- Compiling module rtlref_neo_guitar_i2s_top
+-- Compiling module rtlref_neo_guitar_lissajous_top
+-- Compiling module rtlref_neo_guitar_main_top
+-- Compiling module rtlref_neo_guitar_radial_top
+-- Compiling module rtlref_neo_guitar_touch_game_top
+-- Compiling module rtlref_neo_lcd_lissajous_top
+-- Compiling module rtlref_lcd_demo_button
+-- Compiling module rtlref_neo_minimal_audio_top
+-- Compiling module rtlref_neo_mpu6050_lcd_diagnostic_top
+-- Compiling module rtlref_neo_row0_led_test
+-- Compiling module rtlref_note_phase_rom
+-- Compiling module rtlref_note_phase_table
+-- Compiling module rtlref_pcm24_chorus
+-- Compiling module rtlref_pcm24_mixer
+-- Compiling module rtlref_pcm24_reverb
+-- Compiling module rtlref_pcm24_rock_soft_clip
+-- Compiling module rtlref_pcm24_to_16
+-- Compiling module rtlref_performance_vibrato_gesture
+-- Compiling module rtlref_phase_slide_smoother
+-- Compiling module rtlref_phase_vibrato_modulator
+-- Compiling module rtlref_piano_hammer_model
+-- Compiling module rtlref_piano_mode_state_ram
+-- Compiling module rtlref_piano_rock_gain_rom
+-- Compiling module rtlref_piano_stereo_chorus
+-- Compiling module rtlref_piano_stereo_effects
+-- Compiling module rtlref_piano_stereo_room
+-- Compiling module rtlref_piano_voice_core
+-- Compiling module rtlref_pluck_event_cdc
+-- Compiling module rtlref_posture_timbre_cdc
+-- Compiling module rtlref_posture_timbre_policy
+-- Compiling module rtlref_posture_touch_controls
+-- Compiling module rtlref_pt8211_tx
+-- Compiling module rtlref_reset_sync
+-- Compiling module rtlref_rgb_spectrum_timing
+-- Compiling module rtlref_sample_tick_gen
+-- Compiling module rtlref_sine_nco
+-- Compiling module rtlref_spectrum_bars32
+-- Compiling module rtlref_spectrum_bar_cdc
+-- Compiling module rtlref_spectrum_display_top
+-- Compiling module rtlref_spectrum_fft1024
+-- Compiling module rtlref_stable_fret_cdc
+-- Compiling module rtlref_stereo_audio_effects
+-- Compiling module rtlref_test_tone_trigger
+-- Compiling module rtlref_timbre_blend_smoother
+-- Compiling module rtlref_touch_coordinate_mapper
+-- Compiling module rtlref_touch_game_renderer
+-- Compiling module rtlref_touch_game_ui
+-- Compiling module rtlref_touch_gesture
+-- Compiling module rtlref_voice_audio_core
+-- Compiling module rtlref_voice_envelope
+-- Compiling module rtlref_xinxian_top
+-- Compiling module tb_dual_uart_gate_accelerated
+
+Top level modules:
+	MUX2_MUX8
+	MUX2_MUX16
+	MUX2_MUX32
+	LUT1
+	LUT8
+	DLCE
+	DLPE
+	RAM16S1
+	RAM16S2
+	RAM16S4
+	RAM16SDP1
+	RAM16SDP2
+	RAM16SDP4
+	ROM16
+	TLVDS_IBUF
+	TLVDS_OBUF
+	TLVDS_TBUF
+	TLVDS_IOBUF
+	ELVDS_OBUF
+	ELVDS_TBUF
+	ELVDS_IOBUF
+	MIPI_IBUF
+	MIPI_OBUF_A
+	MIPI_OBUF_LP
+	IOBUF_LP
+	ELVDS_IOBUF_R
+	I3C_IOBUF
+	TLVDS_IBUF_ADC
+	SP
+	SPX9
+	SDPX9B
+	SDP36KE
+	SDP136K
+	MULTACC
+	IDDR
+	IDDRC
+	IDDR_MEM
+	ODDR
+	ODDRC
+	ODDR_MEM
+	IDES4
+	IDES8
+	IDES10
+	IDES16
+	IDES4_MEM
+	IVIDEO
+	IDES8_MEM
+	IDES14
+	IDES32
+	OSER4
+	OSER4_MEM
+	OVIDEO
+	OSER8
+	OSER8_MEM
+	OSER10
+	OSER14
+	OSER16
+	OSIDES64
+	DCE
+	DCS
+	DDRDLL
+	DLLDLY
+	CLKDIV
+	CLKDIV2
+	DHCE
+	OSC
+	OSCA
+	OSCB
+	PLL
+	AE350_SOC
+	AE350_RAM
+	SAMB
+	OTP
+	CMSER
+	CMSERA
+	CMSERB
+	SAMBA
+	ADCLRC
+	ADCULC
+	ADC
+	ADC_SAR
+	ADCA
+	LICD
+	MIPI_DPHY_RX
+	MIPI_DPHY
+	MIPI_DPHYA
+	MIPI_CPHY
+	GTR12_QUAD
+	GTR12_UPAR
+	GTR12_PMAC
+	GTR12_QUADA
+	GTR12_UPARA
+	GTR12_PMACA
+	GTR12_QUADB
+	rtlref_four_string_audio_chain
+	rtlref_four_string_harmonic_audio_chain
+	rtlref_game_p3_service
+	rtlref_minimal_audio_core
+	rtlref_neo_four_string_matrix_audio_test_top
+	rtlref_neo_full_guitar_top
+	rtlref_neo_guitar_audio_full_top
+	rtlref_neo_guitar_i2s_top
+	rtlref_neo_guitar_lissajous_top
+	rtlref_neo_guitar_main_top
+	rtlref_neo_guitar_radial_top
+	rtlref_neo_lcd_lissajous_top
+	rtlref_neo_minimal_audio_top
+	rtlref_neo_mpu6050_lcd_diagnostic_top
+	rtlref_neo_row0_led_test
+	rtlref_pluck_event_cdc
+	rtlref_stable_fret_cdc
+	rtlref_xinxian_top
+	tb_dual_uart_gate_accelerated
+End time: 17:20:34 on Nov 02,2026, Elapsed time: 0:00:09
+Errors: 0, Warnings: 0

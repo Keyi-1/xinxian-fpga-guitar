@@ -1,0 +1,48 @@
+{
+  "result": "PASS",
+  "scope": "Release bytes, packaged source hashes, exact cross-client score identity, protocol sources and pre-existing test receipt binding; no physical transfer.",
+  "android_apk": "T:\\Documents\\AMD\\xinxian-companion-ui\\build\\releases\\android\\xinxian_jdy23_0.3.0\\xinxian_jdy23_0.3.0.apk",
+  "android_sha256": "9f685e9bb056fefa3e6428698f7bf85f3ddcc173306d43e5b395c6e9aed7f974",
+  "windows_zip": "T:\\Documents\\AMD\\xinxian-companion-ui\\build\\releases\\windows\\FPGA_Guitar_Uploader_1.2.0.zip",
+  "windows_sha256": "6410a8ca7dc1b3f2a980dfe69185711e249beca9711b3bc64b15df6a4605437e",
+  "reused_android_api35_checks": 195,
+  "reused_windows_cases": 34,
+  "scores": [
+    {
+      "title": "生日快乐歌",
+      "events": 25,
+      "duration_samples": 1152000,
+      "timbre": 1,
+      "crc32": "f08df358",
+      "payload_sha256": "4bb16cd049af95d6f0c994f392b02a16f85ccd9fe5f6f7a91b3d13e42d94628c"
+    },
+    {
+      "title": "我不难过",
+      "events": 564,
+      "duration_samples": 14220000,
+      "timbre": 1,
+      "crc32": "5d01057f",
+      "payload_sha256": "5364c48c4c147ee1f0c1f44e4ff9ae818129b4f596fdaacb0a8d45c545fa823e"
+    },
+    {
+      "title": "City of Stars",
+      "events": 491,
+      "duration_samples": 6451200,
+      "timbre": 1,
+      "crc32": "1dd77241",
+      "payload_sha256": "a1eb88cb90838b894a9a574dd9dbb02c3c2e47c3a54f242e0169fd6298b9085b"
+    }
+  ],
+  "three_songs_total_events": 1080,
+  "import_shared_capacity": 1345,
+  "receipt_sha256": {
+    "build/companion_ui/verification.json": "aac66a0c58bc104f1c7093f6d26d64d5d8a1c565fbd69cac010ef87ac8a64c05",
+    "build/companion_ui/android_os/verification.json": "c1cd92cd982bd572858505068cea4aff0a4213871f56ed03c8d2920280edc25a",
+    "build/companion_ui/checks/verification.json": "6a0d197634b1ad0765a0390305161d2ae92ee09c146b48b9121de380008a289e",
+    "build/jdy23/v1/android_test/verification.json": "0ad8b9df50ac189f72111171d67e349a66b5c3ba1ee67e7b3c29a153c73e5ff8",
+    "build/companion_ui/windows_checks/verification.json": "e571c22330b0b3de064c2422b9526a432b0e3429bf088c2749a81a07c0114880",
+    "build/releases/android/xinxian_jdy23_0.3.0/verification.json": "bb60af9ed2bf7710bfaf1496ff36aeb3a4c5041a8f54030d78213c421cb3c317"
+  },
+  "physical_hardware_tested": false,
+  "apps_rebuilt": false
+}

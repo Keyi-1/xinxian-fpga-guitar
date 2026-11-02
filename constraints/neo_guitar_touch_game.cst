@@ -146,6 +146,12 @@ IO_PORT "song_uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
 IO_LOC "song_uart_rx" AB22;
 IO_PORT "song_uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;
 
+# Independent DEBUG-USB2 / BL616 UART, 115200 8N1. JDY-23 stays on J8.
+IO_LOC "usb_song_uart_tx" U15;
+IO_PORT "usb_song_uart_tx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=4 BANK_VCCIO=3.3;
+IO_LOC "usb_song_uart_rx" V14;
+IO_PORT "usb_song_uart_rx" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=OFF BANK_VCCIO=3.3;
+
 # MPU-6050 independent open-drain GPIO bus. 31005 J8, unused by J8-5..8 ADC.
 # J8-11 PMOD1_IO0 -> J2-5 -> Y21; J8-12 PMOD1_IO1 -> J2-3 -> Y22, Bank8 3V3.
 IO_LOC "imu_scl" Y21;

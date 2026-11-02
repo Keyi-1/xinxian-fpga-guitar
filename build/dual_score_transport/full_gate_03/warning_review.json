@@ -1,0 +1,28 @@
+{
+  "result": "PASS",
+  "warning_count": 238,
+  "unique_warnings": [
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16253): (vopt-13162) Assignment to 'real_duty0' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16484): (vopt-13162) Assignment to 'real_duty1' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16579): (vopt-13162) Assignment to 'real_duty2' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16674): (vopt-13162) Assignment to 'real_duty3' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16769): (vopt-13162) Assignment to 'real_duty4' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16855): (vopt-13162) Assignment to 'real_duty5' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(16941): (vopt-13162) Assignment to 'real_duty6' within the always block cannot trigger the same always block.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1860): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1864): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1868): (vopt-2697) MSB of part-select into 'mem_a' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1884): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1888): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(1893): (vopt-2697) MSB of part-select into 'mem_b' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3130): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3134): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3138): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3142): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3313): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds.",
+    "# ** Warning: S:/BaiduNetdiskDownload/GOWIN/Gowin_V1.9.12.03_x64/IDE/simlib/gw5a/prim_sim.v(3317): (vopt-2697) MSB of part-select into 'mem_t' is out of bounds."
+  ],
+  "simulation_sha256": "d90dbaf18ce2b5df8b1a25a19f4287a47928e144e48b4b44e65ac17d8c5428b9",
+  "library_sha256": "7db6e9953af24f1233dbc8f58352a1673e91d01bb69656a16ae893a68089f85d",
+  "review": "Exact reviewed vendor RAM-width/PLLA sensitivity sites only; no application warning."
+}

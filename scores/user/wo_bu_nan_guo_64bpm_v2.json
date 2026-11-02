@@ -1,0 +1,29 @@
+{
+  "format_version": 2,
+  "event_bytes": 16,
+  "sample_rate_hz": 48000,
+  "pitch_profile": "game_extended",
+  "event_count": 564,
+  "duration_samples": 14220000,
+  "bpm": 64,
+  "recommended_timbre": 1,
+  "crc32": "5d01057f",
+  "source_csv_sha256": "74470c83b146a653fd9a8a294ffedb32c5f49995bb246785f932e8e39aa10f3b",
+  "title": "我不难过（64BPM读谱修订版）",
+  "arrangement": "single_melody",
+  "transcription_status": "rechecked_revision",
+  "total_score_beats": "316",
+  "bar_count": 80,
+  "source_files_sha256": {
+    "T:\\Downloads\\Screenshot_20261101_220151_com_xingin_xhs_NoteDe.jpg": "d3ada7b67065e216ebfec8d8ef290f51f4a6c5ef4e0dbaa1e84fc6a393d0ec52",
+    "T:\\Downloads\\Screenshot_20261101_220201_com_xingin_xhs_NoteDe.jpg": "84afa9b4daf03881c212d1db7d1e6ef613295e79ca610d6a92ce7bda5e09e97e"
+  },
+  "adaptation_notes": [
+    "沿用谱面第一/第二结尾与(2)返回点；共80小节，反复已逐段展开。",
+    "修正634、465、565、352、56等减时线读法和低音点；桥段上方伴奏斜杠三连音不套用到主旋律。",
+    "本曲仍为单旋律，保持64BPM；无数值fermata/rit仍按基础拍长。"
+  ],
+  "musical_review_required": [
+    "源图反复和节奏已重新核对；仍需用户实听确认其演唱编配。"
+  ]
+}

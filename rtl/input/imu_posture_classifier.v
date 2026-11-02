@@ -1,4 +1,6 @@
-// Body axes: +X toward neck, +Z outward through the front of the instrument.
+// Body axes: X along neck, +Z outward through the front of the instrument.
+// Neck-up and neck-down use the same inclination limits. The mounting may
+// reverse X/Y without changing the flat/guitar classification.
 // 100Hz, +/-4g (8192LSB/g), +/-250dps (131LSB/dps). Explicit stationary,
 // face-up calibration; no orientation decision before calibration/health.
 module imu_posture_classifier #(
@@ -94,14 +96,14 @@ module imu_posture_classifier #(
         holding=0;classified=UNKNOWN;
         case(stable_pose)
             FACE_UP:holding=filtered_z>0 && (z_squared<<2)>=norm_three;
-            GUITAR:holding=filtered_z>=0 && filtered_x>=-2048 && zs<=guitar_hold_z && xs<=guitar_hold_x;
-            UPRIGHT:holding=filtered_x>0 && filtered_z>=-1229 && (x_squared<<2)>=norm_three;
+            GUITAR:holding=filtered_z>=0 && zs<=guitar_hold_z && xs<=guitar_hold_x;
+            UPRIGHT:holding=filtered_z>=-1229 && (x_squared<<2)>=norm_three;
             default:holding=0;
         endcase
         if(holding)classified=stable_pose;
         else if(filtered_z>0 && zs>=enter_ratio)classified=FACE_UP;
-        else if(filtered_x>0 && filtered_z>=-1229 && xs>=enter_ratio)classified=UPRIGHT;
-        else if(filtered_z>=0 && filtered_x>=-1229 && (z_squared<<1)<=norm && (x_squared<<2)<=norm_three)classified=GUITAR;
+        else if(filtered_z>=-1229 && xs>=enter_ratio)classified=UPRIGHT;
+        else if(filtered_z>=0 && (z_squared<<1)<=norm && (x_squared<<2)<=norm_three)classified=GUITAR;
     end
     always @(posedge clk)begin
         if(!rst_n)begin

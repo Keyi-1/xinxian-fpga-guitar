@@ -1,0 +1,935 @@
+{
+  "result": "PASS",
+  "scope": "Only registered touch readiness and the enumerated UART countdown high-bit Q outputs are forced in the two complete tops. All serial bytes use physical top pins. No FIFO, importer, RAM, CRC, catalog or audio result forcing.",
+  "force_gate": "gate.u_touch.touch_ready=1'b1",
+  "force_reference": "reference.u_touch.ready=1'b1",
+  "countdown_audit": {
+    "0": {
+      "nominal_cycles": 5208,
+      "kept_bits": 5,
+      "accelerated_cycles": 24,
+      "half_cycles": 12,
+      "all_32_q": {
+        "rx_count[12]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_12_s0",
+          "pins": {
+            "Q": "rx_count[12]",
+            "D": "n220_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[11]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_11_s0",
+          "pins": {
+            "Q": "rx_count[11]",
+            "D": "n221_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[10]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_10_s0",
+          "pins": {
+            "Q": "rx_count[10]",
+            "D": "n222_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[9]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_9_s0",
+          "pins": {
+            "Q": "rx_count[9]",
+            "D": "n223_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[6]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_6_s0",
+          "pins": {
+            "Q": "rx_count[6]",
+            "D": "n226_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[5]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_5_s0",
+          "pins": {
+            "Q": "rx_count[5]",
+            "D": "n227_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[4]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_4_s0",
+          "pins": {
+            "Q": "rx_count[4]",
+            "D": "n228_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[3]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_3_s0",
+          "pins": {
+            "Q": "rx_count[3]",
+            "D": "n229_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[2]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_2_s0",
+          "pins": {
+            "Q": "rx_count[2]",
+            "D": "n230_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[15]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_15_s1",
+          "pins": {
+            "Q": "rx_count[15]",
+            "D": "n8_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "rx_count[14]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_14_s1",
+          "pins": {
+            "Q": "rx_count[14]",
+            "D": "n9_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "rx_count[13]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_13_s1",
+          "pins": {
+            "Q": "rx_count[13]",
+            "D": "n10_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "rx_count[8]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_8_s1",
+          "pins": {
+            "Q": "rx_count[8]",
+            "D": "n15_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "rx_count[7]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_7_s1",
+          "pins": {
+            "Q": "rx_count[7]",
+            "D": "n16_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "rx_count[1]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_1_s1",
+          "pins": {
+            "Q": "rx_count[1]",
+            "D": "n22_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "rx_count[0]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_0_s1",
+          "pins": {
+            "Q": "rx_count[0]",
+            "D": "n23_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_11"
+          }
+        },
+        "tx_count[15]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_15_s1",
+          "pins": {
+            "Q": "tx_count[15]",
+            "D": "n347_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[14]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_14_s1",
+          "pins": {
+            "Q": "tx_count[14]",
+            "D": "n348_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[13]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_13_s1",
+          "pins": {
+            "Q": "tx_count[13]",
+            "D": "n349_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[12]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_12_s1",
+          "pins": {
+            "Q": "tx_count[12]",
+            "D": "n350_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[11]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_11_s1",
+          "pins": {
+            "Q": "tx_count[11]",
+            "D": "n351_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[10]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_10_s1",
+          "pins": {
+            "Q": "tx_count[10]",
+            "D": "n352_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[9]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_9_s1",
+          "pins": {
+            "Q": "tx_count[9]",
+            "D": "n353_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[8]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_8_s1",
+          "pins": {
+            "Q": "tx_count[8]",
+            "D": "n354_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[7]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_7_s1",
+          "pins": {
+            "Q": "tx_count[7]",
+            "D": "n355_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[6]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_6_s1",
+          "pins": {
+            "Q": "tx_count[6]",
+            "D": "n356_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[5]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_5_s1",
+          "pins": {
+            "Q": "tx_count[5]",
+            "D": "n357_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[4]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_4_s1",
+          "pins": {
+            "Q": "tx_count[4]",
+            "D": "n358_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[3]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_3_s1",
+          "pins": {
+            "Q": "tx_count[3]",
+            "D": "n359_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[2]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_2_s1",
+          "pins": {
+            "Q": "tx_count[2]",
+            "D": "n360_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[1]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_1_s1",
+          "pins": {
+            "Q": "tx_count[1]",
+            "D": "n361_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[0]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_0_s1",
+          "pins": {
+            "Q": "tx_count[0]",
+            "D": "n362_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        }
+      }
+    },
+    "1": {
+      "nominal_cycles": 434,
+      "kept_bits": 6,
+      "accelerated_cycles": 50,
+      "half_cycles": 25,
+      "all_32_q": {
+        "rx_count[8]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_8_s0",
+          "pins": {
+            "Q": "rx_count[8]",
+            "D": "n224_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[6]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_6_s0",
+          "pins": {
+            "Q": "rx_count[6]",
+            "D": "n226_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[5]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_5_s0",
+          "pins": {
+            "Q": "rx_count[5]",
+            "D": "n227_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[3]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_3_s0",
+          "pins": {
+            "Q": "rx_count[3]",
+            "D": "n229_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[0]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_0_s0",
+          "pins": {
+            "Q": "rx_count[0]",
+            "D": "n232_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "VCC"
+          }
+        },
+        "rx_count[15]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_15_s1",
+          "pins": {
+            "Q": "rx_count[15]",
+            "D": "n8_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[14]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_14_s1",
+          "pins": {
+            "Q": "rx_count[14]",
+            "D": "n9_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[13]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_13_s1",
+          "pins": {
+            "Q": "rx_count[13]",
+            "D": "n10_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[12]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_12_s1",
+          "pins": {
+            "Q": "rx_count[12]",
+            "D": "n11_10",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[11]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_11_s1",
+          "pins": {
+            "Q": "rx_count[11]",
+            "D": "n12_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[10]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_10_s1",
+          "pins": {
+            "Q": "rx_count[10]",
+            "D": "n13_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[9]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_9_s1",
+          "pins": {
+            "Q": "rx_count[9]",
+            "D": "n14_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[7]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_7_s1",
+          "pins": {
+            "Q": "rx_count[7]",
+            "D": "n16_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[4]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_4_s1",
+          "pins": {
+            "Q": "rx_count[4]",
+            "D": "n19_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[2]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_2_s1",
+          "pins": {
+            "Q": "rx_count[2]",
+            "D": "n21_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "rx_count[1]": {
+          "cell": "DFFRE",
+          "instance": "rx_count_1_s1",
+          "pins": {
+            "Q": "rx_count[1]",
+            "D": "n22_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "rx_count_15_9"
+          }
+        },
+        "tx_count[15]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_15_s1",
+          "pins": {
+            "Q": "tx_count[15]",
+            "D": "n347_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[14]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_14_s1",
+          "pins": {
+            "Q": "tx_count[14]",
+            "D": "n348_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[13]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_13_s1",
+          "pins": {
+            "Q": "tx_count[13]",
+            "D": "n349_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[12]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_12_s1",
+          "pins": {
+            "Q": "tx_count[12]",
+            "D": "n350_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[11]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_11_s1",
+          "pins": {
+            "Q": "tx_count[11]",
+            "D": "n351_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[10]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_10_s1",
+          "pins": {
+            "Q": "tx_count[10]",
+            "D": "n352_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[9]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_9_s1",
+          "pins": {
+            "Q": "tx_count[9]",
+            "D": "n353_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[8]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_8_s1",
+          "pins": {
+            "Q": "tx_count[8]",
+            "D": "n354_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[7]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_7_s1",
+          "pins": {
+            "Q": "tx_count[7]",
+            "D": "n355_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[6]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_6_s1",
+          "pins": {
+            "Q": "tx_count[6]",
+            "D": "n356_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[5]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_5_s1",
+          "pins": {
+            "Q": "tx_count[5]",
+            "D": "n357_11",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[4]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_4_s1",
+          "pins": {
+            "Q": "tx_count[4]",
+            "D": "n358_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[3]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_3_s1",
+          "pins": {
+            "Q": "tx_count[3]",
+            "D": "n359_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[2]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_2_s1",
+          "pins": {
+            "Q": "tx_count[2]",
+            "D": "n360_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[1]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_1_s1",
+          "pins": {
+            "Q": "tx_count[1]",
+            "D": "n361_7",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        },
+        "tx_count[0]": {
+          "cell": "DFFRE",
+          "instance": "tx_count_0_s1",
+          "pins": {
+            "Q": "tx_count[0]",
+            "D": "n362_8",
+            "CLK": "sys_clk_50m_d",
+            "RESET": "n562_6",
+            "CE": "tx_count_15_9"
+          }
+        }
+      }
+    }
+  },
+  "countdown_forces": [
+    "force gate.\\p3.service .\\link[0].uart .rx_count_5_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_6_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_7_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_8_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_9_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_10_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_11_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_12_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_13_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_14_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .rx_count_15_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_5_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_6_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_7_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_8_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_9_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_10_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_11_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_12_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_13_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_14_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[0].uart .tx_count_15_s1.Q=1'b0;",
+    "force reference.p3.service.link[0].uart.rx_count[15:5]=0;",
+    "force reference.p3.service.link[0].uart.tx_count[15:5]=0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_6_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_7_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_8_s0.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_9_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_10_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_11_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_12_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_13_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_14_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .rx_count_15_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_6_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_7_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_8_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_9_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_10_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_11_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_12_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_13_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_14_s1.Q=1'b0;",
+    "force gate.\\p3.service .\\link[1].uart .tx_count_15_s1.Q=1'b0;",
+    "force reference.p3.service.link[1].uart.rx_count[15:6]=0;",
+    "force reference.p3.service.link[1].uart.tx_count[15:6]=0;"
+  ],
+  "translated_sources_sha256": {
+    "audio_mode_router.v": "6c9e5993ec8fcf70bc110a25c6556be4996d2634713e556e8e1dd77261818641",
+    "debounced_toggle.v": "f24b6dc0a2bfdb9ed59423c06969dccaa188121d0df74873cea2d3d018efd1c6",
+    "display_orientation.vh": "e226ffc1c797b8e58a54fd004f3e221830e60539ecfa888c62439a067acddd82",
+    "four_string_audio_chain.v": "c7afc072aeb4e0820b1b85aacd7fbc4dff3ab1878077d0c4cd7e934df23138e6",
+    "four_string_board_audio_chain.v": "1fd2559abb6b84fe3ed7eaaa0fde784a77c33c74b75a416c4185a01d9bdf24a9",
+    "four_string_harmonic_audio_chain.v": "ba6bb1f35aa378223330a3bad08ea67afaabca8c0e6498fbece942ad4b9fbd2b",
+    "four_string_pluck_detector.v": "449ca8ec300221399e48a63aba04f057667ef859f0fff174195cf74d5802c566",
+    "four_string_vibrato_serial.v": "8eb5eb51f37fb72cc3a969db45132f827c245527523a3726417e2070fd1dfa28",
+    "four_string_voice_control.v": "4c08262790ee6cf611d7227ecaab86ef832ee79eeb6cf7e7c8c73c9950cb0d25",
+    "four_voice_antibeat_allocator.v": "12fab586b78c9f3623ee151f917348928adc96271085ed829d4ee24ee586bbf1",
+    "four_voice_audio_core.v": "8146fb3c9c8db9694ddd0dbf26c7ad31628e259bed63562bf404b50ae1dd13b2",
+    "four_voice_audio_output.v": "b9314f6c567652d73613d11fd6ddefe5e3e1ceae0e559f133c945c80e6b2c422",
+    "four_voice_harmonic_audio_core.v": "722d1d46c2a9beec9c8c8ab3d0128a5406aee6ba41c7ba2f06c2df3760b324b9",
+    "four_voice_harmonic_audio_output.v": "1462a6020819d56a13fb24c18bb4b1b1a366a2d56d01ca9b3ec207b5af460a33",
+    "four_voice_piano_audio_core.v": "7a8451b48387e3f1df10c03f16f870d01c0c47bbd9850c2b25415262ba383880",
+    "fret_note_event.v": "6b1869e13e996d15be9282b44992621c16e961a97038fe5cfd84adedb88ca4fe",
+    "full_guitar_top.v": "c1842326df8dabebc9c1a2dd0d98cd0ade8d86d80e89191cc995fc45bd2d6280",
+    "game_chart_layout.v": "f6d0a75b0ecb80a4612b009d649aa118102c35e53fb17ffaed63393a34bd0a1a",
+    "game_font_rom.v": "4ab231d4047c7c5e1dac07a4b5cbf861ee4ea904e78b238b37e610534ee48e1e",
+    "game_message_rom.v": "67e0335bd1911a6f2fd253752e9fa1dc9613ec41693672cb6ff54b4b0f48cf35",
+    "game_miss_audio_cue.v": "986a92f2fe2e270354f098e81183cbb1786276912d594b5ff5e112a9880194e1",
+    "game_note_controller.v": "00e0e4e2ddefa3421935199d83b7316ed45598ac8f4d435b80163fa88e3e4865",
+    "game_p2_bsram_init.vh": "95ca7d325a4f4bfcefab63de52e216a2f308f88192da1a88e7e900aa5dfa0b5e",
+    "game_p2_catalog.v": "ffc95e42716b55a25259a59894e632fdea98653b74d8df50f26183fe2be215fe",
+    "game_p2_catalog.vh": "5cdd6aadb848f0e893fc7f7659d83c6a30c8bd3bdcc0ecf36f7f9933e84766f6",
+    "game_p2_chart_layout.v": "af44a2d700b4217a8db06facb15db1281d82e85bfd5de7e904c93938c4127f44",
+    "game_p2_mode_router.v": "8be454b0edfb6363c200a3c89cc18203aa0064b0b59ee31d90027dc0d121af64",
+    "game_p2_phase.vh": "70313310e78aacb8616120e18df1714a76ca7cddcdb784b083a02f01387752b5",
+    "game_p2_progress.vh": "4c1f5ba3663b0f693bd55a803d9cf844a776a1c83afd9b36bceeee1aaf886671",
+    "game_p2_score_bank.v": "01008f97437a2ac377d1ff735ecffc35c42e18da19b8a3464a72aa4f537376ab",
+    "game_p2_static_engine.v": "989e54fb7f4ab5b7c7e328e44b7c99433f5957ab6b61f210e11bae1abae2b607",
+    "game_p2_window_controller.v": "92a709f9bbb32b2a99f0b296088f453d3fb6c81182996890996aae04a6742415",
+    "game_p3_bsram_init.vh": "ea5e0c57cc75b830aa5c212b6fca896aa77dbca480a29f520f735d9fae198146",
+    "game_p3_catalog.v": "7a63e224e260b4daff59a433a3c0bc31af4bab672f7c9fc3cd8e6839e07818bd",
+    "game_p3_catalog_cdc.v": "451d9447b60c31f2cb39ccddd4430c849139cddfe52cb8cdf69d94db0e4c8b25",
+    "game_p3_default_catalog.v": "4bb38eb6d034cb51db210d17db007bf5580e2b43c87de069dad221322e90a9cb",
+    "game_p3_dual_service.v": "f83c7dbda33e31d46937bf43c86b545b88083c90485b724b8cc6dafcc7a04d09",
+    "game_p3_import.v": "0b41995bf76dab60670ed45a3a03c3b701cbcd92387ee70a6e2b98ba2e2d075d",
+    "game_p3_protocol.v": "4e4a216bf63384431dd0eb7568bab0b9d9e90eab379b539f6e9ddf5b574fb0c0",
+    "game_p3_score_bank.v": "3320ee331cf7a2a75d702b56063d2a9cddce6a69b2561506ec785858a4eb8584",
+    "game_p3_service.v": "6956927671689b81ff46730b5f1a6e4a85248c4445c6749d6c27a624e7859018",
+    "game_p3_slot_map.vh": "b747c094a199fc597512e560ccd75a497c220b58185813ef429cf73cba3a23f0",
+    "game_p3_uart.v": "8f3b21cb577422af21805aa3b731b28b62a6cd99237ac0610b389bed9ee430b4",
+    "game_score_config.vh": "a9921dbe3eb9fd4ddc6a305cc2a28f8f0ca0d2988998f18ed482e01c2e81bdd9",
+    "game_score_rom.v": "abfb10c1bb8bca9c761b41c7c93e100acb00b746054deb3a480bdd1df6173821",
+    "game_snapshot_cdc.v": "251c44c9dc27a77328736d0e8a27cbd8bbada02efe30a44edae153fe869df487",
+    "game_ui_messages.vh": "14d092b34616beb2d8aa687cdb86d8b597659e555cd8fddd1e03c1c99169017e",
+    "gowin_dpb_ram.v": "b69fdb63e7eef274bd23d14a93ac49c293d20892ebe1c67b662c7c4dddf4e617",
+    "gt911_touch.v": "6e1f0237508d8e047cd2acf2d709c62a787ef2ea4c16b1f9a7519a4157e23482",
+    "guitar_audio_top.v": "8148898f83b598d152a5ddae51e742d90c40cf0d25ca6ea4a58c8c2e226b3661",
+    "guitar_config.vh": "b4e62a5e3eb55b66f2efc42d7703fa24f38b164007ea70352c93e3f725169cc0",
+    "guitar_curve_envelope.v": "112c37f52301fced5179b450b64f4221de10714dc9b51b477669c9b4290fc601",
+    "guitar_effect_buttons.v": "5f7fdf5dd6de16a253fb889569763441eb6c93e17f2984df44d8d6af08b6f758",
+    "guitar_hz_bcd.v": "377b0f0619833c74c1c75d8b1a9ef5afcc9b26f7ef2b51641135b210ee9c496d",
+    "guitar_lissajous_arcsine.v": "e69ffd6a967ca08f2750be1b004e548430b980a28d31a0bfd650cc791b2b1bc4",
+    "guitar_lissajous_display.v": "1e108681103d1bb1e7e8497f1a777a36717c445eae64f408e1884807a2704316",
+    "guitar_lissajous_palette.v": "4ba440b73e11af8134260028051d1972652d1f64dcbd5b93707b72d93a492ee1",
+    "guitar_lissajous_renderer.v": "30a03d74cfb18cb26bd19fae9bcafc4f3f8cc37c4e37ed42be7ded7339e4a4e4",
+    "guitar_lissajous_sine.v": "b805221dca5c13390c6e18801f44e5ea9a8ca11751ea97807f978c83d96b0d44",
+    "guitar_pcm_cdc.v": "6483804a1f447c34b26438c3d8454c18d4660ac6d21c4f10ca0cf0c6f894fb8e",
+    "guitar_play_control.v": "dc2a5b3bf51cc4474ecd68bed44d38381111ee3dce0dd1284be7766ed1194096",
+    "guitar_radial_arcsine.v": "9d50873001ca510d4d636623a66b467f78530485a2fa45ede78d6312b11737a5",
+    "guitar_radial_bands.v": "b5ba6c3589f3379ee1336b83058591bc92553e1345dfab6c5d7de240774287c3",
+    "guitar_radial_curve_renderer.v": "a2457781ca82bc8894a65346f06bb486ed00c146ba17c61911020f1dceeb170a",
+    "guitar_radial_display.v": "08d39b9c61145e383ebe501a9cc83ced4580875e352e6d844d3b571c883d86b8",
+    "guitar_radial_fft.v": "56ab05153dc4e28d4305fa8a5acf4cac2b440e7699e21e255ccf50abcbaf0b88",
+    "guitar_radial_palette.v": "471559eddfec6ef8fcdb97dd52116e4fea3f6843104bccdfc889bfd43ff461e9",
+    "guitar_radial_twiddle.v": "4f949eb6fc43f34c719b9e2211767709a79d4cb76f43258bed1ea89087596219",
+    "guitar_scanline_ram.v": "04efca932dbc963c33ea15ab618378ffad0bc7401e850a1528e8f912e779799d",
+    "guitar_touch_game_audio.v": "331dd8a49dbf895c96f65e671ac49cd06c0886d9aec30ef2a570ea5e42ef4396",
+    "guitar_touch_game_display.v": "cd0b53aa0ffb931e830868e5e11e1950f42b8de4f7685abeab926f6ea0c7b147",
+    "guitar_visual_cdc.v": "ecc1d95141bc91f15565aa696c7cc63c4157e493e1e0c3362c71b8ed15e43191",
+    "guitar_visual_telemetry.v": "e54f6e9d59b8e85147a76ea32b3f8ac23f63930a7ce71bfeee3e5f8e31441633",
+    "harmonic_voice_core.v": "37a9e1d2f05f0846498e55d56381f2d72f7d90d64c9c6598bb9f9f389aeb7bf8",
+    "i2c_register_master.v": "ccbbcdc04fd72e5596baf78375040e96afb9d9dc4b653830c116307d6de84f9a",
+    "i2s_tx.v": "7f31a5575c47d8e2305050262a32d1bcf5dc0d57b057b1b581944817d5813105",
+    "imu_posture_classifier.v": "888f93e8dda89ffff8935adf4cfd80bbc0d53685c488627cf5adc13bb5241356",
+    "imu_serial_multiplier.v": "4b6718664a5a792589c537255b22a431cd319f9dfa7b77e0f58a57bf05f29e02",
+    "karplus_strong_voice.v": "04c98b28de54752adbbeac984c9a4fe4f8a4bd61f6b5987006c13c50c43df5b9",
+    "ks_compute_pll.v": "3ed857d3290208adadf96047a70b3fc37d882de70cc6e18ed89a13216760fb21",
+    "ks_reciprocal.vh": "ed4be6dbf316fdba16c07be14d0eb8816cebcba62765ae053df2873e277a3671",
+    "ks_tdm_bank.v": "dd5004f616d1f9efbc840a265ba7b074893f8b1db96cd36fb3a16a7aa950019e",
+    "lcd_lissajous_ram.v": "5b52587249d440da026bf0d1a433e585d0d9e275ec99d4b53fed9935240f875d",
+    "lcd_lissajous_renderer.v": "29bd66da499cea26a53d1417552980a3b7f0090774d0ebeb2321900e68d290fd",
+    "lcd_lissajous_sine.v": "c052ff48492310d9d2cecf1b79b601ff7e0d7ba38e72df2ac93fbca9068814ee",
+    "lcd_neon_palette.v": "4d4c1615f358db19f6f43d303927c28b0e5977ca9fc84dfa02ea7e2aa22a3265",
+    "lcd_rgb_scan_480x272.v": "12238922dd578cec58335ea32a85feb55b7dd9d47d2fe23d639fed748e3c49d8",
+    "matrix_scanner.v": "606b556c8f703bf4a103bab923a519997cf4bf1752fe58e439b95d1282992413",
+    "mcp3208_four_channel_reader.v": "9bd2d94d9ba6a8072e50058b2705ec17b196d7f2b37059d2513229f42f176138",
+    "mcp3208_pluck_frontend.v": "61a0b76845fcaf1edb8b88af7b78f75d368d442b6bf517c5d8d3b0a93ed3d26b",
+    "mcp3208_spi.v": "8fb7043a9c3cf089759902761c484613769a801de11b6393778c25796438852e",
+    "minimal_audio_core.v": "c30006cb25f48554ee744e550eb757fa3c311fb991074942c63273eaac532575",
+    "minimal_audio_output.v": "3e33998141051d52988365d1c1a792a8b0380bb8be66d2ee1cccfd80be31889a",
+    "minimal_top.v": "cfbe7e9323998f1c063c93f04b7d76ef36582ac865dab4db7ec72c679d8b4bd9",
+    "mode_command_cdc.v": "8bdde47cce46f94d094279e87cf5a57d311dfdcbf19811a0b779390382938788",
+    "mpu6050_posture.v": "63b254d99dd3781738fa274e3a78f4a6066d8aca34ca1ca206939060c5166635",
+    "mpu6050_reader.v": "fdaf6e66b4d52d3811ff944e736cef763b8150c96d28cd1337f259828d9c7370",
+    "mpu_diag_i2c_master.v": "5f186698eab04c080cb8a61fedbb2172eb01dfe084be99b51fd005bfd348c8e7",
+    "mpu_lcd_diag_reader.v": "2b75dc73473d1cefd8d22b781a938d56a1d88774786b42b1158acd2d1f9f5506",
+    "mpu_lcd_diag_screen.v": "b937af5c08019f6f14d80cf8b8b85e3b47efb0215b372045812b036fd088dba4",
+    "neo_four_string_matrix_audio_test_top.v": "5d8597dec95ebec6451d3ba4396eb944d0a189f493d9d4369ee4a729f679b7ea",
+    "neo_full_guitar_top.v": "200eb0062d46471d02efd201d047ce998d56f9d2e1ed9345240f70495be6ce54",
+    "neo_guitar_audio_full_top.v": "aca91ffe538cccf4e1178bc42d86bea288f9f7f79e64a746282f4234aa957cb9",
+    "neo_guitar_i2s_top.v": "0cd19d41764083540eb235831e90ce25d22cc7ea032320144c50640dbd87ff68",
+    "neo_guitar_lissajous_top.v": "ff0e44817577285a9b646d12a6d41015d93f9e62f9e83c4558360bb8b6e733b3",
+    "neo_guitar_main_top.v": "cd38d4dcca3006d91c5857d7b2ce61eb5287603bff6e1b24db53b3f10acc9656",
+    "neo_guitar_radial_top.v": "60c77002a5d3bb88ac0cdd5755f51d59db167f4d0cc7da99f9c19a40399f9c0e",
+    "neo_guitar_touch_game_top.v": "65d99914d47385f7c3c3419c9373d70b72a1ae0e4bc96950c57df18170a7ce45",
+    "neo_lcd_lissajous_top.v": "5adb65ff6efc9fc18761cdf001a4376094a0498b1f0598fb1dc46fff95497863",
+    "neo_minimal_audio_top.v": "1ff14cd6c0f9d64e39067b7bdd2ab878f35020bca367433f0899535fae372967",
+    "neo_mpu6050_lcd_diagnostic_top.v": "a15c6d32f2643f5ed99afd7e336366f0121e410114f9426f60d99535ff90d31a",
+    "neo_row0_led_test.v": "43d822617716fd51678ddc097c2fc3dbd973bbff3a17796a9f81a15839ebc52a",
+    "note_phase_rom.v": "78da72d562a1daa6cad3f0792179d12570e928193b569ea701360f27e977aaf4",
+    "note_phase_table.v": "859967d4e6c492b2708e138216580032b241cb71d06cde6c124a4fab6b60a56e",
+    "pcm24_chorus.v": "c38a3a4ba9b9371e2d87b5f4375e8bc6cf11a0289394123d29101d20692d9752",
+    "pcm24_mixer.v": "838453e474fca832a4af0fed010cfeeaa0a3c4360fdf0ea0f71eb81ce42932a8",
+    "pcm24_reverb.v": "ae8303436ec89a08cfbcf1483def4a1d952c9679678889f3e256dfcc159d418b",
+    "pcm24_rock_soft_clip.v": "d8af3dcd8f9ded9b55f4eecf1c840e6698867caa0b94ca5a978c81ba433ee099",
+    "pcm24_to_16.v": "aaa22430f132367989bf2c9f62c58a8111b541d09475618ff0303f4fbfa413d8",
+    "performance_vibrato_gesture.v": "ec952923dbb1591c419f5ec8489ca5f232af20057b521de8760d32230ba80797",
+    "phase_slide_smoother.v": "1e0070d6cf76289ebaf30a3a30736fe274a4ad5bd26ae307ca59b24ace3db7bb",
+    "phase_vibrato_modulator.v": "e943febc95c89a56e490268fbefe22c3b1e9cf78de4747bae2c826002482ed3d",
+    "piano_bright_coeffs.vh": "cc4033cc17717df9dbeb7c2f12259ff2c1ecb5dd6674cbd729fcb2a1ffc3d7ce",
+    "piano_hammer_coeffs.vh": "7dfa03b0dc3e43cc12767f8eabb244cc304177a14c7df08f155d4eced59569fb",
+    "piano_hammer_model.v": "648b7b036bbed9426e957ffdce994ac4a57269cc14f301aa9814416193d944b1",
+    "piano_mode_state_ram.v": "3aabcd0eccf276f8516bce42af20f92ffbc9ccda563b3b97b640b37c18374a36",
+    "piano_rock_gain_init.vh": "29641b9e41f5a64bd096db57455d2b93eea71f9e86d8b081fae7c1aedf536749",
+    "piano_rock_gain_rom.v": "17d947de74b5777caf653be0c6f8e87ade08152f03642272f9c3f952376ba272",
+    "piano_stereo_chorus.v": "c792f1354060cf04ab7268468b39396a258b6796641d326e71f81c4f21aeaf8c",
+    "piano_stereo_effects.v": "609a0073acafba0e696c0bca95e3b4141b2ed6177d17d9a826ad148a5a5a3f5c",
+    "piano_stereo_room.v": "1506a91d7bbd262c7a394a8eb769e32c08b5eb14c935f573d8ec1f123c633b45",
+    "piano_voice_core.v": "f6c3260e493dd594ece5bf7af1fa1d2535eee5bf0615722dc687e73703832242",
+    "pluck_event_cdc.v": "944ac3943f0b4bde00c9055e5ec095ead0a03aecbfe8531d9ddfd2abd7405be8",
+    "posture_timbre_cdc.v": "4010ee5daf84252dd995dae78d6a7b7f398cb23ad61582aa40ff22336ed15d09",
+    "posture_timbre_policy.v": "4fca83d27ed4a713143b60ba4666e1f715d2dbafe68cdb01de1bc220d3decfb0",
+    "posture_touch_controls.v": "9631eca1c74a876b4a9c5ac3a5aeee50c275c91cba1eeb8fa40c8a13268573a9",
+    "pt8211_tx.v": "fdf12acbb566d306a48213ecba7e0ca74cb7738a8dd720da9ccf0719852fe739",
+    "reset_sync.v": "150cc2879d7e23c1f5cb001ccff8059b51f7a7f28c1c290bed0386e9e2bd37d3",
+    "rgb_spectrum_timing.v": "2d8fc5796f0713ecb2ddd58bfda38844f20aac6230a2e04481bbb7406e2593f7",
+    "rock_coeffs.vh": "90176eda5c40f29cd937898047ead773dba31dfd9dbbdc96a658701c20c64206",
+    "sample_tick_gen.v": "4cba7a85fa969598c8007649dab4ff61df1a8cadb6a98fe6d99cf9c7b2c5f27a",
+    "sine_nco.v": "4d27b792139475d08012e6ae21b69a4d415ab1abacdb3a6b12eff52a6ce1688b",
+    "spectrum_bars32.v": "0cb4dd9d7d101bcd7e605fdc55725448f3b6d41951529c1db595dc3847522460",
+    "spectrum_bar_cdc.v": "b25e33fc8c316aa8a9078540ff330b7e3951dc8d311d0d0fc737ef3105a38473",
+    "spectrum_display_top.v": "ce7501fbad1b7fbfefab25c709e9624f46dc00f9bc98a80449c09fe35724d7c9",
+    "spectrum_fft1024.v": "b4256edc81f7171b3fddf4fded1b169e39d88f5d5548b3675adb7180f176cf74",
+    "stable_fret_cdc.v": "cd723d24ba95c1f5499235396451f6393d1451c0d92b4ed7faff6bfc00cbafea",
+    "stereo_audio_effects.v": "5a845e8608b57c449846c2cd029d4924ab1c21e252c78fa072134081c906d929",
+    "test_tone_trigger.v": "4fe2ffc7a7c174752712bda2f314ff00cb7e61087c87ca52adde8736504e3f5d",
+    "timbre_blend_smoother.v": "dc07fb3c1099f40b88c0203db3cf73b93e1e829b07c54b3ef8380aa107048fbd",
+    "touch_coordinate_mapper.v": "0ebe41c5fe16b42d121fd4c6fa61ee3bfdeeca785472e98e2b66adad9ef64de6",
+    "touch_game_renderer.v": "0f59a8caa10b24f386b3a266dad0df54ddc3fbb93cc4534c1419130aa4775224",
+    "touch_game_ui.v": "16799658092aa03a5f903ce4e3faea5e63f5961b562b0cdb64dd370b93498538",
+    "touch_gesture.v": "427fa229e4ba0378316a3d973c28dec01ecaa64d1d813303c2eb1111f00bcbf0",
+    "voice_audio_core.v": "afa6ac1b3aaa375d67bbcf6561dc995a6aad70f1c71d2f0ec666f60b4e96cd78",
+    "voice_envelope.v": "83e0327c8c97cb5cd745976ad58979809414a9dc39dbd0997deef409d63c8188",
+    "xinxian_top.v": "50b5f576f32e7a23c1c4fc662a9763ab7648feb51e00f6d9909251dbd0165f15"
+  }
+}

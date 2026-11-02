@@ -1,0 +1,515 @@
+{
+  "result": "PASS",
+  "slots_stimulus": [
+    "force gate.u_buttons.harmony_enable_Z=harmony_command;",
+    "force reference.u_buttons.harmony_enable=harmony_command;",
+    "force gate.u_touch.touch_ready=1'b1;",
+    "force reference.u_touch.ready=1'b1;",
+    "force gate.u_gesture.click_Z=click;",
+    "force reference.u_gesture.click=click;",
+    "force gate.u_gesture.double_click_Z=dbl;",
+    "force reference.u_gesture.double_click=dbl;",
+    "force gate.u_gesture.click_x_Z=cx;",
+    "force reference.u_gesture.click_x=cx;",
+    "force gate.u_gesture.click_y_Z=cy;",
+    "force reference.u_gesture.click_y=cy;",
+    "force gate.u_audio.u_adc.pluck_valid_Z=pluck;",
+    "force reference.u_audio.u_adc.pluck_valid=pluck;",
+    "force gate.u_audio.u_adc.velocity=velocity;",
+    "force reference.u_audio.u_adc.velocity_level=velocity;"
+  ],
+  "slots_ports": {
+    "guitar_effect_buttons": {
+      "harmony_enable_Z": [
+        "output",
+        [
+          null
+        ]
+      ]
+    },
+    "gt911_touch": {
+      "touch_ready": [
+        "output",
+        [
+          null
+        ]
+      ]
+    },
+    "touch_gesture": {
+      "click_Z": [
+        "output",
+        [
+          null
+        ]
+      ],
+      "double_click_Z": [
+        "output",
+        [
+          null
+        ]
+      ],
+      "click_x_Z": [
+        "output",
+        [
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      ],
+      "click_y_Z": [
+        "output",
+        [
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      ]
+    },
+    "mcp3208_pluck_frontend": {
+      "pluck_valid_Z": [
+        "output",
+        [
+          3,
+          2,
+          1,
+          0
+        ]
+      ],
+      "velocity": [
+        "output",
+        [
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      ]
+    },
+    "touch_game_ui": {
+      "page_Z": [
+        "output",
+        [
+          2,
+          1,
+          0
+        ]
+      ],
+      "selected_slot_Z": [
+        "output",
+        [
+          2,
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "countdown_q": {
+    "31": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_31_s0",
+      "pins": {
+        "Q": "countdown_left[31]",
+        "D": "n2478_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "30": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_30_s0",
+      "pins": {
+        "Q": "countdown_left[30]",
+        "D": "n2479_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "29": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_29_s0",
+      "pins": {
+        "Q": "countdown_left[29]",
+        "D": "n2480_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "28": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_28_s0",
+      "pins": {
+        "Q": "countdown_left[28]",
+        "D": "n2481_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "27": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_27_s0",
+      "pins": {
+        "Q": "countdown_left[27]",
+        "D": "n2482_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "26": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_26_s0",
+      "pins": {
+        "Q": "countdown_left[26]",
+        "D": "n2483_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "25": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_25_s0",
+      "pins": {
+        "Q": "countdown_left[25]",
+        "D": "n2484_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "24": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_24_s0",
+      "pins": {
+        "Q": "countdown_left[24]",
+        "D": "n2485_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "23": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_23_s0",
+      "pins": {
+        "Q": "countdown_left[23]",
+        "D": "n2486_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "22": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_22_s0",
+      "pins": {
+        "Q": "countdown_left[22]",
+        "D": "n2487_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "21": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_21_s0",
+      "pins": {
+        "Q": "countdown_left[21]",
+        "D": "n2488_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "20": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_20_s0",
+      "pins": {
+        "Q": "countdown_left[20]",
+        "D": "n2489_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "19": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_19_s0",
+      "pins": {
+        "Q": "countdown_left[19]",
+        "D": "n2490_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "18": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_18_s0",
+      "pins": {
+        "Q": "countdown_left[18]",
+        "D": "n2491_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "17": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_17_s0",
+      "pins": {
+        "Q": "countdown_left[17]",
+        "D": "n2492_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "15": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_15_s0",
+      "pins": {
+        "Q": "countdown_left[15]",
+        "D": "n2494_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "11": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_11_s0",
+      "pins": {
+        "Q": "countdown_left[11]",
+        "D": "n2498_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "7": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_7_s0",
+      "pins": {
+        "Q": "countdown_left[7]",
+        "D": "n2502_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "6": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_6_s0",
+      "pins": {
+        "Q": "countdown_left[6]",
+        "D": "n2503_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "5": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_5_s0",
+      "pins": {
+        "Q": "countdown_left[5]",
+        "D": "n2504_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "4": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_4_s0",
+      "pins": {
+        "Q": "countdown_left[4]",
+        "D": "n2505_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "3": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_3_s0",
+      "pins": {
+        "Q": "countdown_left[3]",
+        "D": "n2506_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "2": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_2_s0",
+      "pins": {
+        "Q": "countdown_left[2]",
+        "D": "n2507_9",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "1": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_1_s0",
+      "pins": {
+        "Q": "countdown_left[1]",
+        "D": "n2508_7",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "0": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_0_s0",
+      "pins": {
+        "Q": "countdown_left[0]",
+        "D": "n2509_8",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "n18572_4",
+        "CE": "n17564_4"
+      }
+    },
+    "16": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_16_s1",
+      "pins": {
+        "Q": "countdown_left[16]",
+        "D": "n9511_6",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    },
+    "14": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_14_s1",
+      "pins": {
+        "Q": "countdown_left[14]",
+        "D": "n9513_6",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    },
+    "13": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_13_s1",
+      "pins": {
+        "Q": "countdown_left[13]",
+        "D": "n9514_6",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    },
+    "12": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_12_s1",
+      "pins": {
+        "Q": "countdown_left[12]",
+        "D": "n9515_6",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    },
+    "10": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_10_s1",
+      "pins": {
+        "Q": "countdown_left[10]",
+        "D": "n9517_6",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    },
+    "9": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_9_s1",
+      "pins": {
+        "Q": "countdown_left[9]",
+        "D": "n9518_8",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    },
+    "8": {
+      "kind": "DFFRE",
+      "instance": "countdown_left_8_s1",
+      "pins": {
+        "Q": "countdown_left[8]",
+        "D": "n9519_6",
+        "CLK": "audio_clk_12m288_d",
+        "RESET": "pa_en_n_d_4",
+        "CE": "countdown_left_16_10"
+      }
+    }
+  },
+  "countdown_forces": [
+    "force reference.u_audio.p2.u_router.engine.controller.countdown_left=32'd0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_0_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_1_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_2_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_3_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_4_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_5_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_6_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_7_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_8_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_9_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_10_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_11_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_12_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_13_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_14_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_15_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_16_s1.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_17_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_18_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_19_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_20_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_21_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_22_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_23_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_24_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_25_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_26_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_27_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_28_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_29_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_30_s0.Q=1'b0;",
+    "force gate.u_audio.\\p2.u_router .engine.controller.countdown_left_31_s0.Q=1'b0;"
+  ],
+  "score_initialization_640_blocks": "PASS",
+  "vendor_library_sha256": "7db6e9953af24f1233dbc8f58352a1673e91d01bb69656a16ae893a68089f85d",
+  "scope": "Complete original VG and complete RTL; registered gesture/ADC/harmony commands, audited countdown Q waiting only; no ROM/phase/note/audio result forcing. Real first events/metadata for3 builtin slots; pending4/5 cannot start."
+}

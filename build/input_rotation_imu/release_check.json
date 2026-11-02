@@ -1,0 +1,9 @@
+{
+  "result": "PASS",
+  "zip": "build/releases/touch_game/ks_fifth_v2_lcd180_inputfix_20261101.zip",
+  "zip_sha256": "487ec2a753a214832db193a172fe88ecfcbf5d3e9083ad1d180645ff209a9d8b",
+  "bitstream_sha256": "1be03302c47a9d1c50b673a0d637eb3aa638e43b852b3d8f25e111ad3eae9a3e",
+  "code_only_zip": "build/exports/neo_guitar_touch_game_ks_fifth_v2_lcd180_inputfix_code_only_20261101.zip",
+  "code_only_files": 137,
+  "code_only_zip_sha256": "518fecb9d29f9ca3bc740e660d038b5a841a197140d61990ec1d9fc5b79fd2b5"
+}

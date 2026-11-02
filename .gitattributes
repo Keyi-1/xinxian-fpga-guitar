@@ -12,3 +12,12 @@ scores/p2/*.bin binary
 /build/ks_fifth/** -text
 /build/lcd_rotate_ks/** -text
 /build/releases/touch_game/ks_*.zip binary
+
+# Fixed successful release receipts keep their original build-time bytes.
+/build/dual_score_transport/** -text
+/build/input_rotation_imu/** -text
+/build/song_slots_123/** -text
+/build/companion_ui/** -text
+/build/releases/android/**/verification.json -text
+/build/releases/windows/**/manifest.json -text
+/build/exports/*.zip binary

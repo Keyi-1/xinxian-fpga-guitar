@@ -1,7 +1,8 @@
 // XG3 fixed 32-byte packets, stop-and-wait, CRC32/ISO-HDLC. A DATA
 // packet carries one v2 event. No byte-level backpressure is assumed.
 // See docs/P3_WRITABLE_SONG_IMPORT.md for the frozen wire layout.
-module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
+module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000, EXTERNAL_QUERY=0, FIFO_LOG2=4,
+                         DIRECT_INPUT=0, CONTEXT_SWITCH=0)(
     input wire clk,rst_n,rx_valid,rx_error,input wire [7:0] rx_data,
     output wire tx_valid,output reg [7:0] tx_data,input wire tx_ready,
     output wire cmd_valid,input wire cmd_ready,output reg [1:0] cmd,
@@ -10,7 +11,11 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
     output wire [127:0] record_data,
     input wire response_valid,input wire [3:0] response_code,input wire locked,
     input wire [4:0] overlay_valid,input wire [479:0] overlay_data,
-    output reg [15:0] error_count);
+    output reg [15:0] error_count,
+    output wire query_request,output wire [2:0] query_slot,
+    input wire query_ready,input wire [119:0] query_body,
+    input wire context_load,input wire [233:0] context_data,
+    output wire [233:0] context_state,output wire frame_idle,rx_ready);
     localparam SYNC=0,RX=1,VERIFY=2,ISSUE=3,WAIT=4,TX=5;
     reg [2:0] state;
     reg [1:0] magic_index;
@@ -23,19 +28,33 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
     reg [31:0] last_crc;
     reg [7:0] last_opcode;
     reg session_valid,cache_valid;
-    reg [7:0] fifo[0:15];
-    reg [3:0] wp,rp;
-    reg [4:0] used;
+    localparam FIFO_DEPTH=1<<FIFO_LOG2;
+    reg [7:0] fifo[0:FIFO_DEPTH-1];
+    reg [FIFO_LOG2-1:0] wp,rp;
+    reg [FIFO_LOG2:0] used;
     reg poisoned;
-    wire pop=used!=0 && (state==SYNC || state==RX) && !poisoned;
-    wire push=rx_valid && (used<16 || pop);
-    wire [7:0] byte_value=fifo[rp];
+    assign rx_ready=(state==SYNC || state==RX) && !poisoned;
+    wire pop=(DIRECT_INPUT ? rx_valid : used!=0) && rx_ready;
+    wire push=!DIRECT_INPUT && rx_valid && (used<FIFO_DEPTH || pop);
+    wire [7:0] byte_value=DIRECT_INPUT ? rx_data : fifo[rp];
+    assign frame_idle=state==SYNC && magic_index==0 && used==0 && !poisoned;
+    // Only session/retry state survives a complete-frame context switch.
+    assign context_state={error_count,cached_payload,cache_valid,session_valid,
+                          last_opcode,last_crc,last_sequence,next_sequence,current_session};
     wire [3:0] payload_byte=index[3:0]-4'd10;
     wire [31:0] final_tx_crc=tx_crc^32'hffffffff;
-    wire qv,qp,qt;wire [10:0] qb;wire [11:0] qc;wire [31:0] qd,qs;wire [1:0] qi;
-    wire [95:0] query_descriptor={7'd0,qi,qd,qc,qb,qs};
-    game_p3_catalog query(.slot(payload[2:0]),.overlay_valid(overlay_valid),.overlay_data(overlay_data),
-        .valid(qv),.playable(qp),.test_only(qt),.base(qb),.event_count(qc),.duration(qd),.progress_step(qs),.timbre(qi));
+    wire [119:0] selected_query_body;
+    assign query_request=state==VERIFY && opcode==2;
+    assign query_slot=payload[2:0];
+    generate if(EXTERNAL_QUERY)begin:shared_query
+        assign selected_query_body=query_body;
+    end else begin:private_query
+        wire qv,qp,qt;wire [10:0] qb;wire [11:0] qc;wire [31:0] qd,qs;wire [1:0] qi;
+        wire [95:0] query_descriptor={7'd0,qi,qd,qc,qb,qs};
+        game_p3_catalog query(.slot(payload[2:0]),.overlay_valid(overlay_valid),.overlay_data(overlay_data),
+            .valid(qv),.playable(qp),.test_only(qt),.base(qb),.event_count(qc),.duration(qd),.progress_step(qs),.timbre(qi));
+        assign selected_query_body={8'd0,4'd0,qt,overlay_valid[payload[2:0]],qp,qv,payload[7:0],query_descriptor};
+    end endgenerate
     assign tx_valid=state==TX;
     assign cmd_valid=state==ISSUE;
     assign slot=payload[2:0];assign timbre=payload[9:8];
@@ -50,6 +69,10 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
         input [1:0] pos;
         begin case(pos)0:magic=8'h58;1:magic=8'h47;2:magic=8'h33;default:magic=8'h21;endcase end
     endfunction
+    // RX and TX are disjoint FSM states. One CRC byte network serves both
+    // directions without sharing state or adding a clock of latency.
+    wire [31:0] next_crc=crc_byte(state==TX ? tx_crc : crc,
+                                state==TX ? tx_data : byte_value);
     // All response payloads begin with one status byte. The remaining bytes
     // depend on the command and are cached exactly for lost-ACK retries.
     task respond;
@@ -81,11 +104,13 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
             timeout_count<=0;current_session<=0;next_sequence<=0;last_sequence<=0;last_crc<=0;last_opcode<=0;
             session_valid<=0;cache_valid<=0;cmd<=0;error_count<=0;wp<=0;rp<=0;used<=0;poisoned<=0;
         end else begin
-            if(push)begin fifo[wp]<=rx_data;wp<=wp+1'b1;end
-            if(pop)rp<=rp+1'b1;
-            case({push,pop})2'b10:used<=used+1'b1;2'b01:used<=used-1'b1;default:begin end endcase
-            if(rx_error || (rx_valid && !push))begin poisoned<=1;if(error_count!=65535)error_count<=error_count+1'b1;end
-            if(pop || state!=RX)timeout_count<=0;
+            if(!DIRECT_INPUT)begin
+                if(push)begin fifo[wp]<=rx_data;wp<=wp+1'b1;end
+                if(pop)rp<=rp+1'b1;
+                case({push,pop})2'b10:used<=used+1'b1;2'b01:used<=used-1'b1;default:begin end endcase
+            end
+            if(rx_error || (!DIRECT_INPUT && rx_valid && !push))begin poisoned<=1;if(error_count!=65535)error_count<=error_count+1'b1;end
+            if(DIRECT_INPUT || pop || state!=RX)timeout_count<=0;
             else if(timeout_count<FRAME_TIMEOUT)timeout_count<=timeout_count+1'b1;
             if((poisoned || timeout_count>=FRAME_TIMEOUT) && (state==SYNC || state==RX))begin
                 state<=SYNC;magic_index<=0;poisoned<=0;used<=0;rp<=wp;timeout_count<=0;
@@ -98,7 +123,7 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
                     end else magic_index<=byte_value==8'h58 ? 1 : 0;
                 end
                 RX:if(pop)begin
-                    if(index<28)crc<=crc_byte(crc,byte_value);
+                    if(index<28)crc<=next_crc;
                     case(index)
                         4:version<=byte_value;5:opcode<=byte_value;
                         6:packet_session[7:0]<=byte_value;7:packet_session[15:8]<=byte_value;
@@ -120,10 +145,11 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
                         // bytes1..: event format2, five slots, first runtime row,
                         // total capacity2048, max MIDI79, min MIDI50, 48kHz.
                         respond(0,{16'h0001,32'd48000,8'd79,8'd50,16'd2048,16'd703,8'd32,8'd5,8'd2},1);
-                    end else if(!session_valid || packet_session!=current_session || packet_sequence!=next_sequence)respond(13,0,0);
+                    end else if(opcode==1 && packet_sequence==0 && locked)respond(1,0,0);
+                    else if(!session_valid || packet_session!=current_session || packet_sequence!=next_sequence)respond(13,0,0);
                     else if(opcode==2)begin
                         if(payload[7:0]>=5 || payload[127:8]!=0)respond(6,0,0);
-                        else respond(0,{8'd0,4'd0,qt,overlay_valid[payload[2:0]],qp,qv,payload[7:0],query_descriptor},1);
+                        else if(!EXTERNAL_QUERY || query_ready)respond(0,selected_query_body,1);
                     end else if(opcode==7)respond(0,{64'd0,error_count,next_sequence,3'd0,overlay_valid,7'd0,locked,8'd0},1);
                     else if(opcode==3)begin
                         if(payload[7:0]>=5 || payload[15:8]>=3 || payload[31:16]>2048 || payload[127:96]!=0)respond(6,0,0);
@@ -135,11 +161,15 @@ module game_p3_protocol #(parameter integer FRAME_TIMEOUT=25000000)(
                 ISSUE:if(cmd_ready)state<=WAIT;
                 WAIT:if(response_valid)respond({4'd0,response_code},0,response_code==0);
                 TX:if(tx_ready)begin
-                    if(index>=4 && index<28)tx_crc<=crc_byte(tx_crc,tx_data);
+                    if(index>=4 && index<28)tx_crc<=next_crc;
                     if(index==31)begin state<=SYNC;magic_index<=0;end else index<=index+1'b1;
                 end
                 default:state<=SYNC;
             endcase
+            if(CONTEXT_SWITCH && context_load)begin
+                {error_count,cached_payload,cache_valid,session_valid,
+                 last_opcode,last_crc,last_sequence,next_sequence,current_session}<=context_data;
+            end
         end
     end
 endmodule

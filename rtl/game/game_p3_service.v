@@ -20,7 +20,9 @@ module game_p3_service #(parameter integer UART_CLKS_PER_BIT=434)(
     game_p3_protocol protocol(.clk(clk),.rst_n(rst_n),.rx_valid(rx_valid),.rx_error(rx_error),.rx_data(rx_data),
         .tx_valid(tx_valid),.tx_data(tx_data),.tx_ready(tx_ready),.cmd_valid(cmd_valid),.cmd_ready(cmd_ready),.cmd(cmd),
         .slot(slot),.event_count(count),.duration(duration),.expected_crc(expected_crc),.timbre(timbre),.record_data(record_data),
-        .response_valid(response_valid),.response_code(response_code),.locked(locked),.overlay_valid(system_valid),.overlay_data(system_data),.error_count());
+        .response_valid(response_valid),.response_code(response_code),.locked(locked),.overlay_valid(system_valid),.overlay_data(system_data),.error_count(),
+        .query_request(),.query_slot(),.query_ready(1'b0),.query_body(120'd0),
+        .context_load(1'b0),.context_data(234'd0),.context_state(),.frame_idle(),.rx_ready());
     game_p3_import importer(.clk(clk),.rst_n(rst_n),.import_allowed(idle_sync && menu_idle),
         .cmd_valid(cmd_valid),.cmd_ready(cmd_ready),.cmd(cmd),.slot(slot),.event_count(count),.duration(duration),.expected_crc(expected_crc),.timbre(timbre),.record_data(record_data),
         .response_valid(response_valid),.response_code(response_code),.locked(locked),.write_enable(write_enable),.write_address(write_address),.write_data(write_data),
