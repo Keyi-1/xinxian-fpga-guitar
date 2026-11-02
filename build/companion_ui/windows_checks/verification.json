@@ -1,0 +1,21 @@
+{
+  "result": "PASS",
+  "tests_run": 34,
+  "failures": 0,
+  "errors": 0,
+  "physical_com_opened": false,
+  "source_sha256": {
+    "tools/windows_score_uploader/core.py": "fb3657132448ce935b59ff307996e30ac7a40d0ee833bbcb1086359c52e45c9b",
+    "tools/windows_score_uploader/media_smoke.py": "1d75dc54c3114cfd4c3b43dc46b217166a6f471463bc8c1c13a554b163b698ac",
+    "tools/windows_score_uploader/preview_audio.py": "f18ca1f0f4592c825187359be9c9d8a1dae9966dd23aebe04bc0f8e6180b254e",
+    "tools/windows_score_uploader/preview_panel.py": "30ab5818bca3d3ebb30aa1f929e62a81c94459b968af10eb7cb2c50167c78a9a",
+    "tools/windows_score_uploader/smoke.py": "fd6b3e3b7308e5086a83eba868f3d2c2ab2013b87abd08402bd1f8349843708f",
+    "tools/windows_score_uploader/window.py": "9fe1288850e2e62d3bf772b62d5b9530b85136b27ed443005e27390e323962cd",
+    "tools/windows_score_uploader/__init__.py": "7f8bbff304fc5c55e49dd302b9fc44f0ed3e10f8630e521965cbbc9726b4534c",
+    "tools/test_windows_score_uploader.py": "b6495f050ded398b793d930f68f46d31c72f56f45afb0cc867fa837e63e00ade",
+    "tools/test_windows_score_preview.py": "ec9349249ea999106133ffe55e0a3f35b4a1dacc9e911a8b5f122172fb53c387",
+    "tools/game_score_upload.py": "17759e806bf3d03dc5101aecfeeb4ca44a4fe1dd77728a1661a65449b6a35209",
+    "tools/game_score_v2.py": "410a3b0ce1636c21c3aa4afc4a37ad2d7ea3f8f6cac83ff1f0eae6fa0b2271c9",
+    "tools/game_fingering.py": "bba6d914d142e1d46febf7ef805ed5c32d832050f5497a4618f89f0248f763bf"
+  }
+}

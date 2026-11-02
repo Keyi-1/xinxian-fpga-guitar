@@ -1,0 +1,49 @@
+{
+  "result": "PASS",
+  "android_api": 35,
+  "emulator": "emulator-5580",
+  "adb_port": 5041,
+  "installed_apk_sha256": "9f685e9bb056fefa3e6428698f7bf85f3ddcc173306d43e5b395c6e9aed7f974",
+  "scenarios": {
+    "normal": {
+      "result": "PASS",
+      "checks": 39,
+      "size": "1080x2400",
+      "density": "420",
+      "font_scale": "1.0"
+    },
+    "compact": {
+      "result": "PASS",
+      "checks": 39,
+      "size": "720x1280",
+      "density": "320",
+      "font_scale": "1.0"
+    },
+    "large_font": {
+      "result": "PASS",
+      "checks": 39,
+      "size": "1080x2400",
+      "density": "420",
+      "font_scale": "1.5"
+    },
+    "landscape": {
+      "result": "PASS",
+      "checks": 39,
+      "size": "1920x1080",
+      "density": "320",
+      "font_scale": "1.0"
+    },
+    "cutout": {
+      "result": "PASS",
+      "checks": 39,
+      "size": "1080x2400",
+      "density": "420",
+      "font_scale": "1.0"
+    }
+  },
+  "physical_hardware_tested": false,
+  "test_source_sha256": {
+    "mobile/android/app/src/androidTest/java/com/keyi/xinxian/uitest/TestFiles.java": "3b58ba70a25bf114916451908c0f53ce0ce99f2db525e0a2d4903a0faa140dcf",
+    "mobile/android/app/src/androidTest/java/com/keyi/xinxian/uitest/UiProbe.java": "2981b634cc4f0e8f771dd6d2a5d1891de6a8dce1cb17e136f9bcc621583524d7"
+  }
+}

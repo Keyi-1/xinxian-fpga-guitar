@@ -242,8 +242,8 @@ class Window(QMainWindow):
         self.slot = QComboBox()
         for i in range(5):
             self.slot.addItem(f"第 {i+1} 槽 · 待查询", i)
-        self.slot.setCurrentIndex(1)
-        self.slot.setToolTip("推荐先使用第 2 或第 5 槽。上传会替换该槽的运行时曲谱。")
+        self.slot.setCurrentIndex(3)
+        self.slot.setToolTip("连接后读取实际槽位状态。上传会替换所选槽的运行时曲谱。")
         ll.addWidget(self.slot)
         self.capacity = label("五槽共享最多 1345 条导入事件。\n替换时需先有足够空间存放整首新曲。", "muted")
         ll.addWidget(self.capacity)
@@ -270,7 +270,7 @@ class Window(QMainWindow):
         options.addWidget(self.bpm)
         options.addWidget(label("音色"))
         self.timbre = QComboBox()
-        self.timbre.addItems([f"{i+1} · {t}" for i, t in enumerate(TIMBRES)])
+        self.timbre.addItems(TIMBRES)
         self.timbre.setCurrentIndex(1)
         self.timbre.setEnabled(False)
         options.addWidget(self.timbre, 1)
@@ -279,7 +279,7 @@ class Window(QMainWindow):
         rl.addWidget(self.csv_hint)
         metrics = QGridLayout()
         self.metrics = []
-        for col, name in enumerate(("音符事件", "曲目时长", "推荐音色")):
+        for col, name in enumerate(("音符事件", "曲目时长", "音色")):
             w = label("—", "metric")
             metrics.addWidget(w, 0, col)
             metrics.addWidget(label(name, "muted"), 1, col)
@@ -395,13 +395,15 @@ class Window(QMainWindow):
         self.update_guide()
 
     def set_slots(self, slots):
-        names = ("茉莉花", "待导入", "Seven Nation Army", "情歌", "诊断槽")
+        builtins = {(67, 1620000, 0): "茉莉花", (168, 9216000, 2): "Seven Nation Army", (212, 7296000, 1): "情歌"}
         for i in range(5):
             text = "待查询"
             if slots:
                 s = slots[i]
-                text = (f"USER {i+1}" if s["imported"] else names[i])
-                text += f" · {s['event_count']} 事件" if s["playable"] else " · 未开放"
+                key = (s["event_count"], s["duration_samples"], s["recommended_timbre"])
+                text = f"USER {i+1}" if s["imported"] else builtins.get(key, "设备曲谱") if s["playable"] else "待导入"
+                if s["playable"]:
+                    text += f" · {s['event_count']} 事件"
             self.slot.setItemText(i, f"第 {i+1} 槽 · {text}")
 
     def run_job(self, fn, complete, kind):
@@ -682,7 +684,7 @@ class Window(QMainWindow):
         self.log.setVisible(not self.log.isVisible())
 
     def help(self):
-        QMessageBox.information(self, "三步开始练习", "① 连接设备\n将 DEBUG-USB2 连接电脑，在琴上回到主页或选曲页。刷新串口，选择 COM 后点击“检查设备”。如果不确定 COM 号，可拔插 USB 对照列表。\n\n② 选择曲谱\n新手可用“打开示例曲谱”。.xgscore 是单文件包；BIN 与同名 JSON 需放在一起；CSV 是音符表，可设置速度和音色。拍数支持 1/2、1/3 等分数。样本时间 CSV 已含绝对时间，BPM 不改变其节奏。 选好曲谱后可点“电脑试听”，支持暂停、停止、拖动进度和独立音量，无需连接开发板；电脑参考音用于核对节奏，实际音色以琴为准。\n\n③ 上传与试听\n推荐先用第 2 槽。确认替换后等待成功，再在琴上选择 USER 槽试听。传输进度根据 FPGA 的真实确认更新；提交完成前请保持供电。\n\n曲谱限制\nMIDI 50–79（D3–G5）、最长 10 分钟、最多 1345 个导入事件（五槽共享）。同弦不能重叠，也不能过密。不符合要求会提示原因。图片、PDF 和 MP3 需先整理成音符事件。\n\n常见问题\n串口打不开：关闭其他占用串口的软件。BUSY：回主页/选曲页。NO_SPACE：新曲需要额外暂存空间。提交结果未知：先检查设备和实物，再处理记录，勿直接重传。\n\n导入曲仅保存在 RAM，断电、复位或重新配置后丢失。")
+        QMessageBox.information(self, "三步开始练习", "① 连接设备\n将 DEBUG-USB2 连接电脑，在琴上回到主页或选曲页。刷新串口，选择 COM 后点击“检查设备”。如果不确定 COM 号，可拔插 USB 对照列表。\n\n② 选择曲谱\n新手可用“打开示例曲谱”。.xgscore 是单文件包；BIN 与同名 JSON 需放在一起；CSV 是音符表，可设置速度和音色。拍数支持 1/2、1/3 等分数。样本时间 CSV 已含绝对时间，BPM 不改变其节奏。 选好曲谱后可点“电脑试听”，支持暂停、停止、拖动进度和独立音量，无需连接开发板；电脑参考音用于核对节奏，实际音色以琴为准。\n\n③ 上传与试听\n选择目标槽位，确认替换后等待成功，再在琴上选择 USER 槽试听。传输进度根据 FPGA 的真实确认更新；提交完成前请保持供电。\n\n曲谱限制\nMIDI 50–79（D3–G5）、最长 10 分钟、最多 1345 个导入事件（五槽共享）。同弦不能重叠，也不能过密。不符合要求会提示原因。图片、PDF 和 MP3 需先整理成音符事件。\n\n常见问题\n串口打不开：关闭其他占用串口的软件。BUSY：回主页/选曲页。NO_SPACE：新曲需要额外暂存空间。提交结果未知：先检查设备和实物，再处理记录，勿直接重传。\n\n导入曲仅保存在 RAM，断电、复位或重新配置后丢失。")
 
     def closeEvent(self, event):
         if self.busy:

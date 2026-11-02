@@ -266,6 +266,32 @@ class DesktopTests(unittest.TestCase):
 
 
 class GuiTests(unittest.TestCase):
+    def test_slot_names_follow_device_descriptors_and_timbres_are_named(self):
+        from windows_score_uploader.window import Window
+        root = ROOT/'build/windows_uploader'
+        root.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=root) as temp:
+            w = Window(temp, root, port_provider=lambda:[])
+            slots = []
+            for count, duration, timbre in [(67,1620000,0),(168,9216000,2),(212,7296000,1),(0,0,0),(0,0,0)]:
+                slots.append(dict(imported=False, playable=bool(count), event_count=count,
+                                  duration_samples=duration, recommended_timbre=timbre))
+            w.set_slots(slots)
+            self.assertIn('茉莉花', w.slot.itemText(0))
+            self.assertIn('Seven Nation Army', w.slot.itemText(1))
+            self.assertIn('情歌', w.slot.itemText(2))
+            self.assertEqual(w.slot.itemText(3).split(' · ',1)[1], '待导入')
+            self.assertEqual(w.slot.itemText(4).split(' · ',1)[1], '待导入')
+            slots[3] = dict(slots[1], imported=True)
+            slots[1], slots[2] = slots[2], slots[1]
+            w.set_slots(slots)
+            self.assertIn('情歌', w.slot.itemText(1))
+            self.assertIn('Seven Nation Army', w.slot.itemText(2))
+            self.assertIn('USER 4', w.slot.itemText(3))
+            self.assertEqual([w.timbre.itemText(i) for i in range(3)], ['钢琴','明亮弦音','哇音'])
+            self.assertNotIn('推荐', w.slot.toolTip())
+            w.close()
+
     @classmethod
     def setUpClass(cls):
         from PyQt5.QtWidgets import QApplication

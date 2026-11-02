@@ -70,7 +70,7 @@ def compiled(raw, info, title, source):
     duration = integer(info, "duration_samples")
     timbre = integer(info, "recommended_timbre")
     if timbre not in range(3):
-        raise ValueError("推荐音色必须为 0、1 或 2。")
+        raise ValueError("音色必须为钢琴、明亮弦音或哇音。")
     events = from_binary(raw, profile="game_extended")
     validate(events, duration, profile="game_extended")
     _, crc = payload_info(events)

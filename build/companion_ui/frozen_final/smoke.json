@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "frozen": true,
+  "events": 212,
+  "crc32": "c3451bbc",
+  "serial_version": "3.5",
+  "physical_com_opened": false,
+  "preview_samples": 384000,
+  "audio_device_opened": false,
+  "executable": "T:\\Documents\\AMD\\xinxian-companion-ui\\build\\releases\\windows\\FPGA_Guitar_Uploader_1.2.0\\FPGA_Guitar_Uploader\\FPGA_Guitar_Uploader.exe"
+}
