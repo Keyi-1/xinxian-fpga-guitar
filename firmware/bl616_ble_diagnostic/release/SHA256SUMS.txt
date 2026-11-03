@@ -1,1 +1,0 @@
-c93ec2735be48af2e049ce3caa5f0ec04210307c1ba944d9701e541b43ff1089  xinxian_ble_diag_usb_neo31005_26m_0x40000.bin

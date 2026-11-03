@@ -1,0 +1,278 @@
+`timescale 1ns/1ps
+
+module tb_guitar_audio_top;
+
+    reg         sys_clk_50m;
+    reg         audio_clk_12m288;
+    reg         rst_n;
+    reg [31:0]  pressed;
+
+    wire [7:0]  fret_col_in_n;
+    wire [3:0]  fret_row_oe;
+    wire [3:0]  fret_row_drive_n;
+    wire        adc_cs_n;
+    wire        adc_sclk;
+    wire        adc_mosi;
+    reg         adc_miso;
+    wire        dac_bclk;
+    wire        dac_lrck;
+    wire        dac_din;
+    wire [31:0] stable_fret_mask;
+    wire [15:0] stable_fret_id;
+    wire [3:0]  audio_voice_active;
+    wire [7:0]  velocity_level;
+    wire [47:0] raw_adc;
+    wire [47:0] peak_adc;
+    wire [31:0] event_timestamp;
+
+    reg [11:0] adc_value0;
+    reg [11:0] adc_value1;
+    reg [11:0] adc_value2;
+    reg [11:0] adc_value3;
+    reg [4:0]  adc_command;
+    reg [2:0]  adc_channel;
+    reg [11:0] adc_selected_data;
+    integer    adc_rising_count;
+
+    // Diode-isolated active-low matrix model.
+    assign fret_col_in_n = fret_row_oe[0] ? ~pressed[7:0]   :
+                           fret_row_oe[1] ? ~pressed[15:8]  :
+                           fret_row_oe[2] ? ~pressed[23:16] :
+                           fret_row_oe[3] ? ~pressed[31:24] :
+                           8'hff;
+
+    guitar_audio_top #(
+        .MATRIX_CLK_DIV        (2),
+        .MATRIX_SETTLE_CYCLES  (1),
+        .MATRIX_DEBOUNCE_FRAMES(2),
+        .SAMPLE_DIV            (64),
+        .PT8211_REF_DIV        (1),
+        .SLIDE_SAMPLES         (4),
+        .ADC_SPI_CLK_DIV       (2),
+        .ADC_DEAD_SAMPLES(2), .ADC_SETTLE_SAMPLES(2), .FIXED_VELOCITY_ENABLE(0)
+    ) dut (
+        .rock_select(1'b0),
+        .sys_clk_50m      (sys_clk_50m),
+        .audio_clk_12m288 (audio_clk_12m288),
+        .rst_n            (rst_n),
+        .fret_col_in_n    (fret_col_in_n),
+        .adc_cs_n         (adc_cs_n),
+        .adc_sclk         (adc_sclk),
+        .adc_mosi         (adc_mosi),
+        .adc_miso         (adc_miso),
+        .timbre_select    (1'b0),
+        .chorus_enable    (1'b0),
+        .sustain_enable(1'b0),.harmony_enable(1'b0),.reverb_enable(1'b0),
+        .fret_row_oe      (fret_row_oe),
+        .fret_row_drive_n (fret_row_drive_n),
+        .dac_bclk         (dac_bclk),
+        .dac_lrck         (dac_lrck),
+        .dac_din          (dac_din),
+        .stable_fret_mask (stable_fret_mask),
+        .stable_fret_id   (stable_fret_id),
+        .audio_voice_active(audio_voice_active),
+        .velocity_level   (velocity_level),
+        .raw_adc          (raw_adc),
+        .peak_adc         (peak_adc),
+        .event_timestamp  (event_timestamp),
+        .pluck_events(), .final_pcm_valid(), .final_pcm()
+    ,
+        .display_phase_inc(),.display_note_on(),.display_sample_tick(),.display_voice_sample_valid(),.display_voice_pcm(),
+        .i2s_bclk(),.i2s_ws(),.i2s_data()
+    );
+
+    // System clock is unrelated; all matrix/ADC/audio processing uses audio_clk.
+    always #5 sys_clk_50m = ~sys_clk_50m;
+    always #7 audio_clk_12m288 = ~audio_clk_12m288;
+
+    function [11:0] adc_value_for_channel;
+        input [2:0] channel;
+        begin
+            case (channel)
+                3'd0: adc_value_for_channel = adc_value0;
+                3'd1: adc_value_for_channel = adc_value1;
+                3'd2: adc_value_for_channel = adc_value2;
+                default: adc_value_for_channel = adc_value3;
+            endcase
+        end
+    endfunction
+
+    always @(negedge adc_cs_n) begin
+        adc_command       = 5'd0;
+        adc_channel       = 3'd0;
+        adc_selected_data = 12'd0;
+        adc_rising_count  = 0;
+        adc_miso          = 1'b0;
+    end
+
+    always @(posedge adc_sclk) begin
+        if (!adc_cs_n) begin
+            if (adc_rising_count < 5)
+                adc_command[4-adc_rising_count] = adc_mosi;
+            if (adc_rising_count == 4) begin
+                adc_channel = {adc_command[2:1], adc_mosi};
+                adc_selected_data = adc_value_for_channel(
+                    {adc_command[2:1], adc_mosi});
+            end
+            adc_rising_count = adc_rising_count + 1;
+        end
+    end
+
+    always @(negedge adc_sclk) begin
+        if (!adc_cs_n) begin
+            if ((adc_rising_count >= 7) && (adc_rising_count <= 18))
+                adc_miso = adc_selected_data[18-adc_rising_count];
+            else
+                adc_miso = 1'b0;
+        end
+    end
+
+    task wait_stable_fret;
+        input [15:0] expected_id;
+        integer guard;
+        begin
+            guard = 0;
+            while (stable_fret_id !== expected_id) begin
+                @(posedge sys_clk_50m);
+                #1;
+                guard = guard + 1;
+                if (guard > 1000) begin
+                    $display("FAIL: stable fret timeout expected=%h got=%h",
+                             expected_id, stable_fret_id);
+                    $finish;
+                end
+            end
+        end
+    endtask
+
+    task wait_audio_active;
+        input [3:0] expected_active;
+        integer guard;
+        begin
+            guard = 0;
+            while (audio_voice_active !== expected_active) begin
+                @(posedge audio_clk_12m288);
+                #1;
+                guard = guard + 1;
+                if (guard > 2000) begin
+                    $display("FAIL: audio active timeout expected=%b got=%b",
+                             expected_active, audio_voice_active);
+                    $finish;
+                end
+            end
+        end
+    endtask
+
+    integer bit_count;
+    integer frame_count;
+    integer error_count;
+    integer nonzero_frame_count;
+    integer stereo_frame_count;
+    reg [15:0] expected_left;
+    reg [15:0] expected_right;
+
+    always @(posedge dac_bclk) begin
+        if (bit_count == 0) begin
+            expected_left = dut.u_board_audio_chain
+                               .u_pt8211_tx.current_left;
+            expected_right = dut.u_board_audio_chain
+                                .u_pt8211_tx.current_right;
+        end
+
+        if (bit_count < 16) begin
+            if (dac_lrck !== 1'b0 ||
+                dac_din !== expected_left[15-bit_count])
+                error_count = error_count + 1;
+        end
+        else begin
+            if (dac_lrck !== 1'b1 ||
+                dac_din !== expected_right[31-bit_count])
+                error_count = error_count + 1;
+        end
+
+        if (bit_count == 31) begin
+            frame_count = frame_count + 1;
+            if (expected_left !== expected_right)
+                stereo_frame_count = stereo_frame_count + 1;
+            if (expected_left !== 16'd0)
+                nonzero_frame_count = nonzero_frame_count + 1;
+            bit_count = 0;
+        end
+        else begin
+            bit_count = bit_count + 1;
+        end
+    end
+
+    initial begin
+        sys_clk_50m       = 1'b0;
+        audio_clk_12m288  = 1'b0;
+        rst_n             = 1'b0;
+        pressed           = 32'd0;
+        adc_miso          = 1'b0;
+        adc_value0        = 12'd2053;
+        adc_value1        = 12'd2053;
+        adc_value2        = 12'd2053;
+        adc_value3        = 12'd2053;
+        adc_command       = 5'd0;
+        adc_channel       = 3'd0;
+        adc_selected_data = 12'd0;
+        adc_rising_count  = 0;
+        bit_count         = 0;
+        frame_count       = 0;
+        error_count       = 0;
+        nonzero_frame_count = 0;
+        stereo_frame_count = 0;
+        expected_left     = 16'd0;
+        expected_right    = 16'd0;
+
+        repeat (5) @(posedge sys_clk_50m);
+        #1 rst_n = 1'b1;
+
+        // Frets 1, 2, 4, and 7 on strings 0 through 3 respectively.
+        pressed = 32'h40080201;
+        wait_stable_fret(16'h7421);
+
+        // Four MCP3208 envelope levels map to velocity levels 0 through 3.
+        adc_value0 = 12'd2153;
+        adc_value1 = 12'd2253;
+        adc_value2 = 12'd2453;
+        adc_value3 = 12'd2853;
+        wait_audio_active(4'b1111);
+        if (velocity_level !== 8'hE4) begin
+            $display("FAIL: ADC velocity levels=%h", velocity_level);
+            $finish;
+        end
+        if ((dut.u_board_audio_chain.g_sine.u_core.u_voice0.u_voice_envelope.attack_target !== 16'd12288) ||
+            (dut.u_board_audio_chain.g_sine.u_core.u_voice1.u_voice_envelope.attack_target !== 16'd16384) ||
+            (dut.u_board_audio_chain.g_sine.u_core.u_voice2.u_voice_envelope.attack_target !== 16'd24576) ||
+            (dut.u_board_audio_chain.g_sine.u_core.u_voice3.u_voice_envelope.attack_target !== 16'd32767)) begin
+            $display("FAIL: ADC velocity attack targets %0d %0d %0d %0d",
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice0.u_voice_envelope.attack_target,
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice1.u_voice_envelope.attack_target,
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice2.u_voice_envelope.attack_target,
+                     dut.u_board_audio_chain.g_sine.u_core.u_voice3.u_voice_envelope.attack_target);
+            $finish;
+        end
+
+        // Releasing string 2 changes its pitch to open without damping.
+        pressed = 32'h40000201;
+        wait_stable_fret(16'h7021);
+        wait_audio_active(4'b1111);
+
+        wait (frame_count >= 10000);
+        #1;
+        if (error_count != 0) begin
+            $display("FAIL: PT8211 protocol errors=%0d", error_count);
+            $finish;
+        end
+        if (nonzero_frame_count == 0 || stereo_frame_count == 0) begin
+            $display("FAIL: top chain produced only zero PT8211 frames");
+            $finish;
+        end
+
+        $display("PASS: matrix and pluck through stereo four-string PT8211 top, frames=%0d nonzero=%0d",
+                 frame_count, nonzero_frame_count);
+        $finish;
+    end
+
+endmodule

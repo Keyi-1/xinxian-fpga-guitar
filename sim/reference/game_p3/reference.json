@@ -1,6 +1,0 @@
-{
-  "commit": "cc8dbb7bd0d14be19c136d68f8d16679e823c0e9",
-  "original_renderer_sha256": "d7a68c255951123d99443ee7cf56ad595a87d5a6851f0826ede9416f9999466c",
-  "original_messages_sha256": "8da25632a5d141702b6c01cfc493e3de3eb11f827e1d69f6f305a910435f189b",
-  "scope": "Frozen accepted M2 renderer and message lookup; only module/include names changed"
-}

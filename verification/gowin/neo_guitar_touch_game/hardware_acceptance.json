@@ -1,0 +1,519 @@
+{
+  "date": "2026-10-15",
+  "source": "User feedback in the project conversation",
+  "user_statement": "现在效果还可以，可以push到github上并merge到master中",
+  "code_commit": "4bf7e0c",
+  "implementation_commits": [
+    "246b146",
+    "98ba437"
+  ],
+  "reference_release_bitstream": "build/releases/touch_game/neo_guitar_touch_game_full_width.fs",
+  "reference_release_sha256": "9c161ac673cd1c081831075f4f84d4ff2067f6a20797119b9a65d9623b770883",
+  "installed_bitstream_sha256": null,
+  "configuration": "Training: ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1; native J6 INT=T16",
+  "publication_authorized": true,
+  "scope": "User approves the current full-width-stage effect and explicitly authorizes GitHub push and merge to master. This records user feedback, not an independent hardware measurement or a capture of the installed bitstream hash. No additional quantitative audio, long-duration stability, or strict-competition hardware measurements recorded",
+  "artifact_audit": "The archived full-width release matches its recorded SHA256. Existing digital verification binds production RTL, ROMs, netlist, logs and routed implementation; the separate serial-spectrum area probe is not applied to this release; local IDE outputs were subsequently regenerated and differ from this archive. The archived logs do not certify the regenerated netlist or bitstream",
+  "previous_acceptances": [
+    {
+      "date": "2026-10-15",
+      "source": "User feedback in the project conversation",
+      "user_statement": "现在这个版本没有什么bug了，可以先提交。",
+      "code_commit": "a13fd79",
+      "reference_release_bitstream": "build/releases/touch_game/neo_guitar_touch_game_j6_gamefix.fs",
+      "reference_release_sha256": "db1e7578e676d4cdbd0de375c46f016e744386f7fd1cfc45d340205f99ce849a",
+      "installed_bitstream_sha256": null,
+      "configuration": "Training: ALLOW_AUTOPLAY_PREVIEW=1, ENABLE_MISS_CUE=1; native J6 INT=T16",
+      "scope": "User acceptance of the current source version; the installed bitstream hash was not captured. No additional quantitative audio, long-duration stability, or strict-competition hardware measurements recorded",
+      "artifact_audit": "The archived release still matches its recorded hash. Local IDE synthesis and PNR outputs have since changed; the old gate evidence does not certify those regenerated artifacts. No rebuild or new release was performed for this UI concept task."
+    }
+  ],
+  "local_ide_bitstream_sha256": "d0a12ed908c9503b7e838b6a80f0b1d1e93fab5c7abc010b6493b4a32915c8aa",
+  "p1_user_feedback": {
+    "date": "2026-10-15",
+    "implementation_commit": "e169d93",
+    "branch": "experiment/display-game-resource-opt",
+    "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs",
+    "reference_sha256": "e8ddbbc64dc81cf61c3037039b54752bf3a21ecca155264bfe6db907f9354c86",
+    "digital_status": "P&R/STA and required RTL/full-top synthesized-display/full-score regressions pass; all three P1 margin targets met",
+    "hardware_status": "User explicitly reports having performed on-board confirmation using P1.fs. Exact installed-file hash was not independently captured; no new quantitative acoustic or long-duration measurements supplied.",
+    "installed_bitstream_sha256": null,
+    "publication_authorized": false,
+    "agent_programmed_hardware": false,
+    "scope": "User feedback on the current P1 version, recorded separately from digital evidence. Local saving is authorized; no new push, merge or agent board-programming authorization. Reference archive hash remains recorded, installed image hash remains unknown.",
+    "feedback_date": "2026-10-15",
+    "feedback_code_commit": "c36689c",
+    "user_statement": "现在的版本好像没什么问题，可以先提交保存。还有可以优化的空间吗？",
+    "local_save_authorized": true,
+    "on_board_confirmation": {
+      "date": "2026-10-15",
+      "user_statement": "我已使用P1.fs做过下板确认。",
+      "reported_image": "P1.fs (user wording)",
+      "reference_release": "build/releases/touch_game/neo_guitar_touch_game_p1_display_opt.fs",
+      "installed_bitstream_sha256": null,
+      "scope": "Explicit user confirmation, not an agent hardware programming action or independent measurement."
+    }
+  },
+  "p2_digital_release": {
+    "date": "2026-10-16",
+    "validated_source_commit": "e19dd8198ea74d4647a87b7f93f1053eca390ea4",
+    "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_p2_static_songs.fs",
+    "reference_sha256": "8d78cf9005fadfa9aa863adf4e9c17fc494521c68b828ddce6269b8091d87292",
+    "verification": "gowin/neo_guitar_touch_game/p2_integration_verification.json",
+    "digital_status": "PASS: original project synthesis, complete P&R/STA, RTL, audio and final-netlist layout/video/musical output checks",
+    "hardware_status": "User reports fragment practice loops pass on 2026-10-16; installed image/hash and quantitative measurements not independently captured",
+    "installed_bitstream_sha256": null,
+    "publication_authorized": false,
+    "agent_programmed_hardware": false,
+    "scope": "Four practice slots, not complete Qing Ge or Seven Nation Army arrangements. No new acoustic or long-duration hardware measurement.",
+    "user_feedback": {
+      "date": "2026-10-16",
+      "user_statement": "现在片段练习循环已经可以通过了。可以尝试改成完整的旋律吗？",
+      "reported_scope": "Fragment practice-loop version only; not an acceptance of a full-song melody build",
+      "installed_bitstream_sha256": null,
+      "agent_programmed_hardware": false
+    }
+  },
+  "qing_ge_melody_digital_release": {
+    "date": "2026-10-16",
+    "validated_source_commit": "12a1b16bfe4e963088541f1811ef838d7e1fcc2f",
+    "reference_bitstream": "build/releases/touch_game/neo_guitar_touch_game_qing_ge_melody.fs",
+    "reference_sha256": "c0a138912edbf2504f64143049066234c4f10ea381fd974b9c58f6b147bd3bf4",
+    "verification": "gowin/neo_guitar_touch_game/p2_qing_ge_melody_verification.json",
+    "digital_status": "PASS: original-project full synthesis/P&R/STA and current-source RTL/Python/actual-netlist checks",
+    "hardware_status": "User reports on-board confirmation of the current melody version on 2026-10-18; minor rhythm discrepancies in bars 10 and 18 are accepted for now. Installed image hash and quantitative measurements were not independently captured.",
+    "installed_bitstream_sha256": null,
+    "publication_authorized": false,
+    "agent_programmed_hardware": false,
+    "content_scope": "All supplied 38 upper-staff measures,212 attacks,60BPM,152s,second timbre,one octave down,game D3-G5; accompaniment excluded",
+    "accepted_trial_rhythm_bars": [
+      10,
+      18
+    ],
+    "listening_check_high_pitch": "bar36 G5",
+    "user_feedback": {
+      "date": "2026-10-18",
+      "user_statement": "我觉得还好，10和18那两个小节好像是有一点节奏不对，但是影响不大，而且已经经过了下板验证。",
+      "reported_scope": "Current supplied-score melody version; overall board confirmation with a known minor rhythm discrepancy accepted for now, not a claim of score-perfect rhythm or separately measured bar36 G5",
+      "known_rhythm_bars": [
+        10,
+        18
+      ],
+      "rhythm_disposition": "Keep current accepted timing; defer correction until explicitly revisited",
+      "installed_bitstream_sha256": null,
+      "agent_programmed_hardware": false
+    },
+    "measurements": "No new quantitative acoustic or long-duration stability measurements"
+  },
+  "local_ide_bitstream_sha256_scope": "Historical post-full-width rebuild value retained above; see current_original_project_bitstream for the current certified implementation",
+  "current_original_project_bitstream": {
+    "path": "gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
+    "sha256": "cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30",
+    "verification": "gowin/neo_guitar_touch_game/quarter_dynamics_verification.json",
+    "scope": "Current CH2 threshold60 and quarter-step64/128/192/256 gain build; original project complete. Hardware comparison pending."
+  },
+  "p3_writable_uart_import": {
+    "date": "2026-10-18",
+    "digital_result": "PASS",
+    "implementation": "C7 original gprj and original impl",
+    "bitstream_sha256": "57f0860227ba6b4c0010bebbaca829dfeea4799289ff3f47f8bf3e328afca4e1",
+    "archive": "build/releases/touch_game/neo_guitar_touch_game_p3_uart_import.fs",
+    "resources": {
+      "Logic": 45324,
+      "Register": 18449,
+      "CLS": 26860,
+      "BSRAM": 113,
+      "DSP": 115.5
+    },
+    "fmax_mhz": {
+      "system": 50.158,
+      "audio": 13.068
+    },
+    "operating_clocks_mhz": {
+      "system": 50,
+      "audio": 12.288
+    },
+    "margin_targets_met": false,
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_deadlines": 0
+    },
+    "features": "Five-slot writable bank,1345 shared imported records, RAM readback CRC and frame-atomic commit, DEBUG-USB2 UART115200 8N1, original slow practice removed, full Qing Ge content/timbre retained",
+    "audio_preservation": "All original32 modes/parameters/sample clocks; frozen8192-sample performance and45210-sample/per-mode original-array proof; existing preview and physical frontend velocity2 retained",
+    "hardware_status": "Awaiting user programming and DEBUG-USB2 physical UART/playing/listening/power/endurance checks; no COM port opened by agent",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "publication_authorized": true,
+    "measurements": "No new quantitative acoustic or long-duration stability measurements",
+    "next_action_policy": "After this digital delivery stop and wait for explicit human instruction. No automatic Bluetooth/MPU/Flash work.",
+    "user_feedback": {
+      "date": "2026-10-18",
+      "user_statement": "现在的版本没什么问题了，我觉得可以先commit并push到远端仓库，然后再进行修改。",
+      "reported_scope": "General positive feedback on accepted current P3 version; no separate claim of every UART failure/endurance test or installed-file hash",
+      "installed_bitstream_sha256": null,
+      "agent_programmed_hardware": false
+    },
+    "publication": {
+      "commit": "7837a24837de29454f0da28f413bdd48abd5a592",
+      "target": "origin/master",
+      "result": "Pushed successfully before new P4 edits; this authorization does not publish new P4 work"
+    }
+  },
+  "p4_posture_and_confirmed_rhythm": {
+    "date": "2026-10-18",
+    "digital_result": "PASS",
+    "implementation": "A2 original gprj/impl; runtime be885621daae47e73bbe6956256db95eb884b0d5",
+    "rhythm_software_listening": {
+      "bars": [
+        10,
+        18
+      ],
+      "user_statement": "节奏正确，采用这版修改正式曲谱",
+      "reference": "scores/p2/review/qing_ge_rhythm_10_18_v1.json",
+      "scope": "Software reference for rhythm, not FPGA PCM/hardware acceptance"
+    },
+    "mpu_hardware": {
+      "model": "GY-521 / MPU-6050",
+      "user_supply_statement": "应该3V3",
+      "dupont_leads_available": true,
+      "wired_to_fpga": false,
+      "mounted_on_guitar": false,
+      "measured_supply_or_pullup_voltage": null
+    },
+    "hardware_status": "Awaiting new P4 board listening, physical MPU supply/pull-up checks, mounting axes, motion/pose/idle-tail switching and existing game/UART/endurance checks",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "publication_authorized": false,
+    "bitstream_sha256": "34f8a86e942e291453159655c654fc72e5424167686cb2200dd659d4daf7229c",
+    "archive": "build/releases/touch_game/p4_posture_20261018/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
+    "verification": "gowin/neo_guitar_touch_game/p4_posture_verification.json",
+    "resources": {
+      "Logic": 50580.0,
+      "Register": 20090.0,
+      "CLS": 28585.0,
+      "BSRAM": 113.0,
+      "DSP": 115.5
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 13.858
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 50.02
+      }
+    },
+    "margin_targets_met": false,
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_layout_deadline": 0,
+      "tested_posture_math_deadline": 0
+    },
+    "digital_scope": "20 existing RTL+4 P3+8 posture component/top+12-scene centred pixel proof+2 full current voice/RAM closure benches+33 PC tests+4 actual VG benches+384 bank Boolean cases+fresh full P&R/STA; renderer-only scoped reuse explicit",
+    "ui": "Visible-character centering in CALIBRATE/AUTO/status; right status rectangle; no new touch actions",
+    "original_publication_path": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive_scope": "Saved original P4 snapshot; original_publication_path was explicitly authorized for replacement by the velocity-calibration release. Old verification certifies this immutable snapshot only."
+  },
+  "velocity_calibration_digital_release": {
+    "date": "2026-10-19",
+    "digital_result": "PASS",
+    "validated_source_commit": "e5680ef3510581f6a4ed487f90656495fddb1a45",
+    "implementation": "Original gprj and original impl, Gowin V1.9.12.03 Device B; synthesis PID39028 and same-netlist P&R PID24376 complete",
+    "bitstream_sha256": "210877be3e236c36d431e67bd116a6c9b0c2ac4e6d7b18912b162473b2b5812c",
+    "bitstream": "build/releases/touch_game/p4_velocity_calibration_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
+    "evidence_archive": "build/releases/touch_game/p4_velocity_calibration_20261019",
+    "verification": "gowin/neo_guitar_touch_game/velocity_calibration_verification.json",
+    "resources": {
+      "Logic": {
+        "used": 50570.0,
+        "available": 59904.0
+      },
+      "Register": {
+        "used": 20146.0,
+        "available": 60780.0
+      },
+      "CLS": {
+        "used": 28316.0,
+        "available": 29952.0
+      },
+      "BSRAM": {
+        "used": 113.0,
+        "available": 118.0
+      },
+      "DSP": {
+        "used": 115.5,
+        "available": 118.0
+      }
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 13.638
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 50.089
+      }
+    },
+    "margin_targets_met": false,
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_posture_deadline": 0
+    },
+    "calibration": {
+      "baseline_codes": [
+        2053,
+        2053,
+        2053,
+        2053
+      ],
+      "trigger": [
+        150,
+        100,
+        80,
+        100
+      ],
+      "rearm": [
+        20,
+        20,
+        20,
+        20
+      ],
+      "bin_boundaries": [
+        [
+          280,
+          430,
+          620
+        ],
+        [
+          250,
+          400,
+          600
+        ],
+        [
+          150,
+          280,
+          400
+        ],
+        [
+          220,
+          380,
+          600
+        ]
+      ],
+      "capture_subsequent_channel_samples": 32,
+      "total_peak_observations": 33,
+      "dead_channel_samples": 400,
+      "settle_channel_samples": 80,
+      "fixed_velocity_default": false,
+      "existing_voice_gain_q8": [
+        112,
+        160,
+        208,
+        256
+      ],
+      "voice_envelope_unchanged": true,
+      "scope": "Measured per-string thresholds supplied by teammate; no independent raw ADC/acoustic measurement. Actual piano/bright/wah models,all FX/coefficients/sample clocks/master gain unchanged; game autoplay stays2."
+    },
+    "audio_scope": "Existing 112/160/208/256 gains and original synthesis equations, modes, envelope, effects and sample clocks preserved; real performance and game plucks now use captured velocity, preview remains fixed2",
+    "digital_scope": "16384 detector cases, physical SPI four strings by four levels, 3 timbres by 4 levels ADC-to-PCM/PT8211/I2S, frozen audio/judgement/extended-range/key/policy/top checks, current actual VG ADC and two full-top gate benches, 384 bank cases, exact-hash reuse of33 PC tests, fresh complete P&R/STA and artifact binding",
+    "same_name_overwrite_authorized": true,
+    "saved_previous_tag": "snapshot/p4-posture-before-velocity-20261018",
+    "saved_previous_archive": "build/releases/touch_game/p4_posture_20261018",
+    "hardware_status": "Pending user on-board four-level dynamics, per-string noise/crosstalk/retrigger, loudness and posture interplay checks; digital checks are not quantitative acoustic calibration",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "github_push_authorized": false,
+    "measurements": "No new physical ADC labelled traces, target sound pressure, amplifier gain or long-duration measurements",
+    "next_action_policy": "Stop after local delivery and wait for user board feedback and explicit further instructions; no automatic Bluetooth, Flash or new timbre work",
+    "original_publication_path": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive_scope": "Saved initial velocity release only; original publication path is replaced by explicitly authorized dynamics tuning.",
+    "user_feedback": {
+      "date": "2026-10-19",
+      "scope": "User reports first-string notes triggered by other strings and insufficient contrast between low/high loudness. No installed-file hash or quantitative ADC/acoustic measurement captured."
+    }
+  },
+  "dynamics_tuning_digital_release": {
+    "date": "2026-10-19",
+    "digital_result": "PASS",
+    "validated_source_commit": "855e63d518784f7a9f07bec2eb1d4dc743a66c20",
+    "bitstream": "build/releases/touch_game/p4_dynamics_tuning_20261019/evidence/gowin/neo_guitar_touch_game/impl/pnr/neo_guitar_touch_game.fs",
+    "bitstream_sha256": "e97afee45346aad123a1ec525a2ddc0b344348898348eaf518fd7d9d7b0c4213",
+    "verification": "gowin/neo_guitar_touch_game/dynamics_tuning_verification.json",
+    "evidence_archive": "build/releases/touch_game/p4_dynamics_tuning_20261019",
+    "implementation": "Original gprj/impl; synthesis PID12236 and same-netlist P&R PID31412 complete",
+    "resources": {
+      "Logic": {
+        "used": 50570.0,
+        "available": 59904.0
+      },
+      "Register": {
+        "used": 20139.0,
+        "available": 60780.0
+      },
+      "CLS": {
+        "used": 28479.0,
+        "available": 29952.0
+      },
+      "BSRAM": {
+        "used": 113.0,
+        "available": 118.0
+      },
+      "DSP": {
+        "used": 115.5,
+        "available": 118.0
+      }
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 13.619
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 50.043
+      }
+    },
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_posture_deadline": 0
+    },
+    "margin_targets_met": false,
+    "authorized_changes": {
+      "CH0_E4_trigger": [
+        150,
+        220
+      ],
+      "all_strings_level0_gain_q8": [
+        112,
+        64
+      ],
+      "other_gains_unchanged": [
+        160,
+        208,
+        256
+      ]
+    },
+    "preservation_scope": "Exactly two literal edits from saved df770fa: CH0 trigger150->220 and level0 voice gain112->64; every other runtime/ROM/score/display/MPU/pin/clock/route setting unchanged",
+    "frozen_audio_scope": "Independent saved voice proves levels1..3 exact PCM and level0 64/112 scaling within integer rounding. 8192-sample master oracle permits exactly the user-authorized level0 gain literal only; never claim level0 still equals unmodified historical PCM.",
+    "digital_scope": "12 RTL benches; 30024 saved-voice samples; actual SPI x16 grades; physical ADC to three timbres/four gains; fresh VG ADC+UART/16-frame dynamic display+production256 MPU/tail/manual; 384 bank and128 four-voice DSP gain Boolean cases;33 exact-source PC tests reused; full P&R/STA and final artifact binding PASS",
+    "same_name_overwrite_authorized": true,
+    "saved_previous_tag": "snapshot/p4-velocity-before-ch0-threshold-20261019",
+    "hardware_status": "Awaiting user comparison of CH0 false/missed triggers and lowest-level loudness; threshold220 is a first trial based on reported behavior, not a newly measured hardware calibration.",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "github_push_authorized": false,
+    "next_action_policy": "Stop after local delivery; wait for board feedback, no automatic new feature work",
+    "original_publication_path": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "archive_scope": "Saved CH0/minimum-gain release; original publication path is replaced by explicitly requested quarter-step tuning. Historical verification applies to fixed internal archived FS only."
+  },
+  "quarter_dynamics_digital_release": {
+    "date": "2026-10-19",
+    "digital_result": "PASS",
+    "validated_source_commit": "152a7645d1aa1829b4d3b2e60b2f07f8b2a0d5fe",
+    "bitstream": "build/releases/touch_game/neo_guitar_touch_game_p4_posture.fs",
+    "bitstream_sha256": "cfda7ead63703142876e10776a38f86237188aeb4a4d910b02aa0927df611a30",
+    "verification": "gowin/neo_guitar_touch_game/quarter_dynamics_verification.json",
+    "evidence_archive": "build/releases/touch_game/p4_quarter_dynamics_20261019",
+    "implementation": "Original gprj/impl; synthesis PID23460 and same-netlist P&R PID38532 complete",
+    "resources": {
+      "Logic": {
+        "used": 50432.0,
+        "available": 59904.0
+      },
+      "Register": {
+        "used": 20139.0,
+        "available": 60780.0
+      },
+      "CLS": {
+        "used": 28650.0,
+        "available": 29952.0
+      },
+      "BSRAM": {
+        "used": 113.0,
+        "available": 118.0
+      },
+      "DSP": {
+        "used": 115.5,
+        "available": 118.0
+      }
+    },
+    "clocks": {
+      "audio_clk_12m288": {
+        "required_mhz": 12.288,
+        "fmax_mhz": 14.051
+      },
+      "sys_clk_50m": {
+        "required_mhz": 50.0,
+        "fmax_mhz": 53.171
+      }
+    },
+    "violations": {
+      "setup": 0,
+      "hold": 0,
+      "latch": 0,
+      "unrouted": 0,
+      "tested_audio_deadline": 0,
+      "tested_score_deadline": 0,
+      "tested_posture_deadline": 0
+    },
+    "margin_targets_met": false,
+    "authorized_changes": {
+      "CH2_G3_trigger": [
+        80,
+        60
+      ],
+      "middle_gains_q8": {
+        "level1": [
+          160,
+          128
+        ],
+        "level2": [
+          208,
+          192
+        ]
+      },
+      "CH0_remains": 220,
+      "all_four_gains_q8": [
+        64,
+        128,
+        192,
+        256
+      ]
+    },
+    "preservation_scope": "Exactly three literal edits in two runtime files from saved d0b57a4: CH2 trigger80->60 and class1/2 gains160/208->128/192. All other runtime/ROM/score/display/MPU/pin/clock/route settings unchanged.",
+    "physical_velocity_behavior": "Real ADC captured peak selects one of four gains per attack, as already enabled in prior release; this is parameter tuning. Preview still fixed grade2 and now uses75 percent gain.",
+    "frozen_audio_scope": "48456 prior-voice samples: levels0/3 exact5796 samples; levels1/2 scaled42660 samples within integer rounding. 8192 master-reference samples use only the exact previously/currently authorized gain literal edits112/160/208->64/128/192; do not claim all altered classes equal the untouched old PCM.",
+    "digital_scope": "13 RTL benches,16384 detector cases,40 newly admitted CH2 light strikes and140 retained CH0 rejection cases; physical SPI four grades per string; ADC-to-three-timbre/four-grade audio; fresh actual VG ADC+full UART/display+production256 MPU gate checks;384 bank/128 gain truth combinations;33 PC exact-source reuse; complete P&R/STA and final hash binding PASS",
+    "same_name_overwrite_authorized": true,
+    "saved_previous_tag": "snapshot/p4-before-quarter-gains-20261019",
+    "hardware_status": "User board comparison pending for CH2 light strikes/noise/crosstalk and quarter-step loudness. Trial threshold60 was selected from request, not newly measured physical ADC data.",
+    "installed_bitstream_sha256": null,
+    "agent_programmed_hardware": false,
+    "physical_com_opened": false,
+    "github_push_authorized": false,
+    "next_action_policy": "After local digital delivery wait for user board feedback; no automatic new functionality."
+  }
+}

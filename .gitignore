@@ -38,3 +38,17 @@ __pycache__/
 # Local IDE and user settings
 .vscode/
 *.gprj.user
+
+# Local artifacts and drafts; archived tracked evidence is staged explicitly.
+/verification/local/
+/verification/build/
+/verification/results/
+*.jks
+*.keystore
+/.venv/
+/impl/
+/ip/
+/tmp/
+/xinxian-fpga-guita appr/
+node_modules/
+.expo/

@@ -42,6 +42,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    sourceSets {
+        getByName("test").java.setSrcDirs(listOf("../../../verification/mobile/android/app/src/test/java"))
+        getByName("androidTest").java.setSrcDirs(listOf("../../../verification/mobile/android/app/src/androidTest/java"))
+    }
 }
 
 dependencies {

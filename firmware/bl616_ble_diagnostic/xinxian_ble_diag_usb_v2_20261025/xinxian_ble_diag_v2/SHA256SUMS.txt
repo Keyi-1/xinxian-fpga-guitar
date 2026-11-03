@@ -1,1 +1,0 @@
-c2da5b45762fb347685e496a10d59a2ee786c21ae50eda078820545de51b8b61  xinxian_ble_diag_v2_manual_start_0x40000.bin

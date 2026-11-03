@@ -1,0 +1,19 @@
+{
+  "expo": {
+    "name": "弦芯曲谱导入",
+    "slug": "xinxian-p5-import",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "com.xinxian.scoreimport",
+      "infoPlist": { "NSBluetoothAlwaysUsageDescription": "连接弦芯吉他并导入曲谱。" }
+    },
+    "android": {
+      "package": "com.xinxian.scoreimport",
+      "blockedPermissions": ["android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE"],
+      "permissions": ["android.permission.BLUETOOTH_CONNECT"]
+    },
+    "plugins": [["react-native-ble-plx", { "isBackgroundEnabled": false, "neverForLocation": true,
+      "bluetoothAlwaysPermission": "连接弦芯吉他并导入曲谱。" }], "expo-document-picker"]
+  }
+}

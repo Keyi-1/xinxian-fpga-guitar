@@ -15,7 +15,6 @@ from windows_score_uploader import VERSION
 
 def sources():
     files = [Path('tools/run_windows_score_uploader.py'), Path('tools/build_windows_score_uploader.py'),
-             Path('tools/test_windows_score_uploader.py'), Path('tools/test_windows_score_preview.py'),
              Path('docs/WINDOWS_SCORE_UPLOADER.md')]
     files += [Path('tools')/name for name in ('game_score_upload.py', 'game_score_v2.py', 'game_fingering.py')]
     files += [p.relative_to(ROOT) for p in (ROOT/'tools/windows_score_uploader').rglob('*')

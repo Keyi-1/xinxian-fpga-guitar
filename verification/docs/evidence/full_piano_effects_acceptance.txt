@@ -1,0 +1,113 @@
+FULL PIANO / EFFECTS ACCEPTANCE 2026-10-04..2026-10-05 Asia/Shanghai
+Branch: feat/full-piano-effects; base: 1fef7b6
+Gowin V1.9.12.03; GW5AT-LV60PG484AC1/I0 Version B; ModelSim SE-64 10.6d
+Previous fixed-piano interpolation fix physically accepted by user.
+New FULL board audio/effects and LCD physical acceptance remain pending.
+
+[full_regression.log]
+PASS tb_all_note_frequencies
+PASS tb_antibeat_pcm_compare
+PASS tb_audio_sample_tick
+PASS tb_four_string_audio_chain
+PASS tb_four_string_audio_output_chain
+PASS tb_four_string_velocity_slide
+PASS tb_four_string_vibrato_gesture
+PASS tb_four_string_voice_control
+PASS tb_four_voice_antibeat_allocator
+PASS tb_four_voice_audio_core
+PASS tb_four_voice_audio_output
+PASS tb_four_voice_event_boundaries
+PASS tb_four_voice_harmonic_audio_core
+PASS tb_four_voice_harmonic_audio_output
+PASS tb_four_voice_harmonic_lifecycle
+PASS tb_four_voice_lifecycle
+PASS tb_fret_note_event
+PASS tb_full_guitar_top
+PASS tb_full_piano_budget
+PASS tb_full_piano_voice
+PASS tb_full_realtime_acceptance
+PASS tb_guitar_audio_latency
+PASS tb_guitar_audio_top
+PASS tb_guitar_effect_buttons_defaults
+PASS tb_guitar_effect_buttons
+PASS tb_guitar_harmonic_audio_top
+PASS tb_guitar_play_control
+PASS tb_harmonic_timbre_switch
+PASS tb_harmonic_velocity_profiles
+PASS tb_harmonic_voice_core
+PASS tb_long_voice_pcm16_export
+PASS tb_matrix_scanner_debounce
+PASS tb_matrix_scanner_exhaustive
+PASS tb_matrix_scanner
+PASS tb_mcp3208_pluck_frontend
+PASS tb_mcp3208_velocity_exhaustive
+PASS tb_minimal_audio_core
+PASS tb_minimal_audio_output
+PASS tb_minimal_top
+PASS tb_nco_frequency
+PASS tb_neo_four_string_matrix_audio_test
+PASS tb_neo_full_guitar_top
+PASS tb_neo_guitar_main_default_timing
+PASS tb_neo_guitar_main_equivalence
+PASS tb_neo_minimal_audio_top
+PASS tb_neo_row0_led_test
+PASS tb_pcm16_golden_compare
+PASS tb_pcm24_chorus
+PASS tb_pcm24_mixer
+PASS tb_pcm24_reverb
+PASS tb_pcm24_rock_soft_clip
+PASS tb_pcm24_to_16
+PASS tb_phase_slide_factor_equivalence
+PASS tb_phase_slide_smoother
+PASS tb_piano_pcm_export
+PASS tb_piano_room_control
+PASS tb_piano_stereo_room
+PASS tb_piano_voice_core
+PASS tb_pt8211_tx
+PASS tb_reset_sync
+PASS tb_rgb_spectrum_timing
+PASS tb_sine_nco
+PASS tb_spectrum_bar_cdc
+PASS tb_spectrum_bars32
+PASS tb_spectrum_display_top
+PASS tb_spectrum_fft1024
+PASS tb_stereo_audio_effects
+PASS tb_voice_audio_core
+PASS tb_voice_envelope_pluck_sustain
+PASS tb_voice_envelope_sustain
+PASS tb_voice_envelope_velocity
+PASS tb_voice_envelope
+PASS tb_voice_golden_compare
+PASS tb_xinxian_top
+MAIN REGRESSION PASSED: 74 benches
+[full_button_defaults.log]
+PASS tb_guitar_effect_buttons_defaults
+MAIN REGRESSION PASSED: 1 benches
+[full_gate_check.log]
+# PASS: 3263 actual DAC frames bit-identical; 4x32 piano/bright, chorus, independent sustain/light room, fifth harmony, power-on initialization; 2923 nonzero
+# PASS: 32000 bit-exact piano samples; hammer on/off; velocities; profiles; slides; same-tick pluck priority; damping; rapid re-strike continuity
+# Errors: 0, Warnings: 0
+# PASS: 12000 bit-exact FULL samples; all 32 modes produce nonzero amplitudes; fifth pitch, timbre crossfade, sustain/release and re-strike within 256 clocks
+# Errors: 0, Warnings: 0
+# PASS: 4 x 32 = 128 nonzero components; 2000 real 48 kHz samples; synthesis latency 231 / 256 clocks
+# Errors: 0, Warnings: 0
+# PASS: dry has zero reverberation; enabled room matches accepted light room sample-for-sample; signed crossfade and tail
+# Errors: 0, Warnings: 0
+# PASS: FULL real-time 10000-frame endurance pcm=10002 spectrum=6 display=6 interval_ns=32916582..32916583
+# Errors: 0, Warnings: 0
+# PASS: actual 245760-cycle debounce and 12288000-cycle long hold; default hardware key mappings; no forced state
+# Errors: 0, Warnings: 0
+
+Physical audio PNR: Logic 25727; FF 16124; BSRAM 76/118; DSP 86/118; 28 unique constrained pads.
+Audio clock 12.288 MHz; Fmax 19.329 MHz; minimum setup slack +29.647 ns; setup/hold violations 0.
+LCD FULL logical PNR (automatic pins, NOT downloadable): Logic 31206; FF 18445; BSRAM 79/118; DSP 91/118.
+Audio Fmax 16.644 MHz; pixel Fmax 127.197 MHz; setup/hold violations 0.
+Both builds complete with .fs output. No bitstream was programmed by Codex.
+Gate check: 3263 DAC frames exact, 2923 nonzero; only mechanical counters accelerated in both DUT/reference.
+130 known prim_sim.v vopt-2697 unused-width memory warnings; no RTL warnings/errors; no SDF loaded.
+PNR generic-clock-routing and unused/truncated-bit warnings retained in full logs; all timed paths meet constraints.
+Logs: build/piano/full_audio_build.log, full_lcd_logic_build.log; sim/temp/full_piano_gate/run.log.
+
+SHA256 gowin/neo_guitar_audio_full/impl/pnr/neo_guitar_audio_full.fs = 594c3879dee3b466b97b389ecd2294ea075644d8a79e63d0949b56d06ebd95bc
+SHA256 gowin/neo_guitar_audio_full/impl/gwsynthesis/neo_guitar_audio_full.vg = f1b043b2ec74fd6f2ee26143eede864d18a0c24d260f417723775690148997b6
+SHA256 gowin/full_main_build/impl/pnr/full_guitar_top.fs = ad063fae167fa4848bc809e63ccf46c1eef563f094eda3d250429ff588e8f75f

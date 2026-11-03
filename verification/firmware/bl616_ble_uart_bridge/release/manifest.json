@@ -1,0 +1,18 @@
+{
+  "project": "xinxian_ble_uart",
+  "chip": "BL616",
+  "board_profile": "bl616dk",
+  "sdk_reported_version": "1.1.1",
+  "compiler": "T-Head GCC 10.2.0",
+  "image": "xinxian_ble_uart_bl616_secondary_0x40000.bin",
+  "image_size_bytes": 281968,
+  "image_sha256": "753dc6f96b7a64e75d547262f4d821e7dbc7371ac50d191a8b5830d6b84d6001",
+  "intended_flash_address": "0x40000",
+  "intended_flash_end_inclusive": "0x84D6F",
+  "official_recovery_image": "E:\\BL616\\bl616_fpga_partner_NeoDock.bin",
+  "official_recovery_sha256": "4a7bae28bae18ae713a95177e1758954214253e5cdbb84d8436cba8bc1d085d7",
+  "compile_status": "passed",
+  "flash_performed": false,
+  "hardware_tested": false,
+  "usb_jtag_uart_implemented_in_secondary": false
+}

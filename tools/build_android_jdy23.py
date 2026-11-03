@@ -1,5 +1,6 @@
 """Build the JDY-23 serial APK with installed Android SDK tools, no Gradle downloads."""
 from pathlib import Path
+import argparse
 import hashlib
 import json
 import os
@@ -11,10 +12,21 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "mobile/android/app/src/main"
 OUT = ROOT / "build/releases/android/xinxian_jdy23_0.3.0"
-SDK = Path("S:/Software/AndroidSDK")
+SDK = Path(os.environ.get("ANDROID_SDK_ROOT") or os.environ.get("ANDROID_HOME") or "S:/Software/AndroidSDK")
 TOOLS = SDK / "build-tools/35.0.1"
-JDK = Path("S:/AndroidSoftWare/JDK_Version/bin")
+JDK = Path(os.environ.get("JAVA_HOME") or "S:/AndroidSoftWare/JDK_Version") / "bin"
 ANDROID = SDK / "platforms/android-35/android.jar"
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--check-tools", action="store_true", help="Validate SDK/JDK paths without generating an APK")
+args = parser.parse_args()
+required = [ANDROID, *(TOOLS / n for n in ("aapt2.exe", "zipalign.exe", "lib/d8.jar", "lib/apksigner.jar")),
+            *(JDK / n for n in ("javac.exe", "java.exe", "jar.exe", "keytool.exe"))]
+missing = [str(p) for p in required if not p.is_file()]
+if missing:
+    raise SystemExit("Missing build tools; set ANDROID_SDK_ROOT and JAVA_HOME:\n" + "\n".join(missing))
+if args.check_tools:
+    print(json.dumps({"result": "PASS", "sdk": str(SDK), "jdk_bin": str(JDK), "build_tools": "35.0.1"}))
+    raise SystemExit(0)
 OUT.mkdir(parents=True, exist_ok=True)
 LOG = []
 SOURCE_INPUTS = sorted(p for p in APP.rglob('*') if p.is_file())
@@ -60,7 +72,7 @@ with zipfile.ZipFile(OUT / "unsigned.apk", "a", zipfile.ZIP_STORED) as z:
     for item in sorted(dex.glob("*.dex")):
         z.write(item, item.name)
 run(TOOLS / "zipalign.exe", "-f", "4", OUT / "unsigned.apk", OUT / "aligned.apk")
-keystore = ROOT / "build/companion_ui/signing/jdy23-debug.jks"
+keystore = Path(os.environ.get("XINXIAN_KEYSTORE") or ROOT / "build/companion_ui/signing/jdy23-debug.jks")
 keystore.parent.mkdir(parents=True, exist_ok=True)
 if not keystore.exists():
     run(JDK / "keytool.exe", "-genkeypair", "-keystore", keystore, "-storepass", "android",

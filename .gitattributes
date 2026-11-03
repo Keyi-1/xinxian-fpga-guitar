@@ -21,3 +21,14 @@ scores/p2/*.bin binary
 /build/releases/android/**/verification.json -text
 /build/releases/windows/**/manifest.json -text
 /build/exports/*.zip binary
+
+# Preserve original bytes of relocated evidence and accepted releases.
+/verification/** -text
+/releases/** -text
+/docs/images/*.png binary
+
+# Freeze accepted FPGA inputs exactly, independent of a clone's core.autocrlf.
+/rtl/** -text
+/constraints/** -text
+/mem/** -text
+/gowin/neo_guitar_touch_game/neo_guitar_touch_game.gprj -text

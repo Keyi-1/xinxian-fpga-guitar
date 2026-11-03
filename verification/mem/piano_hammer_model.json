@@ -1,0 +1,101 @@
+{
+  "sample_rate_hz": 48000,
+  "duration_samples": 2048,
+  "seed": 1831565813,
+  "algorithm": "xorshift32 innovations; four shift-only lowpass poles; three parallel damped bandpass resonators; difference of exponential envelopes",
+  "innovation_lowpass_poles": 4,
+  "innovation_lowpass_shift": 2,
+  "coefficients_fraction_bits": 14,
+  "filter_state_bits": 18,
+  "profiles": [
+    {
+      "a1_q14": [
+        -31148,
+        -26897,
+        -13108
+      ],
+      "a2_q14": [
+        14912,
+        14964,
+        8493
+      ],
+      "noise_shifts": [
+        6,
+        6,
+        5
+      ],
+      "envelope_start_q24": 6111103,
+      "fitted_centers_hz": [
+        650.0000000000001,
+        4107.70353104739,
+        7499.999999999999
+      ],
+      "fitted_radii": [
+        0.9540155924275852,
+        0.9556766374198338,
+        0.7200000000000001
+      ],
+      "target_rms_pcm16": 125.11824875642641
+    },
+    {
+      "a1_q14": [
+        -32062,
+        -30362,
+        -19055
+      ],
+      "a2_q14": [
+        15871,
+        15896,
+        8493
+      ],
+      "noise_shifts": [
+        8,
+        8,
+        4
+      ],
+      "envelope_start_q24": 12421247,
+      "fitted_centers_hz": [
+        828.119358006148,
+        2644.6512798759472,
+        4817.459685731737
+      ],
+      "fitted_radii": [
+        0.9842196522771893,
+        0.9849999999999999,
+        0.7200000000000001
+      ],
+      "target_rms_pcm16": 135.3682026657987
+    },
+    {
+      "a1_q14": [
+        -31026,
+        -27952,
+        -23744
+      ],
+      "a2_q14": [
+        14795,
+        15896,
+        15896
+      ],
+      "noise_shifts": [
+        5,
+        7,
+        6
+      ],
+      "envelope_start_q24": 9257087,
+      "fitted_centers_hz": [
+        650.0000000000001,
+        4000.0871845193565,
+        5685.022487099172
+      ],
+      "fitted_radii": [
+        0.9502844194819782,
+        0.9849999999999999,
+        0.9849999999999999
+      ],
+      "target_rms_pcm16": 355.03604157931983
+    }
+  ],
+  "reference_usage": "Spectral shape and RMS only; no recorded PCM or per-sample trajectory emitted",
+  "reference_sha256": "24f501751136883664b6c769e0ca476d88bdbc9b57bea9c87ad0ae4e092b3e96"
+}

@@ -1,0 +1,66 @@
+PROCEDURAL PIANO HAMMER EXPERIMENT — 2026-10-13
+Branch: experiment/procedural-piano-hammer
+Accepted baseline: fb574a4
+Device: GW5AT-LV60PG484AC1/I0, Device B
+Tool: Gowin V1.9.12.03 x64
+
+Production change:
+  Recorded 3 x 2048-sample hammer ROM removed, including its generator output.
+  Four independent xorshift streams, four shift-only LP poles, three damped
+  resonators and an analytic difference-of-exponentials envelope per voice.
+  Existing modal DSP and idle modal scheduler slots reused; LP arithmetic shared.
+  No new model DSP or BSRAM; no stored noise/state trajectory or PCM playback.
+  Modal body ROMs, bright/wah coefficients, controls, FX and display sources
+  checked against fb574a4 and unchanged. The attack waveform intentionally differs.
+
+Physical implementation: place=4, route=2, clock_route_order=1; hold repair on.
+  Full placement, routing and bitstream generation completed without ERROR.
+  Original CST/SDC unchanged; 52 unique pins checked, including 1.5 V buttons.
+  Logic      47596 / 59904
+  Register   18674 / 60780; no latches
+  CLS        26683 / 29952
+  BSRAM      86 / 118, versus baseline 118 / 118: 32 blocks freed
+  DSP        115.5 / 118, unchanged
+  Audio Fmax 14.148 MHz >= 12.288 MHz
+  System Fmax 52.895 MHz >= 50 MHz
+  Setup violated endpoints: 0
+  Hold violated endpoints: 0
+  Four-voice 32-mode source budget: 233 / 256 clocks per 48 kHz sample.
+
+Latest hash-bound source regression: 7 benches PASS.
+  Sample-domain independent integer oracle, three profiles, four velocities;
+  four-voice budget, three timbres, release-to-open, hammer properties and A/B.
+  A/B: 136000 stereo PCM16 frames per version; no clipping or deadline misses.
+  287464 post-transient piano-body samples and 103996 pure bright/wah samples
+  exactly match the frozen baseline source voices.
+  Repeated strikes use fresh noise; reset reproduces the algorithm.
+  Filter state bounds checked; last 16 attack samples <= 2 PCM16 units.
+  Sixteen display/control/FX integration tests were retained from the initial
+  procedural implementation. Their stage sources and ROMs match fb574a4;
+  final core/A-B and full synthesized gate checks cover the final hammer source.
+
+Final synthesized netlist versus current RTL:
+  Actual serial DAC frames: 7632, all bit-identical; 7293 nonzero.
+  Includes 4 x 32 voices, all timbres, sustain/light room, chorus, fifth harmony,
+  real matrix fret release and initialization; 1596 half-speed wah frames.
+  LCD board clocks: 7949456; visible pixels: 1115060, all bit-identical.
+  Errors: 0. The 225 vendor warnings are only allowlisted unused-width branches
+  in Gowin's primitive memory models; no source/netlist/bench warnings allowed.
+  Netlist SHA256:
+    3a8ff8dddb901b56491299c184f6ecd78f1d1359595714b9706d39f52f6babfe
+
+Download file: gowin/neo_guitar_procedural/impl/pnr/neo_guitar_procedural.fs
+  Bytes: 20561995
+  SHA256: ba16d65fedfd658a2a640be6b87c34153ff9d3f87b55db502a9ddfce95b8c4f4
+Accepted radial_curve_fade.fs remains unchanged:
+  SHA256: 870b8c1f2bd76d6dc6b0ddc2d5210fe75bdefa1017f62c4f9726649268598173
+
+Reproducible checker: gowin/neo_guitar_procedural/check_result.py
+Machine-readable hashes/results: gowin/neo_guitar_procedural/verification.json
+Listening artifacts: build/procedural_piano/, actual RTL PCM, no normalisation.
+Hardware status: awaits user listening/physical acceptance of the new attack.
+Rule basis: user-provided 高云 (1).pdf, printed pages 13–14. This production
+path removes recorded-PCM playback. Parameter identification is interpreted
+under the permitted synthesis/physical-model methods; no claim certifies all
+unrelated contest requirements. Historical PCM is local ignored A/B data only,
+excluded from every production project and contest source submission.

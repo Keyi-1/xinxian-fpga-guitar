@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Project>
+<Template>FPGA</Template>
+<Version>5</Version>
+<Device name="GW5AT-60B" pn="GW5AT-LV60PG484AC1/I0">gw5at60b-002</Device>
+<FileList>
+  <File path="../../rtl/diagnostics/neo_mpu6050_lcd_diagnostic_top.v" type="file.verilog" enable="1"/>
+  <File path="../../rtl/diagnostics/mpu_lcd_diag_reader.v" type="file.verilog" enable="1"/>
+  <File path="../../rtl/diagnostics/mpu_diag_i2c_master.v" type="file.verilog" enable="1"/>
+  <File path="../../rtl/diagnostics/mpu_lcd_diag_screen.v" type="file.verilog" enable="1"/>
+  <File path="../../rtl/control/reset_sync.v" type="file.verilog" enable="1"/>
+  <File path="../../rtl/display/lcd_rgb_scan_480x272.v" type="file.verilog" enable="1"/>
+  <File path="../../constraints/neo_mpu6050_lcd_diagnostic.cst" type="file.cst" enable="1"/>
+  <File path="../../constraints/neo_mpu6050_lcd_diagnostic.sdc" type="file.sdc" enable="1"/>
+</FileList>
+</Project>

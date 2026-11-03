@@ -1,0 +1,7 @@
+{
+  "commit": "a6009a3596d812402c06e7a2fadf8c6b881faae5",
+  "path": "rtl/game/game_p2_window_controller.v",
+  "original_sha256": "fc271fc517e1a777a0798f8142b42af964311ea1651d2b19f4f11112bb8ca265",
+  "reference_sha256": "cecddd6812f664f90a700a4f6312a44c9ccfd5d0e031e408dde8d9858e0d3f27",
+  "only_transform": "module identifier suffix _a4"
+}

@@ -1,0 +1,364 @@
+{
+  "title": "茉莉花",
+  "alias": "JASMINE",
+  "arrangement": "常见单旋律、27 小节 2/4、保留句尾休止、无伴奏",
+  "bpm": 96,
+  "tonic": "G3",
+  "sample_rate_hz": 48000,
+  "event_bytes": 16,
+  "event_count": 67,
+  "time_signature": "2/4",
+  "bar_count": 27,
+  "runtime_time_unit": "48kHz samples from rational beats",
+  "reference": "https://www.ysmen.org.tw/upload/info_center/f202111031038110.pdf#page=28",
+  "duration_ms": 33750,
+  "midi_min": 50,
+  "midi_max": 67,
+  "crc32": "c0504b6e",
+  "lane_assignment": "offline: non-overlapping voices; prefer nearby notes on different strings",
+  "open_midi": [
+    64,
+    59,
+    55,
+    50
+  ],
+  "fingering": [
+    {
+      "event": 0,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 1,
+      "lane": 2,
+      "fret": 4
+    },
+    {
+      "event": 2,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 3,
+      "lane": 0,
+      "fret": 0
+    },
+    {
+      "event": 4,
+      "lane": 1,
+      "fret": 8
+    },
+    {
+      "event": 5,
+      "lane": 0,
+      "fret": 3
+    },
+    {
+      "event": 6,
+      "lane": 1,
+      "fret": 5
+    },
+    {
+      "event": 7,
+      "lane": 2,
+      "fret": 7
+    },
+    {
+      "event": 8,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 9,
+      "lane": 0,
+      "fret": 0
+    },
+    {
+      "event": 10,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 11,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 12,
+      "lane": 2,
+      "fret": 4
+    },
+    {
+      "event": 13,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 14,
+      "lane": 0,
+      "fret": 0
+    },
+    {
+      "event": 15,
+      "lane": 1,
+      "fret": 8
+    },
+    {
+      "event": 16,
+      "lane": 0,
+      "fret": 3
+    },
+    {
+      "event": 17,
+      "lane": 1,
+      "fret": 5
+    },
+    {
+      "event": 18,
+      "lane": 2,
+      "fret": 7
+    },
+    {
+      "event": 19,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 20,
+      "lane": 0,
+      "fret": 0
+    },
+    {
+      "event": 21,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 22,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 23,
+      "lane": 2,
+      "fret": 7
+    },
+    {
+      "event": 24,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 25,
+      "lane": 2,
+      "fret": 4
+    },
+    {
+      "event": 26,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 27,
+      "lane": 0,
+      "fret": 0
+    },
+    {
+      "event": 28,
+      "lane": 0,
+      "fret": 0
+    },
+    {
+      "event": 29,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 30,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 31,
+      "lane": 2,
+      "fret": 2
+    },
+    {
+      "event": 32,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 33,
+      "lane": 2,
+      "fret": 7
+    },
+    {
+      "event": 34,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 35,
+      "lane": 2,
+      "fret": 2
+    },
+    {
+      "event": 36,
+      "lane": 3,
+      "fret": 5
+    },
+    {
+      "event": 37,
+      "lane": 2,
+      "fret": 0
+    },
+    {
+      "event": 38,
+      "lane": 3,
+      "fret": 7
+    },
+    {
+      "event": 39,
+      "lane": 2,
+      "fret": 0
+    },
+    {
+      "event": 40,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 41,
+      "lane": 2,
+      "fret": 2
+    },
+    {
+      "event": 42,
+      "lane": 3,
+      "fret": 5
+    },
+    {
+      "event": 43,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 44,
+      "lane": 2,
+      "fret": 2
+    },
+    {
+      "event": 45,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 46,
+      "lane": 2,
+      "fret": 7
+    },
+    {
+      "event": 47,
+      "lane": 1,
+      "fret": 5
+    },
+    {
+      "event": 48,
+      "lane": 0,
+      "fret": 3
+    },
+    {
+      "event": 49,
+      "lane": 1,
+      "fret": 3
+    },
+    {
+      "event": 50,
+      "lane": 2,
+      "fret": 2
+    },
+    {
+      "event": 51,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 52,
+      "lane": 2,
+      "fret": 7
+    },
+    {
+      "event": 53,
+      "lane": 3,
+      "fret": 7
+    },
+    {
+      "event": 54,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 55,
+      "lane": 2,
+      "fret": 0
+    },
+    {
+      "event": 56,
+      "lane": 3,
+      "fret": 2
+    },
+    {
+      "event": 57,
+      "lane": 3,
+      "fret": 0
+    },
+    {
+      "event": 58,
+      "lane": 3,
+      "fret": 2
+    },
+    {
+      "event": 59,
+      "lane": 2,
+      "fret": 0
+    },
+    {
+      "event": 60,
+      "lane": 2,
+      "fret": 2
+    },
+    {
+      "event": 61,
+      "lane": 1,
+      "fret": 0
+    },
+    {
+      "event": 62,
+      "lane": 2,
+      "fret": 0
+    },
+    {
+      "event": 63,
+      "lane": 3,
+      "fret": 7
+    },
+    {
+      "event": 64,
+      "lane": 2,
+      "fret": 0
+    },
+    {
+      "event": 65,
+      "lane": 3,
+      "fret": 2
+    },
+    {
+      "event": 66,
+      "lane": 3,
+      "fret": 0
+    }
+  ],
+  "slots_available": 5,
+  "populated_slots": 1
+}
