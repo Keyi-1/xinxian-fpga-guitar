@@ -8,7 +8,7 @@
 
 ![节奏模式选曲页的 RTL 仿真画面](docs/images/song_slots_rtl.png)
 
-*板端选曲页，来自真实 RTL 像素输出。显示和触控已一起适配屏幕倒置安装。*
+板端选曲页，来自真实 RTL 像素输出。显示和触控已一起适配屏幕倒置安装。
 
 ## 系统特性
 
@@ -23,14 +23,14 @@
 
 ## 下载与上板
 
-当前配套版本为 **2026-11-02 位流、Android 0.3.0、Windows 1.2.0**，已确认均通过实物验收。
+当前配套版本为 **2026-11-02 位流、Android 0.3.0、Windows 1.2.0**，已均通过实物验收。
 
 | 文件 | 用途 |
 | --- | --- |
 | [FPGA 位流 `.fs`](releases/fpga/neo_guitar_touch_game.fs) | 可直接下载到板上 |
 | [FPGA 完整发布包](releases/fpga/verified_release_20261102.zip) | 同一位流及构建、资源、时序报告 |
 | [Android APK 0.3.0](releases/android/xinxian_jdy23_0.3.0.apk) | Android 8.0 及以上，JDY-23 蓝牙传谱 |
-| [Windows 便携版 1.2.0（许可补充版）](releases/windows/FPGA_Guitar_Uploader_1.2.0_licensed.zip) | 原程序与资源保持不变，补齐许可和带许可的对应源码；解压后运行 EXE |
+| [Windows 便携版 1.2.0](releases/windows/FPGA_Guitar_Uploader_1.2.0_licensed.zip) | 原程序与资源保持不变，补齐许可和带许可的对应源码；解压后运行 EXE |
 | [FPGA 140 文件纯源码包](releases/fpga/source_code_140_files.zip) | 最终综合所用源码与约束，不含报告、位流和测试 |
 | [SHA256 校验表](releases/SHA256SUMS) | 核对下载文件完整性 |
 | [发布许可补充包](releases/license_notices_20261104.zip) | 对应原始 FS、APK、源码和 Windows 包的许可范围、正文与第三方来源 |
