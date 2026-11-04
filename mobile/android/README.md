@@ -16,3 +16,5 @@
 从仓库根目录运行 `python tools/build_android_jdy23.py`，设置 `JAVA_HOME` 和 `ANDROID_SDK_ROOT`，需要 JDK17、SDK35、Build Tools35.0.1。`--check-tools` 只检查工具路径。Gradle 工程保留 AGP8.7.3；当前交付 APK 实际由 SDK 命令行工具生成，签名密钥不入库。测试源码集中在 `verification/mobile/android/`，Gradle sourceSets 指向该位置。
 
 完整说明：[构建与签名](../../docs/BUILDING.md)、[硬件接线](../../docs/HARDWARE.md)、[传谱与提交结果核对](../../docs/TRANSFER.md)。
+
+原创客户端代码采用 Apache-2.0，版权归芯弦项目贡献者；内置第三方曲谱不由此重新授权，部分再分发权待核实。详见[许可范围](../../LICENSING.md)和[第三方说明](../../THIRD_PARTY_NOTICES.md)。

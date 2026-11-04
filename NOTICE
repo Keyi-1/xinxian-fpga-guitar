@@ -1,0 +1,14 @@
+Xinxian FPGA Four-String Guitar
+Copyright (c) 2026 Xinxian project contributors.
+
+Original project components are licensed under the Apache License, Version 2.0,
+except for the Windows application components designated GPL-3.0-only in
+LICENSING.md. Copyright in individual contributions remains with their holders.
+
+Third-party dependencies and materials retain their own rights and licenses.
+In particular, the Gowin-copyrighted PLL wrapper, musical compositions and score
+data, third-party schematics, and font-derived data are not relicensed here.
+See THIRD_PARTY_NOTICES.md and COPYRIGHT.md for scope and attribution.
+
+This NOTICE is informational and does not add restrictions to the applicable
+Apache or GPL license terms.

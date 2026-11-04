@@ -35,3 +35,8 @@ scores/p2/*.bin binary
 
 # Gowin .fs files are generated configuration bitstreams, not F# programs.
 *.fs linguist-language=Text linguist-generated=true linguist-detectable=false
+
+# Preserve the verbatim standard and third-party license texts.
+/LICENSE -text
+/LICENSES/** -text
+/tools/windows_score_uploader/LICENSE -text

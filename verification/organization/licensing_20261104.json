@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-04",
+  "baseline_commit": "e1d7b86fbafc83c92047c1030b77aafcd9fc4cdb",
+  "maintainer_confirmed_team_authority": true,
+  "copyright_attribution": "2026 芯弦项目贡献者 / Xinxian project contributors",
+  "licenses": {
+    "original_fpga_android_and_independent_tools": "Apache-2.0",
+    "original_windows_application": "GPL-3.0-only"
+  },
+  "third_party_rights_not_relicensed": true,
+  "pending_clearance": [
+    "Gowin IP redistribution terms",
+    "Third-party compositions, arrangements and score images",
+    "SimHei-derived bitmap font data"
+  ],
+  "repository_visibility_preserved": "private",
+  "package_checks": {
+    "result": "PASS",
+    "original_windows_members_preserved": 232,
+    "original_source_members_preserved": 30,
+    "executable_and_dlls_unchanged": true,
+    "standard_licenses_match": true,
+    "third_party_ip_music_font_exceptions_explicit": true
+  },
+  "fpga_original_inputs_unchanged": 140,
+  "original_release_artifacts_unchanged": true,
+  "no_synthesis_bitstream_or_runtime_rebuild": true
+}

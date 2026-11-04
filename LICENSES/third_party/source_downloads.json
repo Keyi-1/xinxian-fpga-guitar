@@ -1,0 +1,83 @@
+{
+  "date": "2026-11-04",
+  "scope": "Exact upstream versions recorded by the accepted Windows package; source locations and original notices. No claim of independent rebuild of upstream binaries.",
+  "components": {
+    "PyQt5": {
+      "version": "5.15.10",
+      "source_archives": [
+        {
+          "name": "PyQt5-5.15.10.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/4d/5d/b8b6e26956ec113ad3f566e02abd12ac3a56b103fcc7e0735e27ee4a1df3/PyQt5-5.15.10.tar.gz",
+          "sha256": "d46b7804b1b10a4ff91753f8113e5b5580d2b4462f3226288e2d84497334898a",
+          "bytes": 3242654
+        }
+      ],
+      "license": "GPL v3"
+    },
+    "PyQt5-sip": {
+      "version": "12.13.0",
+      "source_archives": [
+        {
+          "name": "PyQt5_sip-12.13.0.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/ee/81/fce2a475aa56c1f49707d9306b930695b6ff078c2242c9f2fd72a3214e1f/PyQt5_sip-12.13.0.tar.gz",
+          "sha256": "7f321daf84b9c9dbca61b80e1ef37bdaffc0e93312edae2cd7da25b953971d91",
+          "bytes": 123225
+        }
+      ],
+      "license": "SIP"
+    },
+    "pyserial": {
+      "version": "3.5",
+      "source_archives": [
+        {
+          "name": "pyserial-3.5.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/1e/7d/ae3f0a63f41e4d2f6cb66a5b57197850f919f59e558159a4dd3a818f5082/pyserial-3.5.tar.gz",
+          "sha256": "3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb",
+          "bytes": 159125
+        }
+      ],
+      "license": "BSD"
+    },
+    "pyinstaller": {
+      "version": "6.16.0",
+      "source_archives": [
+        {
+          "name": "pyinstaller-6.16.0.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/94/94/1f62e95e4a28b64cfbb5b922ef3046f968b47170d37a1e1a029f56ac9cb4/pyinstaller-6.16.0.tar.gz",
+          "sha256": "53559fe1e041a234f2b4dcc3288ea8bdd57f7cad8a6644e422c27bb407f3edef",
+          "bytes": 4008473
+        }
+      ],
+      "license": "GPLv2-or-later with a special exception which allows to use PyInstaller to build and distribute non-free programs (including commercial ones)"
+    },
+    "pyinstaller-hooks-contrib": {
+      "version": "2026.8",
+      "source_archives": [
+        {
+          "name": "pyinstaller_hooks_contrib-2026.8.tar.gz",
+          "url": "https://files.pythonhosted.org/packages/c9/3b/fab1a12a21bf9223af012e5dd002b7d4265683d21d9fabbd0ccb347316e4/pyinstaller_hooks_contrib-2026.8.tar.gz",
+          "sha256": "4d825786ad7a9b7dbcc52d612748a34562fe273461bcfd88f4d549c594bbf8f9",
+          "bytes": 176955
+        }
+      ],
+      "license": null
+    },
+    "Qt": {
+      "version": "5.15.2",
+      "source_archives": [
+        {
+          "name": "qt-everywhere-src-5.15.2.tar.xz",
+          "url": "https://download.qt.io/archive/qt/5.15/5.15.2/single/qt-everywhere-src-5.15.2.tar.xz",
+          "sha256": "3a530d1b243b5dec00bc54937455471aaa3e56849d2593edb8ded07228202240",
+          "bytes": 586690220
+        }
+      ],
+      "metadata_url": "https://download.qt.io/archive/qt/5.15/5.15.2/single/qt-everywhere-src-5.15.2.tar.xz.mirrorlist"
+    },
+    "Python": {
+      "version": "3.12 series; exact runtime bytes are identified by the original package manifest",
+      "license": "PSF and bundled third-party licenses",
+      "source_index": "https://www.python.org/downloads/source/"
+    }
+  }
+}

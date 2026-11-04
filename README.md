@@ -30,9 +30,10 @@
 | [FPGA 位流 `.fs`](releases/fpga/neo_guitar_touch_game.fs) | 可直接下载到板上 |
 | [FPGA 完整发布包](releases/fpga/verified_release_20261102.zip) | 同一位流及构建、资源、时序报告 |
 | [Android APK 0.3.0](releases/android/xinxian_jdy23_0.3.0.apk) | Android 8.0 及以上，JDY-23 蓝牙传谱 |
-| [Windows 便携版 1.2.0](releases/windows/FPGA_Guitar_Uploader_1.2.0.zip) | 解压后运行 `FPGA_Guitar_Uploader/FPGA_Guitar_Uploader.exe` |
+| [Windows 便携版 1.2.0（许可补充版）](releases/windows/FPGA_Guitar_Uploader_1.2.0_licensed.zip) | 原程序与资源保持不变，补齐许可和带许可的对应源码；解压后运行 EXE |
 | [FPGA 140 文件纯源码包](releases/fpga/source_code_140_files.zip) | 最终综合所用源码与约束，不含报告、位流和测试 |
 | [SHA256 校验表](releases/SHA256SUMS) | 核对下载文件完整性 |
+| [发布许可补充包](releases/license_notices_20261104.zip) | 对应原始 FS、APK、源码和 Windows 包的许可范围、正文与第三方来源 |
 
 ### 1. 准备硬件
 
@@ -221,6 +222,14 @@ python verification/check_repository.py
 | 音频 | 48 kHz，16 bit，立体声；四独立声部 |
 
 已完成生产 RTL、实际综合网表与完整 P&R/STA 验证；网表功能仿真未回标 SDF，时序依据实际布线 STA。客户端已有 Android 五场景 195 项检查、Windows 34 项回归及发布包校验，双接口实物传谱由用户确认通过。[版本与验证边界](docs/VALIDATION.md)记录具体范围和对应哈希。
+
+## 开源许可与版权
+
+团队原创 FPGA、Android 和独立工具采用 **Apache-2.0**；Windows 客户端采用 **GPL-3.0-only**，兼顾其开源版 PyQt5 依赖。Copyright (c) 2026 **芯弦项目贡献者**。各贡献者保留自身贡献的版权，商业使用、修改和分发须遵守对应许可证。
+
+具体目录和例外见 [LICENSING.md](LICENSING.md)，版权与署名见 [COPYRIGHT.md](COPYRIGHT.md)，第三方依赖和源码来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。高云 PLL IP、第三方曲谱、谱面、图纸和字体数据不由团队重新授权；部分再分发权仍待核实，不能将它们视为已按本项目协议开放的原创材料。
+
+本次补充许可保留原位流、APK 和冻结 ZIP 的字节，并提供独立许可补充包。Windows 许可补充版仅增加许可和对应源码说明。新增许可证不改变仓库可见性，也不替代第三方素材授权核实。
 
 ## 参考
 

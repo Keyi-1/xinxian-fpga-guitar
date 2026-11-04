@@ -19,6 +19,9 @@ def sources():
     files += [Path('tools')/name for name in ('game_score_upload.py', 'game_score_v2.py', 'game_fingering.py')]
     files += [p.relative_to(ROOT) for p in (ROOT/'tools/windows_score_uploader').rglob('*')
               if p.is_file() and '__pycache__' not in p.parts]
+    files += [Path(name) for name in ('LICENSE', 'LICENSING.md', 'COPYRIGHT.md',
+                                     'NOTICE', 'THIRD_PARTY_NOTICES.md')]
+    files += [p.relative_to(ROOT) for p in (ROOT/'LICENSES').rglob('*') if p.is_file()]
     return sorted(set(files))
 
 
@@ -39,6 +42,11 @@ def main():
     shutil.copy2(ROOT/'docs/WINDOWS_SCORE_UPLOADER.md', app/'使用说明.md')
     shutil.copy2(ROOT/'tools/windows_score_uploader/开始使用.txt', app/'开始使用.txt')
     shutil.copy2(ROOT/'tools/windows_score_uploader/THIRD_PARTY_NOTICES.txt', app/'THIRD_PARTY_NOTICES.txt')
+    shutil.copy2(ROOT/'tools/windows_score_uploader/LICENSE', app/'LICENSE.txt')
+    for name in ('LICENSING.md', 'COPYRIGHT.md', 'NOTICE'):
+        shutil.copy2(ROOT/name, app/name)
+    shutil.copy2(ROOT/'THIRD_PARTY_NOTICES.md', app/'THIRD_PARTY_COMPONENTS.md')
+    shutil.copytree(ROOT/'LICENSES', app/'project_licenses', dirs_exist_ok=True)
     licenses = app/'licenses'
     licenses.mkdir(exist_ok=True)
     for name in ('PyQt5-Qt5', 'PyQt5-sip'):
