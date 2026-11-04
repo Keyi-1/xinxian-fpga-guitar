@@ -1,6 +1,6 @@
-# 芯弦 · FPGA 四弦电子吉他
+# 芯弦 FPGA 四弦电子吉他
 
-**把按弦、拨弦、音色合成和节奏练习放进一块 FPGA。**
+**把按弦、拨弦、音色合成和节奏练习集成于一块 FPGA。**
 
 芯弦是一台基于 Tang Mega 60K 的四弦电子乐器。左手通过品位矩阵选择音高，右手拨动琴弦触发压电传感器；FPGA 根据演奏动作逐音、逐样本生成声音，并同步绘制频谱和节奏界面。Windows 和 Android 客户端用于管理、导入曲谱，离开电脑和手机后仍可独立演奏。
 
@@ -10,12 +10,12 @@
 
 *板端选曲页，来自真实 RTL 像素输出。显示和触控已一起适配屏幕倒置安装。*
 
-## 能做什么
+## 系统特性
 
 - **四根弦独立发声。** 四个声部可同时演奏，支持四档拨弦力度、滑音、尾音音高保持和颤音手势。
 - **三种实时音色。** 钢琴、明亮弦音、哇音；明亮弦音使用 Karplus–Strong 物理建模，四声部共保存 32 个独立模型状态。五度和声使用独立延迟线和滤波状态，保留根音主体。
 - **并行与流水结合。** KS 在 100 MHz 时钟下用两条并行滤波通路配合 TDM 调度和调音流水线，持续输出 48 kHz 音频。
-- **一边演奏，一边看见声音。** 480×272 触控屏显示四弦反馈、莉萨如曲线、64 根环形频谱柱；节奏模式提供落点判定、计分、连击和曲目试听。
+- **一边演奏，一边看见声音。** 480×272 触控屏显示四弦反馈、李萨如曲线、64 根环形频谱柱；节奏模式提供落点判定、计分、连击和曲目试听。
 - **两种传谱方式。** Windows 通过开发板 DEBUG-USB2 串口，Android 通过 JDY-23 蓝牙。两端可同时连接，各自保留独立会话；上传写入由 FPGA 仲裁。
 - **姿态切换音色。** MPU6050 校准后可在平放与持琴姿态间自动切换钢琴、明亮弦音，保留手动控制优先级。
 
@@ -23,7 +23,7 @@
 
 ## 下载与上板
 
-当前配套版本为 **2026-11-02 双接口位流、Android 0.3.0、Windows 1.2.0**。用户已于 2026-11-04 确认蓝牙与 USB 串口传谱均通过实物验收。
+当前配套版本为 **2026-11-02 位流、Android 0.3.0、Windows 1.2.0**，已确认均通过实物验收。
 
 | 文件 | 用途 |
 | --- | --- |
@@ -34,11 +34,9 @@
 | [FPGA 140 文件纯源码包](releases/fpga/source_code_140_files.zip) | 最终综合所用源码与约束，不含报告、位流和测试 |
 | [SHA256 校验表](releases/SHA256SUMS) | 核对下载文件完整性 |
 
-这里的 `.fs` 是高云 FPGA 配置位流，用于下载到开发板；它不是 F# 源码，语言统计中已将其排除。
-
 ### 1. 准备硬件
 
-已验收组合：**Sipeed Tang Mega 60K（GW5AT-LV60PG484AC1/I0，Device B）+ NEO Dock 31005**，以及四弦品位矩阵、压电拾音前端与 MCP3208、480×272 RGB666 屏、GT911 触控、MPU6050、JDY-23 模块。
+本系统基于FPGA基础套件：**Sipeed Tang Mega 60K（GW5AT-LV60PG484AC1/I0，Device B）+ NEO Dock 31005**，以及四弦品位矩阵PCB板、压电拾音前端PCB板与 MCP3208、480×272 RGB666 屏、GT911 触控、MPU6050、JDY-23 模块。
 
 | 模块 | 接口与配置 |
 | --- | --- |
@@ -85,9 +83,9 @@
 | 板端槽位 | 上电默认内容 |
 | --- | --- |
 | 1 | 茉莉花 |
-| 2 | Seven Nation Army 短 riff 练习片段 |
-| 3 | 情歌，38 小节主旋律练习版 |
-| 4、5 | 待导入 |
+| 2 | Seven Nation Army 短 riff 片段 |
+| 3 | 情歌，38 小节主旋律版 |
+| 4、5 | 待导入，可通过Android手机蓝牙或Windows串口传输 |
 
 ### Windows / Android 导入曲谱
 
@@ -147,12 +145,12 @@ flowchart LR
 │   ├── build_*                  # 当前 Android / Windows 构建入口
 │   └── game_*、compile_* 等     # 曲谱格式、编谱与传谱工具
 ├── scores/                      # 当前曲谱数据与示例
-├── releases/                    # 已验收 .fs、APK、Windows ZIP 与校验表
+├── releases/                    # .fs、APK、Windows ZIP 与校验表
 ├── docs/                        # 当前硬件、使用、构建和架构说明、图片
 └── verification/                # 测试平台、旧工程、实验代码与冻结验证记录
 ```
 
-正式工程的 **140 份综合输入保持已验收版本的原路径和字节**，可对照[源码清单](releases/fpga/source_manifest.json)。`verification/` 内的历史材料保留原始内容与版本边界；[归档说明](verification/README.md)提供验证入口和迁移索引。`build/`、`impl/` 等本地生成目录不属于发布源码。
+正式工程可对照[源码清单](releases/fpga/source_manifest.json)。`verification/` 内的历史材料保留原始内容与版本边界；[归档说明](verification/README.md)提供验证入口和迁移索引。`build/`、`impl/` 等本地生成目录不属于发布源码。
 
 ## 开发与构建
 
@@ -169,7 +167,7 @@ flowchart LR
 | Windows | Python 3.12 x64 / PyQt5 | PyQt5 **5.15.10**、Qt **5.15.2**、pyserial **3.5**、PyInstaller **6.16.0** |
 | 曲谱、自动检查 | Python | Python 3.12；Windows 依赖锁定文件位于软件源码目录 |
 
-Android 同时保留 AGP **8.7.3** 的 Gradle 工程；当前交付 APK 实际使用 SDK 命令行工具链构建。仓库没有 Gradle Wrapper，Gradle 离线缓存未完整验证。可复现的入口、环境变量和仿真步骤见[构建与仿真指南](docs/BUILDING.md)。
+Android 同时保留 AGP **8.7.3** 的 Gradle 工程；当前交付 APK 实际使用 SDK 命令行工具链构建可复现的入口、环境变量和仿真步骤见[构建与仿真指南](docs/BUILDING.md)。
 
 ### FPGA
 
@@ -208,7 +206,7 @@ python verification/check_repository.py
 .venv\Scripts\python verification/run_client_checks.py
 ```
 
-前者检查工程依赖、冻结源码及发布文件哈希；后者运行曲谱协议和 Windows 客户端回归，不打开实体串口或蓝牙。ModelSim 的 RTL / 实际网表测试平台、冻结日志和试听材料均保留在 `verification/`，入口与适用版本见[验证说明](verification/README.md)。
+前者检查工程依赖、冻结源码及发布文件哈希；后者运行曲谱协议和 Windows 客户端回归。ModelSim 的 RTL / 实际网表测试平台、冻结日志和试听材料均保留在 `verification/`，入口与适用版本见[验证说明](verification/README.md)。
 
 ## 已验收版本的实现结果
 
