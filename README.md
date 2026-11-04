@@ -34,6 +34,8 @@
 | [FPGA 140 文件纯源码包](releases/fpga/source_code_140_files.zip) | 最终综合所用源码与约束，不含报告、位流和测试 |
 | [SHA256 校验表](releases/SHA256SUMS) | 核对下载文件完整性 |
 
+这里的 `.fs` 是高云 FPGA 配置位流，用于下载到开发板；它不是 F# 源码，语言统计中已将其排除。
+
 ### 1. 准备硬件
 
 已验收组合：**Sipeed Tang Mega 60K（GW5AT-LV60PG484AC1/I0，Device B）+ NEO Dock 31005**，以及四弦品位矩阵、压电拾音前端与 MCP3208、480×272 RGB666 屏、GT911 触控、MPU6050、JDY-23 模块。

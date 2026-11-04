@@ -52,3 +52,17 @@ __pycache__/
 /xinxian-fpga-guita appr/
 node_modules/
 .expo/
+
+# Local secrets, signing material, and machine-specific SDK/licence settings.
+.env
+.env.*
+!.env.example
+!.env.sample
+*.p12
+*.pfx
+*.key
+id_rsa
+id_ed25519
+local.properties
+license.dat
+license.lic

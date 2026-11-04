@@ -1,0 +1,51 @@
+{
+  "date": "2026-11-04",
+  "audited_commit": "069c75d35add13e2990c30930af10665aed1babe",
+  "scope": {
+    "tracked_files": 1232,
+    "master_history_commits": 155,
+    "reachable_git_objects": 4035,
+    "unique_archives_including_nested": 19,
+    "archive_members": 760,
+    "additional_removed_historical_archives": 0
+  },
+  "scanner": {
+    "name": "Gitleaks",
+    "version": "8.30.1",
+    "official_download_sha256_verified": true,
+    "history_scan_findings": 0,
+    "current_files_and_archives_candidates": 20,
+    "archive_depth_limit": 4,
+    "decode_depth_limit": 3,
+    "reports_redacted": true
+  },
+  "review": {
+    "confirmed_secrets": 0,
+    "sensitive_filenames_current_or_history": 0,
+    "sensitive_archive_member_names": 0,
+    "encrypted_unreadable_archive_members": 0,
+    "embedded_commercial_tool_files": 0,
+    "false_positive_groups": [
+      {
+        "count": 2,
+        "reason": "qtaudio_wasapi.dll filename plus its SHA256 in Windows package manifests."
+      },
+      {
+        "count": 18,
+        "reason": "Random encoded data in the old Gowin place-and-route .pr artifact."
+      }
+    ],
+    "private_key_header_review": {
+      "library": "Qt5Network.dll",
+      "header_constants": 6,
+      "result": "PEM format string constants terminated by NUL; no private-key payload."
+    }
+  },
+  "result": "NO_CONFIRMED_SECRETS_FOUND_IN_SCANNED_SCOPE",
+  "changes": [
+    "Classify Gowin .fs as generated Text and exclude it from GitHub language statistics.",
+    "Add ignore rules for local credentials, signing files and SDK/licence settings."
+  ],
+  "production_inputs_or_release_bytes_changed": false,
+  "raw_reports_and_scanner_uploaded": false
+}

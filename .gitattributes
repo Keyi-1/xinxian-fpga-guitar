@@ -32,3 +32,6 @@ scores/p2/*.bin binary
 /constraints/** -text
 /mem/** -text
 /gowin/neo_guitar_touch_game/neo_guitar_touch_game.gprj -text
+
+# Gowin .fs files are generated configuration bitstreams, not F# programs.
+*.fs linguist-language=Text linguist-generated=true linguist-detectable=false
